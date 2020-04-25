@@ -1,5 +1,5 @@
 const Board = require('../board');
-const { BOARD_WIDTH, BOARD_HEIGHT } = require('../config');
+const { BOARD_WIDTH, BOARD_HEIGHT } = require('../data');
 
 
 describe('game board tests', () => {

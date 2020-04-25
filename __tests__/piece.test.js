@@ -1,5 +1,5 @@
 const Piece = require('../piece');
-const { PIECES } = require('../config');
+const { PIECES } = require('../data');
 
 describe('game pieces', () => {
 
