@@ -1,7 +1,7 @@
-const { PIECES, SEED_PIECES } = require('./data');
+const { PIECES, SEED_PIECES, BOARD_WIDTH } = require('./data');
 const { randomize } = require('./helpers/utils');
 
-class Pieces {
+class PieceList {
   constructor() {
     this.pieces;
     this.currIdx;
@@ -23,13 +23,26 @@ class Pieces {
   }
 }
 
-class Piece extends Pieces {
-  constructor() {
-    super();
-    this.piece = this.getNextPiece();
-    this.x = 0;
+const pieceList = new PieceList();
+
+class Piece {
+  constructor(piece) {
+    this.grid = piece;
+    this.x = Math.floor(BOARD_WIDTH / 2) - Math.ceil(this.grid[0].length / 2);
     this.y = 0;
+  }
+
+  move(x,y) {
+    this.x += x;
+    this.y += y;
+  }
+
+  update(newGrid) {
+    this.grid = newGrid;
   }
 }
 
-module.exports = Piece;
+module.exports = {
+  pieceList,
+  Piece
+};
