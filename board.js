@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT } = require('./config');
+const { BOARD_WIDTH, BOARD_HEIGHT } = require('./data');
 
 class Board {
   constructor() {
