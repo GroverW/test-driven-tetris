@@ -89,12 +89,10 @@ class Board {
   }
 
   clearLines() {
-    const emptyRow = new Array(BOARD_WIDTH).fill(0);
-
     this.grid.forEach((row, rowInd) => {
       if(row.every(cell => cell > 0)) {
-        this.grid.splice(rowInd,1);
-        this.grid.unshift([...emptyRow]);
+        this.grid.splice(rowInd, 1);
+        this.grid.unshift(Array(BOARD_WIDTH).fill(0));
       }
     })
   }
