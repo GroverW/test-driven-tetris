@@ -136,7 +136,7 @@ describe('game board tests', () => {
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared);
   });
 
-  test('clears lines from the middle of the board', () => {
+  test('clears non-consecutive lines', () => {
     gameBoard.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
     gameBoard.piece = p5;
     
