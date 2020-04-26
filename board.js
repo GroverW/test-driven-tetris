@@ -26,18 +26,19 @@ class Board {
       return true;
     }
 
+    if(y > 0) this.drop()
+
     return false;
   }
 
   drop() {
     this.addPieceToBoard();
+    this.clearLines();
     this.getPieces();
   }
 
   hardDrop() {
     while (this.movePiece(0, 1)) continue;
-
-    this.drop()
   }
 
   validMove(xChange, yChange) {
@@ -58,7 +59,7 @@ class Board {
   }
 
   isInBounds(x, y) {
-    return x > 0 && x < BOARD_WIDTH && y < BOARD_HEIGHT;
+    return x >= 0 && x < BOARD_WIDTH && y < BOARD_HEIGHT;
   }
 
   rotatePiece(piece, direction) {
@@ -85,6 +86,17 @@ class Board {
         if (cell > 0) this.grid[yStart + yDiff][xStart + xDiff] = cell;
       })
     });
+  }
+
+  clearLines() {
+    const emptyRow = new Array(BOARD_WIDTH).fill(0);
+
+    this.grid.forEach((row, rowInd) => {
+      if(row.every(cell => cell > 0)) {
+        this.grid.splice(rowInd,1);
+        this.grid.unshift([...emptyRow]);
+      }
+    })
   }
 }
 
