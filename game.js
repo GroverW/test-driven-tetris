@@ -1,5 +1,6 @@
 const Board = require('./board');
 const { CONTROLS } = require('./data');
+const { subscribe } = require('./pubSub');
 
 class Game {
   constructor() {
@@ -7,6 +8,7 @@ class Game {
     this.level = 1;
     this.lines = 0;
     this.board = new Board();
+    this.unsubScore = subscribe('updateScore', this.updateScore.bind(this))
   }
 
   start() {
@@ -24,6 +26,10 @@ class Game {
     }
 
     if(key in commands) commands[key]();
+  }
+
+  updateScore(points) {
+    this.score += points;
   }
 }
 
