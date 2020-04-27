@@ -1,8 +1,8 @@
 const Game = require('../game');
-const Board = require('../board');
 const { Piece } = require ('../piece');
-const { PIECES, CONTROLS } = require('../data');
+const { PIECES, CONTROLS, BOARD_HEIGHT } = require('../data');
 const { TEST_BOARDS } = require('./helpers/testData');
+const { publish } = require('../pubSub');
 
 describe('game tests', () => {
   let game;
@@ -71,5 +71,22 @@ describe('game tests', () => {
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.board.grid).toEqual(TEST_BOARDS.pattern1);
-  })
+  });
+
+  test('score points by moving piece down', () => {
+    game.board.piece = p1;
+    
+    game.command(CONTROLS.HARD_DROP);
+
+    // expected score is 36
+    expect(game.score).toBe(36)
+
+    game.command(CONTROLS.DOWN);
+    
+    expect(game.score).toBe(37)
+  });
+
+  test('score points by clearing lines', () => {
+
+  });
 });
