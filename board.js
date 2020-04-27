@@ -1,5 +1,6 @@
 const { BOARD_WIDTH, BOARD_HEIGHT } = require('./data');
 const { pieceList, Piece } = require('./piece');
+const { publish } = require('./pubSub')
 
 class Board {
   constructor() {
@@ -20,9 +21,12 @@ class Board {
     this.nextPiece = new Piece(pieceList.getNextPiece());
   }
 
-  movePiece(x, y) {
+  movePiece(x, y, multiplier = 1) {
     if (this.validMove(x, y)) {
       this.piece.move(x, y);
+      
+      if(y > 0) publish('updateScore', y * multiplier)
+      
       return true;
     }
 
@@ -38,7 +42,7 @@ class Board {
   }
 
   hardDrop() {
-    while (this.movePiece(0, 1)) continue;
+    while (this.movePiece(0, 1, 2)) continue;
   }
 
   validMove(xChange, yChange) {
