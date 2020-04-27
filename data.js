@@ -2,6 +2,15 @@ const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 const ROTATE_LEFT = -1;
 const ROTATE_RIGHT = 1;
+const CONTROLS = {
+  LEFT: 37,
+  RIGHT: 39,
+  DOWN: 40,
+  ROTATE_LEFT: 65,
+  ROTATE_RIGHT: 83,
+  HARD_DROP: 32
+}
+
 const PIECES = [
   [
     [0,0,0,0],
@@ -46,6 +55,7 @@ module.exports = {
   BOARD_HEIGHT,
   ROTATE_LEFT,
   ROTATE_RIGHT,
+  CONTROLS,
   PIECES,
   SEED_PIECES
 }
