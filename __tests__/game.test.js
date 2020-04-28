@@ -1,6 +1,6 @@
 const Game = require('../game');
 const { Piece } = require ('../piece');
-const { PIECES, CONTROLS, BOARD_HEIGHT } = require('../data');
+const { PIECES, CONTROLS,  } = require('../data');
 const { TEST_BOARDS } = require('./helpers/testData');
 const { publish } = require('../pubSub');
 
@@ -104,6 +104,78 @@ describe('game tests', () => {
     game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
     game.board.piece = p2;
 
+    expect(game.score).toBe(0);
+
+    game.command(CONTROLS.ROTATE_LEFT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
+
+    // J piece will hard drop 16. 32 + 300
+    expect(game.score).toBe(332);
+  });
+  
+  test('score points for triple line', () => {
+    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
+    game.board.piece = p1;
+
+    expect(game.score).toBe(0);
+
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
+
+    // I piece will hard drop 16. 32 + 500
+    expect(game.score).toBe(532);
+  });
+  
+  test('score points for tetris', () => {
+    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
+    game.board.piece = p3;
+    game.board.nextPiece = p1;
+    
+    expect(game.score).toBe(0);
+
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.HARD_DROP);
+
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
+
+    // T will hard drop 14, I will hard drop 16
+    // 28 + 32 + 800 for tetris
+    expect(game.score).toBe(860);
+  });
+
+  test('score points with level modifier', () => {
+    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines1));
+    game.board.piece = p1;
+    game.level = 2;
+    
+    expect(game.score).toBe(0);
+
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
+    
+    // I piece will hard drop 18. 36 + 200
+    expect(game.score).toBe(236);
+  })
+
+  test('clearing lines updates lines cleared', () => {
+    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
+    game.board.piece = p2;
+
     game.command(CONTROLS.ROTATE_LEFT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
@@ -114,40 +186,21 @@ describe('game tests', () => {
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
 
     // J piece will hard drop 16. 32 + 300
-    expect(game.score).toBe(332)
+    expect(game.lines).toBe(2)
   });
-  
-  test('score points for triple line', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
-    game.board.piece = p1;
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.HARD_DROP)
+  test('clearing lines updates level', () => {
+    expect(game.level).toBe(1);
 
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
+    publish('clearLines', 4);
+    publish('clearLines', 4);
+    publish('clearLines', 4);
 
-    // I piece will hard drop 16. 32 + 500
-    expect(game.score).toBe(532)
-  });
-  
-  test('score points for tetris', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
-    game.board.piece = p3;
-    game.board.nextPiece = p1;
+    expect(game.level).toBe(2);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.LEFT)
-    game.command(CONTROLS.LEFT)
-    game.command(CONTROLS.HARD_DROP)
+    publish('clearLines', 4);
+    publish('clearLines', 4);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.HARD_DROP)
-
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
-
-    // T will hard drop 14, I will hard drop 16
-    // 28 + 32 + 800 for tetris
-    expect(game.score).toBe(860)
+    expect(game.level).toBe(3);
   });
 });
