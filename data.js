@@ -10,6 +10,20 @@ const CONTROLS = {
   ROTATE_RIGHT: 83,
   HARD_DROP: 32
 }
+const SINGLE = 1;
+const DOUBLE = 2;
+const TRIPLE = 3;
+const TETRIS = 4;
+const POINTS = {
+  DOWN: 1,
+  HARD_DROP: 2,
+  LINES_CLEARED: {
+    [SINGLE]: 100,
+    [DOUBLE]: 300,
+    [TRIPLE]: 500,
+    [TETRIS]: 800
+  }
+}
 
 const PIECES = [
   [
@@ -56,6 +70,7 @@ module.exports = {
   ROTATE_LEFT,
   ROTATE_RIGHT,
   CONTROLS,
+  POINTS,
   PIECES,
   SEED_PIECES
 }
