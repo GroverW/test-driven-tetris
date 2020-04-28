@@ -25,7 +25,9 @@ class Board {
     if (this.validMove(x, y)) {
       this.piece.move(x, y);
       
-      if(y > 0) publish('updateScore', y * multiplier)
+      if(y > 0) {
+        publish('dropPiece', y * multiplier)
+      } 
       
       return true;
     }
@@ -103,9 +105,7 @@ class Board {
       }
     })
     
-    if(POINTS.LINES_CLEARED[numCleared]) {
-      publish('updateScore', POINTS.LINES_CLEARED[numCleared]);
-    }
+    numCleared && publish('clearLines', numCleared);
   }
 }
 
