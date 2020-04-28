@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT } = require('./data');
+const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('./data');
 const { pieceList, Piece } = require('./piece');
 const { publish } = require('./pubSub')
 
@@ -21,7 +21,7 @@ class Board {
     this.nextPiece = new Piece(pieceList.getNextPiece());
   }
 
-  movePiece(x, y, multiplier = 1) {
+  movePiece(x, y, multiplier = POINTS.DOWN) {
     if (this.validMove(x, y)) {
       this.piece.move(x, y);
       
@@ -42,7 +42,7 @@ class Board {
   }
 
   hardDrop() {
-    while (this.movePiece(0, 1, 2)) continue;
+    while (this.movePiece(0, 1, POINTS.HARD_DROP)) continue;
   }
 
   validMove(xChange, yChange) {
@@ -93,12 +93,19 @@ class Board {
   }
 
   clearLines() {
+    let numCleared = 0;
+
     this.grid.forEach((row, rowInd) => {
       if(row.every(cell => cell > 0)) {
         this.grid.splice(rowInd, 1);
         this.grid.unshift(Array(BOARD_WIDTH).fill(0));
+        numCleared++;
       }
     })
+    
+    if(POINTS.LINES_CLEARED[numCleared]) {
+      publish('updateScore', POINTS.LINES_CLEARED[numCleared]);
+    }
   }
 }
 
