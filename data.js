@@ -9,21 +9,18 @@ const CONTROLS = {
   ROTATE_LEFT: 65,
   ROTATE_RIGHT: 83,
   HARD_DROP: 32
-}
-const SINGLE = 1;
-const DOUBLE = 2;
-const TRIPLE = 3;
-const TETRIS = 4;
+};
+
 const POINTS = {
   DOWN: 1,
   HARD_DROP: 2,
   LINES_CLEARED: {
-    [SINGLE]: 100,
-    [DOUBLE]: 300,
-    [TRIPLE]: 500,
-    [TETRIS]: 800
+    1: 100,
+    2: 300,
+    3: 500,
+    4: 800
   }
-}
+};
 
 const PIECES = [
   [
@@ -62,7 +59,7 @@ const PIECES = [
     [0,0,0]
   ]
 ]
-const SEED_PIECES = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6]
+const SEED_PIECES = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
 
 module.exports = {
   BOARD_WIDTH,
