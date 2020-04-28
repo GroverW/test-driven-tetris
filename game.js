@@ -1,5 +1,5 @@
 const Board = require('./board');
-const { CONTROLS } = require('./data');
+const { CONTROLS, POINTS } = require('./data');
 const { subscribe } = require('./pubSub');
 
 class Game {
@@ -7,8 +7,10 @@ class Game {
     this.score = 0;
     this.level = 1;
     this.lines = 0;
+    this.linesRemaining = 10;
     this.board = new Board();
-    this.unsubScore = subscribe('updateScore', this.updateScore.bind(this))
+    this.unsubDrop = subscribe('dropPiece', this.updateScore.bind(this))
+    this.unsubClear = subscribe('clearLines', this.clearLines.bind(this))
   }
 
   start() {
@@ -30,6 +32,21 @@ class Game {
 
   updateScore(points) {
     this.score += points;
+  }
+
+  updateLines(lines) {
+    this.lines += lines;
+
+    if(this.linesRemaining <= lines) this.level++
+
+    this.linesRemaining = 10 - this.lines % 10;
+  }
+
+  clearLines(lines) {
+    if(POINTS.LINES_CLEARED[lines]) {
+      this.updateScore(POINTS.LINES_CLEARED[lines] * this.level);
+      this.updateLines(lines);
+    }
   }
 }
 
