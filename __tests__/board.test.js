@@ -133,7 +133,7 @@ describe('game board tests', () => {
     gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
     gameBoard.hardDrop();
 
-    expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared);
+    expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
   });
 
   test('clears non-consecutive lines', () => {
