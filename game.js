@@ -1,5 +1,5 @@
 const Board = require('./board');
-const { CONTROLS, POINTS } = require('./data');
+const { CONTROLS, POINTS, LINES_PER_LEVEL } = require('./data');
 const { subscribe } = require('./pubSub');
 
 class Game {
@@ -9,8 +9,9 @@ class Game {
     this.lines = 0;
     this.linesRemaining = 10;
     this.board = new Board();
-    this.unsubDrop = subscribe('dropPiece', this.updateScore.bind(this))
-    this.unsubClear = subscribe('clearLines', this.clearLines.bind(this))
+    this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
+    this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
+    this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
   }
 
   start() {
@@ -21,7 +22,7 @@ class Game {
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: () => this.board.movePiece(0,1),
+      [CONTROLS.DOWN]: (multi=1) => this.board.movePiece(0,1, multi),
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
@@ -39,7 +40,7 @@ class Game {
 
     if(this.linesRemaining <= lines) this.level++
 
-    this.linesRemaining = 10 - this.lines % 10;
+    this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
   }
 
   clearLines(lines) {
@@ -47,6 +48,12 @@ class Game {
       this.updateScore(POINTS.LINES_CLEARED[lines] * this.level);
       this.updateLines(lines);
     }
+  }
+
+  gameOver() {
+    this.unsubDrop();
+    this.unsubClear();
+    this.unsubGame();
   }
 }
 
