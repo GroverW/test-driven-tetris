@@ -15,6 +15,13 @@ describe('game tests', () => {
     p3 = new Piece(PIECES[2]);
   })
 
+  afterEach(() => {
+    jest.clearAllMocks();
+    game.unsubDrop();
+    game.unsubClear();
+    game.unsubGame();
+  });
+
   test('start game', () => {
     expect([game.score, game.level, game.lines]).toEqual([0,1,0]);
     expect(game.board.grid).toEqual(TEST_BOARDS.empty);
@@ -193,14 +200,33 @@ describe('game tests', () => {
     expect(game.level).toBe(1);
 
     publish('clearLines', 4);
+
+    expect(game.linesRemaining).toBe(6);
+
     publish('clearLines', 4);
     publish('clearLines', 4);
 
     expect(game.level).toBe(2);
+    expect(game.linesRemaining).toBe(8);
 
     publish('clearLines', 4);
     publish('clearLines', 4);
 
     expect(game.level).toBe(3);
   });
+
+  test('game over', () => {
+    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.empty));
+    game.board.piece = new Piece(PIECES[0]);
+    const gameOver = jest.spyOn(game, 'unsubGame');
+
+    for(let i = 0; i < 5; i++) {
+      game.board.nextPiece = new Piece(PIECES[0]);
+      game.command(CONTROLS.ROTATE_LEFT);
+      game.command(CONTROLS.HARD_DROP);
+    }
+
+    game.gameOver();
+    expect(gameOver).toHaveBeenCalled();
+  })
 });
