@@ -17,6 +17,10 @@ class Board {
     this.piece = this.nextPiece
       ? this.nextPiece
       : new Piece(pieceList.getNextPiece());
+    
+    if(!this.validMove(0,0)) {
+      publish("gameOver", this.piece);
+    } 
 
     this.nextPiece = new Piece(pieceList.getNextPiece());
   }
@@ -25,9 +29,7 @@ class Board {
     if (this.validMove(x, y)) {
       this.piece.move(x, y);
       
-      if(y > 0) {
-        publish('dropPiece', y * multiplier)
-      } 
+      if(y > 0) publish('lowerPiece', y * multiplier)
       
       return true;
     }
