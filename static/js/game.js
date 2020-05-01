@@ -4,6 +4,7 @@ const { publish, subscribe } = require('../../pubSub');
 
 class Game {
   constructor() {
+    this.gameStatus = true;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
@@ -16,10 +17,11 @@ class Game {
 
   start() {
     this.board.getPieces();
+    this.gameStatus = true;
     publish('draw', {
       board: this.board.grid,
-      piece: this.board.piece.grid,
-      nextPiece: this.board.nextPiece.grid
+      piece: this.board.piece,
+      nextPiece: this.board.nextPiece
     });
   }
 
@@ -33,7 +35,7 @@ class Game {
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
-    if(key in commands) commands[key]();
+    if((key in commands) && this.gameStatus) commands[key]();
   }
 
   updateScore(points) {
@@ -59,6 +61,7 @@ class Game {
     this.unsubDrop();
     this.unsubClear();
     this.unsubGame();
+    this.gameStatus = false;
   }
 }
 
