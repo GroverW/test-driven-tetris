@@ -1,6 +1,6 @@
 const Board = require('./board');
 const { CONTROLS, POINTS, LINES_PER_LEVEL } = require('./data');
-const { subscribe } = require('./pubSub');
+const { publish, subscribe } = require('./pubSub');
 
 class Game {
   constructor() {
@@ -16,13 +16,14 @@ class Game {
 
   start() {
     this.board.getPieces();
+    publish('drawAll', this.board)
   }
 
   command(key) {
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: (multi=1) => this.board.movePiece(0,1, multi),
+      [CONTROLS.DOWN]: (multiplier=1) => this.board.movePiece(0,1, multiplier),
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
