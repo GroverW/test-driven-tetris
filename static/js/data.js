@@ -25,7 +25,7 @@ const POINTS = {
 };
 
 const CELL_COLORS = {
-  0: "#55555",
+  0: "#111111",
   1: "#63BCE6",
   2: "#E6CE63",
   3: "#E64EC0",
