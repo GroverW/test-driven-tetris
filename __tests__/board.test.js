@@ -1,7 +1,7 @@
 const Board = require('../static/js/board');
 const { Piece } = require('../static/js/piece');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../static/js/data');
-const { TEST_BOARDS } = require('./helpers/testData');
+const { TEST_BOARDS, getTestBoard } = require('./helpers/testData');
 
 
 describe('game board tests', () => {
@@ -118,7 +118,7 @@ describe('game board tests', () => {
   });
 
   test('clears single line', () => {
-    gameBoard.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines1));
+    gameBoard.grid = getTestBoard('clearLines1');
     gameBoard.piece = p1;
 
     gameBoard.hardDrop();
@@ -127,7 +127,7 @@ describe('game board tests', () => {
   });
 
   test('clears multiple lines', () => {
-    gameBoard.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
+    gameBoard.grid = getTestBoard('clearLines2');
     gameBoard.piece = p1;
     
     gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
@@ -137,7 +137,7 @@ describe('game board tests', () => {
   });
 
   test('clears non-consecutive lines', () => {
-    gameBoard.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
+    gameBoard.grid = getTestBoard('clearLines3');
     gameBoard.piece = p5;
     
     gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
