@@ -1,6 +1,6 @@
-const Board = require('../board');
-const { Piece } = require('../piece');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../data');
+const Board = require('../static/js/board');
+const { Piece } = require('../static/js/piece');
+const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../static/js/data');
 const { TEST_BOARDS } = require('./helpers/testData');
 
 

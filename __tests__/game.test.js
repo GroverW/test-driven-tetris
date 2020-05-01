@@ -1,6 +1,6 @@
-const Game = require('../game');
-const { Piece } = require ('../piece');
-const { PIECES, CONTROLS,  } = require('../data');
+const Game = require('../static/js/game');
+const { Piece } = require ('../static/js/piece');
+const { PIECES, CONTROLS,  } = require('../static/js/data');
 const { TEST_BOARDS } = require('./helpers/testData');
 const { publish } = require('../pubSub');
 
