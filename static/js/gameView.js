@@ -12,31 +12,39 @@ class GameView {
 
   initCtx(ctx, cellSize, width=BOARD_WIDTH, height=BOARD_HEIGHT) {
     this.scaleBoardSize(ctx, cellSize, width, height);
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 3 / cellSize;
     
     return ctx;
   }
 
   draw(data) {
-    data.piece && this.drawPiece(this.ctx, data.piece, data.piece.x, data.piece.y);
     data.board && this.drawBoard(this.ctx, data.board);
-    data.nextPiece && this.drawPiece(this.ctxNext, data.nextPiece, 0, 0);
+    data.piece && this.drawPiece(this.ctx, data.piece, data.piece.x, data.piece.y);
+    data.nextPiece && this.drawNext(this.ctxNext, data.nextPiece);
   }
 
   drawBoard(ctx, board) {
     board.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
+      ctx.strokeRect(colIdx, rowIdx, 1, 1);
       ctx.fillStyle = CELL_COLORS[cell];
-      ctx.rect(colIdx, rowIdx, 1, 1);
+      ctx.fillRect(colIdx, rowIdx, 1, 1);
     }))
   }
 
   drawPiece(ctx, piece, xStart, yStart) {
-    piece.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
+    piece.grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
       if(cell > 0) {
+        ctx.strokeRect(xStart + colIdx, yStart + rowIdx, 1, 1);
         ctx.fillStyle = CELL_COLORS[cell];
-        ctx.rect(xStart + colIdx, yStart + rowIdx, 1, 1);
+        ctx.fillRect(xStart + colIdx, yStart + rowIdx, 1, 1);
       }
     }))
+  }
+
+  drawNext(ctx, piece) {
+    ctx.clearRect(0, 0, 4, 4);
+    this.drawPiece(ctx, piece, 0, 0)
   }
 
   scaleBoardSize(ctx, cellSize, width=BOARD_WIDTH, height=BOARD_HEIGHT) {
