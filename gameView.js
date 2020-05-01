@@ -9,9 +9,9 @@ class GameView {
   }
 
   drawBoard(board) {
-    board.grid.forEach(row => row.forEach(cell => {
+    board.grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
       this.ctx.fillStyle = CELL_COLORS[cell];
-
+      this.ctx.rect(colIdx, rowIdx, 1, 1);
     }))
   }
 }
