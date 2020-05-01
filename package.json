@@ -2,9 +2,10 @@
   "name": "tetris",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "debug": ""
   },
   "keywords": [],
   "author": "",
@@ -13,7 +14,12 @@
     "axios": "^0.19.2",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
+    "nodemon": "^2.0.3",
     "socket.io": "^2.3.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "webpack": "^4.43.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.11"
   }
 }
