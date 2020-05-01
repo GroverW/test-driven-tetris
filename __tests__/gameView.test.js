@@ -32,11 +32,11 @@ describe('game view tests', () => {
     gameView.unsubDraw();
   });
 
-  test('draw board', () => {
-    const ctxSpy = jest.spyOn(gameView.ctx, 'rect');
+  test('draw elements on game start', () => {
+    const drawELementSpy = jest.spyOn(gameView, 'drawElement');
 
     game.start();
     
-    expect(ctxSpy).toHaveBeenCalled();
+    expect(drawELementSpy).toHaveBeenCalledTimes(2);
   })
 });
