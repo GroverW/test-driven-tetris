@@ -34,7 +34,7 @@ class Board {
       if(multiplier < POINTS.HARD_DROP) {
         publish('draw', {
           board: this.grid,
-          piece: this.piece.grid
+          piece: this.piece
         })
       }
 
@@ -53,8 +53,8 @@ class Board {
 
     publish('draw', {
       board: this.grid,
-      piece: this.piece.grid,
-      nextPiece: this.nextPiece.grid
+      piece: this.piece,
+      nextPiece: this.nextPiece
     })
   }
 
@@ -102,6 +102,11 @@ class Board {
       : newGrid.reverse();
 
     piece.update(newGrid);
+
+    publish('draw', {
+      board: this.grid,
+      piece: this.piece,
+    })
   }
 
   addPieceToBoard() {
