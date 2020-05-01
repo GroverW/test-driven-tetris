@@ -12,8 +12,8 @@ describe('game view tests', () => {
 
   beforeEach(() => {
     mockCtx = {
-      fillStyle,
-      strokeStyle,
+      fillStyle: "",
+      strokeStyle: "",
       rect: jest.fn()
     }
 
@@ -33,8 +33,10 @@ describe('game view tests', () => {
   });
 
   test('draw board', () => {
-    game.start();
+    const ctxSpy = jest.spyOn(gameView.ctx, 'rect');
 
-    expect(mockCtx.fillRect).toHaveBeenCalled();
+    game.start();
+    
+    expect(ctxSpy).toHaveBeenCalled();
   })
 });
