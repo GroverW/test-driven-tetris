@@ -11,6 +11,9 @@ const randomize = pieces => {
   return randomized;
 }
 
+const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
+
 module.exports = {
-  randomize
+  randomize,
+  getNewPlayer
 }
