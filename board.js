@@ -20,7 +20,7 @@ class Board {
     
     if(!this.validMove(0,0)) {
       publish("gameOver", this.piece);
-    } 
+    }
 
     this.nextPiece = new Piece(pieceList.getNextPiece());
   }
@@ -31,6 +31,13 @@ class Board {
       
       if(y > 0) publish('lowerPiece', y * multiplier)
       
+      if(multiplier < POINTS.HARD_DROP) {
+        publish('draw', {
+          board: this.grid,
+          piece: this.piece.grid
+        })
+      }
+
       return true;
     }
 
@@ -43,10 +50,21 @@ class Board {
     this.addPieceToBoard();
     this.clearLines();
     this.getPieces();
+
+    publish('draw', {
+      board: this.grid,
+      piece: this.piece.grid,
+      nextPiece: this.nextPiece.grid
+    })
   }
 
   hardDrop() {
-    while (this.movePiece(0, 1, POINTS.HARD_DROP)) continue;
+    let yChange = 0;
+
+    while (this.validMove(0, ++yChange)) continue;
+
+    this.movePiece(0, yChange - 1, POINTS.HARD_DROP);
+    this.drop();
   }
 
   validMove(xChange, yChange) {
