@@ -16,7 +16,11 @@ class Game {
 
   start() {
     this.board.getPieces();
-    publish('drawAll', this.board)
+    publish('draw', {
+      board: this.board.grid,
+      piece: this.board.piece.grid,
+      nextPiece: this.board.nextPiece.grid
+    });
   }
 
   command(key) {
