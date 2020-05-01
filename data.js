@@ -23,6 +23,17 @@ const POINTS = {
   }
 };
 
+const CELL_COLORS = {
+  0: "#55555",
+  1: "#63BCE6",
+  2: "#E6CE63",
+  3: "#E64EC0",
+  4: "#4EE65B",
+  5: "#E6534E",
+  6: "#E6A44E",
+  7: "#4E6AE6",
+}
+
 const PIECES = [
   [
     [0,0,0,0],
@@ -70,6 +81,7 @@ module.exports = {
   ROTATE_RIGHT,
   CONTROLS,
   POINTS,
+  CELL_COLORS,
   PIECES,
   SEED_PIECES
 }
