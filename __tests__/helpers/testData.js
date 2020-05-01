@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT, PIECES } = require('../../data');
+const { BOARD_WIDTH, BOARD_HEIGHT } = require('../../static/js/data');
 
 const TEST_BOARDS = {
   empty: new Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0)),
@@ -268,6 +268,27 @@ const TEST_BOARDS = {
   ],
 }
 
+const getTestBoard = (board) =>
+  JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+
+const getMockCtx = () => ({
+  canvas: {
+    width: 0,
+    height: 0,
+    xScale: 1,
+    yScale: 1
+  },
+  scale (xScale, yScale) {
+    this.canvas.xScale = xScale;
+    this.canvas.yScale = yScale;
+  },
+  fillStyle: "",
+  strokeStyle: "",
+  rect: jest.fn()
+});
+
 module.exports = {
-  TEST_BOARDS
+  TEST_BOARDS,
+  getTestBoard,
+  getMockCtx,
 }
