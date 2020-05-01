@@ -283,8 +283,11 @@ const getMockCtx = () => ({
     this.canvas.yScale = yScale;
   },
   fillStyle: "",
+  fillRect: jest.fn(),
+  lineWidth: 0,
   strokeStyle: "",
-  rect: jest.fn()
+  strokeRect: jest.fn(),
+  clearRect: jest.fn()
 });
 
 module.exports = {
