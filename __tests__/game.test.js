@@ -1,7 +1,7 @@
 const Game = require('../static/js/game');
 const { Piece } = require ('../static/js/piece');
 const { PIECES, CONTROLS,  } = require('../static/js/data');
-const { TEST_BOARDS } = require('./helpers/testData');
+const { TEST_BOARDS, getTestBoard } = require('./helpers/testData');
 const { publish } = require('../pubSub');
 
 describe('game tests', () => {
@@ -96,7 +96,7 @@ describe('game tests', () => {
   });
 
   test('score points for single line', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines1));
+    game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
 
     game.command(CONTROLS.HARD_DROP)
@@ -108,7 +108,7 @@ describe('game tests', () => {
   });
   
   test('score points for double line', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
+    game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
     expect(game.score).toBe(0);
@@ -127,7 +127,7 @@ describe('game tests', () => {
   });
   
   test('score points for triple line', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
+    game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p1;
 
     expect(game.score).toBe(0);
@@ -142,7 +142,7 @@ describe('game tests', () => {
   });
   
   test('score points for tetris', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines2));
+    game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
     
@@ -165,7 +165,7 @@ describe('game tests', () => {
   });
 
   test('score points with level modifier', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines1));
+    game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
     game.level = 2;
     
@@ -180,7 +180,7 @@ describe('game tests', () => {
   })
 
   test('clearing lines updates lines cleared', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.clearLines3));
+    game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
     game.command(CONTROLS.ROTATE_LEFT);
@@ -216,9 +216,10 @@ describe('game tests', () => {
   });
 
   test('game over', () => {
-    game.board.grid = JSON.parse(JSON.stringify(TEST_BOARDS.empty));
+    game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECES[0]);
-    const gameOver = jest.spyOn(game, 'unsubGame');
+    const gameOverSpy = jest.spyOn(game, 'unsubGame');
+    const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
 
     for(let i = 0; i < 5; i++) {
       game.board.nextPiece = new Piece(PIECES[0]);
@@ -226,7 +227,12 @@ describe('game tests', () => {
       game.command(CONTROLS.HARD_DROP);
     }
 
-    game.gameOver();
-    expect(gameOver).toHaveBeenCalled();
+    expect(boardMoveSpy).toHaveBeenCalledTimes(5);
+    expect(gameOverSpy).toHaveBeenCalled();
+
+    game.command(CONTROLS.LEFT);
+    // should not get called again
+    expect(boardMoveSpy).toHaveBeenCalledTimes(5);
+
   })
 });
