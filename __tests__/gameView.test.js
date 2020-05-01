@@ -30,6 +30,7 @@ describe('game view tests', () => {
 
     drawBoardSpy = jest.spyOn(gameView, 'drawBoard');
     drawPieceSpy = jest.spyOn(gameView, 'drawPiece');
+    drawNextSpy = jest.spyOn(gameView, 'drawNext');
   })
 
   afterEach(() => {
@@ -48,21 +49,30 @@ describe('game view tests', () => {
 
     game.start();
 
-    expect(drawBoardSpy).toHaveBeenCalled();
+    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
     expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('draw elements on piece rotate', () => {
+    game.start();
+
+    game.command(CONTROLS.ROTATE_LEFT);
+
+    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(drawPieceSpy).toHaveBeenCalledTimes(3);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
   });
 
   test('only draw nextPiece when piece dropped', () => {
     game.start();
-
-    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
 
     game.command(CONTROLS.DOWN);
 
     // redraw board and piece once per command
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
     expect(drawPieceSpy).toHaveBeenCalledTimes(3);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.HARD_DROP);
 
@@ -70,6 +80,7 @@ describe('game view tests', () => {
     // should be drawn
     expect(drawBoardSpy).toHaveBeenCalledTimes(3);
     expect(drawPieceSpy).toHaveBeenCalledTimes(5);
+    expect(drawNextSpy).toHaveBeenCalledTimes(2);
   });
 
   test('add new player', () => {
@@ -77,18 +88,16 @@ describe('game view tests', () => {
     
     expect(gameView.players.length).toBe(0);
 
-    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
-
     gameView.addPlayer(newCtx1, newBoard1);
 
     expect(gameView.players.length).toBe(1);
 
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
     expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('adding 3rd player should reduce board size of 2nd', () => {
+  test('adding 3rd player rescales player 2 board', () => {
     game.start();
     const fullBoardWidth = BOARD_WIDTH * CELL_SIZE;
     const fullBoardHeight = BOARD_HEIGHT * CELL_SIZE;
@@ -143,7 +152,7 @@ describe('game view tests', () => {
     expect(gameView.players[0].id).toBe(2)
   });
 
-  test('removing down to 2 players rescales player 2 board', () => {
+  test('removing 3rd player rescales player 2 board', () => {
     game.start();
     const fullBoardWidth = BOARD_WIDTH * CELL_SIZE;
     const fullBoardHeight = BOARD_HEIGHT * CELL_SIZE;
