@@ -2,7 +2,7 @@ const { GAMES, MAX_PLAYERS } = require('../helpers/data');
 
 class GameServer {
   constructor() {
-    this.players = [];
+    this.players = new Set();
   }
 
   static get(id) {
@@ -12,12 +12,18 @@ class GameServer {
   }
 
   join(player) {
-    if(this.players.length <= MAX_PLAYERS) {
-      this.players.push(player);
+    if(this.players.size < MAX_PLAYERS) {
+      this.players.add(player);
       return true;
     }
     
     return false;
+  }
+
+  leave(player) {
+    if(this.players.has(player)) {
+      this.players.delete(player);
+    }
   }
 }
 
