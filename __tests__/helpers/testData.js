@@ -293,26 +293,23 @@ const getMockCtx = () => ({
 const getMockDOMSelector = () => ({
   id: "",
   innerText: "",
+  parentNode: {
+    removeChild: jest.fn()
+  },
   classList: {
     classes: [],
     add(className) {
-      this.classList.classes.push(className)
+      this.classes.push(className)
     },
-    toggle(str) {
-      const items = str.split(' ');
-      items.forEach(item => {
-        let idx = this.classList.classes.indexOf(item);
-        
-        idx >= 0
-          ? this.classList.classes.splice(idx, 1)
-          : this.classList.classes.push(item);
-      })
+    replace(class1, class2) {
+      const idx = this.classes.indexOf(class1);
+      if(idx >= 0) this.classes[idx] = class2;
+      if(idx < 0) this.classes.push(class2);
     },
     contains (className) {
-      return this.classList.classes.indexOf(className) >= 0;
+      return this.classes.indexOf(className) >= 0;
     }
   },
-  createElement: () => getMockDOMSelector(),
   getContext: () => getMockCtx(),
   appendChild: jest.fn(),
 });
