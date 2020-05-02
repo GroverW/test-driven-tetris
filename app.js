@@ -7,7 +7,7 @@ const app = express();
 const wsExpress = require('express-ws')(app);
 
 // serve stuff in static/ folder
-app.use(express.static('../frontend/static/'));
+app.use(express.static('frontend/static/'));
 
 /**Handle websocket messages */
 
@@ -26,7 +26,7 @@ app.ws('/test', (ws, req, next) => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(`${__dirname}/../frontend/static/index.html`);
+  res.sendFile(`${__dirname}/frontend/static/index.html`);
 });
 
 module.exports = app;
