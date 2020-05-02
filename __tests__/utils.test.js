@@ -1,4 +1,8 @@
-const { randomize, getNewPlayer } = require('../helpers/utils');
+const { 
+  randomize,
+  getNewPlayer,
+  getNewPlayerDOM 
+} = require('../helpers/utils');
 
 describe('utils', () => {
   let pieces = [1,2,3,4,5,6,7];
@@ -23,5 +27,14 @@ describe('utils', () => {
     }
 
     expect(getNewPlayer('test', [], 1)).toEqual(testPlayer)
+  });
+
+  test('get new player DOM', () => {
+    const testPlayerDOM = {
+      selector: 'test',
+      id: 1
+    }
+
+    expect(getNewPlayerDOM('test', 1)).toEqual(testPlayerDOM);
   });
 });
