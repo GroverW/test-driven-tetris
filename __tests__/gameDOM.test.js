@@ -1,10 +1,18 @@
 const GameDOM = require('../static/js/gameDOM');
+const Game = require('../static/js/game');
+const { Piece } = require('../static/js/piece');
 const { publish } = require('../pubSub');
 const { getNewPlayer, getNewPlayerDOM } = require('../helpers/utils');
-const { getMockDOMSelector, getMockCtx } = require('./helpers/testData');
+const { CONTROLS, PIECES } = require('../static/js/data');
+const { 
+  getMockDOMSelector,
+  getMockCtx,
+  getTestBoard
+} = require('./helpers/testData');
 
 describe('game DOM tests', () => {
   let gameDOM;
+  let game;
   let newCtx1, newBoard1, newId1;
   let newCtx2, newBoard2, newId2;
   let addPlayerSpy;
@@ -29,6 +37,7 @@ describe('game DOM tests', () => {
     }
 
     gameDOM = new GameDOM(selectors);
+    game = new Game();
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
     document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);
@@ -39,6 +48,10 @@ describe('game DOM tests', () => {
     jest.clearAllMocks();
     gameDOM.unsubAddP();
     gameDOM.unsubRemoveP();
+    gameDOM.unsubScore();
+    game.unsubDrop();
+    game.unsubClear();
+    game.unsubGame();
   });
 
   test('start new game', () => {
@@ -104,5 +117,48 @@ describe('game DOM tests', () => {
     expect(gameDOM.players.length).toBe(1);
     expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
     expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(false);
+  });
+
+  test('scoreboard - updates on game start', () => {
+    expect(gameDOM.scoreSelector.innerText).toBe("");
+    expect(gameDOM.levelSelector.innerText).toBe("");
+    expect(gameDOM.linesSelector.innerText).toBe("");
+    
+    game.start();
+
+    expect(gameDOM.scoreSelector.innerText).toBe(0);
+    expect(gameDOM.levelSelector.innerText).toBe(1);
+    expect(gameDOM.linesSelector.innerText).toBe(0);
+  });
+
+  test('scoreboard - updates points when piece moves down', () => {
+    game.start();
+    
+    game.command(CONTROLS.DOWN);
+
+    expect(gameDOM.scoreSelector.innerText).toBe(1);
+  });
+
+  test('scoreboard - updates on line clear (tetris)', () => {
+    game.start();
+    
+    game.board.grid = getTestBoard('clearLines2');
+    game.board.piece = new Piece(PIECES[2]);
+    game.board.nextPiece = new Piece(PIECES[0]);
+
+    expect(gameDOM.scoreSelector.innerText).toBe(0);
+    expect(gameDOM.linesSelector.innerText).toBe(0);
+
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.HARD_DROP);
+
+    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(gameDOM.scoreSelector.innerText).toBe(860);
+    expect(gameDOM.linesSelector.innerText).toBe(4);
   });
 });
