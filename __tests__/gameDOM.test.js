@@ -2,7 +2,7 @@ const GameDOM = require('../static/js/gameDOM');
 const Game = require('../static/js/game');
 const { Piece } = require('../static/js/piece');
 const { publish } = require('../pubSub');
-const { getNewPlayer, getNewPlayerDOM } = require('../helpers/utils');
+const { getNewPlayer } = require('../helpers/utils');
 const { CONTROLS, PIECES } = require('../static/js/data');
 const { 
   getMockDOMSelector,
@@ -161,4 +161,20 @@ describe('game DOM tests', () => {
     expect(gameDOM.scoreSelector.innerText).toBe(860);
     expect(gameDOM.linesSelector.innerText).toBe(4);
   });
+
+  test('scoreboard - updates on level increase', () => {
+    game.start();
+
+    expect(gameDOM.levelSelector.innerText).toBe(1);
+
+    publish('clearLines', 4);
+
+    expect(gameDOM.linesSelector.innerText).toBe(4);
+    expect(gameDOM.levelSelector.innerText).toBe(1);
+
+    publish('clearLines', 4);
+    publish('clearLines', 4);
+
+    expect(gameDOM.levelSelector.innerText).toBe(2);
+  })
 });
