@@ -22,18 +22,23 @@ describe('game DOM tests', () => {
     const selectors = {
       playerCtx: getMockCtx(),
       nextCtx: getMockCtx(),
+      gameContainer: getMockDOMSelector(),
       scoreSelector: getMockDOMSelector(),
       levelSelector: getMockDOMSelector(),
       linesSelector: getMockDOMSelector()
     }
 
     gameDOM = new GameDOM(selectors);
-    addPlayerSpy = jest.spyOn(gameDOM, 'addPlayer');
-    document.getElementById = jest.fn().mockReturnValue(getMockDOMSelector());
+    addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
+
+    document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);
+    document.createElement = jest.fn().mockImplementation(getMockDOMSelector);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    gameDOM.unsubAddP();
+    gameDOM.unsubRemoveP();
   });
 
   test('start new game', () => {
@@ -46,9 +51,58 @@ describe('game DOM tests', () => {
   })
 
   test('add player', () => {
-    publish('addPlayer', newPlayer1);
+    publish('addPlayer', newPlayer1.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
     expect(gameDOM.players.length).toBe(1);
+    expect(gameDOM.gameView.players.length).toBe(1);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
   })
+
+  test('add 3rd player resizes 2nd player', () => {
+    publish('addPlayer', newPlayer1.id)
+
+    expect(addPlayerSpy).toHaveBeenCalledTimes(1);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
+
+    publish('addPlayer', newPlayer2.id);
+
+    expect(addPlayerSpy).toHaveBeenCalledTimes(2);
+    expect(gameDOM.players.length).toBe(2);
+    expect(gameDOM.gameView.players.length).toBe(2);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(false);
+    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(true);
+  })
+
+  test('remove player', () => {
+    publish('addPlayer', newPlayer1.id)
+    
+    expect(gameDOM.players.length).toBe(1);
+    expect(gameDOM.gameView.players.length).toBe(1);
+
+    publish('removePlayer', newPlayer1.id)
+
+    expect(gameDOM.players.length).toBe(0);
+    expect(gameDOM.gameView.players.length).toBe(0);
+  });
+
+  test('remove 3rd player resizes 2nd player', () => {
+    publish('addPlayer', newPlayer1.id)
+
+    expect(addPlayerSpy).toHaveBeenCalledTimes(1);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
+
+    publish('addPlayer', newPlayer2.id);
+
+    expect(addPlayerSpy).toHaveBeenCalledTimes(2);
+    expect(gameDOM.players.length).toBe(2);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(false);
+    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(true);
+
+    publish('removePlayer', newPlayer1.id);
+
+    expect(gameDOM.players.length).toBe(1);
+    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
+    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(false);
+  });
 });
