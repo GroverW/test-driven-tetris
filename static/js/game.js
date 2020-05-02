@@ -1,5 +1,5 @@
 const Board = require('./board');
-const { CONTROLS, POINTS, LINES_PER_LEVEL } = require('./data');
+const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED } = require('./data');
 const { publish, subscribe } = require('../../pubSub');
 
 class Game {
@@ -10,6 +10,8 @@ class Game {
     this.lines = 0;
     this.linesRemaining = 10;
     this.board = new Board();
+    this.time = { start: 0, elapsed: 0 }
+    this.animationId;
     this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
     this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
     this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
@@ -18,6 +20,7 @@ class Game {
   start() {
     this.board.getPieces();
     this.gameStatus = true;
+    this.animate();
 
     publish('draw', {
       board: this.board.grid,
@@ -32,17 +35,17 @@ class Game {
     });
   }
 
-  command(key) {
+  command(key, val) {
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: (multiplier=1) => this.board.movePiece(0,1, multiplier),
+      [CONTROLS.DOWN]: (points=POINTS.DOWN) =>  this.board.movePiece(0,1,points),
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) commands[key]();
+    if((key in commands) && this.gameStatus) commands[key](val);
   }
 
   updateScore(points) {
@@ -78,6 +81,19 @@ class Game {
     this.unsubClear();
     this.unsubGame();
     this.gameStatus = false;
+    cancelAnimationFrame(this.animationId);
+    this.animationId = undefined;
+  }
+
+  animate(currTime = 0) {
+    this.time.elapsed = currTime - this.time.start;
+    
+    if(this.time.elapsed > ANIMATION_SPEED[Math.min(this.level, 21)]) {
+      this.time.start = currTime;
+      this.command(CONTROLS.DOWN, 0);
+    }
+    
+    this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 }
 
