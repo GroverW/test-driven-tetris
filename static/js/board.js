@@ -1,4 +1,5 @@
 const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('./data');
+const { getEmptyBoard } = require('../../helpers/utils');
 const { pieceList, Piece } = require('./piece');
 const { publish } = require('../../pubSub')
 
@@ -10,7 +11,7 @@ class Board {
   }
 
   createEmptyGrid() {
-    return new Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0));
+    return getEmptyBoard();
   }
 
   getPieces() {
