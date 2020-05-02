@@ -1,7 +1,11 @@
 const Game = require('../static/js/game');
 const { Piece } = require ('../static/js/piece');
-const { PIECES, CONTROLS,  } = require('../static/js/data');
-const { TEST_BOARDS, getTestBoard } = require('./helpers/testData');
+const { PIECES, CONTROLS  } = require('../static/js/data');
+const { 
+  TEST_BOARDS,
+  getTestBoard,
+  mockAnimation
+} = require('./helpers/testData');
 const { publish } = require('../pubSub');
 
 describe('game tests', () => {
@@ -13,10 +17,15 @@ describe('game tests', () => {
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[6]);
     p3 = new Piece(PIECES[2]);
+
+    jest.useFakeTimers();
+    
+    requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   })
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.clearAllTimers();
     game.unsubDrop();
     game.unsubClear();
     game.unsubGame();
@@ -235,4 +244,41 @@ describe('game tests', () => {
     expect(boardMoveSpy).toHaveBeenCalledTimes(5);
 
   })
+
+  test('animate - animates on start', () => {
+    const animateSpy = jest.spyOn(game, 'animate');
+
+    expect(game.animationId).toBe(undefined);
+
+    game.start();
+
+    expect(game.animationId).toEqual(expect.any(Number));
+    expect(animateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('animate - clears animation on gameOver', () => {
+    const canelAnimationSpy = jest.spyOn(window, 'cancelAnimationFrame');
+    
+    expect(game.animationId).toBe(undefined);
+    
+    game.start();
+
+    expect(game.animationId).toEqual(expect.any(Number));
+
+    game.gameOver();
+
+    expect(canelAnimationSpy).toHaveBeenCalledTimes(1);
+    expect(game.animationId).toBe(undefined);
+  })
+
+  test('animate - moves piece at set intervals', () => {
+    const movePieceSpy = jest.spyOn(game.board, 'movePiece');
+    
+    game.start();
+    
+    jest.advanceTimersByTime(1000);
+
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(11);
+    expect(movePieceSpy).toHaveBeenCalledTimes(1);
+  });
 });
