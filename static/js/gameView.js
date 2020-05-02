@@ -1,12 +1,14 @@
 const { subscribe } = require('../../pubSub');
 const { CELL_COLORS, BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE } = require('./data');
-const { getNewPlayer } = require('../../helpers/utils');
 
 class GameView {
   constructor(ctx, ctxNext) {
     this.ctx = this.initCtx(ctx, CELL_SIZE);
     this.ctxNext = this.initCtx(ctxNext, CELL_SIZE, 4, 4);
     this.unsubDraw = subscribe('draw', this.draw.bind(this));
+    this.unsubAddP = subscribe('addPlayer', this.addPlayer.bind(this));
+    this.unsubRemoveP = subscribe('removePlayer', this.removePlayer.bind(this));
+    this.unsubUpdateP = subscribe('updatePlayerBoard', this.updatePlayer.bind(this));
     this.players = [];
   }
 
@@ -53,7 +55,7 @@ class GameView {
     ctx.scale(cellSize, cellSize)
   }
 
-  addPlayer(playerCtx, board, id) {
+  addPlayer(player) {
     let cellSize = CELL_SIZE;
 
     if(this.players.length === 1) {
@@ -62,10 +64,10 @@ class GameView {
       this.drawBoard(this.players[0].ctx, this.players[0].board);
     }
 
-    const newCtx = this.initCtx(playerCtx, cellSize);
+    this.players.push(player)
 
-    this.players.push(getNewPlayer(newCtx, board, id))
-    this.drawBoard(newCtx, board);
+    this.initCtx(player.ctx, cellSize);
+    this.drawBoard(player.ctx, player.board);
   }
 
   removePlayer(id) {
@@ -75,6 +77,17 @@ class GameView {
     if(this.players.length === 1) {
       this.scaleBoardSize(this.players[0].ctx, CELL_SIZE);
       this.drawBoard(this.players[0].ctx, this.players[0].board);
+    }
+  }
+
+  updatePlayer(player) {
+    const playerIdx = this.players.findIndex(p => p.id === player.id);
+
+    if(playerIdx >= 0) {
+      const selectedPlayer = this.players[playerIdx];
+      
+      selectedPlayer.board = player.board;
+      this.drawBoard(selectedPlayer.ctx, selectedPlayer.board);
     }
   }
 }
