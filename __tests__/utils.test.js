@@ -1,8 +1,10 @@
 const { 
   randomize,
+  getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM 
 } = require('../helpers/utils');
+const { getTestBoard } = require('../__tests__/helpers/testData');
 
 describe('utils', () => {
   let pieces = [1,2,3,4,5,6,7];
@@ -37,4 +39,10 @@ describe('utils', () => {
 
     expect(getNewPlayerDOM('test', 1)).toEqual(testPlayerDOM);
   });
+
+  test('get empty board', () => {
+    const testBoard = getTestBoard('empty');
+
+    expect(getEmptyBoard()).toEqual(testBoard);
+  })
 });
