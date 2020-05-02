@@ -1,6 +1,6 @@
 const Board = require('./board');
-const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED } = require('./data');
-const { publish, subscribe } = require('../../pubSub');
+const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED } = require('../../helpers/data');
+const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
   constructor() {

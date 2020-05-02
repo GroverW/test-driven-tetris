@@ -1,4 +1,4 @@
-const { PIECES, SEED_PIECES, BOARD_WIDTH } = require('./data');
+const { PIECES, SEED_PIECES, BOARD_WIDTH } = require('../../helpers/data');
 const { randomize } = require('../../helpers/utils');
 
 class PieceList {

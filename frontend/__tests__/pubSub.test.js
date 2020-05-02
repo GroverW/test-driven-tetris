@@ -1,4 +1,4 @@
-const { publish, subscribe } = require('../static/js/pubSub');
+const { publish, subscribe } = require('../helpers/pubSub');
 
 describe('publish / subscribe', () => {
   let sub1, sub2, sub3;

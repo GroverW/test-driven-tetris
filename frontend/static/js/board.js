@@ -1,7 +1,7 @@
-const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('./data');
+const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('../../helpers/data');
 const { getEmptyBoard } = require('../../helpers/utils');
 const { pieceList, Piece } = require('./piece');
-const { publish } = require('./pubSub')
+const { publish } = require('../../helpers/pubSub')
 
 class Board {
   constructor() {

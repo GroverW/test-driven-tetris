@@ -4,7 +4,7 @@ const {
   getNewPlayer,
   getNewPlayerDOM 
 } = require('../helpers/utils');
-const { getTestBoard } = require('./helpers/testData');
+const { getTestBoard } = require('../helpers/mocks');
 
 describe('utils', () => {
   let pieces = [1,2,3,4,5,6,7];

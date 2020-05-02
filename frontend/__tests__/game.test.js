@@ -1,12 +1,12 @@
 const Game = require('../static/js/game');
 const { Piece } = require ('../static/js/piece');
-const { PIECES, CONTROLS  } = require('../static/js/data');
+const { PIECES, CONTROLS  } = require('../helpers/data');
 const { 
   TEST_BOARDS,
   getTestBoard,
   mockAnimation
-} = require('./helpers/testData');
-const { publish } = require('../pubSub');
+} = require('../helpers/mocks');
+const { publish } = require('../helpers/pubSub');
 
 describe('game tests', () => {
   let game;

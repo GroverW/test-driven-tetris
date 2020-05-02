@@ -1,5 +1,5 @@
 const GameView = require('./gameView');
-const { subscribe } = require('../../pubSub');
+const { subscribe } = require('../../helpers/pubSub');
 const {
   getEmptyBoard,
   getNewPlayer,

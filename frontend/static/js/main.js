@@ -1,6 +1,6 @@
 const Game = require('./game');
 const GameDOM = require('./gameDOM');
-const { publish } = require('../../pubSub');
+const { publish } = require('../../helpers/pubSub');
 
 const p1Canvas = document.getElementById('p1-board');
 const nextPieceCanvas = document.getElementById('next-piece');

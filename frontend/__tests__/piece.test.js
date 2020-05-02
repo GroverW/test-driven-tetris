@@ -1,6 +1,6 @@
 const { pieceList, Piece } = require('../static/js/piece');
 const Board = require('../static/js/board');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../static/js/data');
+const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 
 describe('game pieces', () => {
   let p1, p2, p3, p4, p5, p6, p7;

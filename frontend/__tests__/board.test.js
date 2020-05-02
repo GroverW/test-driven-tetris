@@ -1,7 +1,7 @@
 const Board = require('../static/js/board');
 const { Piece } = require('../static/js/piece');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../static/js/data');
-const { TEST_BOARDS, getTestBoard } = require('./helpers/testData');
+const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { TEST_BOARDS, getTestBoard } = require('../helpers/mocks');
 
 
 describe('game board tests', () => {
