@@ -312,7 +312,8 @@ const getMockDOMSelector = () => ({
       return this.classList.classes.indexOf(className) >= 0;
     }
   },
-  createElement() { return getMockDOMSelector()},
+  createElement: () => getMockDOMSelector(),
+  getContext: () => getMockCtx(),
   appendChild: jest.fn(),
 });
 
