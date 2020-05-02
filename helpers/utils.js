@@ -13,7 +13,10 @@ const randomize = pieces => {
 
 const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
 
+const getNewPlayerDOM = (selector, id) => ({ selector, id });
+
 module.exports = {
   randomize,
-  getNewPlayer
+  getNewPlayer,
+  getNewPlayerDOM
 }
