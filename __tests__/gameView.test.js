@@ -45,6 +45,8 @@ describe('game view tests', () => {
     game.unsubClear();
     game.unsubGame();
     gameView.unsubDraw();
+    gameView.unsubRemoveP();
+    gameView.unsubUpdateP();
   });
 
   test('draw elements on game start', () => {
@@ -183,26 +185,27 @@ describe('game view tests', () => {
     expect(gameView.players[0].ctx.canvas.height).toBe(fullBoardHeight);
   });
 
-  test('server commands - add player', () => {
-    game.start();
+  // test('server commands - add player', () => {
+  //   game.start();
 
-    expect(gameView.players.length).toBe(0);
+  //   expect(gameView.players.length).toBe(0);
 
-    publish('addPlayer', newPlayer1);
+  //   publish('addPlayer', newPlayer1);
 
-    expect(gameView.players.length).toBe(1);
+  //   expect(gameView.players.length).toBe(1);
 
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
-    expect(drawNextSpy).toHaveBeenCalledTimes(1);
-  });
+  //   expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+  //   expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+  //   expect(drawNextSpy).toHaveBeenCalledTimes(1);
+  // });
 
   test('server commands - remove player', () => {
     game.start();
 
     expect(gameView.players.length).toBe(0);
 
-    publish('addPlayer', newPlayer1);
+    // publish('addPlayer', newPlayer1);
+    gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
 
@@ -220,7 +223,8 @@ describe('game view tests', () => {
 
     const testBoard = getTestBoard('pattern1');
 
-    publish('addPlayer', newPlayer1);
+    // publish('addPlayer', newPlayer1);
+    gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
