@@ -18,10 +18,17 @@ class Game {
   start() {
     this.board.getPieces();
     this.gameStatus = true;
+
     publish('draw', {
       board: this.board.grid,
       piece: this.board.piece,
-      nextPiece: this.board.nextPiece
+      nextPiece: this.board.nextPiece,
+    });
+    
+    publish('updateScore', {
+      score: this.score,
+      level: this.level,
+      lines: this.lines
     });
   }
 
@@ -40,6 +47,10 @@ class Game {
 
   updateScore(points) {
     this.score += points;
+
+    publish('updateScore', {
+      score: this.score
+    })
   }
 
   updateLines(lines) {
@@ -48,6 +59,11 @@ class Game {
     if(this.linesRemaining <= lines) this.level++
 
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
+
+    publish('updateScore', {
+      level: this.level,
+      lines: this.lines
+    })
   }
 
   clearLines(lines) {
