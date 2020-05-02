@@ -6,7 +6,7 @@ class GameView {
     this.ctx = this.initCtx(ctx, CELL_SIZE);
     this.ctxNext = this.initCtx(ctxNext, CELL_SIZE, 4, 4);
     this.unsubDraw = subscribe('draw', this.draw.bind(this));
-    this.unsubAddP = subscribe('addPlayer', this.addPlayer.bind(this));
+    // this.unsubAddP = subscribe('addPlayer', this.addPlayer.bind(this));
     this.unsubRemoveP = subscribe('removePlayer', this.removePlayer.bind(this));
     this.unsubUpdateP = subscribe('updatePlayerBoard', this.updatePlayer.bind(this));
     this.players = [];
