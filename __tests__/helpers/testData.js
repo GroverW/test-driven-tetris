@@ -287,11 +287,38 @@ const getMockCtx = () => ({
   lineWidth: 0,
   strokeStyle: "",
   strokeRect: jest.fn(),
-  clearRect: jest.fn()
+  clearRect: jest.fn(),
+});
+
+const getMockDOMSelector = () => ({
+  id: "",
+  innerText: "",
+  classList: {
+    classes: [],
+    add(className) {
+      this.classList.classes.push(className)
+    },
+    toggle(str) {
+      const items = str.split(' ');
+      items.forEach(item => {
+        let idx = this.classList.classes.indexOf(item);
+        
+        idx >= 0
+          ? this.classList.classes.splice(idx, 1)
+          : this.classList.classes.push(item);
+      })
+    },
+    contains (className) {
+      return this.classList.classes.indexOf(className) >= 0;
+    }
+  },
+  createElement() { return getMockDOMSelector()},
+  appendChild: jest.fn(),
 });
 
 module.exports = {
   TEST_BOARDS,
   getTestBoard,
   getMockCtx,
+  getMockDOMSelector,
 }
