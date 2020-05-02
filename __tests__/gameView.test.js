@@ -1,12 +1,14 @@
 const GameView = require('../static/js/gameView')
 const Game = require('../static/js/game');
-const { 
+const {
   CONTROLS,
   BOARD_HEIGHT,
   BOARD_WIDTH,
-  CELL_SIZE 
+  CELL_SIZE
 } = require('../static/js/data');
 const { getMockCtx, getTestBoard } = require('./helpers/testData');
+const { publish } = require('../pubSub');
+const { getNewPlayer } = require('../helpers/utils');
 
 describe('game view tests', () => {
   let game;
@@ -14,6 +16,7 @@ describe('game view tests', () => {
   let newCtx1, newBoard1, newId1;
   let newCtx2, newBoard2, newId2;
   let drawBoardSpy, drawPieceSpy;
+  let newPlayer1, newPlayer2;
 
   beforeEach(() => {
     mockCtx = getMockCtx();
@@ -24,6 +27,9 @@ describe('game view tests', () => {
     newCtx2 = getMockCtx();
     newBoard2 = getTestBoard('empty');
     newId2 = 2;
+
+    newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
+    newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
     game = new Game();
     gameView = new GameView(mockCtx, mockCtxNext);
@@ -85,10 +91,10 @@ describe('game view tests', () => {
 
   test('add new player', () => {
     game.start();
-    
+
     expect(gameView.players.length).toBe(0);
 
-    gameView.addPlayer(newCtx1, newBoard1);
+    gameView.addPlayer(newPlayer1);
 
     expect(gameView.players.length).toBe(1);
 
@@ -108,10 +114,10 @@ describe('game view tests', () => {
 
     expect(gameView.players.length).toBe(0);
     expect(drawBoardSpy).toHaveBeenCalledTimes(1);
-    
-    
-    gameView.addPlayer(newCtx1, newBoard1)
-    
+
+
+    gameView.addPlayer(newPlayer1)
+
     expect(gameView.players.length).toBe(1);
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
 
@@ -119,8 +125,8 @@ describe('game view tests', () => {
     expect(gameView.players[0].ctx.canvas.height).toBe(fullBoardHeight);
     expect(gameView.players[0].ctx.canvas.xScale).toBe(fullCell);
     expect(gameView.players[0].ctx.canvas.yScale).toBe(fullCell);
-    
-    gameView.addPlayer(newCtx2, newBoard2);
+
+    gameView.addPlayer(newPlayer2);
 
     expect(gameView.players.length).toBe(2);
     expect(drawBoardSpy).toHaveBeenCalledTimes(4);
@@ -138,11 +144,11 @@ describe('game view tests', () => {
 
   test('remove player', () => {
     game.start();
-    
+
     expect(gameView.players.length).toBe(0);
 
-    gameView.addPlayer(newCtx1, newBoard1, newId1)
-    gameView.addPlayer(newCtx2, newBoard2, newId2)
+    gameView.addPlayer(newPlayer1)
+    gameView.addPlayer(newPlayer2)
 
     expect(gameView.players.length).toBe(2);
 
@@ -158,11 +164,11 @@ describe('game view tests', () => {
     const fullBoardHeight = BOARD_HEIGHT * CELL_SIZE;
     const halfBoardWidth = BOARD_WIDTH * CELL_SIZE / 2;
     const halfBoardHeight = BOARD_HEIGHT * CELL_SIZE / 2;
-    
+
     expect(gameView.players.length).toBe(0);
 
-    gameView.addPlayer(newCtx1, newBoard1, newId1)
-    gameView.addPlayer(newCtx2, newBoard2, newId2)
+    gameView.addPlayer(newPlayer1)
+    gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(2);
     expect(gameView.players[0].ctx.canvas.width).toBe(halfBoardWidth);
@@ -175,5 +181,54 @@ describe('game view tests', () => {
     expect(gameView.players.length).toBe(1);
     expect(gameView.players[0].ctx.canvas.width).toBe(fullBoardWidth);
     expect(gameView.players[0].ctx.canvas.height).toBe(fullBoardHeight);
+  });
+
+  test('server commands - add player', () => {
+    game.start();
+
+    expect(gameView.players.length).toBe(0);
+
+    publish('addPlayer', newPlayer1);
+
+    expect(gameView.players.length).toBe(1);
+
+    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('server commands - remove player', () => {
+    game.start();
+
+    expect(gameView.players.length).toBe(0);
+
+    publish('addPlayer', newPlayer1);
+
+    expect(gameView.players.length).toBe(1);
+
+    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawNextSpy).toHaveBeenCalledTimes(1);
+
+    publish('removePlayer', newPlayer1.id);
+
+    expect(gameView.players.length).toBe(0);
+  });
+
+  test('server commands - update player board', () => {
+    game.start()
+
+    const testBoard = getTestBoard('pattern1');
+
+    publish('addPlayer', newPlayer1);
+
+    expect(gameView.players.length).toBe(1);
+    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
+
+    publish('updatePlayerBoard', { id: newPlayer1.id, board: testBoard });
+
+    expect(gameView.players[0].board).toEqual(testBoard);
+    expect(drawBoardSpy).toHaveBeenCalledTimes(3);
   });
 });
