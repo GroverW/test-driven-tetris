@@ -16,6 +16,7 @@ class GameDOM {
     this.players = [];
     this.unsubAddP = subscribe('addPlayer', this.addPlayer.bind(this));
     this.unsubRemoveP = subscribe('removePlayer', this.removePlayer.bind(this));
+    this.unsubScore = subscribe('updateScore', this.updateScoreboard.bind(this));
   }
 
   addPlayer(id) {
@@ -60,6 +61,12 @@ class GameDOM {
     if (this.players.length === 1) {
       this.players[0].selector.classList.replace('item-small', 'item-large');
     }
+  }
+
+  updateScoreboard(data) {
+    if('score' in data) this.scoreSelector.innerText = data.score;
+    if('level' in data) this.levelSelector.innerText = data.level;
+    if('lines' in data) this.linesSelector.innerText = data.lines;
   }
 }
 
