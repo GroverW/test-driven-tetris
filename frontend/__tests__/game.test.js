@@ -3,26 +3,28 @@ const { Piece } = require('../static/js/piece');
 const {
   PIECES,
   CONTROLS,
-  COMMAND_QUEUE_MAP,
   ANIMATION_SPEED,
   MAX_SPEED
 } = require('../helpers/data');
 const {
   TEST_BOARDS,
   getTestBoard,
-  mockAnimation
+  mockAnimation,
+  pubSubMocks
 } = require('../helpers/mocks');
 const { publish } = require('../helpers/pubSub');
 
 describe('game tests', () => {
   let game;
   let p1, p2, p3;
+  let pubSub;
 
   beforeEach(() => {
     game = new Game();
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[6]);
     p3 = new Piece(PIECES[2]);
+    pubSub = pubSubMocks();
 
     jest.useFakeTimers();
 
@@ -35,6 +37,8 @@ describe('game tests', () => {
     game.unsubDrop();
     game.unsubClear();
     game.unsubGame();
+    game.unsubBoard();
+    pubSub.clearMockSubscriptions();
   });
 
   test('start game', () => {
@@ -44,10 +48,17 @@ describe('game tests', () => {
     expect(game.board.piece).not.toEqual(expect.any(Piece));
     expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
 
+    expect(pubSub.drawMock).not.toHaveBeenCalled();
+    expect(pubSub.updateScoreMock).not.toHaveBeenCalled();
+
     game.start();
 
     expect(game.board.piece).toEqual(expect.any(Piece));
     expect(game.board.nextPiece).toEqual(expect.any(Piece));
+
+    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
   });
 
   test('keyboard controls', () => {
@@ -104,10 +115,12 @@ describe('game tests', () => {
 
     // expected score is 36
     expect(game.score).toBe(36)
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.DOWN);
 
     expect(game.score).toBe(37)
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(2);
   });
 
   test('score points for single line', () => {
@@ -120,6 +133,8 @@ describe('game tests', () => {
 
     // I piece will hard drop 18. 36 + 100    
     expect(game.score).toBe(136)
+    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
   });
 
   test('score points for double line', () => {
@@ -139,6 +154,8 @@ describe('game tests', () => {
 
     // J piece will hard drop 16. 32 + 300
     expect(game.score).toBe(332);
+    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
   });
 
   test('score points for triple line', () => {
@@ -154,6 +171,8 @@ describe('game tests', () => {
 
     // I piece will hard drop 16. 32 + 500
     expect(game.score).toBe(532);
+    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
   });
 
   test('score points for tetris', () => {
@@ -177,6 +196,8 @@ describe('game tests', () => {
     // T will hard drop 14, I will hard drop 16
     // 28 + 32 + 800 for tetris
     expect(game.score).toBe(860);
+    // 2 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
   });
 
   test('score points with level modifier', () => {
@@ -192,6 +213,8 @@ describe('game tests', () => {
 
     // I piece will hard drop 18. 36 + 200
     expect(game.score).toBe(236);
+    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
   })
 
   test('clearing lines updates lines cleared', () => {
@@ -316,10 +339,33 @@ describe('game tests', () => {
     game.command(CONTROLS.AUTO_DOWN);
     game.command(CONTROLS.ROTATE_LEFT);
     game.command(CONTROLS.ROTATE_RIGHT);
-    game.command(CONTROLS.HARD_DROP);
 
     expect(game.commandQueue).toEqual([
-      "LEFT", "RIGHT", "DOWN", "AUTO_DOWN", "ROTATE_LEFT", "ROTATE_RIGHT", "HARD_DROP"
+      "LEFT", "RIGHT", "DOWN", "AUTO_DOWN", "ROTATE_LEFT", "ROTATE_RIGHT"
     ]);
   });
+
+  test('command queue - send commands', () => {
+    game.start();
+    
+    game.command(CONTROLS.DOWN);
+    game.command(CONTROLS.ROTATE_RIGHT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.AUTO_DOWN);
+
+    expect(game.commandQueue.length).toBe(4);
+
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.commandQueue.length).toBe(0);
+    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+
+    game.command(CONTROLS.ROTATE_RIGHT);
+    game.command(CONTROLS.AUTO_DOWN);
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.commandQueue.length).toBe(0);
+    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(2);
+  })
 });
