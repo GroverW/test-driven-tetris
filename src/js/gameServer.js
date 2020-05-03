@@ -5,6 +5,7 @@ class GameServer {
   constructor(id) {
     this.id = id;
     this.players = new Set();
+    this.nextPlayerId = 0;
     this.gameStarted = false;
     this.nextRanking;
     this.subscriptions = {};
@@ -20,6 +21,7 @@ class GameServer {
     if (this.players.size < MAX_PLAYERS && !this.gameStarted) {
       this.players.add(player);
       
+      player.id = ++this.nextPlayerId;
       this.addSubscriptions(player)
 
       if (this.players.size === 1) player.isHost = true;
@@ -39,7 +41,7 @@ class GameServer {
     this.subscriptions[player.id] = [
       player.pubSub.subscribe('leave', this.leave.bind(this)),
       player.pubSub.subscribe('startGame', this.startGame.bind(this)),
-      player.pubSub.subscribe('getRanking', this.gameOver.bind(this)),
+      player.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
       player.pubSub.subscribe('getPieces', this.getPieces.bind(this)),
     ]
   }
@@ -104,6 +106,7 @@ class GameServer {
 
     this.players.forEach(player => {
       player.game.board.pieceList.addSet(pieces);
+      player.game.start();
       
       player._send(JSON.stringify({
         message: 'addPieces',
@@ -113,18 +116,14 @@ class GameServer {
   }
 
   gameOver(player) {
-    this.sendAllExcept(player, {
-      message: 'playerGameOver',
+    this.sendAll({
+      message: 'gameOver',
       data: {
         id: player.id,
-        ranking: this.nextRanking
+        board: player.board,
+        ranking: RANKINGS[this.nextRanking],
       }
     });
-
-    player._send(JSON.stringify({
-      message: 'gameOver',
-      data: RANKINGS[this.nextRanking]
-    }))
 
     this.nextRanking--;
   }
