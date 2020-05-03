@@ -1,7 +1,7 @@
 const Board = require('../js/board');
 const { Piece } = require('../js/piece');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
-const { TEST_BOARDS, getTestBoard } = require('../helpers/mocks');
+const { TEST_BOARDS, getTestBoard, getTestPieces } = require('../helpers/mocks');
 const pubSub = require('../helpers/pubSub');
 
 
@@ -13,6 +13,7 @@ describe('game board tests', () => {
   beforeEach(() => {
     pubSubTest = pubSub();
     gameBoard = new Board(pubSubTest);
+    gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[1]);
     p3 = new Piece(PIECES[2]);
@@ -149,5 +150,16 @@ describe('game board tests', () => {
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
   });
+
+  test('requests new pieces when almost out', () => {
+    const publishSpy = jest.spyOn(pubSubTest, 'publish');
+
+    expect(publishSpy).not.toHaveBeenCalled();
+
+    for(let i = 0; i < 40; i++) gameBoard.getPieces();
+
+    expect(gameBoard.pieceList.almostEmpty()).toBe(true);
+    expect(publishSpy).toHaveBeenCalled();
+  })
 })
 
