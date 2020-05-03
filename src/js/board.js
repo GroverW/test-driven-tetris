@@ -4,10 +4,11 @@ const { pieceList, Piece } = require('./piece');
 const { publish } = require('../helpers/pubSub')
 
 class Board {
-  constructor() {
+  constructor(pubSub) {
     this.grid = getEmptyBoard();
     this.piece;
     this.nextPiece;
+    this.pubSub = pubSub;
   }
 
   createEmptyGrid() {
@@ -20,7 +21,7 @@ class Board {
       : new Piece(pieceList.getNextPiece());
     
     if(!this.validMove(0,0)) {
-      publish("gameOver", this.piece);
+      this.pubSub.publish("gameOver", this.piece);
     }
 
     this.nextPiece = new Piece(pieceList.getNextPiece());
@@ -30,7 +31,7 @@ class Board {
     if (this.validMove(x, y)) {
       this.piece.move(x, y);
       
-      if(y > 0) publish('lowerPiece', y * multiplier)
+      if(y > 0) this.pubSub.publish('lowerPiece', y * multiplier)
 
       return true;
     }
@@ -113,7 +114,7 @@ class Board {
       }
     })
     
-    numCleared && publish('clearLines', numCleared);
+    numCleared && this.pubSub.publish('clearLines', numCleared);
   }
 }
 

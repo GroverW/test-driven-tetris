@@ -2,14 +2,17 @@ const Board = require('../js/board');
 const { Piece } = require('../js/piece');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 const { TEST_BOARDS, getTestBoard } = require('../helpers/mocks');
+const pubSub = require('../helpers/pubSub');
 
 
 describe('game board tests', () => {
   let gameBoard;
   let p1, p2, p3, p4, p5;
+  let pubSubTest;
   
   beforeEach(() => {
-    gameBoard = new Board();
+    pubSubTest = pubSub();
+    gameBoard = new Board(pubSubTest);
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[1]);
     p3 = new Piece(PIECES[2]);
