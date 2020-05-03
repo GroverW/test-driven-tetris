@@ -1,12 +1,16 @@
-const { pieceList, Piece } = require('../js/piece');
+const { PieceList, Piece } = require('../js/piece');
 const Board = require('../js/board');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { getTestPieces } = require('../helpers/mocks');
 
 describe('game pieces', () => {
   let p1, p2, p3, p4, p5, p6, p7;
   let board;
+  let pieceList;
 
   beforeEach(() => {
+    pieceList = new PieceList();
+    pieceList.addSet(getTestPieces());
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[1]);
     p3 = new Piece(PIECES[2]);
