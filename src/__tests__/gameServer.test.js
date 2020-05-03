@@ -1,18 +1,19 @@
 const GameServer = require('../js/gameServer');
 const Player = require('../js/player');
 const { mockSend } = require('../helpers/mocks');
+const pubSub = require('../helpers/pubSub');
 
-describe('game manager tests', () => {
+describe('game server tests', () => {
   let gameServer;
   let gameServerId;
   let p1, p2, p3, p4, p5;
 
   beforeEach(() => {
-    p1 = new Player(mockSend);
-    p2 = new Player(mockSend);
-    p3 = new Player(mockSend);
-    p4 = new Player(mockSend);
-    p5 = new Player(mockSend);
+    p1 = new Player(mockSend, pubSub());
+    p2 = new Player(mockSend, pubSub());
+    p3 = new Player(mockSend, pubSub());
+    p4 = new Player(mockSend, pubSub());
+    p5 = new Player(mockSend, pubSub());
     gameServer = new GameServer();
     gameServerId = 1;
   })
@@ -88,8 +89,8 @@ describe('game manager tests', () => {
     gameServer.join(p1);
     gameServer.join(p2);
 
-    const sendSpy1 = jest.spyOn(p1, 'send');
-    const sendSpy2 = jest.spyOn(p2, 'send');
+    const sendSpy1 = jest.spyOn(p1, '_send');
+    const sendSpy2 = jest.spyOn(p2, '_send');
 
     gameServer.sendAll(p1, '');
 
@@ -101,8 +102,8 @@ describe('game manager tests', () => {
     gameServer.join(p1);
     gameServer.join(p2);
 
-    const sendSpy1 = jest.spyOn(p1, 'send');
-    const sendSpy2 = jest.spyOn(p2, 'send');
+    const sendSpy1 = jest.spyOn(p1, '_send');
+    const sendSpy2 = jest.spyOn(p2, '_send');
 
     gameServer.sendAllExcept(p1, '');
 
