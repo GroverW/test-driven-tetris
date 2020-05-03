@@ -51,6 +51,7 @@ class Board {
     this.addPieceToBoard();
     this.clearLines();
     this.getPieces();
+    this.publishBoardChange();
 
     publish('draw', {
       board: this.grid,
@@ -131,7 +132,14 @@ class Board {
       }
     })
     
-    numCleared && publish('clearLines', numCleared);
+    if(numCleared) {
+      publish('clearLines', numCleared);
+      this.publishBoardChange();
+    } 
+  }
+
+  publishBoardChange() {
+    publish('boardChange', this.grid)
   }
 }
 
