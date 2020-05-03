@@ -25,6 +25,7 @@ const POINTS = {
   }
 };
 
+const MAX_SPEED = 21;
 const ANIMATION_SPEED = {
   1: 800,
   2: 720,
@@ -109,6 +110,7 @@ module.exports = {
   CONTROLS,
   POINTS,
   ANIMATION_SPEED,
+  MAX_SPEED,
   CELL_COLORS,
   PIECES,
   SEED_PIECES
