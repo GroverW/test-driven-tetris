@@ -1,5 +1,5 @@
 const Board = require('./board');
-const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED } = require('../../helpers/data');
+const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED, MAX_SPEED } = require('../../helpers/data');
 const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
@@ -89,12 +89,16 @@ class Game {
   animate(currTime = 0) {
     this.time.elapsed = currTime - this.time.start;
     
-    if(this.time.elapsed > ANIMATION_SPEED[Math.min(this.level, 21)]) {
+    if(this.time.elapsed > this.getAnimationDelay()) {
       this.time.start = currTime;
       this.command(CONTROLS.DOWN, 0);
     }
     
     this.animationId = requestAnimationFrame(this.animate.bind(this));
+  }
+
+  getAnimationDelay() {
+    return ANIMATION_SPEED[Math.min(this.level, MAX_SPEED)];
   }
 }
 
