@@ -1,5 +1,12 @@
 const Board = require('./board');
-const { CONTROLS, POINTS, LINES_PER_LEVEL, ANIMATION_SPEED, MAX_SPEED } = require('../../helpers/data');
+const { 
+  CONTROLS,
+  COMMAND_QUEUE_MAP,
+  POINTS,
+  LINES_PER_LEVEL,
+  ANIMATION_SPEED,
+  MAX_SPEED 
+} = require('../../helpers/data');
 const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
@@ -12,6 +19,7 @@ class Game {
     this.board = new Board();
     this.time = { start: 0, elapsed: 0 }
     this.animationId;
+    this.commandQueue = [];
     this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
     this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
     this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
@@ -46,7 +54,16 @@ class Game {
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) commands[key]();
+    if((key in commands) && this.gameStatus) {
+      commands[key]();
+      this.addToCommandQueue(key);
+    }
+  }
+
+  addToCommandQueue(action) {
+    if (action in COMMAND_QUEUE_MAP) {
+      this.commandQueue.push(COMMAND_QUEUE_MAP[action]);
+    }
   }
 
   updateScore(points) {
