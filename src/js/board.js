@@ -3,7 +3,8 @@ const { getEmptyBoard } = require('../helpers/utils');
 const { PieceList, Piece } = require('./piece');
 
 class Board {
-  constructor(pubSub) {
+  constructor(pubSub, playerId) {
+    this.playerId = playerId;
     this.grid = getEmptyBoard();
     this.piece;
     this.nextPiece;
@@ -21,7 +22,10 @@ class Board {
       : new Piece(this.pieceList.getNextPiece());
     
     if(!this.validMove(0,0)) {
-      this.pubSub.publish("gameOver", this.piece);
+      this.pubSub.publish("gameOver", {
+        id: this.playerId,
+        board: this.grid
+      });
     }
 
     this.nextPiece = new Piece(this.pieceList.getNextPiece());
@@ -49,6 +53,7 @@ class Board {
     this.addPieceToBoard();
     this.clearLines();
     this.getPieces();
+    this.publishBoardUpdate();
   }
 
   hardDrop() {
@@ -118,7 +123,17 @@ class Board {
       }
     })
     
-    numCleared && this.pubSub.publish('clearLines', numCleared);
+    if(numCleared) {
+      this.pubSub.publish('clearLines', numCleared);
+      this.publishBoardUpdate();
+    } 
+  }
+
+  publishBoardUpdate() {
+    this.pubSub.publish('updateBoard', {
+      id: this.id,
+      board: this.grid
+    })
   }
 }
 
