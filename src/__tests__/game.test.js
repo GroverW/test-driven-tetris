@@ -4,6 +4,7 @@ const { PIECES, CONTROLS  } = require('../helpers/data');
 const { 
   TEST_BOARDS,
   getTestBoard,
+  getTestPieces,
 } = require('../helpers/mocks');
 const pubSub = require('../helpers/pubSub');
 
@@ -15,6 +16,7 @@ describe('game tests', () => {
   beforeEach(() => {
     pubSubTest = pubSub();
     game = new Game(pubSubTest);
+    game.board.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[6]);
     p3 = new Piece(PIECES[2]);
