@@ -1,7 +1,7 @@
 const Game = require('../static/js/game');
 const { Piece } = require ('../static/js/piece');
-const { PIECES, CONTROLS  } = require('../helpers/data');
-const { 
+const { PIECES, CONTROLS, ANIMATION_SPEED, MAX_SPEED  } = require('../helpers/data');
+const {
   TEST_BOARDS,
   getTestBoard,
   mockAnimation
@@ -281,4 +281,18 @@ describe('game tests', () => {
     expect(requestAnimationFrame).toHaveBeenCalledTimes(11);
     expect(movePieceSpy).toHaveBeenCalledTimes(1);
   });
+
+  test('animation speed', () => {
+    game.start();
+    
+    expect(game.level).toBe(1);
+    
+    expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[game.level]);
+    
+    game.level = 10;
+    expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[10]);
+
+    game.level = 100;
+    expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[MAX_SPEED]);
+  })
 });
