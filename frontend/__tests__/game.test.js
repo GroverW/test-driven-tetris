@@ -1,6 +1,12 @@
 const Game = require('../static/js/game');
-const { Piece } = require ('../static/js/piece');
-const { PIECES, CONTROLS, ANIMATION_SPEED, MAX_SPEED  } = require('../helpers/data');
+const { Piece } = require('../static/js/piece');
+const {
+  PIECES,
+  CONTROLS,
+  COMMAND_QUEUE_MAP,
+  ANIMATION_SPEED,
+  MAX_SPEED
+} = require('../helpers/data');
 const {
   TEST_BOARDS,
   getTestBoard,
@@ -19,7 +25,7 @@ describe('game tests', () => {
     p3 = new Piece(PIECES[2]);
 
     jest.useFakeTimers();
-    
+
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   })
 
@@ -32,9 +38,9 @@ describe('game tests', () => {
   });
 
   test('start game', () => {
-    expect([game.score, game.level, game.lines]).toEqual([0,1,0]);
+    expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
     expect(game.board.grid).toEqual(TEST_BOARDS.empty);
-    
+
     expect(game.board.piece).not.toEqual(expect.any(Piece));
     expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
 
@@ -47,43 +53,43 @@ describe('game tests', () => {
   test('keyboard controls', () => {
     game.board.piece = p1;
 
-    expect([p1.x, p1.y]).toEqual([3,0]);
+    expect([p1.x, p1.y]).toEqual([3, 0]);
 
     game.command(CONTROLS.DOWN);
 
-    expect([p1.x, p1.y]).toEqual([3,1]);
+    expect([p1.x, p1.y]).toEqual([3, 1]);
 
     game.command(CONTROLS.LEFT);
 
-    expect([p1.x, p1.y]).toEqual([2,1]);
+    expect([p1.x, p1.y]).toEqual([2, 1]);
 
     game.command(CONTROLS.RIGHT);
 
-    expect([p1.x, p1.y]).toEqual([3,1]);    
+    expect([p1.x, p1.y]).toEqual([3, 1]);
 
     expect(game.board.piece.grid).toEqual([
-      [0,0,0,0],
-      [1,1,1,1],
-      [0,0,0,0],
-      [0,0,0,0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
     ])
 
     game.command(CONTROLS.ROTATE_LEFT);
 
     expect(game.board.piece.grid).toEqual([
-      [0,1,0,0],
-      [0,1,0,0],
-      [0,1,0,0],
-      [0,1,0,0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
     ])
 
     game.command(CONTROLS.ROTATE_RIGHT);
 
     expect(game.board.piece.grid).toEqual([
-      [0,0,0,0],
-      [1,1,1,1],
-      [0,0,0,0],
-      [0,0,0,0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
     ])
 
     game.command(CONTROLS.HARD_DROP);
@@ -93,14 +99,14 @@ describe('game tests', () => {
 
   test('score points by moving piece down', () => {
     game.board.piece = p1;
-    
+
     game.command(CONTROLS.HARD_DROP);
 
     // expected score is 36
     expect(game.score).toBe(36)
 
     game.command(CONTROLS.DOWN);
-    
+
     expect(game.score).toBe(37)
   });
 
@@ -111,11 +117,11 @@ describe('game tests', () => {
     game.command(CONTROLS.HARD_DROP)
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
-    
+
     // I piece will hard drop 18. 36 + 100    
     expect(game.score).toBe(136)
   });
-  
+
   test('score points for double line', () => {
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
@@ -134,14 +140,14 @@ describe('game tests', () => {
     // J piece will hard drop 16. 32 + 300
     expect(game.score).toBe(332);
   });
-  
+
   test('score points for triple line', () => {
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p1;
 
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.ROTATE_LEFT);
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
@@ -149,21 +155,21 @@ describe('game tests', () => {
     // I piece will hard drop 16. 32 + 500
     expect(game.score).toBe(532);
   });
-  
+
   test('score points for tetris', () => {
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
-    
+
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.ROTATE_LEFT);
+    game.command(CONTROLS.ROTATE_LEFT);
     game.command(CONTROLS.LEFT);
     game.command(CONTROLS.LEFT);
     game.command(CONTROLS.HARD_DROP);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
+    game.command(CONTROLS.ROTATE_LEFT);
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
@@ -177,13 +183,13 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
     game.level = 2;
-    
+
     expect(game.score).toBe(0);
 
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
-    
+
     // I piece will hard drop 18. 36 + 200
     expect(game.score).toBe(236);
   })
@@ -197,12 +203,12 @@ describe('game tests', () => {
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.HARD_DROP)
+    game.command(CONTROLS.HARD_DROP);
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
 
     // J piece will hard drop 16. 32 + 300
-    expect(game.lines).toBe(2)
+    expect(game.lines).toBe(2);
   });
 
   test('clearing lines updates level', () => {
@@ -228,9 +234,9 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECES[0]);
     const gameOverSpy = jest.spyOn(game, 'unsubGame');
-    const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
+    const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
-    for(let i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       game.board.nextPiece = new Piece(PIECES[0]);
       game.command(CONTROLS.ROTATE_LEFT);
       game.command(CONTROLS.HARD_DROP);
@@ -258,9 +264,9 @@ describe('game tests', () => {
 
   test('animate - clears animation on gameOver', () => {
     const canelAnimationSpy = jest.spyOn(window, 'cancelAnimationFrame');
-    
+
     expect(game.animationId).toBe(undefined);
-    
+
     game.start();
 
     expect(game.animationId).toEqual(expect.any(Number));
@@ -269,13 +275,13 @@ describe('game tests', () => {
 
     expect(canelAnimationSpy).toHaveBeenCalledTimes(1);
     expect(game.animationId).toBe(undefined);
-  })
+  });
 
   test('animate - moves piece at set intervals', () => {
     const movePieceSpy = jest.spyOn(game.board, 'movePiece');
-    
+
     game.start();
-    
+
     jest.advanceTimersByTime(1000);
 
     expect(requestAnimationFrame).toHaveBeenCalledTimes(11);
@@ -284,15 +290,36 @@ describe('game tests', () => {
 
   test('animation speed', () => {
     game.start();
-    
+
     expect(game.level).toBe(1);
-    
+
     expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[game.level]);
-    
+
     game.level = 10;
     expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[10]);
 
     game.level = 100;
     expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[MAX_SPEED]);
-  })
+  });
+
+  test('command queue - add commands', () => {
+    game.start();
+    game.command(CONTROLS.DOWN);
+
+    expect(game.commandQueue).toEqual(['DOWN']);
+
+    game.commandQueue = [];
+
+    game.command(CONTROLS.LEFT);
+    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.DOWN);
+    game.command(CONTROLS.AUTO_DOWN);
+    game.command(CONTROLS.ROTATE_LEFT);
+    game.command(CONTROLS.ROTATE_RIGHT);
+    game.command(CONTROLS.HARD_DROP);
+
+    expect(game.commandQueue).toEqual([
+      "LEFT", "RIGHT", "DOWN", "AUTO_DOWN", "ROTATE_LEFT", "ROTATE_RIGHT", "HARD_DROP"
+    ]);
+  });
 });
