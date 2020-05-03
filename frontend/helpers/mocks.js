@@ -1,4 +1,5 @@
 const TEST_BOARDS = require('./sampleBoards');
+const { subscribe } = require('./pubSub');
 
 const getTestBoard = (board) =>
   JSON.parse(JSON.stringify(TEST_BOARDS[board]));
@@ -54,10 +55,43 @@ const mockAnimation = () => {
   }, 100)
 };
 
+const pubSubMocks = () => {
+  const mocks = {
+    gameOverMock: jest.fn(),
+    gameOverMock: jest.fn(),
+    lowerPieceMock: jest.fn(),
+    drawMock: jest.fn(),
+    clearMock: jest.fn(),
+    boardMock: jest.fn(),
+    updateScoreMock: jest.fn(),
+    executeCommandsMock: jest.fn(),
+  }
+  
+  const unsubscribe = [
+    subscribe('gameOver', mocks.gameOverMock),
+    subscribe('lowerPiece', mocks.lowerPieceMock),
+    subscribe('draw', mocks.drawMock),
+    subscribe('clearLines', mocks.clearMock),
+    subscribe('boardChange', mocks.boardMock),
+    subscribe('updateScore', mocks.updateScoreMock),
+    subscribe('executeCommands', mocks.executeCommandsMock),
+  ]
+  
+  const clearMockSubscriptions = () => {
+    unsubscribe.forEach(unsub => unsub());
+  }
+
+  return {
+    ...mocks,
+    clearMockSubscriptions
+  }
+}
+
 module.exports = {
   TEST_BOARDS,
   getTestBoard,
   getMockCtx,
   getMockDOMSelector,
   mockAnimation,
+  pubSubMocks,
 }
