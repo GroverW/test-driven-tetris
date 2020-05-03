@@ -177,18 +177,20 @@ describe('game server tests', () => {
 
     expect(gameServer.nextRanking).toBe(3);
 
-    const sendAllExceptSpy = jest.spyOn(gameServer, 'sendAllExcept');
+    const sendAllExceptSpy = jest.spyOn(gameServer, 'sendAll');
     const _sendSpy1 = jest.spyOn(p1, '_send');
     const _sendSpy2 = jest.spyOn(p2, '_send');
 
-    p1.gameOver();
+    // this will add the current piece to the board
+    // and try to get a new one on top of it
+    p1.game.board.drop();
 
     expect(sendAllExceptSpy).toHaveBeenCalledTimes(1);
     expect(_sendSpy1).toHaveBeenCalledTimes(1);
 
     expect(gameServer.nextRanking).toBe(2);
     
-    p2.gameOver();
+    p2.game.board.drop();
 
     expect(sendAllExceptSpy).toHaveBeenCalledTimes(2);
     expect(_sendSpy1).toHaveBeenCalledTimes(2);
