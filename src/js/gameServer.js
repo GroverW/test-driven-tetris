@@ -16,7 +16,7 @@ class GameServer {
   join(player) {
     if(this.players.size < MAX_PLAYERS && !this.gameStarted) {
       this.players.add(player);
-      player.gameServer = this;
+      player.init(this);
       
       this.sendAllExcept(player, {
         message: 'addPlayer',
@@ -46,18 +46,18 @@ class GameServer {
 
   sendAll(data) {
     for(let player of this.players) {
-      player.send(JSON.stringify(data));
+      player._send(JSON.stringify(data));
     }
   }
 
   sendAllExcept(exceptPlayer, data) {
     for(let player of this.players) {
-      (player !== exceptPlayer) && player.send(JSON.stringify(data));
+      (player !== exceptPlayer) && player._send(JSON.stringify(data));
     }
   }
 
   sendTo(player, data) {
-    player.send(JSON.stringify(data));
+    player._send(JSON.stringify(data));
   }
 
   startGame() {
