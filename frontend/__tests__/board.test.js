@@ -1,19 +1,14 @@
 const Board = require('../static/js/board');
 const { Piece } = require('../static/js/piece');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
-const { TEST_BOARDS, getTestBoard } = require('../helpers/mocks');
+const { TEST_BOARDS, getTestBoard, pubSubMocks } = require('../helpers/mocks');
 const { subscribe } = require('../helpers/pubSub');
 
 
 describe('game board tests', () => {
   let gameBoard;
   let p1, p2, p3, p4, p5;
-  let gameOverMock = jest.fn();
-  let lowerPieceMock = jest.fn();
-  let drawMock = jest.fn();
-  let clearMock = jest.fn();
-  let boardMock = jest.fn();
-  let unsub1, unsub2, unsub3, unsub4, unsub5;
+  let pubSub;
   
   beforeEach(() => {
     gameBoard = new Board();
@@ -22,21 +17,12 @@ describe('game board tests', () => {
     p3 = new Piece(PIECES[2]);
     p4 = new Piece(PIECES[5]);
     p5 = new Piece(PIECES[6]);
-    
-    unsub1 = subscribe('gameOver', gameOverMock)
-    unsub2 = subscribe('lowerPiece', lowerPieceMock)
-    unsub3 = subscribe('draw', drawMock)
-    unsub4 = subscribe('clearLines', clearMock)
-    unsub5 = subscribe('boardChange', boardMock)
+    pubSub = pubSubMocks();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
-    unsub1();
-    unsub2();
-    unsub3();
-    unsub4();
-    unsub5();
+    pubSub.clearMockSubscriptions();
   })
   
   test('creates a new, empty board', () => {
@@ -71,7 +57,7 @@ describe('game board tests', () => {
     gameBoard.piece = p1;
 
     gameBoard.hardDrop();
-    expect(lowerPieceMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.lowerPieceMock).toHaveBeenCalledTimes(1);
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern1);
   });
@@ -118,7 +104,7 @@ describe('game board tests', () => {
   test('drop piece if invalid move down', () => {
     gameBoard.piece = p1;
     gameBoard.movePiece(0,18);
-    expect(drawMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
     
     expect(gameBoard.grid).toEqual(TEST_BOARDS.empty);
     expect([p1.x, p1.y]).toEqual([3,18]);
@@ -148,7 +134,7 @@ describe('game board tests', () => {
     gameBoard.hardDrop();
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
-    expect(clearMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.clearMock).toHaveBeenCalledTimes(1);
   });
 
   test('clears multiple lines', () => {
@@ -183,8 +169,8 @@ describe('game board tests', () => {
     
     // 1 for adding piece to board
     // 1 for clearing lines
-    expect(clearMock).toHaveBeenCalledTimes(1);
-    expect(boardMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.clearMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.boardMock).toHaveBeenCalledTimes(1);
   })
 })
 
