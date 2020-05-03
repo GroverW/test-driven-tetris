@@ -3,6 +3,8 @@ const { GAMES, MAX_PLAYERS } = require('../helpers/data');
 class GameServer {
   constructor() {
     this.players = new Set();
+    this.gameStarted = false;
+    this.nextRanking;
   }
 
   static get(id) {
@@ -12,8 +14,15 @@ class GameServer {
   }
 
   join(player) {
-    if(this.players.size < MAX_PLAYERS) {
+    if(this.players.size < MAX_PLAYERS && !this.gameStarted) {
       this.players.add(player);
+      player.gameServer = this;
+      
+      this.sendAllExcept(player, {
+        message: 'addPlayer',
+        data: player.id
+      });
+      
       return true;
     }
     
@@ -23,7 +32,57 @@ class GameServer {
   leave(player) {
     if(this.players.has(player)) {
       this.players.delete(player);
+
+      this.sendAllExcept(player, {
+        message: 'removePlayer',
+        data: player.id
+      });
+
+      return true;
     }
+
+    return false;
+  }
+
+  sendAll(data) {
+    for(let player of this.players) {
+      player.send(JSON.stringify(data));
+    }
+  }
+
+  sendAllExcept(exceptPlayer, data) {
+    for(let player of this.players) {
+      (player !== exceptPlayer) && player.send(JSON.stringify(data));
+    }
+  }
+
+  sendTo(player, data) {
+    player.send(JSON.stringify(data));
+  }
+
+  startGame() {
+    this.gameStarted = true;
+    this.sendAll({
+      message: 'startGame',
+    })
+    this.nextRanking = this.players.size;
+  }
+
+  gameOver(player) {
+    this.sendAllExcept(player, {
+      message: 'playerGameOver',
+      data: {
+        id: player.id,
+        ranking: this.nextRanking
+      }
+    });
+
+    this.sendTo(player, {
+      message: 'gameOver',
+      data: this.nextRanking
+    });
+
+    this.nextRanking--;
   }
 }
 
