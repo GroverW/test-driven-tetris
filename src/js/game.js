@@ -1,16 +1,16 @@
 const Board = require('./board');
-const { CONTROLS, POINTS, LINES_PER_LEVEL } = require('../helpers/data');
-const { subscribe } = require('../helpers/pubSub');
+const { POINTS, LINES_PER_LEVEL } = require('../helpers/data');
 
 class Game {
-  constructor(pubSub) {
+  constructor(pubSub, playerId) {
+    this.playerId = playerId;
     this.gameStatus = true;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
     this.linesRemaining = 10;
     this.pubSub = pubSub;
-    this.board = new Board(this.pubSub);
+    this.board = new Board(this.pubSub, this.playerId);
     this.unsubDrop = this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this));
     this.unsubClear = this.pubSub.subscribe('clearLines', this.clearLines.bind(this));
     this.unsubGame = this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
@@ -21,7 +21,7 @@ class Game {
     this.gameStatus = true;
   }
 
-  command(key) {
+  command(action) {
     const commands = {
       LEFT: () => this.board.movePiece(-1,0),
       RIGHT: () => this.board.movePiece(1,0),
@@ -32,7 +32,11 @@ class Game {
       HARD_DROP: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) commands[key]();
+    if((action in commands) && this.gameStatus) commands[action]();
+  }
+
+  executeCommandQueue(commands) {
+    commands.forEach(action => this.command(action));
   }
 
   updateScore(points) {
