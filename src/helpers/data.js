@@ -26,6 +26,13 @@ const POINTS = {
   }
 };
 
+const RANKINGS = {
+  1: "1st",
+  2: "2nd",
+  3: "3rd",
+  4: "4th"
+}
+
 const PIECES = [[
     [0,0,0,0],
     [1,1,1,1],
@@ -56,7 +63,15 @@ const PIECES = [[
     [0,0,0]
   ]
 ]
-const SEED_PIECES = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
+const SEED_PIECES = [
+  0,0,0,0,0,0,0,
+  1,1,1,1,1,1,1,
+  2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,
+  4,4,4,4,4,4,4,
+  5,5,5,5,5,5,5,
+  6,6,6,6,6,6,6,
+];
 
 
 module.exports = {
@@ -69,6 +84,7 @@ module.exports = {
   ROTATE_RIGHT,
   CONTROLS,
   POINTS,
+  RANKINGS,
   PIECES,
   SEED_PIECES
 }
