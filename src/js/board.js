@@ -1,7 +1,6 @@
 const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('../helpers/data');
 const { getEmptyBoard } = require('../helpers/utils');
-const { pieceList, Piece } = require('./piece');
-const { publish } = require('../helpers/pubSub')
+const { PieceList, Piece } = require('./piece');
 
 class Board {
   constructor(pubSub) {
@@ -9,6 +8,7 @@ class Board {
     this.piece;
     this.nextPiece;
     this.pubSub = pubSub;
+    this.pieceList = new PieceList();
   }
 
   createEmptyGrid() {
@@ -18,13 +18,17 @@ class Board {
   getPieces() {
     this.piece = this.nextPiece
       ? this.nextPiece
-      : new Piece(pieceList.getNextPiece());
+      : new Piece(this.pieceList.getNextPiece());
     
     if(!this.validMove(0,0)) {
       this.pubSub.publish("gameOver", this.piece);
     }
 
-    this.nextPiece = new Piece(pieceList.getNextPiece());
+    this.nextPiece = new Piece(this.pieceList.getNextPiece());
+
+    if(this.pieceList.almostEmpty()) {
+      this.pubSub.publish("getPieces")
+    }
   }
 
   movePiece(x, y, multiplier = POINTS.DOWN) {
