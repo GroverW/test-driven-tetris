@@ -3,16 +3,17 @@ const { CONTROLS, POINTS, LINES_PER_LEVEL } = require('../helpers/data');
 const { subscribe } = require('../helpers/pubSub');
 
 class Game {
-  constructor() {
+  constructor(pubSub) {
     this.gameStatus = true;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
     this.linesRemaining = 10;
-    this.board = new Board();
-    this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
-    this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
-    this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
+    this.pubSub = pubSub;
+    this.board = new Board(this.pubSub);
+    this.unsubDrop = this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this));
+    this.unsubClear = this.pubSub.subscribe('clearLines', this.clearLines.bind(this));
+    this.unsubGame = this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
   }
 
   start() {
@@ -20,17 +21,18 @@ class Game {
     this.gameStatus = true;
   }
 
-  command(key, val) {
+  command(key) {
     const commands = {
-      [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
-      [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: (points=POINTS.DOWN) =>  this.board.movePiece(0,1,points),
-      [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
-      [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
-      [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
+      LEFT: () => this.board.movePiece(-1,0),
+      RIGHT: () => this.board.movePiece(1,0),
+      DOWN: () =>  this.board.movePiece(0,1),
+      AUTO_DOWN: () => this.board.movePiece(0,1,0),
+      ROTATE_LEFT: () => this.board.rotatePiece(this.board.piece, -1),
+      ROTATE_RIGHT: () => this.board.rotatePiece(this.board.piece, 1),
+      HARD_DROP: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) commands[key](val);
+    if((key in commands) && this.gameStatus) commands[key]();
   }
 
   updateScore(points) {

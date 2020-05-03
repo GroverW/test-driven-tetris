@@ -5,14 +5,16 @@ const {
   TEST_BOARDS,
   getTestBoard,
 } = require('../helpers/mocks');
-const { publish } = require('../helpers/pubSub');
+const pubSub = require('../helpers/pubSub');
 
 describe('game tests', () => {
   let game;
   let p1, p2, p3;
+  let pubSubTest;
 
   beforeEach(() => {
-    game = new Game();
+    pubSubTest = pubSub();
+    game = new Game(pubSubTest);
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[6]);
     p3 = new Piece(PIECES[2]);
@@ -43,15 +45,15 @@ describe('game tests', () => {
 
     expect([p1.x, p1.y]).toEqual([3,0]);
 
-    game.command(CONTROLS.DOWN);
+    game.command('DOWN');
 
     expect([p1.x, p1.y]).toEqual([3,1]);
 
-    game.command(CONTROLS.LEFT);
+    game.command('LEFT');
 
     expect([p1.x, p1.y]).toEqual([2,1]);
 
-    game.command(CONTROLS.RIGHT);
+    game.command('RIGHT');
 
     expect([p1.x, p1.y]).toEqual([3,1]);    
 
@@ -62,7 +64,7 @@ describe('game tests', () => {
       [0,0,0,0],
     ])
 
-    game.command(CONTROLS.ROTATE_LEFT);
+    game.command('ROTATE_LEFT');
 
     expect(game.board.piece.grid).toEqual([
       [0,1,0,0],
@@ -71,7 +73,7 @@ describe('game tests', () => {
       [0,1,0,0],
     ])
 
-    game.command(CONTROLS.ROTATE_RIGHT);
+    game.command('ROTATE_RIGHT');
 
     expect(game.board.piece.grid).toEqual([
       [0,0,0,0],
@@ -80,7 +82,7 @@ describe('game tests', () => {
       [0,0,0,0],
     ])
 
-    game.command(CONTROLS.HARD_DROP);
+    game.command('HARD_DROP');
 
     expect(game.board.grid).toEqual(TEST_BOARDS.pattern1);
   });
@@ -88,12 +90,12 @@ describe('game tests', () => {
   test('score points by moving piece down', () => {
     game.board.piece = p1;
     
-    game.command(CONTROLS.HARD_DROP);
+    game.command('HARD_DROP');
 
     // expected score is 36
     expect(game.score).toBe(36)
 
-    game.command(CONTROLS.DOWN);
+    game.command('DOWN');
     
     expect(game.score).toBe(37)
   });
@@ -102,7 +104,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
 
-    game.command(CONTROLS.HARD_DROP)
+    game.command('HARD_DROP')
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
     
@@ -116,12 +118,12 @@ describe('game tests', () => {
 
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.HARD_DROP);
+    game.command('ROTATE_LEFT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('HARD_DROP');
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
 
@@ -135,8 +137,8 @@ describe('game tests', () => {
 
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.HARD_DROP);
+    game.command('ROTATE_LEFT');    
+    game.command('HARD_DROP');
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
 
@@ -151,14 +153,14 @@ describe('game tests', () => {
     
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.LEFT);
-    game.command(CONTROLS.LEFT);
-    game.command(CONTROLS.HARD_DROP);
+    game.command('ROTATE_LEFT');    
+    game.command('ROTATE_LEFT');    
+    game.command('LEFT');
+    game.command('LEFT');
+    game.command('HARD_DROP');
 
-    game.command(CONTROLS.ROTATE_LEFT);    
-    game.command(CONTROLS.HARD_DROP);
+    game.command('ROTATE_LEFT');    
+    game.command('HARD_DROP');
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
 
@@ -174,7 +176,7 @@ describe('game tests', () => {
     
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.HARD_DROP);
+    game.command('HARD_DROP');
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
     
@@ -186,12 +188,12 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
-    game.command(CONTROLS.ROTATE_LEFT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.RIGHT);
-    game.command(CONTROLS.HARD_DROP)
+    game.command('ROTATE_LEFT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('RIGHT');
+    game.command('HARD_DROP')
 
     expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
 
@@ -202,18 +204,18 @@ describe('game tests', () => {
   test('clearing lines updates level', () => {
     expect(game.level).toBe(1);
 
-    publish('clearLines', 4);
+    pubSubTest.publish('clearLines', 4);
 
     expect(game.linesRemaining).toBe(6);
 
-    publish('clearLines', 4);
-    publish('clearLines', 4);
+    pubSubTest.publish('clearLines', 4);
+    pubSubTest.publish('clearLines', 4);
 
     expect(game.level).toBe(2);
     expect(game.linesRemaining).toBe(8);
 
-    publish('clearLines', 4);
-    publish('clearLines', 4);
+    pubSubTest.publish('clearLines', 4);
+    pubSubTest.publish('clearLines', 4);
 
     expect(game.level).toBe(3);
   });
@@ -226,14 +228,14 @@ describe('game tests', () => {
 
     for(let i = 0; i < 5; i++) {
       game.board.nextPiece = new Piece(PIECES[0]);
-      game.command(CONTROLS.ROTATE_LEFT);
-      game.command(CONTROLS.HARD_DROP);
+      game.command('ROTATE_LEFT');
+      game.command('HARD_DROP');
     }
 
     expect(boardMoveSpy).toHaveBeenCalledTimes(5);
     expect(gameOverSpy).toHaveBeenCalled();
 
-    game.command(CONTROLS.LEFT);
+    game.command('LEFT');
     // should not get called again
     expect(boardMoveSpy).toHaveBeenCalledTimes(5);
 
