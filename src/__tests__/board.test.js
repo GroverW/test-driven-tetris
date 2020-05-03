@@ -161,5 +161,17 @@ describe('game board tests', () => {
     expect(gameBoard.pieceList.almostEmpty()).toBe(true);
     expect(publishSpy).toHaveBeenCalled();
   })
+
+  test('publish board updates', () => {
+    const publishSpy = jest.spyOn(gameBoard, 'publishBoardUpdate');
+
+    gameBoard.grid = getTestBoard('clearLines1');
+    gameBoard.piece = p1;
+
+    gameBoard.hardDrop();
+
+    // 1 for adding piece to board, 1 for clearing lines
+    expect(publishSpy).toHaveBeenCalledTimes(2);
+  })
 })
 
