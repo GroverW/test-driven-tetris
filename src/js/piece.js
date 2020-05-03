@@ -1,5 +1,4 @@
-const { PIECES, SEED_PIECES, BOARD_WIDTH } = require('../helpers/data');
-const { randomize } = require('../helpers/utils');
+const { PIECES, BOARD_WIDTH } = require('../helpers/data');
 
 class PieceList {
   constructor() {
@@ -16,7 +15,7 @@ class PieceList {
     const currentPiece = PIECES[this.pieces[this.currSet][this.currIdx]];
     this.currIdx++;
     
-    if(this.currIdx >= this.pieces[currSet].length) {
+    if(this.currIdx >= this.pieces[this.currSet].length) {
       this.currIdx = 0;
       this.currSet++;
     }
@@ -26,7 +25,7 @@ class PieceList {
 
   almostEmpty() {
     return (
-      this.currSet === this.pieces.length && 
+      this.currSet === this.pieces.length - 1 && 
       this.pieces[0].length - this.currIdx <= 15
     );
   }
