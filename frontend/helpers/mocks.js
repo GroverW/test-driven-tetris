@@ -87,6 +87,23 @@ const pubSubMocks = () => {
   }
 }
 
+const webSocketMock = {
+    topics: {},
+    send(type, data) {
+      this.topics[type] && this.topics[type].forEach(callback => callback(data));
+    },
+    on (type, callback) {
+      this.topics[type]
+        ? this.topics[type].push(callback)
+        : this.topics[type] = [callback];
+    
+      const index = this.topics[type].length - 1;
+      const unsubscribe = () => { this.topics[type].splice(index, 1) };
+    
+      return unsubscribe;
+    }
+};
+
 module.exports = {
   TEST_BOARDS,
   getTestBoard,
@@ -94,4 +111,5 @@ module.exports = {
   getMockDOMSelector,
   mockAnimation,
   pubSubMocks,
+  webSocketMock,
 }
