@@ -3,27 +3,34 @@ const { randomize } = require('../helpers/utils');
 
 class PieceList {
   constructor() {
-    this.pieces;
-    this.currIdx;
-    this.reset();
+    this.pieces = [];
+    this.currIdx = 0;
+    this.currSet = 0;
   }
 
-  reset() {
-    this.pieces = randomize(SEED_PIECES);
-    this.currIdx = 0;
+  addSet(pieces) {
+    this.pieces.push(pieces);
   }
 
   getNextPiece() {
-    const currentPiece = PIECES[this.pieces[this.currIdx]];
+    const currentPiece = PIECES[this.pieces[this.currSet][this.currIdx]];
     this.currIdx++;
     
-    if(this.currIdx >= this.pieces.length) this.reset();
+    if(this.currIdx >= this.pieces[currSet].length) {
+      this.currIdx = 0;
+      this.currSet++;
+    }
     
     return JSON.parse(JSON.stringify(currentPiece));
   }
-}
 
-const pieceList = new PieceList();
+  almostEmpty() {
+    return (
+      this.currSet === this.pieces.length && 
+      this.pieces[0].length - this.currIdx <= 15
+    );
+  }
+}
 
 class Piece {
   constructor(piece) {
@@ -43,6 +50,6 @@ class Piece {
 }
 
 module.exports = {
-  pieceList,
+  PieceList,
   Piece
 };
