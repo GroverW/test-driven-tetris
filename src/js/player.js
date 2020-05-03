@@ -1,20 +1,24 @@
 const Game = require('./game');
-const pubSub = require('../helpers/pubSub');
 
 class Player {
   constructor(send, pubSub) {
+    this.isHost = false;
     this._send = send;
-    this.gameServer;
     this.pubSub = pubSub;
     this.game = new Game(this.pubSub);
-  }
-
-  init(gameServer) {
-    this.gameServer = gameServer;
+    this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
   }
 
   gameOver() {
-    this.gameServer.gameOver(this)
+    this.pubSub.publish('getRanking', this);
+  }
+
+  leave() {
+    this.pubSub.publish('leave', this);
+  }
+
+  startGame() {
+    this.pubSub.publish('startGame', this);
   }
 }
 
