@@ -357,6 +357,7 @@ describe('game tests', () => {
 
     game.command(CONTROLS.HARD_DROP);
 
+    // updating board should send commands and clear queue
     expect(game.commandQueue.length).toBe(0);
     expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
 
