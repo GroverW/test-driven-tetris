@@ -1,6 +1,6 @@
 const Game = require('../js/game');
 const { Piece } = require ('../js/piece');
-const { PIECES, CONTROLS  } = require('../helpers/data');
+const { PIECES } = require('../helpers/data');
 const { 
   TEST_BOARDS,
   getTestBoard,
@@ -228,6 +228,7 @@ describe('game tests', () => {
     const gameOverSpy = jest.spyOn(game, 'unsubGame');
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
 
+    // stacking I pieces on top of each other until they reach the top
     for(let i = 0; i < 5; i++) {
       game.board.nextPiece = new Piece(PIECES[0]);
       game.command('ROTATE_LEFT');
@@ -240,6 +241,73 @@ describe('game tests', () => {
     game.command('LEFT');
     // should not get called again
     expect(boardMoveSpy).toHaveBeenCalledTimes(5);
+  });
+
+  test('command queue - executes commands', () => {
+    // duplicate scoring points for tetris
+    game.board.grid = getTestBoard('clearLines2');
+    game.board.piece = p3;
+    game.board.nextPiece = p1;
+    
+    expect(game.score).toBe(0);
+
+    const COMMANDS = [
+      'ROTATE_LEFT',
+      'ROTATE_LEFT',
+      'AUTO_DOWN',
+      'LEFT',
+      'LEFT',
+      'HARD_DROP',
+      'ROTATE_LEFT',
+      'AUTO_DOWN',
+      'HARD_DROP',
+    ]
+
+    game.executeCommandQueue(COMMANDS);
+
+    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
+
+    // T will hard drop 13, I will hard drop 15
+    // there are two auto_downs which count for 0 points
+    // 28 + 32 + 800 for tetris
+    expect(game.score).toBe(856);
+  });
+
+  test('command queue - board updates get published', () => {
+    const publishSpy = jest.spyOn(game.board, 'publishBoardUpdate');
+
+    // duplicate scoring points for tetris
+    game.board.grid = getTestBoard('clearLines2');
+    game.board.piece = p3;
+    game.board.nextPiece = p1;
+    
+    expect(game.score).toBe(0);
+
+    const COMMANDS1 = [
+      'ROTATE_LEFT',
+      'ROTATE_LEFT',
+      'AUTO_DOWN',
+      'LEFT',
+      'LEFT',
+      'HARD_DROP',
+    ]
+    
+    game.executeCommandQueue(COMMANDS1);
+
+    // 1 publish to updateBoard for adding piece to board
+    expect(publishSpy).toHaveBeenCalledTimes(1);
+
+    const COMMANDS2 = [
+      'ROTATE_LEFT',
+      'AUTO_DOWN',
+      'HARD_DROP',
+    ]
+
+    game.executeCommandQueue(COMMANDS2)
+
+    // 1 publish for adding piece to board
+    // 1 publish for clearing lines
+    expect(publishSpy).toHaveBeenCalledTimes(3);
 
   })
 });
