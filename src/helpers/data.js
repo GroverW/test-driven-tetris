@@ -5,14 +5,15 @@ const BOARD_HEIGHT = 20;
 const LINES_PER_LEVEL = 10;
 const ROTATE_LEFT = -1;
 const ROTATE_RIGHT = 1;
-const CONTROLS = {
-  LEFT: 37,
-  RIGHT: 39,
-  DOWN: 40,
-  ROTATE_LEFT: 65,
-  ROTATE_RIGHT: 83,
-  HARD_DROP: 32
-};
+const CONTROLS = new Set([
+  'LEFT',
+  'RIGHT',
+  'DOWN',
+  'AUTO_DOWN',
+  'ROTATE_LEFT',
+  'ROTATE_RIGHT',
+  'HARD_DROP'
+]);
 
 const POINTS = {
   DOWN: 1,
