@@ -1,5 +1,5 @@
 const { pieceList, Piece } = require('../js/piece');
-// const Board = require('../static/js/board');
+const Board = require('../js/board');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 
 describe('game pieces', () => {
