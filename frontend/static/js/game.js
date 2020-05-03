@@ -23,6 +23,7 @@ class Game {
     this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
     this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
     this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
+    this.unsubBoard = subscribe('boardChange', this.sendCommandQueue.bind(this));
   }
 
   start() {
@@ -55,17 +56,47 @@ class Game {
     }
 
     if((key in commands) && this.gameStatus) {
-      commands[key]();
       this.addToCommandQueue(key);
+      commands[key]();
     }
   }
 
+  /**
+   * COMMAND QUEUE
+   * 
+   * addToCommandQueue
+   * - adds commands to the queue
+   * 
+   * sendCommandQueue
+   * - on boardChange, sends commandQueue to backend
+   * 
+   */
   addToCommandQueue(action) {
     if (action in COMMAND_QUEUE_MAP) {
       this.commandQueue.push(COMMAND_QUEUE_MAP[action]);
     }
   }
 
+  
+  sendCommandQueue() {
+    publish('executeCommands', this.commandQueue);
+    this.commandQueue = [];
+  }
+
+  /**
+   * SCOREBOARD
+   * 
+   * updateScore
+   * - adds points to score, publishes score
+   * 
+   * updateLines
+   * - updates level
+   * - adds lines lines to lines cleared
+   * - publishes lines and level
+   * 
+   * clearLines
+   * - calls updateScore and updateLines when clearLines is published
+   */
   updateScore(points) {
     this.score += points;
 
@@ -94,15 +125,33 @@ class Game {
     }
   }
 
+  /**
+   * gameOver
+   * - called when gameOver is published
+   * - unsubscribes from all subs
+   * - changes game status
+   * - cancels animation
+   * - resets animationId
+   */
   gameOver() {
     this.unsubDrop();
     this.unsubClear();
     this.unsubGame();
+    this.unsubBoard();
     this.gameStatus = false;
     cancelAnimationFrame(this.animationId);
     this.animationId = undefined;
   }
 
+  /**
+   * ANIMATION
+   * 
+   * animate
+   * - animates the current piece on the board
+   * 
+   * getAnimationDelay
+   * - determines how quickly piece should move
+   */
   animate(currTime = 0) {
     this.time.elapsed = currTime - this.time.start;
     
