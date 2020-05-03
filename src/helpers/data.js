@@ -1,6 +1,7 @@
 const GAMES = new Map();
 const MAX_PLAYERS = 4;
-
+const BOARD_WIDTH = 10;
+const BOARD_HEIGHT = 20;
 const LINES_PER_LEVEL = 10;
 const ROTATE_LEFT = -1;
 const ROTATE_RIGHT = 1;
@@ -60,6 +61,8 @@ const SEED_PIECES = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
 module.exports = {
   GAMES,
   MAX_PLAYERS,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
   LINES_PER_LEVEL,
   ROTATE_LEFT,
   ROTATE_RIGHT,
