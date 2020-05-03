@@ -35,17 +35,18 @@ class Game {
     });
   }
 
-  command(key, val) {
+  command(key) {
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: (points=POINTS.DOWN) =>  this.board.movePiece(0,1,points),
+      [CONTROLS.DOWN]: () =>  this.board.movePiece(0,1),
+      [CONTROLS.AUTO_DOWN]: () =>  this.board.movePiece(0,1,0),
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) commands[key](val);
+    if((key in commands) && this.gameStatus) commands[key]();
   }
 
   updateScore(points) {
