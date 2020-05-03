@@ -146,5 +146,21 @@ describe('game board tests', () => {
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
   });
+
+  test('publishes board changes', () => {
+    gameBoard.grid = getTestBoard('clearLines2');
+    gameBoard.piece = p1;
+
+    const publishSpy = jest.spyOn(gameBoard, 'publishBoardChange');
+    
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.hardDrop();
+
+    expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
+    
+    // 1 for adding piece to board
+    // 1 for clearing lines
+    expect(publishSpy).toHaveBeenCalledTimes(2);
+  })
 })
 
