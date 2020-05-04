@@ -10,8 +10,9 @@ const {
 const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
-  constructor() {
+  constructor(id) {
     this.gameStatus = true;
+    this.id = id;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
@@ -133,14 +134,20 @@ class Game {
    * - cancels animation
    * - resets animationId
    */
-  gameOver() {
+  gameOver(id) {
+    if(id === this.id) {
+      this.unsubscribe();
+      this.gameStatus = false;
+      cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
+    }
+  }
+
+  unsubscribe() {
     this.unsubDrop();
     this.unsubClear();
     this.unsubGame();
     this.unsubBoard();
-    this.gameStatus = false;
-    cancelAnimationFrame(this.animationId);
-    this.animationId = undefined;
   }
 
   /**
