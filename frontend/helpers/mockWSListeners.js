@@ -53,7 +53,7 @@ class MockClientListener {
     this.unsub1 = ws.on('addPlayer', this.addPlayer.bind(this));
     this.unsub2 = ws.on('removePlayer', this.removePlayer.bind(this));
     this.unsub3 = ws.on('startGame', this.startGame.bind(this));
-    this.unsub4 = ws.on('addPieces', this.addPlayer.bind(this));
+    this.unsub4 = ws.on('addPieces', this.addPieces.bind(this));
     this.unsub5 = ws.on('gameOver', this.gameOver.bind(this));
   }
 
@@ -75,7 +75,7 @@ class MockClientListener {
   }
 
   addPieces(pieces) {
-    this.game.board.addPieces(pieces);
+    this.game.board.pieceList.addSet(pieces);
   }
 
   gameOver(id) {
