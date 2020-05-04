@@ -6,12 +6,13 @@ class Player {
     this.isHost = false;
     this._send = send;
     this.pubSub = pubSub;
-    this.game = new Game(this.pubSub, this.id);
-    this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
+    this.game = new Game(this.pubSub);
   }
 
-  gameOver() {
-    
+  setId(id) {
+    this.id = id;
+    this.game.id = id;
+    this.game.board.playerId = id;
   }
 
   leave() {
