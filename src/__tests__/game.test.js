@@ -43,6 +43,7 @@ describe('game tests', () => {
   });
 
   test('keyboard controls', () => {
+    game.start();
     game.board.piece = p1;
 
     expect([p1.x, p1.y]).toEqual([3,0]);
@@ -90,6 +91,7 @@ describe('game tests', () => {
   });
 
   test('score points by moving piece down', () => {
+    game.start();
     game.board.piece = p1;
     
     game.command('HARD_DROP');
@@ -103,6 +105,7 @@ describe('game tests', () => {
   });
 
   test('score points for single line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
 
@@ -115,6 +118,7 @@ describe('game tests', () => {
   });
   
   test('score points for double line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
@@ -134,6 +138,7 @@ describe('game tests', () => {
   });
   
   test('score points for triple line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p1;
 
@@ -149,6 +154,7 @@ describe('game tests', () => {
   });
   
   test('score points for tetris', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
@@ -172,6 +178,7 @@ describe('game tests', () => {
   });
 
   test('score points with level modifier', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
     game.level = 2;
@@ -187,6 +194,7 @@ describe('game tests', () => {
   })
 
   test('clearing lines updates lines cleared', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
@@ -204,6 +212,7 @@ describe('game tests', () => {
   });
 
   test('clearing lines updates level', () => {
+    game.start();
     expect(game.level).toBe(1);
 
     pubSubTest.publish('clearLines', 4);
@@ -223,6 +232,7 @@ describe('game tests', () => {
   });
 
   test('game over', () => {
+    game.start();
     game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECES[0]);
     const gameOverSpy = jest.spyOn(game, 'unsubGame');
@@ -244,6 +254,7 @@ describe('game tests', () => {
   });
 
   test('command queue - executes commands', () => {
+    game.start();
     // duplicate scoring points for tetris
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
@@ -274,6 +285,7 @@ describe('game tests', () => {
   });
 
   test('command queue - board updates get published', () => {
+    game.start();
     const publishSpy = jest.spyOn(game.board, 'publishBoardUpdate');
 
     // duplicate scoring points for tetris
