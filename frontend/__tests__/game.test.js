@@ -9,6 +9,7 @@ const {
 const {
   TEST_BOARDS,
   getTestBoard,
+  getTestPieces,
   mockAnimation,
   pubSubMocks
 } = require('../helpers/mocks');
@@ -20,24 +21,22 @@ describe('game tests', () => {
   let pubSub;
 
   beforeEach(() => {
-    game = new Game();
+    pubSub = pubSubMocks();
+    game = new Game(1);
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[6]);
     p3 = new Piece(PIECES[2]);
-    pubSub = pubSubMocks();
-
+    
     jest.useFakeTimers();
-
+    
+    game.board.pieceList.addSet(getTestPieces());
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   })
 
   afterEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
-    game.unsubDrop();
-    game.unsubClear();
-    game.unsubGame();
-    game.unsubBoard();
+    game.unsubscribe()
     pubSub.clearMockSubscriptions();
   });
 
@@ -62,6 +61,7 @@ describe('game tests', () => {
   });
 
   test('keyboard controls', () => {
+    game.start();
     game.board.piece = p1;
 
     expect([p1.x, p1.y]).toEqual([3, 0]);
@@ -109,21 +109,23 @@ describe('game tests', () => {
   });
 
   test('score points by moving piece down', () => {
+    game.start();
     game.board.piece = p1;
 
     game.command(CONTROLS.HARD_DROP);
 
     // expected score is 36
     expect(game.score).toBe(36)
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(1);
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(2);
 
     game.command(CONTROLS.DOWN);
 
     expect(game.score).toBe(37)
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(2);
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
   });
 
   test('score points for single line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
 
@@ -133,11 +135,12 @@ describe('game tests', () => {
 
     // I piece will hard drop 18. 36 + 100    
     expect(game.score).toBe(136)
-    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
+    // 1 for game start, 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
   });
 
   test('score points for double line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
@@ -154,11 +157,12 @@ describe('game tests', () => {
 
     // J piece will hard drop 16. 32 + 300
     expect(game.score).toBe(332);
-    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
+    // 1 for game start, 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
   });
 
   test('score points for triple line', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p1;
 
@@ -171,11 +175,12 @@ describe('game tests', () => {
 
     // I piece will hard drop 16. 32 + 500
     expect(game.score).toBe(532);
-    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
+    // 1 for game start, 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
   });
 
   test('score points for tetris', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
@@ -196,11 +201,12 @@ describe('game tests', () => {
     // T will hard drop 14, I will hard drop 16
     // 28 + 32 + 800 for tetris
     expect(game.score).toBe(860);
-    // 2 for moving piece down, 1 for clearing lines, 1 for updating lines
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
+    // 1 for game start, 2 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(5);
   });
 
   test('score points with level modifier', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines1');
     game.board.piece = p1;
     game.level = 2;
@@ -213,11 +219,12 @@ describe('game tests', () => {
 
     // I piece will hard drop 18. 36 + 200
     expect(game.score).toBe(236);
-    // 1 for moving piece down, 1 for clearing lines, 1 for updating lines
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(3);
+    // 1 for game start, 1 for moving piece down, 1 for clearing lines, 1 for updating lines
+    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(4);
   })
 
   test('clearing lines updates lines cleared', () => {
+    game.start();
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
@@ -254,9 +261,10 @@ describe('game tests', () => {
   });
 
   test('game over', () => {
+    game.start();
+    
     game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECES[0]);
-    const gameOverSpy = jest.spyOn(game, 'unsubGame');
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
     for (let i = 0; i < 5; i++) {
@@ -264,9 +272,9 @@ describe('game tests', () => {
       game.command(CONTROLS.ROTATE_LEFT);
       game.command(CONTROLS.HARD_DROP);
     }
-
+    
     expect(boardMoveSpy).toHaveBeenCalledTimes(5);
-    expect(gameOverSpy).toHaveBeenCalled();
+    expect(pubSub.gameOverMock).toHaveBeenCalled();
 
     game.command(CONTROLS.LEFT);
     // should not get called again
@@ -286,7 +294,7 @@ describe('game tests', () => {
   });
 
   test('animate - clears animation on gameOver', () => {
-    const canelAnimationSpy = jest.spyOn(window, 'cancelAnimationFrame');
+    const cancelAnimationSpy = jest.spyOn(window, 'cancelAnimationFrame');
 
     expect(game.animationId).toBe(undefined);
 
@@ -294,9 +302,9 @@ describe('game tests', () => {
 
     expect(game.animationId).toEqual(expect.any(Number));
 
-    game.gameOver();
+    game.gameOver({ id: 1 });
 
-    expect(canelAnimationSpy).toHaveBeenCalledTimes(1);
+    expect(cancelAnimationSpy).toHaveBeenCalledTimes(1);
     expect(game.animationId).toBe(undefined);
   });
 
