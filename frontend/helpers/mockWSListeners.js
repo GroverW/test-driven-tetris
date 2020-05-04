@@ -78,8 +78,9 @@ class MockClientListener {
     this.game.board.pieceList.addSet(pieces);
   }
 
-  gameOver(id) {
-    this.game.gameOver(id);
+  gameOver(data) {
+    this.game.gameOver(data);
+    this.gameDOM.gameOver(data);
   }
 
   unsubAll() {
