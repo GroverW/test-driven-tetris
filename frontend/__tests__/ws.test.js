@@ -10,6 +10,8 @@ const {
 } = require("../helpers/mockWSListeners");
 const Player = require('../../src/js/player');
 const Game = require('../static/js/game');
+const { CONTROLS } = require('../helpers/data');
+const Api = require('../helpers/api');
 const serverPubSub = require('../../src/helpers/pubSub');
 const { GAMES } = require("../../src/helpers/data");
 const { mockSend } = require('../../src/helpers/mocks');
@@ -20,9 +22,12 @@ describe('websocket tests', () => {
   let serverToClient;
   let clientToServer;
   let pubSub;
+  let api;
 
   beforeEach(() => {
     WebSocket = jest.fn().mockImplementation(webSocketMock);
+    api = new Api(webSocketMock, 1);
+    api.sendMessage = jest.fn().mockImplementation(webSocketMock.send);
     
     pubSub = pubSubMocks();
 
@@ -50,6 +55,7 @@ describe('websocket tests', () => {
     jest.clearAllMocks();
     serverToClient.unsubAll();
     clientToServer.unsubAll();
+    api.unsubscribe();
     GAMES.clear();
   })
 
@@ -103,5 +109,78 @@ describe('websocket tests', () => {
     const clientPieces = serverToClient.game.board.pieceList.pieces;
 
     expect(serverPieces).toEqual(clientPieces);
+  });
+
+  test('game over', () => {
+    clientToServer.startGame();
+
+    expect(serverToClient.game.gameStatus).toBe(true);
+    
+    const gameOverData = {
+      id: clientToServer.player.id,
+      board: clientToServer.player.game.board.grid
+    }
+
+    clientToServer.gameServer.gameOver(gameOverData);
+
+    expect(serverToClient.game.gameStatus).toBe(false);
+    expect(serverToClient.game.animationId).toBe(undefined);
+  });
+
+  test('execute commands', () => {
+    clientToServer.startGame();
+
+    serverToClient.game.command(CONTROLS.DOWN);
+    serverToClient.game.command(CONTROLS.LEFT);
+    serverToClient.game.command(CONTROLS.ROTATE_RIGHT);
+    serverToClient.game.command(CONTROLS.AUTO_DOWN);
+    serverToClient.game.command(CONTROLS.HARD_DROP);
+
+    const serverBoard = clientToServer.player.game.board.grid;
+    const clientBoard = serverToClient.game.board.grid;
+    expect(serverBoard).toEqual(clientBoard);
+    
+    serverToClient.game.command(CONTROLS.LEFT);
+    serverToClient.game.command(CONTROLS.ROTATE_LEFT);
+    serverToClient.game.command(CONTROLS.HARD_DROP);
+    
+    expect(serverBoard).toEqual(clientBoard);
+    expect(clientToServer.player.game.score).toEqual(serverToClient.game.score);
+  });
+
+  test('game over from play', () => {
+    clientToServer.startGame();
+
+    for(let i = 0; i < 25; i++) {
+      serverToClient.game.command(CONTROLS.HARD_DROP);
+    }
+
+    const serverBoard = clientToServer.player.game.board.grid;
+    const clientBoard = serverToClient.game.board.grid;
+
+    expect(serverBoard).toEqual(clientBoard);
+
+    expect(serverToClient.game.gameStatus).toBe(false);
+    expect(clientToServer.player.game.gameStatus).toBe(false);
+
+  });
+
+  test('close', () => {
+    // this would be caused by player closing their browser or leaving the page
+    clientToServer.startGame();
+
+    serverToClient.game.command(CONTROLS.DOWN);
+    serverToClient.game.command(CONTROLS.LEFT);
+    serverToClient.game.command(CONTROLS.ROTATE_RIGHT);
+    serverToClient.game.command(CONTROLS.AUTO_DOWN);
+    serverToClient.game.command(CONTROLS.HARD_DROP);
+
+    const serverBoard = clientToServer.player.game.board.grid;
+    const clientBoard = serverToClient.game.board.grid;
+    expect(serverBoard).toEqual(clientBoard);
+
+    clientToServer.player.leave();
+
+    expect(GAMES.has(clientToServer.gameServer.id)).toBe(false);
   })
 });
