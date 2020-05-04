@@ -7,7 +7,8 @@ const { CONTROLS, PIECES } = require('../helpers/data');
 const { 
   getMockDOMSelector,
   getMockCtx,
-  getTestBoard
+  getTestBoard,
+  getTestPieces
 } = require('../helpers/mocks');
 
 describe('game DOM tests', () => {
@@ -37,7 +38,8 @@ describe('game DOM tests', () => {
     }
 
     gameDOM = new GameDOM(selectors);
-    game = new Game();
+    game = new Game(1);
+    game.board.pieceList.addSet(getTestPieces());
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
     document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);
