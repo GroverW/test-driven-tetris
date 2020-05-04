@@ -1,8 +1,12 @@
 const TEST_BOARDS = require('./sampleBoards');
 const { subscribe } = require('./pubSub');
+const { SEED_PIECES } = require('./data');
+const { randomize } = require('./utils');
 
 const getTestBoard = (board) =>
   JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+
+const getTestPieces = () => randomize(SEED_PIECES);
 
 const getMockCtx = () => ({
   canvas: {
@@ -74,7 +78,7 @@ const pubSubMocks = () => {
     subscribe('clearLines', mocks.clearMock),
     subscribe('boardChange', mocks.boardMock),
     subscribe('updateScore', mocks.updateScoreMock),
-    subscribe('executeCommands', mocks.executeCommandsMock),
+    subscribe('sendMessage', mocks.executeCommandsMock),
   ]
   
   const clearMockSubscriptions = () => {
@@ -91,17 +95,17 @@ const webSocketMock = {
     topics: {},
     send(data) {
       const parsed = JSON.parse(data);
-      this.topics[parsed.message] && (
-        this.topics[parsed.message].forEach(callback => callback(parsed.data))
+      this.topics[parsed.type] && (
+        this.topics[parsed.type].forEach(callback => callback(parsed.data))
       );
     },
-    on (message, callback) {
-      this.topics[message]
-        ? this.topics[message].push(callback)
-        : this.topics[message] = [callback];
+    on (type, callback) {
+      this.topics[type]
+        ? this.topics[type].push(callback)
+        : this.topics[type] = [callback];
     
-      const index = this.topics[message].length - 1;
-      const unsubscribe = () => { this.topics[message].splice(index, 1) };
+      const index = this.topics[type].length - 1;
+      const unsubscribe = () => { this.topics[type].splice(index, 1) };
     
       return unsubscribe;
     }
@@ -110,6 +114,7 @@ const webSocketMock = {
 module.exports = {
   TEST_BOARDS,
   getTestBoard,
+  getTestPieces,
   getMockCtx,
   getMockDOMSelector,
   mockAnimation,
