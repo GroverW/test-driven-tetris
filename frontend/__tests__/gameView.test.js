@@ -6,7 +6,7 @@ const {
   BOARD_WIDTH,
   CELL_SIZE
 } = require('../helpers/data');
-const { getMockCtx, getTestBoard } = require('../helpers/mocks');
+const { getMockCtx, getTestBoard, getTestPieces } = require('../helpers/mocks');
 const { publish } = require('../helpers/pubSub');
 const { getNewPlayer } = require('../helpers/utils');
 
@@ -31,7 +31,8 @@ describe('game view tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    game = new Game();
+    game = new Game(1);
+    game.board.pieceList.addSet(getTestPieces());
     gameView = new GameView(mockCtx, mockCtxNext);
 
     drawBoardSpy = jest.spyOn(gameView, 'drawBoard');
