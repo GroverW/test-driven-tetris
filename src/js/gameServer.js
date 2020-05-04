@@ -21,13 +21,13 @@ class GameServer {
     if (this.players.size < MAX_PLAYERS && !this.gameStarted) {
       this.players.add(player);
       
-      player.id = ++this.nextPlayerId;
+      player.setId(++this.nextPlayerId);
       this.addSubscriptions(player)
 
       if (this.players.size === 1) player.isHost = true;
 
       this.sendAll({
-        message: 'addPlayer',
+        type: 'addPlayer',
         data: player.id
       });
 
@@ -60,7 +60,7 @@ class GameServer {
       this.players.size === 0
         ? GAMES.delete(this.id)
         : this.sendAllExcept(player, {
-            message: 'removePlayer',
+            type: 'removePlayer',
             data: player.id
           });
 
@@ -94,7 +94,7 @@ class GameServer {
       this.getPieces();
       
       this.sendAll({
-        message: 'startGame',
+        type: 'startGame',
       });
 
       this.nextRanking = this.players.size;
@@ -109,18 +109,18 @@ class GameServer {
       player.game.start();
       
       player._send(JSON.stringify({
-        message: 'addPieces',
+        type: 'addPieces',
         data: pieces
       }))
     })
   }
 
-  gameOver(player) {
+  gameOver(data) {
     this.sendAll({
-      message: 'gameOver',
+      type: 'gameOver',
       data: {
-        id: player.id,
-        board: player.board,
+        id: data.id,
+        board: data.board,
         ranking: RANKINGS[this.nextRanking],
       }
     });
