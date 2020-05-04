@@ -4,7 +4,7 @@ const { POINTS, LINES_PER_LEVEL } = require('../helpers/data');
 class Game {
   constructor(pubSub, playerId) {
     this.playerId = playerId;
-    this.gameStatus = true;
+    this.gameStatus = false;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
