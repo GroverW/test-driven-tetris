@@ -13,7 +13,7 @@ class MockServerListener {
     this.ws = ws;
     this.url = url;
     this.unsub1 = ws.on('open', this.open.bind(this));
-    this.unsub2 = ws.on('startGame', this.startGame.bind(this));
+    this.unsub2 = ws.on('newGame', this.startGame.bind(this));
     this.unsub3 = ws.on('executeCommands', this.execCommands.bind(this));
     this.unsub4 = ws.on('close', this.close.bind(this));
   }
@@ -52,14 +52,14 @@ class MockClientListener {
     this.selectors = selectors;
     this.unsub1 = ws.on('addPlayer', this.addPlayer.bind(this));
     this.unsub2 = ws.on('removePlayer', this.removePlayer.bind(this));
-    this.unsub3 = ws.on('startGame', this.gameStart.bind(this));
+    this.unsub3 = ws.on('startGame', this.startGame.bind(this));
     this.unsub4 = ws.on('addPieces', this.addPlayer.bind(this));
     this.unsub5 = ws.on('gameOver', this.gameOver.bind(this));
   }
 
   addPlayer(id) {
     if (!this.game) {
-      this.gameDOM = new GameDOM(this.selectors);
+      this.gameDOM = new GameDOM(this.selectors, id);
       this.game = new Game(id);
     } else {
       publish('addPlayer', id);
@@ -70,7 +70,7 @@ class MockClientListener {
     publish('removePlayer', id);
   }
 
-  gameStart() {
+  startGame(data) {
     this.game.start(data);
   }
 
@@ -88,6 +88,8 @@ class MockClientListener {
     this.unsub3();
     this.unsub4();
     this.unsub5();
+    this.gameDOM && this.gameDOM.unsubscribe();
+    this.game && this.game.unsubscribe();
   }
 }
 
