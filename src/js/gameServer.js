@@ -26,7 +26,7 @@ class GameServer {
 
       if (this.players.size === 1) player.isHost = true;
 
-      this.sendAllExcept(player, {
+      this.sendAll({
         message: 'addPlayer',
         data: player.id
       });
