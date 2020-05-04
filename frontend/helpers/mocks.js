@@ -89,16 +89,19 @@ const pubSubMocks = () => {
 
 const webSocketMock = {
     topics: {},
-    send(type, data) {
-      this.topics[type] && this.topics[type].forEach(callback => callback(data));
+    send(data) {
+      const parsed = JSON.parse(data);
+      this.topics[parsed.message] && (
+        this.topics[parsed.message].forEach(callback => callback(parsed.data))
+      );
     },
-    on (type, callback) {
-      this.topics[type]
-        ? this.topics[type].push(callback)
-        : this.topics[type] = [callback];
+    on (message, callback) {
+      this.topics[message]
+        ? this.topics[message].push(callback)
+        : this.topics[message] = [callback];
     
-      const index = this.topics[type].length - 1;
-      const unsubscribe = () => { this.topics[type].splice(index, 1) };
+      const index = this.topics[message].length - 1;
+      const unsubscribe = () => { this.topics[message].splice(index, 1) };
     
       return unsubscribe;
     }
