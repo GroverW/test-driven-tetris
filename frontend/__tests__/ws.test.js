@@ -1,7 +1,8 @@
 const { 
   webSocketMock,
   getMockCtx,
-  getMockDOMSelector 
+  getMockDOMSelector,
+  pubSubMocks
 } = require("../helpers/mocks");
 const { 
   MockServerListener,
@@ -18,10 +19,13 @@ describe('websocket tests', () => {
   let player2;
   let serverToClient;
   let clientToServer;
+  let pubSub;
 
   beforeEach(() => {
     WebSocket = jest.fn().mockImplementation(webSocketMock);
     
+    pubSub = pubSubMocks();
+
     const selectors = {
       playerCtx: getMockCtx(),
       nextCtx: getMockCtx(),
@@ -82,8 +86,22 @@ describe('websocket tests', () => {
   });
 
   test('game start - initiated by client', () => {
-    serverToClient.game.start();
+    // user will click button which will send newGame to server
+    expect(serverToClient.game.gameStatus).toBe(false);
+    
+    clientToServer.startGame();
 
     expect(clientToServer.gameServer.gameStarted).toBe(true);
+    expect(serverToClient.game.gameStatus).toBe(true);
+    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('add pieces', () => {
+    clientToServer.startGame();
+
+    const serverPieces = clientToServer.player.game.board.pieceList.pieces;
+    const clientPieces = serverToClient.game.board.pieceList.pieces;
+
+    expect(serverPieces).toEqual(clientPieces);
   })
 });
