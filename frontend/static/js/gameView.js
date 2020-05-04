@@ -91,6 +91,12 @@ class GameView {
       this.drawBoard(selectedPlayer.ctx, selectedPlayer.board);
     }
   }
+
+  unsubscribe() {
+    this.unsubDraw();
+    this.unsubRemoveP();
+    this.unsubUpdateP();
+  }
 }
 
 module.exports = GameView;
