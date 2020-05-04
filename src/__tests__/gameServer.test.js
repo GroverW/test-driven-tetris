@@ -213,6 +213,7 @@ describe('game server tests', () => {
 
     p1.pubSub.publish('getPieces');
 
+    // player who leaves should not get piece updates
     expect(p1.game.board.pieceList.pieces).toEqual(p1.game.board.pieceList.pieces);
     expect(p2.game.board.pieceList.pieces).not.toEqual(p3.game.board.pieceList.pieces);
   });
