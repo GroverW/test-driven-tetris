@@ -1,6 +1,7 @@
 const { pieceList, Piece } = require('../static/js/piece');
 const Board = require('../static/js/board');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { getTestPieces } = require('../helpers/mocks');
 
 describe('game pieces', () => {
   let p1, p2, p3, p4, p5, p6, p7;
@@ -15,13 +16,14 @@ describe('game pieces', () => {
     p6 = new Piece(PIECES[5]);
     p7 = new Piece(PIECES[6]);
     board = new Board();
+    board.pieceList.addSet(getTestPieces());
   });
 
   test('creates a new piece', () => {
-    const p1 = new Piece(pieceList.getNextPiece());
-    const p2 = new Piece(pieceList.getNextPiece());
-    const p3 = new Piece(pieceList.getNextPiece());
-    const p4 = new Piece(pieceList.getNextPiece());
+    const p1 = new Piece(board.pieceList.getNextPiece());
+    const p2 = new Piece(board.pieceList.getNextPiece());
+    const p3 = new Piece(board.pieceList.getNextPiece());
+    const p4 = new Piece(board.pieceList.getNextPiece());
     
     expect(PIECES).toContainEqual(p1.grid);
     expect(PIECES).toContainEqual(p2.grid);
