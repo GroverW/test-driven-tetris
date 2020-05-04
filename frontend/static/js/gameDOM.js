@@ -7,7 +7,8 @@ const {
 } = require('../../helpers/utils');
 
 class GameDOM {
-  constructor(selectors) {
+  constructor(selectors, id) {
+    this.id = id;
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
     this.gameContainer = selectors.gameContainer;
     this.scoreSelector = selectors.scoreSelector;
@@ -20,6 +21,7 @@ class GameDOM {
   }
 
   addPlayer(id) {
+    if(id === this.id) return;
     // create container div
     let playerContainer = document.createElement('div');
     playerContainer.id = `p${id}`;
@@ -51,6 +53,8 @@ class GameDOM {
   }
 
   removePlayer(id) {
+    if(id === this.id) return;
+
     const playerIdx = this.players.findIndex(p => p.id === id);
     
     if (playerIdx >= 0) {
@@ -67,6 +71,13 @@ class GameDOM {
     if('score' in data) this.scoreSelector.innerText = data.score;
     if('level' in data) this.levelSelector.innerText = data.level;
     if('lines' in data) this.linesSelector.innerText = data.lines;
+  }
+
+  unsubscribe() {
+    this.unsubAddP();
+    this.unsubRemoveP();
+    this.unsubScore();
+    this.gameView.unsubscribe();
   }
 }
 
