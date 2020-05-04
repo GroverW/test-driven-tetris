@@ -31,11 +31,11 @@ describe('game server tests', () => {
   });
 
   test('join game', () => {
-    const broadcastSpy = jest.spyOn(gameServer, 'sendAllExcept');
+    const sendAllSpy = jest.spyOn(gameServer, 'sendAll');
 
     expect(gameServer.join(p1)).toBe(true);
     expect(gameServer.players.size).toBe(1);
-    expect(broadcastSpy).toHaveBeenCalledTimes(1);
+    expect(sendAllSpy).toHaveBeenCalledTimes(1);
   });
 
   test('join game - game full', () => {
@@ -65,7 +65,7 @@ describe('game server tests', () => {
   });
 
   test('leave game', () => {
-    const sendAllExceptSpy = jest.spyOn(gameServer, 'sendAllExcept');
+    const sendAllSpy = jest.spyOn(gameServer, 'sendAll');
     
     gameServer.join(p1);
     gameServer.join(p2);
@@ -73,7 +73,7 @@ describe('game server tests', () => {
 
     p1.leave();
     expect(gameServer.players.size).toBe(1);
-    expect(sendAllExceptSpy).toHaveBeenCalledTimes(3);
+    expect(sendAllSpy).toHaveBeenCalledTimes(2);
   });
 
   test('leave game - game empty', () => {
@@ -160,7 +160,7 @@ describe('game server tests', () => {
     gameServer.startGame(p2);
 
     expect(gameServer.gameStarted).toBe(false);
-    expect(sendAllSpy).not.toHaveBeenCalled();
+    expect(sendAllSpy).toHaveBeenCalledTimes(2);
 
     gameServer.startGame(p1);
 
@@ -177,22 +177,23 @@ describe('game server tests', () => {
 
     expect(gameServer.nextRanking).toBe(3);
 
-    const sendAllExceptSpy = jest.spyOn(gameServer, 'sendAll');
+    const sendAllSpy = jest.spyOn(gameServer, 'sendAll');
     const _sendSpy1 = jest.spyOn(p1, '_send');
     const _sendSpy2 = jest.spyOn(p2, '_send');
-
+    console.log(p1.game.gameStatus);
     // this will add the current piece to the board
     // and try to get a new one on top of it
     p1.game.board.drop();
+    console.log(p1.game.gameStatus);
 
-    expect(sendAllExceptSpy).toHaveBeenCalledTimes(1);
+    expect(sendAllSpy).toHaveBeenCalledTimes(1);
     expect(_sendSpy1).toHaveBeenCalledTimes(1);
 
     expect(gameServer.nextRanking).toBe(2);
     
     p2.game.board.drop();
 
-    expect(sendAllExceptSpy).toHaveBeenCalledTimes(2);
+    expect(sendAllSpy).toHaveBeenCalledTimes(2);
     expect(_sendSpy1).toHaveBeenCalledTimes(2);
     expect(_sendSpy2).toHaveBeenCalledTimes(2);
 
