@@ -2,15 +2,16 @@ const Game = require('./game');
 
 class Player {
   constructor(send, pubSub) {
+    this.id;
     this.isHost = false;
     this._send = send;
     this.pubSub = pubSub;
-    this.game = new Game(this.pubSub);
+    this.game = new Game(this.pubSub, this.id);
     this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
   }
 
   gameOver() {
-    this.pubSub.publish('getRanking', this);
+    
   }
 
   leave() {
