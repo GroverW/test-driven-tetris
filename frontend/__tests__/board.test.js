@@ -1,7 +1,7 @@
 const Board = require('../static/js/board');
 const { Piece } = require('../static/js/piece');
 const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
-const { TEST_BOARDS, getTestBoard, pubSubMocks } = require('../helpers/mocks');
+const { TEST_BOARDS, getTestBoard, getTestPieces, pubSubMocks } = require('../helpers/mocks');
 
 
 describe('game board tests', () => {
@@ -11,6 +11,7 @@ describe('game board tests', () => {
 
   beforeEach(() => {
     gameBoard = new Board();
+    gameBoard.pieceList.addSet(getTestPieces())
     p1 = new Piece(PIECES[0]);
     p2 = new Piece(PIECES[1]);
     p3 = new Piece(PIECES[2]);
