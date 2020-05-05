@@ -11,13 +11,13 @@ const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
   constructor(id) {
-    this.gameStatus = true;
+    this.gameStatus = false;
     this.id = id;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
     this.linesRemaining = 10;
-    this.board = new Board();
+    this.board = new Board(id);
     this.time = { start: 0, elapsed: 0 }
     this.animationId;
     this.commandQueue = [];
@@ -28,6 +28,7 @@ class Game {
   }
 
   start() {
+    if(this.gameStatus) return;
     this.board.getPieces();
     this.gameStatus = true;
     this.animate();
@@ -60,6 +61,10 @@ class Game {
       this.addToCommandQueue(key);
       commands[key]();
     }
+
+    if(!this.gameStatus && this.commandQueue.length > 0) {
+      this.sendCommandQueue();
+    }
   }
 
   /**
@@ -80,7 +85,10 @@ class Game {
 
   
   sendCommandQueue() {
-    publish('executeCommands', this.commandQueue);
+    publish('sendMessage', {
+      type: 'executeCommands',
+      data: this.commandQueue
+    });
     this.commandQueue = [];
   }
 
@@ -134,7 +142,7 @@ class Game {
    * - cancels animation
    * - resets animationId
    */
-  gameOver(id) {
+  gameOver({ id }) {
     if(id === this.id) {
       this.unsubscribe();
       this.gameStatus = false;
@@ -164,7 +172,7 @@ class Game {
     
     if(this.time.elapsed > this.getAnimationDelay()) {
       this.time.start = currTime;
-      this.command(CONTROLS.DOWN, 0);
+      this.command(CONTROLS.AUTO_DOWN);
     }
     
     this.animationId = requestAnimationFrame(this.animate.bind(this));
