@@ -4,7 +4,8 @@ const { PieceList, Piece } = require('./piece');
 const { publish } = require('../../helpers/pubSub')
 
 class Board {
-  constructor() {
+  constructor(id) {
+    this.id = id;
     this.grid = this.createEmptyGrid();
     this.piece;
     this.nextPiece;
@@ -19,9 +20,12 @@ class Board {
     this.piece = this.nextPiece
       ? this.nextPiece
       : new Piece(this.pieceList.getNextPiece());
-    
+      
     if(!this.validMove(0,0)) {
-      publish("gameOver", this.piece);
+      publish("gameOver", {
+        id: this.id,
+        grid: this.grid
+      });
     }
 
     this.nextPiece = new Piece(this.pieceList.getNextPiece());
