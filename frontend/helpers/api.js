@@ -1,7 +1,7 @@
 const { subscribe } = require('./pubSub');
 
 class Api {
-  constructor(ws, gameId) {
+  constructor(ws) {
     this.ws = ws;
     this.unsubSend = subscribe('sendMessage', this.sendMessage.bind(this));
   }
