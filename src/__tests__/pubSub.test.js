@@ -14,8 +14,8 @@ describe('publish / subscribe', () => {
       const unsubscribe = pubSubTest.subscribe('math', amt => { sum += amt });
 
       const getSum = () => sum;
-      
-      return {getSum, unsubscribe};
+
+      return { getSum, unsubscribe };
     }
 
     const multiplier = () => {
@@ -35,13 +35,13 @@ describe('publish / subscribe', () => {
 
       const getMessages = () => messages;
 
-      return {getMessages, unsubscribe};
+      return { getMessages, unsubscribe };
     }
 
     sub1 = adder();
     sub2 = multiplier();
     sub3 = messages();
-  })
+  });
 
   test('publish / subscribe', () => {
     expect(sub1.getSum()).toBe(0);

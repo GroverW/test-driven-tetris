@@ -22,6 +22,7 @@ describe('game server tests', () => {
   afterEach(() => {
     jest.clearAllMocks();
     GAMES.clear();
+    gameServer.unsubscribe();
   })
 
   test('get game', () => {
@@ -180,11 +181,10 @@ describe('game server tests', () => {
     const sendAllSpy = jest.spyOn(gameServer, 'sendAll');
     const _sendSpy1 = jest.spyOn(p1, '_send');
     const _sendSpy2 = jest.spyOn(p2, '_send');
-    console.log(p1.game.gameStatus);
+
     // this will add the current piece to the board
     // and try to get a new one on top of it
     p1.game.board.drop();
-    console.log(p1.game.gameStatus);
 
     expect(sendAllSpy).toHaveBeenCalledTimes(1);
     expect(_sendSpy1).toHaveBeenCalledTimes(1);
