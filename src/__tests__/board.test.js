@@ -1,6 +1,6 @@
 const Board = require('../js/board');
 const { Piece } = require('../js/piece');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { PIECES, SEED_PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 const { TEST_BOARDS, getTestBoard, getTestPieces } = require('../helpers/mocks');
 const pubSub = require('../helpers/pubSub');
 
@@ -20,6 +20,10 @@ describe('game board tests', () => {
     p4 = new Piece(PIECES[5]);
     p5 = new Piece(PIECES[6]);
   });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
   
   test('creates a new, empty board', () => {
     expect(gameBoard.grid).toEqual(TEST_BOARDS.empty);
@@ -152,14 +156,16 @@ describe('game board tests', () => {
   });
 
   test('requests new pieces when almost out', () => {
-    const publishSpy = jest.spyOn(pubSubTest, 'publish');
+    gameBoard.pubSub.publish = jest.fn();
 
-    expect(publishSpy).not.toHaveBeenCalled();
+    expect(gameBoard.pubSub.publish).not.toHaveBeenCalled();
 
-    for(let i = 0; i < 40; i++) gameBoard.getPieces();
+    // can't go the entire lenght of the list or the index will get reset
+    // and almostEmpty() will return false
+    for(let i = 0; i < SEED_PIECES.length - 2; i++) gameBoard.getPieces();
 
+    expect(gameBoard.pubSub.publish).toHaveBeenCalled();
     expect(gameBoard.pieceList.almostEmpty()).toBe(true);
-    expect(publishSpy).toHaveBeenCalled();
   })
 
   test('publish board updates', () => {
