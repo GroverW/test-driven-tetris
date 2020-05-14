@@ -12,6 +12,7 @@ const selectors = {
   scoreSelector: document.getElementById('game-score'),
   levelSelector: document.getElementById('game-level'),
   linesSelector: document.getElementById('game-lines'),
+  playerSelector: document.getElementById('p1'),
 }
 
 const gameId = 1;
@@ -45,6 +46,10 @@ ws.onmessage = evt => {
 
   if(type === 'startGame') {
     game.start(data);
+  }
+
+  if(type === 'updatePlayer') {
+    publish('updatePlayerBoard', data);
   }
 
   if(type === 'addPieces') {
