@@ -34,7 +34,8 @@ describe('game DOM tests', () => {
       gameContainer: getMockDOMSelector(),
       scoreSelector: getMockDOMSelector(),
       levelSelector: getMockDOMSelector(),
-      linesSelector: getMockDOMSelector()
+      linesSelector: getMockDOMSelector(),
+      playerSelector: getMockDOMSelector(),
     }
 
     gameDOM = new GameDOM(selectors);
@@ -48,12 +49,8 @@ describe('game DOM tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    gameDOM.unsubAddP();
-    gameDOM.unsubRemoveP();
-    gameDOM.unsubScore();
-    game.unsubDrop();
-    game.unsubClear();
-    game.unsubGame();
+    gameDOM.unsubscribe();
+    game.unsubscribe();
   });
 
   test('start new game', () => {
@@ -62,6 +59,7 @@ describe('game DOM tests', () => {
     expect(gameDOM.scoreSelector).not.toBe(undefined);
     expect(gameDOM.levelSelector).not.toBe(undefined);
     expect(gameDOM.linesSelector).not.toBe(undefined);
+    expect(gameDOM.playerSelector).not.toBe(undefined);
     expect(gameDOM.players.length).toBe(0);
   })
 
