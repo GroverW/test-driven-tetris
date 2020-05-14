@@ -11,9 +11,11 @@ class Game {
     this.linesRemaining = 10;
     this.pubSub = pubSub;
     this.board = new Board(this.pubSub, this.playerId);
-    this.unsubDrop = this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this));
-    this.unsubClear = this.pubSub.subscribe('clearLines', this.clearLines.bind(this));
-    this.unsubGame = this.pubSub.subscribe('gameOver', this.gameOver.bind(this));
+    this.subscriptions = [
+      this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this)),
+      this.pubSub.subscribe('clearLines', this.clearLines.bind(this)),
+      this.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
+    ];
   }
 
   start() {
@@ -37,6 +39,11 @@ class Game {
 
   executeCommandQueue(commands) {
     commands.forEach(action => this.command(action));
+    
+    this.pubSub.publish('updatePlayer', {
+      id: this.playerId,
+      board: this.board.grid,
+    });
   }
 
   updateScore(points) {
@@ -59,10 +66,12 @@ class Game {
   }
 
   gameOver() {
-    this.unsubDrop();
-    this.unsubClear();
-    this.unsubGame();
+    this.unsubscribe();
     this.gameStatus = false;
+  }
+
+  unsubscribe() {
+    this.subscriptions.forEach(unsub => unsub());
   }
 }
 
