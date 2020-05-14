@@ -28,8 +28,17 @@ class GameServer {
 
       this.sendAll({
         type: 'addPlayer',
-        data: player.id
+        data: player.id,
       });
+
+      this.players.forEach(p => {
+        if(p !== player) {
+          this.sendTo(player, {
+            type: 'addPlayer',
+            data: p.id,
+          })
+        }
+      })
 
       return true;
     }
@@ -43,6 +52,7 @@ class GameServer {
       player.pubSub.subscribe('startGame', this.startGame.bind(this)),
       player.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
       player.pubSub.subscribe('getPieces', this.getPieces.bind(this)),
+      player.pubSub.subscribe('updatePlayer', this.updatePlayer.bind(this)),
     ]
   }
 
@@ -87,11 +97,17 @@ class GameServer {
     );
   }
 
+  sendTo(player, data) {
+    player._send(JSON.stringify(data));
+  }
+
   startGame(player) {
     if(player && player.isHost) {
       this.gameStarted = true;
 
       this.getPieces();
+
+      this.players.forEach(p => p.game.start());
       
       this.sendAll({
         type: 'startGame',
@@ -101,12 +117,21 @@ class GameServer {
     }
   }
 
+  updatePlayer(data) {
+    this.sendAll({
+      type: 'updatePlayer',
+      data: {
+        id: data.id,
+        board: data.board,
+      }
+    })
+  }
+
   getPieces() {
     const pieces = randomize(SEED_PIECES);
 
     this.players.forEach(player => {
       player.game.board.pieceList.addSet(pieces);
-      player.game.start();
       
       player._send(JSON.stringify({
         type: 'addPieces',
@@ -126,6 +151,11 @@ class GameServer {
     });
 
     this.nextRanking--;
+  }
+
+  unsubscribe() {
+    Object.values(this.subscriptions)
+      .forEach(p => p.forEach(unsub => unsub()));
   }
 }
 
