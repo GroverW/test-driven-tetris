@@ -42,12 +42,8 @@ describe('game view tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    game.unsubDrop();
-    game.unsubClear();
-    game.unsubGame();
-    gameView.unsubDraw();
-    gameView.unsubRemoveP();
-    gameView.unsubUpdateP();
+    game.unsubscribe();
+    gameView.unsubscribe();
   });
 
   test('draw elements on game start', () => {
