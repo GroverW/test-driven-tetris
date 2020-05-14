@@ -11,7 +11,7 @@ class Player {
 
   setId(id) {
     this.id = id;
-    this.game.id = id;
+    this.game.playerId = id;
     this.game.board.playerId = id;
   }
 

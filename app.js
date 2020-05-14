@@ -2,6 +2,9 @@
 
 const express = require('express');
 const app = express();
+const GameServer = require('./src/js/gameServer');
+const Player = require('./src/js/player');
+const pubSub = require('./src/helpers/pubSub');
 // const server = require('http').Server(app)
 // const io = require('socket.io')(server);
 const wsExpress = require('express-ws')(app);
@@ -12,17 +15,33 @@ app.use(express.static('frontend/static/'));
 /**Handle websocket messages */
 
 //allow for app.ws routes for websocket routes
-app.ws('/test', (ws, req, next) => {
+app.ws('/game/:gameId', (ws, req, next) => {
+  try {
+    let gameServer;
+    let player;
 
+    gameServer = GameServer.get(req.params.gameId)
 
-  ws.on('connection', () => {
-    console.log("CONNECTED!")
-    ws.send('you did it');
-  });
+    player = new Player(
+      ws.send.bind(ws),
+      pubSub()
+    )
 
-  ws.on('message', msg => {
-    ws.send(msg);
-  });
+    gameServer.join(player);
+
+    ws.on('message', m => {
+      const msg = JSON.parse(m);
+      if (msg.type === "newGame") player.startGame();
+      if (msg.type === "executeCommands") player.game.executeCommandQueue(msg.data);
+    });
+
+    ws.on('close', () => {
+      player && player.leave();
+    });
+  }
+  catch (err) {
+    console.error(err);
+  }
 })
 
 app.get('/', (req, res) => {
