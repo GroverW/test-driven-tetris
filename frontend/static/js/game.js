@@ -21,10 +21,12 @@ class Game {
     this.time = { start: 0, elapsed: 0 }
     this.animationId;
     this.commandQueue = [];
-    this.unsubDrop = subscribe('lowerPiece', this.updateScore.bind(this));
-    this.unsubClear = subscribe('clearLines', this.clearLines.bind(this));
-    this.unsubGame = subscribe('gameOver', this.gameOver.bind(this));
-    this.unsubBoard = subscribe('boardChange', this.sendCommandQueue.bind(this));
+    this.subscriptions = [
+      subscribe('lowerPiece', this.updateScore.bind(this)),
+      subscribe('clearLines', this.clearLines.bind(this)),
+      subscribe('gameOver', this.gameOver.bind(this)),
+      subscribe('boardChange', this.sendCommandQueue.bind(this)),
+    ];
   }
 
   start() {
@@ -152,10 +154,7 @@ class Game {
   }
 
   unsubscribe() {
-    this.unsubDrop();
-    this.unsubClear();
-    this.unsubGame();
-    this.unsubBoard();
+    this.subscriptions.forEach(unsub => unsub());
   }
 
   /**
