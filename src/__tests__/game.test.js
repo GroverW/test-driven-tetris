@@ -24,9 +24,7 @@ describe('game tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    game.unsubDrop();
-    game.unsubClear();
-    game.unsubGame();
+    game.unsubscribe();
   });
 
   test('start game', () => {
@@ -235,7 +233,7 @@ describe('game tests', () => {
     game.start();
     game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECES[0]);
-    const gameOverSpy = jest.spyOn(game, 'unsubGame');
+    const gameOverSpy = jest.spyOn(game, 'unsubscribe');
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
 
     // stacking I pieces on top of each other until they reach the top
