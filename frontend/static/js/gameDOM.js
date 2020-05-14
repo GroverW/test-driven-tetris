@@ -14,10 +14,13 @@ class GameDOM {
     this.scoreSelector = selectors.scoreSelector;
     this.levelSelector = selectors.levelSelector;
     this.linesSelector = selectors.linesSelector;
+    this.playerSelector = selectors.playerSelector;
     this.players = [];
-    this.unsubAddP = subscribe('addPlayer', this.addPlayer.bind(this));
-    this.unsubRemoveP = subscribe('removePlayer', this.removePlayer.bind(this));
-    this.unsubScore = subscribe('updateScore', this.updateScoreboard.bind(this));
+    this.subscriptions = [
+      subscribe('addPlayer', this.addPlayer.bind(this)),
+      subscribe('removePlayer', this.removePlayer.bind(this)),
+      subscribe('updateScore', this.updateScoreboard.bind(this)),
+    ];
   }
 
   addPlayer(id) {
@@ -58,7 +61,8 @@ class GameDOM {
     const playerIdx = this.players.findIndex(p => p.id === id);
     
     if (playerIdx >= 0) {
-      this.players[playerIdx].selector.parentNode.removeChild();
+      const playerSelector = this.players[playerIdx].selector;
+      playerSelector.parentNode.removeChild(playerSelector);
       this.players.splice(playerIdx, 1);
     }
     
@@ -73,10 +77,39 @@ class GameDOM {
     if('lines' in data) this.linesSelector.innerText = data.lines;
   }
 
+  gameOver(data) {
+    if(data.id === this.id) {
+      this.unsubscribe();
+      this.gameView.drawBoard(this.gameView.ctx, data.board);
+      this.addGameOverMessage(this.playerSelector, data.ranking);
+      return;
+    }
+
+    const playerIdx = this.players.findIndex(p => p.id = data.id);
+
+    if(playerIdx >= 0) {
+      this.gameView.updatePlayer(data);
+      this.addGameOverMessage(this.players[playerIdx].selector, data.ranking);
+    }
+  }
+
+  addGameOverMessage(container, ranking) {
+    let gameOverMessage = document.createElement('div');
+    gameOverMessage.classList.add('game-over');
+    
+    let messageLine1 = document.createElement('h2');
+    messageLine1.innerText = `Game Over!`;
+    gameOverMessage.appendChild(messageLine1);
+
+    let messageLine2 = document.createElement('p');
+    messageLine2.innerText = `You Came in ${ranking}`;
+    gameOverMessage.appendChild(messageLine2);
+
+    container.appendChild(gameOverMessage);
+  }
+
   unsubscribe() {
-    this.unsubAddP();
-    this.unsubRemoveP();
-    this.unsubScore();
+    this.subscriptions.forEach(unsub => unsub());
     this.gameView.unsubscribe();
   }
 }
