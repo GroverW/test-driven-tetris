@@ -12,10 +12,12 @@ class MockServerListener {
     this.gameServer;
     this.ws = ws;
     this.url = url;
-    this.unsub1 = ws.on('open', this.open.bind(this));
-    this.unsub2 = ws.on('newGame', this.startGame.bind(this));
-    this.unsub3 = ws.on('executeCommands', this.execCommands.bind(this));
-    this.unsub4 = ws.on('close', this.close.bind(this));
+    this.subscriptions = [
+      ws.on('open', this.open.bind(this)),
+      ws.on('newGame', this.startGame.bind(this)),
+      ws.on('executeCommands', this.execCommands.bind(this)),
+      ws.on('close', this.close.bind(this)),
+    ];
   }
 
   open() {
@@ -37,10 +39,7 @@ class MockServerListener {
   }
 
   unsubAll() {
-    this.unsub1();
-    this.unsub2();
-    this.unsub3();
-    this.unsub4();
+    this.subscriptions.forEach(unsub => unsub());
   }
 }
 
@@ -50,11 +49,14 @@ class MockClientListener {
     this.gameDOM;
     this.game;
     this.selectors = selectors;
-    this.unsub1 = ws.on('addPlayer', this.addPlayer.bind(this));
-    this.unsub2 = ws.on('removePlayer', this.removePlayer.bind(this));
-    this.unsub3 = ws.on('startGame', this.startGame.bind(this));
-    this.unsub4 = ws.on('addPieces', this.addPieces.bind(this));
-    this.unsub5 = ws.on('gameOver', this.gameOver.bind(this));
+    this.subscriptions = [
+      ws.on('addPlayer', this.addPlayer.bind(this)),
+      ws.on('removePlayer', this.removePlayer.bind(this)),
+      ws.on('startGame', this.startGame.bind(this)),
+      ws.on('updatePlayer', this.updatePlayer.bind(this)),
+      ws.on('addPieces', this.addPieces.bind(this)),
+      ws.on('gameOver', this.gameOver.bind(this)),
+    ];
   }
 
   addPlayer(id) {
@@ -74,6 +76,10 @@ class MockClientListener {
     this.game.start(data);
   }
 
+  updatePlayer(data) {
+    publish('updatePlayerBoard', data);
+  }
+
   addPieces(pieces) {
     this.game.board.pieceList.addSet(pieces);
   }
@@ -84,11 +90,7 @@ class MockClientListener {
   }
 
   unsubAll() {
-    this.unsub1();
-    this.unsub2();
-    this.unsub3();
-    this.unsub4();
-    this.unsub5();
+    this.subscriptions.forEach(unsub => unsub());
     this.gameDOM && this.gameDOM.unsubscribe();
     this.game && this.game.unsubscribe();
   }
