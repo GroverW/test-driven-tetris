@@ -14,7 +14,7 @@ const { CONTROLS } = require('../helpers/data');
 const Api = require('../helpers/api');
 const serverPubSub = require('../../src/helpers/pubSub');
 const { GAMES } = require("../../src/helpers/data");
-const { mockSend } = require('../../src/helpers/mocks');
+const { mockSend, getTestBoard } = require('../../src/helpers/mocks');
 
 
 describe('websocket tests', () => {
@@ -70,13 +70,32 @@ describe('websocket tests', () => {
   });
 
   test('second player is added to room', () => {
+    const sendAllSpy = jest.spyOn(clientToServer.gameServer, 'sendAll');
+    const sendToSpy = jest.spyOn(clientToServer.gameServer, 'sendTo');
+
     // no additional players
     expect(serverToClient.gameDOM.players.length).toBe(0);
+    expect(sendAllSpy).toHaveBeenCalledTimes(0);
+    expect(sendToSpy).toHaveBeenCalledTimes(0);
 
     clientToServer.gameServer.join(player2);
 
     // one additional player
     expect(serverToClient.gameDOM.players.length).toBe(1);
+    
+    expect(sendAllSpy).toHaveBeenCalledTimes(1);
+    // player joining should receive all other players in game
+    expect(sendToSpy).toHaveBeenCalledTimes(1);
+
+    let player3 = new Player(mockSend, serverPubSub());
+
+    clientToServer.gameServer.join(player3);
+
+    expect(serverToClient.gameDOM.players.length).toBe(2);
+    
+    expect(sendAllSpy).toHaveBeenCalledTimes(2);
+    // player 1 and 2 should be send to player 3
+    expect(sendToSpy).toHaveBeenCalledTimes(3);
   });
 
   test('second player is removed from room', () => {
@@ -148,6 +167,21 @@ describe('websocket tests', () => {
     expect(clientToServer.player.game.score).toEqual(serverToClient.game.score);
   });
 
+  test('execute commands - player 2 board updates on player 1 DOM', () => {    
+    clientToServer.gameServer.join(player2);
+
+    const drawBoardSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawBoard');
+
+    clientToServer.startGame();
+
+    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
+    
+    player2.game.board.grid = getTestBoard('pattern1');
+    player2.game.executeCommandQueue([]);
+    
+    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+  });
+
   test('game over from play', () => {
     clientToServer.startGame();
 
@@ -159,6 +193,7 @@ describe('websocket tests', () => {
     const clientBoard = serverToClient.game.board.grid;
 
     expect(serverBoard).toEqual(clientBoard);
+
 
     expect(serverToClient.game.gameStatus).toBe(false);
     expect(clientToServer.player.game.gameStatus).toBe(false);
@@ -177,6 +212,7 @@ describe('websocket tests', () => {
 
     const serverBoard = clientToServer.player.game.board.grid;
     const clientBoard = serverToClient.game.board.grid;
+
     expect(serverBoard).toEqual(clientBoard);
 
     clientToServer.player.leave();
