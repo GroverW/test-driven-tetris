@@ -37,7 +37,8 @@ describe('websocket tests', () => {
       gameContainer: getMockDOMSelector(),
       scoreSelector: getMockDOMSelector(),
       levelSelector: getMockDOMSelector(),
-      linesSelector: getMockDOMSelector()
+      linesSelector: getMockDOMSelector(),
+      playerSelector: getMockDOMSelector(),
     }
     
     serverToClient = new MockClientListener(webSocketMock, selectors);
@@ -121,6 +122,20 @@ describe('websocket tests', () => {
     expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
   });
 
+  test('game start - subsequent game starts should fail', () => {
+    const getPiecesSpy = jest.spyOn(serverToClient.game.board, 'getPieces');
+
+    expect(getPiecesSpy).toHaveBeenCalledTimes(0);
+
+    clientToServer.startGame();
+
+    expect(getPiecesSpy).toHaveBeenCalledTimes(1);
+
+    clientToServer.startGame();
+
+    expect(getPiecesSpy).toHaveBeenCalledTimes(1);
+  })
+
   test('add pieces', () => {
     clientToServer.startGame();
 
@@ -142,7 +157,7 @@ describe('websocket tests', () => {
 
     clientToServer.gameServer.gameOver(gameOverData);
 
-    expect(serverToClient.game.gameStatus).toBe(false);
+    expect(serverToClient.game.gameStatus).toBe(null);
     expect(serverToClient.game.animationId).toBe(undefined);
   });
 
@@ -195,8 +210,8 @@ describe('websocket tests', () => {
     expect(serverBoard).toEqual(clientBoard);
 
 
-    expect(serverToClient.game.gameStatus).toBe(false);
-    expect(clientToServer.player.game.gameStatus).toBe(false);
+    expect(serverToClient.game.gameStatus).toBe(null);
+    expect(clientToServer.player.game.gameStatus).toBe(null);
 
   });
 
