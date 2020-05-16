@@ -1,11 +1,12 @@
 const Board = require('./board');
-const { 
+const {
   CONTROLS,
   COMMAND_QUEUE_MAP,
   POINTS,
   LINES_PER_LEVEL,
+  MOVE_SPEED,
   ANIMATION_SPEED,
-  MAX_SPEED 
+  MAX_SPEED,
 } = require('../../helpers/data');
 const { publish, subscribe } = require('../../helpers/pubSub');
 
@@ -20,6 +21,8 @@ class Game {
     this.board = new Board(id);
     this.time = { start: 0, elapsed: 0 }
     this.animationId;
+    this.toggledKey = false;
+    this.moveTime = { start: 0, elapsed: 0 }
     this.commandQueue = [];
     this.subscriptions = [
       subscribe('lowerPiece', this.updateScore.bind(this)),
@@ -30,9 +33,10 @@ class Game {
   }
 
   start() {
-    if(this.gameStatus) return;
+    if (this.gameStatus) return;
     this.board.getPieces();
     this.gameStatus = true;
+    console.log(this.board.pieceList.pieces);
     this.animate();
 
     publish('draw', {
@@ -40,7 +44,7 @@ class Game {
       piece: this.board.piece,
       nextPiece: this.board.nextPiece,
     });
-    
+
     publish('updateScore', {
       score: this.score,
       level: this.level,
@@ -50,23 +54,35 @@ class Game {
 
   command(key) {
     const commands = {
-      [CONTROLS.LEFT]: () => this.board.movePiece(-1,0),
-      [CONTROLS.RIGHT]: () => this.board.movePiece(1,0),
-      [CONTROLS.DOWN]: () =>  this.board.movePiece(0,1),
-      [CONTROLS.AUTO_DOWN]: () =>  this.board.movePiece(0,1,0),
+      [CONTROLS.LEFT]: () => this.board.movePiece(-1, 0),
+      [CONTROLS.RIGHT]: () => this.board.movePiece(1, 0),
+      [CONTROLS.DOWN]: () => this.board.movePiece(0, 1),
+      [CONTROLS.AUTO_DOWN]: () => this.board.movePiece(0, 1, 0),
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
-    if((key in commands) && this.gameStatus) {
+    if ((key in commands) && this.gameStatus) {
       this.addToCommandQueue(key);
       commands[key]();
     }
 
-    if(!this.gameStatus && this.commandQueue.length > 0) {
+    if (!this.gameStatus && this.commandQueue.length > 0) {
       this.sendCommandQueue();
     }
+  }
+
+  toggleMove(key, upDown) {
+    const toggleCommands = new Set([
+      CONTROLS.LEFT,
+      CONTROLS.RIGHT,
+      CONTROLS.DOWN,
+    ]);
+
+    if (!toggleCommands.has(key) && upDown === 'down')    this.command(key);
+    else if (!this.toggledKey && upDown === 'down')       this.toggledKey = key;
+    else if (this.toggledKey === key && upDown === 'up')  this.toggledKey = false;
   }
 
   /**
@@ -85,7 +101,7 @@ class Game {
     }
   }
 
-  
+
   sendCommandQueue() {
     publish('sendMessage', {
       type: 'executeCommands',
@@ -119,7 +135,7 @@ class Game {
   updateLines(lines) {
     this.lines += lines;
 
-    if(this.linesRemaining <= lines) this.level++
+    if (this.linesRemaining <= lines) this.level++
 
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
 
@@ -130,7 +146,7 @@ class Game {
   }
 
   clearLines(lines) {
-    if(POINTS.LINES_CLEARED[lines]) {
+    if (POINTS.LINES_CLEARED[lines]) {
       this.updateScore(POINTS.LINES_CLEARED[lines] * this.level);
       this.updateLines(lines);
     }
@@ -145,7 +161,7 @@ class Game {
    * - resets animationId
    */
   gameOver({ id }) {
-    if(id === this.id) {
+    if (id === this.id) {
       this.unsubscribe();
       this.gameStatus = false;
       cancelAnimationFrame(this.animationId);
@@ -168,12 +184,18 @@ class Game {
    */
   animate(currTime = 0) {
     this.time.elapsed = currTime - this.time.start;
-    
-    if(this.time.elapsed > this.getAnimationDelay()) {
+    this.moveTime.elapsed = currTime - this.moveTime.start;
+
+    if (this.time.elapsed > this.getAnimationDelay()) {
       this.time.start = currTime;
       this.command(CONTROLS.AUTO_DOWN);
     }
-    
+
+    if (this.toggledKey && this.moveTime.elapsed > MOVE_SPEED) {
+      this.moveTime.start = currTime;
+      this.command(this.toggledKey);
+    }
+
     this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 
