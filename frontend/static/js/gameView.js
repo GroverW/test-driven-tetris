@@ -94,8 +94,6 @@ class GameView {
       
       selectedPlayer.board = player.board;
       this.drawBoard(selectedPlayer.ctx, selectedPlayer.board);
-    } else {
-      this.drawBoard(this.ctx, player.board);
     }
   }
 
