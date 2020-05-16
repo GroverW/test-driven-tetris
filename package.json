@@ -17,6 +17,7 @@
     "nodemon": "^2.0.3",
     "socket.io": "^2.3.0",
     "supertest": "^4.0.2",
+    "uuid": "^8.0.0",
     "webpack": "^4.43.0"
   },
   "devDependencies": {
