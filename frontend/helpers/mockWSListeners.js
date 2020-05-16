@@ -21,7 +21,8 @@ class MockServerListener {
   }
 
   open() {
-    this.gameServer = GameServer.get(this.url);
+    GameServer.addGame(this.url)
+    this.gameServer = GameServer.getGame(this.url);
     this.player = new Player(this.ws.send.bind(this.ws), serverPubSub());
     this.gameServer.join(this.player);
   }
