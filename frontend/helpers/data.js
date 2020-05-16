@@ -34,6 +34,7 @@ const POINTS = {
   }
 };
 
+const MOVE_SPEED = 34; // time in ms
 const MAX_SPEED = 21;
 const ANIMATION_SPEED = {
   1: 800,
@@ -119,6 +120,7 @@ module.exports = {
   CONTROLS,
   COMMAND_QUEUE_MAP,
   POINTS,
+  MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
   CELL_COLORS,
