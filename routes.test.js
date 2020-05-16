@@ -1,76 +1,35 @@
-// const request = require('supertest');
-const io = require('socket.io-client');
-const ioBackend = require('socket.io');
-const server = require('../server');
-const ioOptions = {
-  'reconnection delay': 0,
-  'reopen delay': 0,
-  'force new connection': true,
-  transports: ['websocket']
-}
+const request = require('supertest');
+const GameServer = require('./src/js/gameServer');
+const { GAMES } = require('./src/helpers/data');
 
-let socket;
-let client;
-let ioServer;
+const app = require('./app');
 
-const BASE_URL = "ws://localhost:3000/test";
+describe('Routes tests', () => {
+  afterEach(() => {
+    GAMES.clear();
+  })
 
-// /**
-//  * setup websocket and http servers
-//  */
-// beforeAll(done => {
-//   httpServer = http.createServer().listen();
-//   httpServerAddress = httpServer.listen().address();
-//   ioServer = ioBackend(httpServer);
-//   done();
-// });
+  describe('GET game', () => {
+    test('Returns uuid', async () => {
+      const response = await request(app).get('/game');
 
-/**
- * cleanup websocket and http servers
- */
-// afterAll(done => {
-//   io.disconnect();
-//   done();
-// });
+      expect(response.statusCode).toBe(200);
 
-/**
- * setup each test
- */
+      expect(response.body.gameId).toEqual(expect.any(String));
+    });
 
-describe("route tests", () => {
-  beforeEach( async (done) => {
-    // client = io.connect(BASE_URL, ioOptions);
-    // console.log("HMMMM",client.connected);
-    // client.on('connect', () => {
-    //   console.log('connected');
-    //   done()
-    // });
-    const ws = new WebSocket(BASE_URL);
-    console.log(ws);
-    ws.onopen = evt => {
-      console.log('open', evt)
-    }
-    done()
-  });
+    test('Creates new game with uuid', async () => {
+      expect(GAMES.size).toBe(0);
 
-  /**
-   * cleanup each test
-   */
-  // afterEach(async done => {
-  //   client.connected && client.disconnect();
-  //   done();
-  // })
+      const response = await request(app).get('/game');
 
-  describe('Message Test', () => {
-    test('sends a message', async (done) => {
-      console.log("heyoooo");
-      // client.emit('message', 'hello');
-      // client.on('message', msg => {
-      //   expect(msg).toBe('hello');
-      // })
+      expect(response.statusCode).toBe(200);
 
-      // client.disconnect();
-      done();
+      expect(response.body.gameId).toEqual(expect.any(String));
+
+      expect(GAMES.size).toBe(1);
+
+      expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
   });
 });
