@@ -11,10 +11,16 @@ class GameServer {
     this.subscriptions = {};
   }
 
-  static get(id) {
+  static getGame(id) {
+    if (GAMES.has(id)) return GAMES.get(id);
+
+    return false;
+  }
+
+  static addGame(id) {
     if (!GAMES.has(id)) GAMES.set(id, new GameServer(id))
 
-    return GAMES.get(id);
+    return id;
   }
 
   join(player) {
