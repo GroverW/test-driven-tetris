@@ -97,6 +97,8 @@ class Board {
   }
 
   rotatePiece(piece, direction) {
+    this.wallKick(piece);
+
     let newGrid = JSON.parse(JSON.stringify(piece.grid));
 
     for (let i = 0; i < newGrid.length; i++) {
@@ -115,6 +117,16 @@ class Board {
       board: this.grid,
       piece: this.piece,
     })
+  }
+
+  wallKick(piece) {
+    const pStart = piece.x;
+    const pEnd = piece.x + piece.grid[0].length;
+    const bStart = 0;
+    const bEnd = this.grid[0].length;
+
+    if(pStart < bStart) this.movePiece(bStart - pStart, 0);
+    if(pEnd > bEnd) this.movePiece(bEnd - pEnd, 0);
   }
 
   addPieceToBoard() {
