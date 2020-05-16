@@ -43,6 +43,53 @@ describe('game board tests', () => {
     expect([p2.x, p2.y]).toEqual([0, 0]);
   });
 
+  test('wall kick - left side', () => {
+    const wallKickSpy = jest.spyOn(gameBoard, 'wallKick');
+
+    gameBoard.piece = p1;
+    expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([3,0]);
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(0);
+
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.movePiece(-4,0);
+
+    expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([-1,0]);
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(1);
+
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(2);
+    expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([0,0]);
+  });
+
+  test('wall kick - right side', () => {
+    const wallKickSpy = jest.spyOn(gameBoard, 'wallKick');
+
+    gameBoard.piece = p1;
+    expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([3,0]);
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(0);
+
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.movePiece(5,0);
+
+    let pieceEdge = gameBoard.piece.x + gameBoard.piece.grid.length;
+    const boardEdge = gameBoard.grid[0].length;
+
+    expect(pieceEdge).toBeGreaterThan(boardEdge);
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(1);
+
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+
+    pieceEdge = gameBoard.piece.x + gameBoard.piece.grid.length;
+
+    expect(wallKickSpy).toHaveBeenCalledTimes(2);
+    expect(pieceEdge).toBe(boardEdge);
+  });
+
   test('gets new piece', () => {
     expect(gameBoard.piece).toBe(undefined);
     expect(gameBoard.nextPiece).toBe(undefined);
