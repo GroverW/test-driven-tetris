@@ -47,7 +47,11 @@ class GameView {
 
   drawNext(ctx, piece) {
     ctx.clearRect(0, 0, 4, 4);
-    this.drawPiece(ctx, piece, 0, 0)
+
+    const xStart = 2 - piece.grid.length / 2;
+    const yStart = piece.grid.length < 4 ? 1 : .5;
+
+    this.drawPiece(ctx, piece, xStart, yStart)
   }
 
   scaleBoardSize(ctx, cellSize, width=BOARD_WIDTH, height=BOARD_HEIGHT) {
@@ -90,6 +94,8 @@ class GameView {
       
       selectedPlayer.board = player.board;
       this.drawBoard(selectedPlayer.ctx, selectedPlayer.board);
+    } else {
+      this.drawBoard(this.ctx, player.board);
     }
   }
 
