@@ -70,5 +70,9 @@ btn.addEventListener('click', () => {
 })
 
 document.addEventListener('keydown', event => {
-  if(game) game.command(event.which);
+  if(game) game.toggleMove(event.which, 'down');
 });
+
+document.addEventListener('keyup', event => {
+  if(game) game.toggleMove(event.which, 'up');
+})
