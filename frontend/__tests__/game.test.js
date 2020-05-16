@@ -108,6 +108,43 @@ describe('game tests', () => {
     expect(game.board.grid).toEqual(TEST_BOARDS.pattern1);
   });
 
+  test('toggle vs keypress movement', () => {
+    const commandSpy = jest.spyOn(game, 'command');
+
+    // should only toggle with basic movement
+    game.toggleMove(CONTROLS.HARD_DROP, 'down');
+
+    expect(game.toggledKey).toBe(false);
+    expect(commandSpy).toHaveBeenCalledTimes(1);
+
+    game.toggleMove(CONTROLS.DOWN, 'down');
+
+    expect(game.toggledKey).toBe(CONTROLS.DOWN);
+    expect(commandSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('toggle on keydown vs up', () => {
+    game.toggleMove(CONTROLS.DOWN, 'down');
+    expect(game.toggledKey).toBe(CONTROLS.DOWN);
+
+    game.toggleMove(CONTROLS.LEFT, 'down');
+    // should not overwrite current key with additional key
+    expect(game.toggledKey).toBe(CONTROLS.DOWN);
+
+    game.toggleMove(CONTROLS.LEFT, 'up');
+    expect(game.toggledKey).toBe(CONTROLS.DOWN);
+
+    game.toggleMove(CONTROLS.DOWN, 'up');
+    expect(game.toggledKey).toBe(false);
+
+    const commandSpy = jest.spyOn(game, 'command');
+    game.toggleMove(CONTROLS.HARD_DROP, 'down');
+    expect(commandSpy).toHaveBeenCalledTimes(1);
+
+    game.toggleMove(CONTROLS.HARD_DROP, 'up');
+    expect(commandSpy).toHaveBeenCalledTimes(1);
+  })
+
   test('score points by moving piece down', () => {
     game.start();
     game.board.piece = p1;
@@ -317,6 +354,23 @@ describe('game tests', () => {
 
     expect(requestAnimationFrame).toHaveBeenCalledTimes(11);
     expect(movePieceSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('animate - moves piece with toggled key', () => {
+    const movePieceSpy = jest.spyOn(game.board, 'movePiece');
+
+    game.toggleMove(CONTROLS.DOWN, 'down');
+
+
+    game.start();
+
+    expect(movePieceSpy).toHaveBeenCalledTimes(0);
+
+    jest.advanceTimersByTime(200);
+
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(3);
+    expect(movePieceSpy).toHaveBeenCalledTimes(2);
+
   });
 
   test('animation speed', () => {
