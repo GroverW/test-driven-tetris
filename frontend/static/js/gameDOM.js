@@ -97,14 +97,18 @@ class GameDOM {
     let gameOverMessage = document.createElement('div');
     gameOverMessage.classList.add('game-over');
     
-    let messageLine1 = document.createElement('h2');
+    let gameOverMessageText = document.createElement('div');
+    gameOverMessageText.classList.add('game-over-message');
+
+    let messageLine1 = document.createElement('h1');
     messageLine1.innerText = `Game Over!`;
-    gameOverMessage.appendChild(messageLine1);
+    gameOverMessageText.appendChild(messageLine1);
 
     let messageLine2 = document.createElement('p');
     messageLine2.innerText = `You Came in ${ranking}`;
-    gameOverMessage.appendChild(messageLine2);
+    gameOverMessageText.appendChild(messageLine2);
 
+    gameOverMessage.appendChild(gameOverMessageText);
     container.appendChild(gameOverMessage);
   }
 
