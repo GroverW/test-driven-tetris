@@ -33,10 +33,9 @@ class Game {
   }
 
   start() {
-    if (this.gameStatus) return;
+    if (this.gameStatus || this.gameStatus === null) return;
     this.board.getPieces();
     this.gameStatus = true;
-    console.log(this.board.pieceList.pieces);
     this.animate();
 
     publish('draw', {
@@ -163,7 +162,7 @@ class Game {
   gameOver({ id }) {
     if (id === this.id) {
       this.unsubscribe();
-      this.gameStatus = false;
+      this.gameStatus = null;
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
