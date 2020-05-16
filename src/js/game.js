@@ -19,8 +19,10 @@ class Game {
   }
 
   start() {
-    this.board.getPieces();
-    this.gameStatus = true;
+    if(this.gameStatus === false) {
+      this.board.getPieces();
+      this.gameStatus = true;
+    }
   }
 
   command(action) {
@@ -67,7 +69,7 @@ class Game {
 
   gameOver() {
     this.unsubscribe();
-    this.gameStatus = false;
+    this.gameStatus = null;
   }
 
   unsubscribe() {
