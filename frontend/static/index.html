@@ -11,6 +11,18 @@
 
 <body>
   <div id="game-container">
+    <div id="menu">
+      <div class="menu-align">
+        <div class="menu-options">
+          <p class="menu-title">
+            Welcome to Test Driven Tetris!
+          </p>
+          <button id="newSinglePlayer">New Single Player Game</button>
+          <button id="newMultiplayer">New Multiplayer Game</button>
+          <button id="joinMultiplayer">Join Multiplayer Game</button>
+        </div>
+      </div>
+    </div>
     <div id="p1" class="item-large">
       <canvas id="p1-board" class="game-board"></canvas>
     </div>
@@ -25,13 +37,9 @@
         <li><span>Level:</span> <span id="game-level"></span></li>
         <li><span>Lines Cleared:</span> <span id="game-lines"></span></li>
       </ul>
+      <br />
+      <button id="start">Start Game</button>
     </div>
-    <button id="test">DO IT</button>
-    <!-- <div id="p2" class="item-large">
-      <canvas id="p2-board" class="game-board"></canvas>
-    </div> -->
-    <!-- <div id="p3" class="item-small">2</div>
-    <div id="p4" class="item-small">3</div> -->
   </div>
   <script src="/js/bundle.js"></script>
 </body>
