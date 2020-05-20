@@ -19,10 +19,11 @@ class Game {
     this.lines = 0;
     this.linesRemaining = 10;
     this.board = new Board(id);
-    this.time = { start: 0, elapsed: 0 }
+    this.time = { start: 0, elapsed: 0 };
     this.animationId;
     this.toggledKey = false;
-    this.moveTime = { start: 0, elapsed: 0 }
+    this.moveTime = { start: 0, elapsed: 0 };
+    this.moveDelayIdx = 0;
     this.commandQueue = [];
     this.subscriptions = [
       subscribe('lowerPiece', this.updateScore.bind(this)),
@@ -190,9 +191,14 @@ class Game {
       this.command(CONTROLS.AUTO_DOWN);
     }
 
-    if (this.toggledKey && this.moveTime.elapsed > MOVE_SPEED) {
-      this.moveTime.start = currTime;
-      this.command(this.toggledKey);
+    if (this.toggledKey) {
+      if(this.moveTime.elapsed > MOVE_SPEED[this.moveDelayIdx]) {
+        this.moveTime.start = currTime;
+        this.command(this.toggledKey);
+        this.moveDelayIdx = Math.min(this.moveDelayIdx + 1, MOVE_SPEED.length - 1);
+      }
+    } else {
+      this.moveDelayIdx = 0;
     }
 
     this.animationId = requestAnimationFrame(this.animate.bind(this));
