@@ -2,8 +2,9 @@ const { GAMES, MAX_PLAYERS, RANKINGS, SEED_PIECES } = require('../helpers/data')
 const { randomize } = require('../helpers/utils');
 
 class GameServer {
-  constructor(id) {
+  constructor(id, gameType) {
     this.id = id;
+    this.gameType = gameType;
     this.players = new Set();
     this.nextPlayerId = 0;
     this.gameStarted = false;
@@ -17,39 +18,36 @@ class GameServer {
     return false;
   }
 
-  static addGame(id) {
-    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id))
+  static addGame(id, gameType) {
+    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType))
 
     return id;
   }
 
+  checkGameStatus() {
+    const full = this.players.size >= MAX_PLAYERS[this.gameType]; 
+
+    return !full && !this.gameStarted;
+  }
+
   join(player) {
-    if (this.players.size < MAX_PLAYERS && !this.gameStarted) {
-      this.players.add(player);
-      
-      player.setId(++this.nextPlayerId);
-      this.addSubscriptions(player)
+    if (!this.checkGameStatus()) return false;
 
-      if (this.players.size === 1) player.isHost = true;
+    if (this.players.size === 0) player.isHost = true;
+    
+    this.players.add(player);
+    
+    player.setId(++this.nextPlayerId);
+    
+    this.addSubscriptions(player)
 
-      this.sendAll({
-        type: 'addPlayer',
-        data: player.id,
-      });
+    this.sendAll({ type: 'addPlayer', data: player.id });
 
-      this.players.forEach(p => {
-        if(p !== player) {
-          this.sendTo(player, {
-            type: 'addPlayer',
-            data: p.id,
-          })
-        }
-      })
+    this.players.forEach(p => {
+      (p !== player) && this.sendTo(player, { type: 'addPlayer', data: p.id, })
+    });
 
-      return true;
-    }
-
-    return false;
+    return true;
   }
 
   addSubscriptions(player) {
@@ -94,12 +92,12 @@ class GameServer {
   }
 
   sendAll(data) {
-    this.players.forEach(player => player._send(JSON.stringify(data)));
+    this.players.forEach(player => this.sendTo(player,data));
   }
 
   sendAllExcept(exceptPlayer, data) {
     this.players.forEach(player =>
-      (player !== exceptPlayer) && player._send(JSON.stringify(data))
+      (player !== exceptPlayer) && this.sendTo(player, data)
     );
   }
 
@@ -139,10 +137,10 @@ class GameServer {
     this.players.forEach(player => {
       player.game.board.pieceList.addSet(pieces);
       
-      player._send(JSON.stringify({
+      this.sendTo(player, {
         type: 'addPieces',
         data: pieces
-      }))
+      })
     })
   }
 
