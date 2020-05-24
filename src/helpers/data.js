@@ -1,5 +1,12 @@
 const GAMES = new Map();
-const MAX_PLAYERS = 4;
+const GAME_TYPES = {
+  MULTI: 'Multiplayer',
+  SINGLE: 'Single Player',
+};
+const MAX_PLAYERS = {
+  [GAME_TYPES.MULTI]: 4,
+  [GAME_TYPES.SINGLE]: 1,
+};
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 const LINES_PER_LEVEL = 10;
@@ -76,6 +83,7 @@ const SEED_PIECES = [
 
 module.exports = {
   GAMES,
+  GAME_TYPES,
   MAX_PLAYERS,
   BOARD_WIDTH,
   BOARD_HEIGHT,
