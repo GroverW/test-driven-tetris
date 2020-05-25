@@ -81,7 +81,7 @@ class GameDOM {
     if(data.id === this.id) {
       this.unsubscribe();
       this.gameView.drawBoard(this.gameView.ctx, data.board);
-      this.addGameOverMessage(this.playerSelector, data.ranking);
+      this.addGameOverMessage(this.playerSelector, data.message);
       return;
     }
 
@@ -89,11 +89,11 @@ class GameDOM {
 
     if(playerIdx >= 0) {
       this.gameView.updatePlayer(data);
-      this.addGameOverMessage(this.players[playerIdx].selector, data.ranking);
+      this.addGameOverMessage(this.players[playerIdx].selector, data.message);
     }
   }
 
-  addGameOverMessage(container, ranking) {
+  addGameOverMessage(container, messages) {
     let gameOverMessage = document.createElement('div');
     gameOverMessage.classList.add('game-over');
     
@@ -104,9 +104,11 @@ class GameDOM {
     messageLine1.innerText = `Game Over!`;
     gameOverMessageText.appendChild(messageLine1);
 
-    let messageLine2 = document.createElement('p');
-    messageLine2.innerText = `You Came in ${ranking}`;
-    gameOverMessageText.appendChild(messageLine2);
+    messages.forEach(msg => {
+      let newMsg = document.createElement('p');
+      newMsg.innerText = msg;
+      gameOverMessageText.appendChild(newMsg);
+    })
 
     gameOverMessage.appendChild(gameOverMessageText);
     container.appendChild(gameOverMessage);
