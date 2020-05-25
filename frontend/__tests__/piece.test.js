@@ -1,6 +1,6 @@
-const { pieceList, Piece } = require('../static/js/piece');
+const { Piece } = require('../static/js/piece');
 const Board = require('../static/js/board');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 const { getTestPieces } = require('../helpers/mocks');
 
 describe('game pieces', () => {
@@ -8,13 +8,13 @@ describe('game pieces', () => {
   let board;
 
   beforeEach(() => {
-    p1 = new Piece(PIECES[0]);
-    p2 = new Piece(PIECES[1]);
-    p3 = new Piece(PIECES[2]);
-    p4 = new Piece(PIECES[3]);
-    p5 = new Piece(PIECES[4]);
-    p6 = new Piece(PIECES[5]);
-    p7 = new Piece(PIECES[6]);
+    p1 = new Piece(PIECE_TYPES.I);
+    p2 = new Piece(PIECE_TYPES.O);
+    p3 = new Piece(PIECE_TYPES.T);
+    p4 = new Piece(PIECE_TYPES.S);
+    p5 = new Piece(PIECE_TYPES.Z);
+    p6 = new Piece(PIECE_TYPES.L);
+    p7 = new Piece(PIECE_TYPES.J);
     board = new Board();
     board.pieceList.addSet(getTestPieces());
   });
@@ -25,10 +25,10 @@ describe('game pieces', () => {
     const p3 = new Piece(board.pieceList.getNextPiece());
     const p4 = new Piece(board.pieceList.getNextPiece());
     
-    expect(PIECES).toContainEqual(p1.grid);
-    expect(PIECES).toContainEqual(p2.grid);
-    expect(PIECES).toContainEqual(p3.grid);
-    expect(PIECES).toContainEqual(p4.grid);
+    expect(PIECES[p1.type]).toContainEqual(p1.grid);
+    expect(PIECES[p2.type]).toContainEqual(p2.grid);
+    expect(PIECES[p3.type]).toContainEqual(p3.grid);
+    expect(PIECES[p4.type]).toContainEqual(p4.grid);
   });
 
   test('starts in the right location', () => {
@@ -87,9 +87,9 @@ describe('game pieces', () => {
     board.rotatePiece(p6, ROTATE_LEFT);
 
     expect(p6.grid).toEqual([
-      [6,0,0],
-      [6,0,0],
       [6,6,0],
+      [0,6,0],
+      [0,6,0],
     ])
   });
 
