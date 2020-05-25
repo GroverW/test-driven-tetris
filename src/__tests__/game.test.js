@@ -1,6 +1,6 @@
 const Game = require('../js/game');
 const { Piece } = require ('../js/piece');
-const { PIECES } = require('../helpers/data');
+const { PIECE_TYPES } = require('../helpers/data');
 const { 
   TEST_BOARDS,
   getTestBoard,
@@ -17,9 +17,9 @@ describe('game tests', () => {
     pubSubTest = pubSub();
     game = new Game(pubSubTest);
     game.board.pieceList.pieces.push(getTestPieces());
-    p1 = new Piece(PIECES[0]);
-    p2 = new Piece(PIECES[6]);
-    p3 = new Piece(PIECES[2]);
+    p1 = new Piece(PIECE_TYPES.I);
+    p2 = new Piece(PIECE_TYPES.J);
+    p3 = new Piece(PIECE_TYPES.T);
   })
 
   afterEach(() => {
@@ -122,8 +122,7 @@ describe('game tests', () => {
 
     expect(game.score).toBe(0);
 
-    game.command('ROTATE_LEFT');
-    game.command('RIGHT');
+    game.command('ROTATE_RIGHT');
     game.command('RIGHT');
     game.command('RIGHT');
     game.command('RIGHT');
@@ -196,8 +195,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
-    game.command('ROTATE_LEFT');
-    game.command('RIGHT');
+    game.command('ROTATE_RIGHT');
     game.command('RIGHT');
     game.command('RIGHT');
     game.command('RIGHT');
@@ -232,13 +230,13 @@ describe('game tests', () => {
   test('game over', () => {
     game.start();
     game.board.grid = getTestBoard('empty');
-    game.board.piece = new Piece(PIECES[0]);
+    game.board.piece = new Piece(PIECE_TYPES.I);
     const gameOverSpy = jest.spyOn(game, 'unsubscribe');
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
 
     // stacking I pieces on top of each other until they reach the top
     for(let i = 0; i < 5; i++) {
-      game.board.nextPiece = new Piece(PIECES[0]);
+      game.board.nextPiece = new Piece(PIECE_TYPES.I);
       game.command('ROTATE_LEFT');
       game.command('HARD_DROP');
     }

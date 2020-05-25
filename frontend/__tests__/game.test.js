@@ -1,17 +1,18 @@
 const Game = require('../static/js/game');
 const { Piece } = require('../static/js/piece');
 const {
-  PIECES,
+  PIECE_TYPES,
   CONTROLS,
   ANIMATION_SPEED,
-  MAX_SPEED
+  MAX_SPEED,
+  MOVE_SPEED,
 } = require('../helpers/data');
 const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
   mockAnimation,
-  pubSubMocks
+  pubSubMocks,
 } = require('../helpers/mocks');
 const { publish } = require('../helpers/pubSub');
 
@@ -23,9 +24,9 @@ describe('game tests', () => {
   beforeEach(() => {
     pubSub = pubSubMocks();
     game = new Game(1);
-    p1 = new Piece(PIECES[0]);
-    p2 = new Piece(PIECES[6]);
-    p3 = new Piece(PIECES[2]);
+    p1 = new Piece(PIECE_TYPES.I);
+    p2 = new Piece(PIECE_TYPES.J);
+    p3 = new Piece(PIECE_TYPES.T);
     
     jest.useFakeTimers();
     
@@ -183,8 +184,7 @@ describe('game tests', () => {
 
     expect(game.score).toBe(0);
 
-    game.command(CONTROLS.ROTATE_LEFT);
-    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.ROTATE_RIGHT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
@@ -265,8 +265,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines3');
     game.board.piece = p2;
 
-    game.command(CONTROLS.ROTATE_LEFT);
-    game.command(CONTROLS.RIGHT);
+    game.command(CONTROLS.ROTATE_RIGHT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
     game.command(CONTROLS.RIGHT);
@@ -301,11 +300,11 @@ describe('game tests', () => {
     game.start();
     
     game.board.grid = getTestBoard('empty');
-    game.board.piece = new Piece(PIECES[0]);
+    game.board.piece = new Piece(PIECE_TYPES.I);
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
     for (let i = 0; i < 5; i++) {
-      game.board.nextPiece = new Piece(PIECES[0]);
+      game.board.nextPiece = new Piece(PIECE_TYPES.I);
       game.command(CONTROLS.ROTATE_LEFT);
       game.command(CONTROLS.HARD_DROP);
     }
@@ -361,7 +360,6 @@ describe('game tests', () => {
 
     game.toggleMove(CONTROLS.DOWN, 'down');
 
-
     game.start();
 
     expect(movePieceSpy).toHaveBeenCalledTimes(0);
@@ -370,7 +368,6 @@ describe('game tests', () => {
 
     expect(requestAnimationFrame).toHaveBeenCalledTimes(3);
     expect(movePieceSpy).toHaveBeenCalledTimes(2);
-
   });
 
   test('animation speed', () => {
