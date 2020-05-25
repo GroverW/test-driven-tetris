@@ -1,6 +1,6 @@
 const Board = require('../static/js/board');
 const { Piece } = require('../static/js/piece');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
+const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/data');
 const { TEST_BOARDS, getTestBoard, getTestPieces, pubSubMocks } = require('../helpers/mocks');
 
 
@@ -12,11 +12,11 @@ describe('game board tests', () => {
   beforeEach(() => {
     gameBoard = new Board();
     gameBoard.pieceList.addSet(getTestPieces())
-    p1 = new Piece(PIECES[0]);
-    p2 = new Piece(PIECES[1]);
-    p3 = new Piece(PIECES[2]);
-    p4 = new Piece(PIECES[5]);
-    p5 = new Piece(PIECES[6]);
+    p1 = new Piece(PIECE_TYPES.I);
+    p2 = new Piece(PIECE_TYPES.O);
+    p3 = new Piece(PIECE_TYPES.T);
+    p4 = new Piece(PIECE_TYPES.L);
+    p5 = new Piece(PIECE_TYPES.J);
     pubSub = pubSubMocks();
   });
 
@@ -96,8 +96,8 @@ describe('game board tests', () => {
 
     gameBoard.getPieces();
 
-    expect(PIECES).toContainEqual(gameBoard.piece.grid);
-    expect(PIECES).toContainEqual(gameBoard.nextPiece.grid);
+    expect(PIECES[gameBoard.piece.type]).toContainEqual(gameBoard.piece.grid);
+    expect(PIECES[gameBoard.nextPiece.type]).toContainEqual(gameBoard.nextPiece.grid);
   });
 
   test('hard drop piece', () => {
@@ -198,8 +198,8 @@ describe('game board tests', () => {
     gameBoard.grid = getTestBoard('clearLines3');
     gameBoard.piece = p5;
 
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
-    gameBoard.movePiece(4, 0);
+    gameBoard.rotatePiece(gameBoard.piece, ROTATE_RIGHT);
+    gameBoard.movePiece(3, 0);
     gameBoard.hardDrop();
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
