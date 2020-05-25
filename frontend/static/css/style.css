@@ -31,6 +31,10 @@ body {
   background-color: rgba(0,0,0,.6);
 }
 
+#menu.hide {
+  display: none;
+}
+
 .menu-align {
   display: table-cell;
   vertical-align: middle;
