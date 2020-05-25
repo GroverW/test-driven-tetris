@@ -126,9 +126,13 @@ body {
   vertical-align: middle;
 }
 
+.game-over-message h1 {
+  font-size: 42px;
+}
+
 #stats {
   border: none;
-  flex-grow: 1;
+  height: 600px;
 }
 
 #stats ul {
