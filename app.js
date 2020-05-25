@@ -6,6 +6,7 @@ const GameServer = require('./src/js/gameServer');
 const Player = require('./src/js/player');
 const pubSub = require('./src/helpers/pubSub');
 const { v4: uuid } = require('uuid');
+const { GAME_TYPES } = require('./src/helpers/data');
 // const server = require('http').Server(app)
 // const io = require('socket.io')(server);
 const wsExpress = require('express-ws')(app);
@@ -15,10 +16,18 @@ app.use(express.static('frontend/static/'));
 
 
 // Get gameId and create game
-app.get('/game', (req, res, next) => {
+app.get('/game/multi', (req, res, next) => {
   const newGameId = uuid();
 
-  const gameId = GameServer.addGame(newGameId);
+  const gameId = GameServer.addGame(newGameId, GAME_TYPES.MULTI);
+
+  return res.json({ gameId });
+});
+
+app.get('/game/single', (req, res, next) => {
+  const newGameId = uuid();
+
+  const gameId = GameServer.addGame(newGameId, GAME_TYPES.SINGLE);
 
   return res.json({ gameId });
 })
