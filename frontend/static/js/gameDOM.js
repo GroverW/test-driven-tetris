@@ -85,7 +85,7 @@ class GameDOM {
       return;
     }
 
-    const playerIdx = this.players.findIndex(p => p.id = data.id);
+    const playerIdx = this.players.findIndex(p => p.id === data.id);
 
     if(playerIdx >= 0) {
       this.gameView.updatePlayer(data);
@@ -93,21 +93,21 @@ class GameDOM {
     }
   }
 
-  addGameOverMessage(container, messages) {
+  addGameOverMessage(container, message) {
     let gameOverMessage = document.createElement('div');
     gameOverMessage.classList.add('game-over');
     
     let gameOverMessageText = document.createElement('div');
     gameOverMessageText.classList.add('game-over-message');
 
-    let messageLine1 = document.createElement('h1');
-    messageLine1.innerText = `Game Over!`;
-    gameOverMessageText.appendChild(messageLine1);
+    let messageHeader = document.createElement('h1');
+    messageHeader.innerText = message.header;
+    gameOverMessageText.appendChild(messageHeader);
 
-    messages.forEach(msg => {
-      let newMsg = document.createElement('p');
-      newMsg.innerText = msg;
-      gameOverMessageText.appendChild(newMsg);
+    message.body.forEach(line => {
+      let newLine = document.createElement('p');
+      newLine.innerText = line;
+      gameOverMessageText.appendChild(newLine);
     })
 
     gameOverMessage.appendChild(gameOverMessageText);
