@@ -56,7 +56,7 @@ app.ws('/game/:gameId', (ws, req, next) => {
 
     ws.on('message', m => {
       const msg = JSON.parse(m);
-      if (msg.type === "newGame") player.startGame();
+      if (msg.type === "play") player.startGame();
       if (msg.type === "executeCommands") player.game.executeCommandQueue(msg.data);
     });
 

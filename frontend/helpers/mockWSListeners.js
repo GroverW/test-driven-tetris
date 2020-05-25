@@ -14,7 +14,7 @@ class MockServerListener {
     this.url = url;
     this.subscriptions = [
       ws.on('open', this.open.bind(this)),
-      ws.on('newGame', this.startGame.bind(this)),
+      ws.on('play', this.startGame.bind(this)),
       ws.on('executeCommands', this.execCommands.bind(this)),
       ws.on('close', this.close.bind(this)),
     ];
