@@ -31,8 +31,8 @@ class Game {
       RIGHT: () => this.board.movePiece(1,0),
       DOWN: () =>  this.board.movePiece(0,1),
       AUTO_DOWN: () => this.board.movePiece(0,1,0),
-      ROTATE_LEFT: () => this.board.rotatePiece(this.board.piece, -1),
-      ROTATE_RIGHT: () => this.board.rotatePiece(this.board.piece, 1),
+      ROTATE_LEFT: () => this.board.rotatePiece(-1),
+      ROTATE_RIGHT: () => this.board.rotatePiece(1),
       HARD_DROP: () => this.board.hardDrop(),
     }
 

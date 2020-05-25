@@ -58,8 +58,8 @@ class Game {
       [CONTROLS.RIGHT]: () => this.board.movePiece(1, 0),
       [CONTROLS.DOWN]: () => this.board.movePiece(0, 1),
       [CONTROLS.AUTO_DOWN]: () => this.board.movePiece(0, 1, 0),
-      [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(this.board.piece, -1),
-      [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(this.board.piece, 1),
+      [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
+      [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
