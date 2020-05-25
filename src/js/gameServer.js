@@ -176,6 +176,7 @@ class GameServer {
       message.header = 'Game Over!'
       message.body = [
         `Final Score: ${player.game.score}`,
+        `Level: ${player.game.level}`,
         `Lines Cleared: ${player.game.lines}`,
       ];
     }
