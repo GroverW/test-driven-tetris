@@ -86,7 +86,8 @@ describe('websocket tests', () => {
     
     expect(sendAllSpy).toHaveBeenCalledTimes(1);
     // player joining should receive all other players in game
-    expect(sendToSpy).toHaveBeenCalledTimes(1);
+    // 2 calls for sendAll, 1 to send p1 info to p2
+    expect(sendToSpy).toHaveBeenCalledTimes(3);
 
     let player3 = new Player(mockSend, serverPubSub());
 
@@ -96,7 +97,8 @@ describe('websocket tests', () => {
     
     expect(sendAllSpy).toHaveBeenCalledTimes(2);
     // player 1 and 2 should be send to player 3
-    expect(sendToSpy).toHaveBeenCalledTimes(3);
+    // 3 for sendAll, 2 for p1 and p2 info to p3
+    expect(sendToSpy).toHaveBeenCalledTimes(8);
   });
 
   test('second player is removed from room', () => {
