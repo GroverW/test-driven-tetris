@@ -12,7 +12,7 @@ class PieceList {
   }
 
   getNextPiece() {
-    const currentPiece = PIECES[this.pieces[this.currSet][this.currIdx]];
+    const currentPiece = this.pieces[this.currSet][this.currIdx];
     this.currIdx++;
     
     if(this.currIdx >= this.pieces[this.currSet].length) {
@@ -20,7 +20,7 @@ class PieceList {
       this.currSet++;
     }
     
-    return JSON.parse(JSON.stringify(currentPiece));
+    return currentPiece;
   }
 
   almostEmpty() {
@@ -33,7 +33,10 @@ class PieceList {
 
 class Piece {
   constructor(piece) {
-    this.grid = piece;
+    this.type = piece;
+    this.piece = PIECES[piece];
+    this.rotation = 0;
+    this.grid = this.piece[this.rotation];
     this.x = Math.floor(BOARD_WIDTH / 2) - Math.ceil(this.grid[0].length / 2);
     this.y = 0;
   }
@@ -43,8 +46,12 @@ class Piece {
     this.y += y;
   }
 
-  update(newGrid) {
-    this.grid = newGrid;
+  update(rotation) {
+    const rotAmt = this.rotation + rotation;
+    
+    this.rotation = rotAmt < 0 ? 3 : rotAmt % 4;
+
+    this.grid = this.piece[this.rotation];
   }
 }
 
