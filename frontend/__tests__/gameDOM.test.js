@@ -3,7 +3,7 @@ const Game = require('../static/js/game');
 const { Piece } = require('../static/js/piece');
 const { publish } = require('../helpers/pubSub');
 const { getNewPlayer } = require('../helpers/utils');
-const { CONTROLS, PIECES } = require('../helpers/data');
+const { CONTROLS, PIECE_TYPES } = require('../helpers/data');
 const { 
   getMockDOMSelector,
   getMockCtx,
@@ -143,8 +143,8 @@ describe('game DOM tests', () => {
     game.start();
     
     game.board.grid = getTestBoard('clearLines2');
-    game.board.piece = new Piece(PIECES[2]);
-    game.board.nextPiece = new Piece(PIECES[0]);
+    game.board.piece = new Piece(PIECE_TYPES.T);
+    game.board.nextPiece = new Piece(PIECE_TYPES.I);
 
     expect(gameDOM.scoreSelector.innerText).toBe(0);
     expect(gameDOM.linesSelector.innerText).toBe(0);
