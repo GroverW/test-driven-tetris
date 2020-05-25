@@ -164,21 +164,29 @@ class GameServer {
   }
 
   gameOverMessage(id) {
-    let message;
+    let message = {};
 
     if(this.gameType === GAME_TYPES.MULTI) {
-      message = [`You came in ${RANKINGS[this.nextRanking]}`];
+      message.header = `${RANKINGS[this.nextRanking]} Place!`;
+      message.body = [];
+
     } else if(this.gameType === GAME_TYPES.SINGLE) {
-      let player;
-      this.players.forEach(p => { if(p.id === id) player = p });
+      const player = this.getPlayerById(id);
       
-      message = [
+      message.header = 'Game Over!'
+      message.body = [
         `Final Score: ${player.game.score}`,
         `Lines Cleared: ${player.game.lines}`,
       ];
     }
     
     return message;
+  }
+
+  getPlayerById(id) {
+    let player;
+    this.players.forEach(p => { if(p.id === id) player = p });
+    return player;
   }
 
   unsubscribe() {
