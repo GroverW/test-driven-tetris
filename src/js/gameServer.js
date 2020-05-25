@@ -1,4 +1,10 @@
-const { GAMES, MAX_PLAYERS, RANKINGS, SEED_PIECES } = require('../helpers/data');
+const {
+  GAMES,
+  GAME_TYPES,
+  MAX_PLAYERS,
+  RANKINGS,
+  SEED_PIECES
+} = require('../helpers/data');
 const { randomize } = require('../helpers/utils');
 
 class GameServer {
@@ -150,11 +156,29 @@ class GameServer {
       data: {
         id: data.id,
         board: data.board,
-        ranking: RANKINGS[this.nextRanking],
+        message: this.gameOverMessage(data.id),
       }
     });
 
     this.nextRanking--;
+  }
+
+  gameOverMessage(id) {
+    let message;
+
+    if(this.gameType === GAME_TYPES.MULTI) {
+      message = [`You came in ${RANKINGS[this.nextRanking]}`];
+    } else if(this.gameType === GAME_TYPES.SINGLE) {
+      let player;
+      this.players.forEach(p => { if(p.id === id) player = p });
+      
+      message = [
+        `Final Score: ${player.game.score}`,
+        `Lines Cleared: ${player.game.lines}`,
+      ];
+    }
+    
+    return message;
   }
 
   unsubscribe() {
