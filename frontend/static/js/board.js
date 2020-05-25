@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT, POINTS } = require('../../helpers/data');
+const { BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I } = require('../../helpers/data');
 const { getEmptyBoard } = require('../../helpers/utils');
 const { PieceList, Piece } = require('./piece');
 const { publish } = require('../../helpers/pubSub')
@@ -89,44 +89,29 @@ class Board {
   }
 
   isEmpty(x, y) {
-    return this.grid[y][x] === 0;
+    return y >= 0 && this.grid[y][x] === 0;
   }
 
   isInBounds(x, y) {
     return x >= 0 && x < BOARD_WIDTH && y < BOARD_HEIGHT;
   }
 
-  rotatePiece(piece, direction) {
-    this.wallKick(piece);
+  rotatePiece(direction) {
+    const lookup = this.piece.type === 1 
+      ? WALL_KICK_TESTS_I
+      : WALL_KICK_TESTS;
 
-    // let newGrid = JSON.parse(JSON.stringify(piece.grid));
+    const tests = lookup[direction][this.piece.rotation];
+    this.piece.update(direction);
 
-    // for (let i = 0; i < newGrid.length; i++) {
-    //   for (let j = 0; j < i; j++) {
-    //     [newGrid[j][i], newGrid[i][j]] = [newGrid[i][j], newGrid[j][i]];
-    //   }
-    // }
+    for(let test of tests) {
+      if(this.validMove(...test)) {
+        this.movePiece(...test, 0);
+        return;
+      }
+    }
 
-    // direction > 0
-    //   ? newGrid.forEach(row => row.reverse())
-    //   : newGrid.reverse();
-
-    piece.update(direction);
-
-    publish('draw', {
-      board: this.grid,
-      piece: this.piece,
-    })
-  }
-
-  wallKick(piece) {
-    const pStart = piece.x;
-    const pEnd = piece.x + piece.grid[0].length;
-    const bStart = 0;
-    const bEnd = this.grid[0].length;
-
-    if(pStart < bStart) this.movePiece(bStart - pStart, 0);
-    if(pEnd > bEnd) this.movePiece(bEnd - pEnd, 0);
+    this.piece.update(-direction);
   }
 
   addPieceToBoard() {
