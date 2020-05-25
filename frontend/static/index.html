@@ -14,12 +14,20 @@
     <div id="menu">
       <div class="menu-align">
         <div class="menu-options">
-          <p class="menu-title">
-            Welcome to Test Driven Tetris!
-          </p>
-          <button id="newSinglePlayer">New Single Player Game</button>
-          <button id="newMultiplayer">New Multiplayer Game</button>
-          <button id="joinMultiplayer">Join Multiplayer Game</button>
+          <div id="game-buttons">
+            <p class="menu-title">
+              Welcome to Test Driven Tetris!
+            </p>
+            <button id="newSinglePlayer">New Single Player Game</button>
+            <button id="newMultiplayer">New Multiplayer Game</button>
+          </div>
+          <form id="joinMultiplayer">
+            <p class="menu-title">
+              Join Multiplayer Game
+            </p>
+            <input type="text" placeholder="Enter Game Id" name="multiplayerGameId" id="multiplayerGameId" />
+            <button type="submit">Join Game</button>
+          </form>
         </div>
       </div>
     </div>
