@@ -20,7 +20,7 @@ class Player {
   }
 
   startGame() {
-    this.pubSub.publish('startGame', this);
+    (this.game.gameStatus !== null) && this.pubSub.publish('startGame', this);
   }
 }
 
