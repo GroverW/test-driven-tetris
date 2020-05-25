@@ -67,7 +67,7 @@ describe('game pieces', () => {
       [0,0,0,0],
     ]);
     
-    board.rotatePiece(p1, ROTATE_LEFT);
+    p1.update(ROTATE_LEFT);
 
     expect(p1.grid).toEqual([
       [0,1,0,0],
@@ -76,8 +76,8 @@ describe('game pieces', () => {
       [0,1,0,0],
     ]);
 
-    board.rotatePiece(p1, ROTATE_RIGHT);
-    board.rotatePiece(p1, ROTATE_RIGHT);
+    p1.update(ROTATE_RIGHT);
+    p1.update(ROTATE_RIGHT);
 
     expect(p1.grid).toEqual([
       [0,0,1,0],
@@ -86,7 +86,7 @@ describe('game pieces', () => {
       [0,0,1,0],
     ]);
 
-    board.rotatePiece(p6, ROTATE_LEFT);
+    p6.update(ROTATE_LEFT);
 
     expect(p6.grid).toEqual([
       [6,6,0],
