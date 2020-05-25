@@ -44,35 +44,24 @@ describe('game board tests', () => {
   });
 
   test('wall kick - left side', () => {
-    const wallKickSpy = jest.spyOn(gameBoard, 'wallKick');
-
     gameBoard.piece = p1;
     expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([3,0]);
 
-    expect(wallKickSpy).toHaveBeenCalledTimes(0);
-
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.movePiece(-4,0);
 
     expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([-1,0]);
 
-    expect(wallKickSpy).toHaveBeenCalledTimes(1);
+    gameBoard.rotatePiece(ROTATE_RIGHT);
 
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
-
-    expect(wallKickSpy).toHaveBeenCalledTimes(2);
     expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([0,0]);
   });
 
   test('wall kick - right side', () => {
-    const wallKickSpy = jest.spyOn(gameBoard, 'wallKick');
-
     gameBoard.piece = p1;
     expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([3,0]);
 
-    expect(wallKickSpy).toHaveBeenCalledTimes(0);
-
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.movePiece(5,0);
 
     let pieceEdge = gameBoard.piece.x + gameBoard.piece.grid[0].length;
@@ -80,13 +69,10 @@ describe('game board tests', () => {
 
     expect(pieceEdge).toBeGreaterThan(boardEdge);
 
-    expect(wallKickSpy).toHaveBeenCalledTimes(1);
-
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.rotatePiece(ROTATE_LEFT);
 
     pieceEdge = gameBoard.piece.x + gameBoard.piece.grid[0].length;
 
-    expect(wallKickSpy).toHaveBeenCalledTimes(2);
     expect(pieceEdge).toBe(boardEdge);
   });
 
@@ -124,7 +110,7 @@ describe('game board tests', () => {
   test('hard drop piece with obstacles', () => {
     gameBoard.piece = p1;
     gameBoard.movePiece(-1,0);
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.hardDrop();
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern2)
@@ -140,7 +126,7 @@ describe('game board tests', () => {
     expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern4);
 
     gameBoard.piece = p3;
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_RIGHT);
+    gameBoard.rotatePiece(ROTATE_RIGHT);
     gameBoard.movePiece(2,0);
     gameBoard.hardDrop();
 
@@ -185,7 +171,7 @@ describe('game board tests', () => {
     gameBoard.grid = getTestBoard('clearLines2');
     gameBoard.piece = p1;
     
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_LEFT);
+    gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.hardDrop();
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
@@ -195,7 +181,7 @@ describe('game board tests', () => {
     gameBoard.grid = getTestBoard('clearLines3');
     gameBoard.piece = p5;
     
-    gameBoard.rotatePiece(gameBoard.piece, ROTATE_RIGHT);
+    gameBoard.rotatePiece(ROTATE_RIGHT);
     gameBoard.movePiece(3,0);
     gameBoard.hardDrop();
 
@@ -225,6 +211,6 @@ describe('game board tests', () => {
 
     // 1 for adding piece to board, 1 for clearing lines
     expect(publishSpy).toHaveBeenCalledTimes(2);
-  })
+  });
 })
 
