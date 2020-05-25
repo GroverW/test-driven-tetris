@@ -4,7 +4,7 @@ const serverPubSub = require('../../src/helpers/pubSub');
 const Game = require('../static/js/game');
 const GameDOM = require("../static/js/gameDOM");
 const { publish } = require('./pubSub');
-
+const { GAME_TYPES } = require('../../src/helpers/data');
 
 class MockServerListener {
   constructor(ws, url) {
@@ -21,7 +21,7 @@ class MockServerListener {
   }
 
   open() {
-    GameServer.addGame(this.url)
+    GameServer.addGame(this.url, GAME_TYPES.MULTI)
     this.gameServer = GameServer.getGame(this.url);
     this.player = new Player(this.ws.send.bind(this.ws), serverPubSub());
     this.gameServer.join(this.player);
