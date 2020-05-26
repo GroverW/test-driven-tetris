@@ -17,18 +17,58 @@ const selectors = {
   playerSelector: document.getElementById('p1'),
 }
 
+const menuSelectors = {
+  menuContainer: document.getElementById('menu'),
+  newSinglePlayer: document.getElementById('newSinglePlayer'),
+  newMultiplayer: document.getElementById('newMultiplayer'),
+  joinMultiplayer: document.getElementById('joinMultiplayer'),
+  multiplayerGameId: document.getElementById('multiplayerGameId'),
+}
+
 let gameId;
 
-(async () => {
+menuSelectors.newSinglePlayer.addEventListener('click', event => {
+  event.target.blur();
+  menuSelectors.menuContainer.classList.toggle('hide');
+  createGame('single')
+})
+
+menuSelectors.newMultiplayer.addEventListener('click', event => {
+  event.target.blur();
+  menuSelectors.menuContainer.classList.toggle('hide');
+  createGame('multi');
+});
+
+menuSelectors.joinMultiplayer.addEventListener('submit', event => {
+  event.preventDefault();
+  event.target.blur();
+  
+  menuSelectors.menuContainer.classList.toggle('hide');
+  
+  gameId = menuSelectors.multiplayerGameId.value;
+  connectToGame(gameId);
+});
+
+const addGameIdToStats = (id) => {
+  const gameIdSelector = document.getElementById('game-id');
+  gameIdSelector.innerText = id;
+}
+
+const createGame = async type => {
   try {
-    const response = await axios.get('/game');
+    const response = await axios.get(`/game/${type}`);
 
     gameId = response.data.gameId;
+
+    connectToGame(gameId);
+
+    (type === 'multi') && addGameIdToStats(gameId);
   } catch (err) {
     console.log(err.response);
   }
+}
 
-
+const connectToGame = (gameId) => {
   const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
 
   let game, gameDOM, api;
@@ -81,11 +121,11 @@ let gameId;
     }
   }
 
-  const btn = document.getElementById('test');
+  const btn = document.getElementById('start');
 
   btn.addEventListener('click', event => {
     event.target.blur();
-    ws.send(JSON.stringify({ type: 'newGame', data: '' }))
+    api.sendMessage({ type: 'play', data: '' })
   })
 
   document.addEventListener('keydown', event => {
@@ -95,4 +135,4 @@ let gameId;
   document.addEventListener('keyup', event => {
     if (game) game.toggleMove(event.which, 'up');
   })
-})();
+}
