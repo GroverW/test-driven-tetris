@@ -7,39 +7,39 @@ Test Driven Tetris
 ### Project Structure - Classes, Helpers, Components, Routes, etc.
 
 ```
-frontend                  # Wrapping folder for front-end
+frontend                        # Wrapping folder for front-end
 ├── helpers
-│   ├── api               # Class for sending messages to backend
-│   ├── data              # Constants to define game settings
-│   ├── pubSub            # Publish / subscribe helper functions
-│   └── utils             # Utilities (e.g. getNewPlayer, getNewBoard)
+│   ├── api                     # Class for sending messages to backend
+│   ├── data                    # Constants to define game settings
+│   ├── pubSub                  # Publish / subscribe helper functions
+│   └── utils                   # Utilities (e.g. getNewPlayer, getNewBoard)
 └── static
-    ├── index             # Main html file
+    ├── index                   # Main html file
     ├── css               
-    │   └── style         # Main stylesheet
+    │   └── style               # Main stylesheet
     └── js
-        ├── game          # Manages score, game status, commands, animation
-        │   └── board     # Manages board state and pieces
-        │       └── piece # Creates and gets new pieces
-        ├── gameDOM       # Manages DOM manipulation
-        │   └── gameView  # Manages HTML canvas manipulation
-        └── main          # Placeholder for event handlers
+        ├── game                # Manages score, game status, commands, animation
+        │   └── board           # Manages board state and pieces
+        │       └── piece       # Creates and gets new pieces
+        ├── gameDOM             # Manages DOM manipulation
+        │   └── gameView        # Manages HTML canvas manipulation
+        └── main                # Placeholder for event handlers
         
 
-src                       # Wrapping folder for back-end classes
+src                             # Wrapping folder for back-end classes
 ├── helpers
-│   ├── api               # Class for sending messages to backend
-│   ├── data              # Constants to define game settings
-│   ├── pubSub            # Factory function for creating local pub/sub functions
-│   └── utils             # Utilities (e.g. getNewPlayer, getNewBoard)
+│   ├── api                     # Class for sending messages to backend
+│   ├── data                    # Constants to define game settings
+│   ├── pubSub                  # Factory function for creating local pub/sub functions
+│   └── utils                   # Utilities (e.g. getNewPlayer, getNewBoard)
 └── js
-    └── gameServer        # Manages adding / removing players, sending messages
-        └── player        # Associates game with gameServer        
-            └── game      # Manages score, game status, executes commands
-                └── board         # Manages board state and pieces
-                    └── piece     # Creates and gets new pieces
+    └── gameServer              # Manages adding / removing players, sending messages
+        └── player              # Associates game with gameServer        
+            └── game            # Manages score, game status, executes commands
+                └── board       # Manages board state and pieces
+                    └── piece   # Creates and gets new pieces
 
-app                       # Backend-routes
+app                             # Backend-routes
 ```
 
 ### Technologies Used
