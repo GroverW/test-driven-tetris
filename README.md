@@ -1,6 +1,4 @@
-# Project Title
-
-Test Driven Tetris
+# Test Driven Tetris
 
 ## Project Overview
 
