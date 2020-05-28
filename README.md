@@ -5,47 +5,47 @@
 ### Project Structure - Classes, Helpers, Components, Routes, etc.
 
 ```
-common                          # Wrapping folder for common js files
+common                              # Wrapping folder for common js files
 ├── helpers
-│   ├── constants               # Constants to define game settings
-│   └── utils                   # Utilities (randomize, getEmptyBoard)
+│   ├── constants                   # Constants to define game settings
+│   └── utils                       # Utilities (randomize, getEmptyBoard)
 └── js
-    └── game                    # Base game class used by frontend and backend
-        └── board               # Base board class used by frontend and backend
-            └── piece           # Created and gets new pieces
+    └── game                        # Base game class used by frontend and backend
+        └── board                   # Base board class used by frontend and backend
+            └── piece               # Created and gets new pieces
 
 
-frontend                        # Wrapping folder for front-end
+frontend                            # Wrapping folder for front-end
 ├── helpers
-│   ├── api                     # Class for sending messages to backend
-│   ├── clientConstants         # Constants specific to client
-│   ├── pubSub                  # Publish / subscribe helper functions
-│   └── clientUtils             # Utilities (e.g. getNewPlayer, getNewBoard)
+│   ├── api                         # Class for sending messages to backend
+│   ├── clientConstants             # Constants specific to client
+│   ├── pubSub                      # Publish / subscribe helper functions
+│   └── clientUtils                 # Utilities (e.g. getNewPlayer, getNewBoard)
 └── static
-    ├── index                   # Main html file
+    ├── index                       # Main html file
     ├── css               
-    │   └── style               # Main stylesheet
+    │   └── style                   # Main stylesheet
     └── js
-        ├── clientGame          # Manages score, commands, etc. (extends common game class)
-        │   └── clientBoard     # Manages board state and pieces (extends common board class)
-        │       └── piece       # Creates and gets new pieces (imported from common)
-        ├── gameDOM             # Manages DOM manipulation
-        │   └── gameView        # Manages HTML canvas manipulation
-        └── main                # Placeholder for event handlers
+        ├── clientGame              # Manages score, commands, etc. (extends common game class)
+        │   └── clientBoard         # Manages board state and pieces (extends common board class)
+        │       └── piece           # Creates and gets new pieces (imported from common)
+        ├── gameDOM                 # Manages DOM manipulation
+        │   └── gameView            # Manages HTML canvas manipulation
+        └── main                    # Placeholder for event handlers
         
 
-src                             # Wrapping folder for back-end classes
+src                                 # Wrapping folder for back-end classes
 ├── helpers
-│   ├── serverConstants         # Constants specific to server
-│   └── pubSub                  # Factory function for creating local pub/sub functions
+│   ├── serverConstants             # Constants specific to server
+│   └── pubSub                      # Factory function for creating local pub/sub functions
 └── js
-    └── gameServer              # Manages adding / removing players, sending messages
-        └── player              # Associates game with gameServer        
-            └── serverGame      # Manages score, executes commands, etc (extends common game class)
-                └── serverBoard # Manages board state and pieces (extends common board class)
-                    └── piece   # Creates and gets new pieces (imported from common)
+    └── gameServer                  # Manages adding / removing players, sending messages
+        └── player                  # Associates game with gameServer        
+            └── serverGame          # Manages score, executes commands, etc (extends common game class)
+                └── serverBoard     # Manages board state and pieces (extends common board class)
+                    └── piece       # Creates and gets new pieces (imported from common)
 
-app                             # Backend-routes
+app                                 # Backend-routes
 ```
 
 ### Technologies Used
