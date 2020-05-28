@@ -6,14 +6,10 @@ const { publish } = require('../../helpers/pubSub')
 class Board {
   constructor(id) {
     this.id = id;
-    this.grid = this.createEmptyGrid();
+    this.grid = getEmptyBoard();
     this.piece;
     this.nextPiece;
     this.pieceList = new PieceList();
-  }
-
-  createEmptyGrid() {
-    return getEmptyBoard();
   }
 
   getPieces() {
@@ -37,6 +33,7 @@ class Board {
       
       if(y > 0) publish('lowerPiece', y * multiplier)
       
+      // client only
       if(multiplier < POINTS.HARD_DROP) {
         publish('draw', {
           board: this.grid,
@@ -47,7 +44,7 @@ class Board {
       return true;
     }
 
-    if(y > 0) this.drop()
+    if(y > 0 && multiplier !== POINTS.DOWN) this.drop()
 
     return false;
   }
@@ -57,6 +54,7 @@ class Board {
     this.clearLines();
     this.getPieces();
     
+    // client only from here down
     publish('boardChange', this.grid)
 
     publish('draw', {
@@ -135,6 +133,7 @@ class Board {
       }
     })
     
+    // client only
     numCleared && publish('clearLines', numCleared);
   }
 }
