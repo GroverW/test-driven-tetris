@@ -12,19 +12,24 @@ const { publish, subscribe } = require('../../helpers/pubSub');
 
 class Game {
   constructor(id) {
-    this.gameStatus = false;
     this.id = id;
+    this.gameStatus = false;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
     this.linesRemaining = 10;
+    // to be passed in
     this.board = new Board(id);
+    // from her to command queue is client only
     this.time = { start: 0, elapsed: 0 };
     this.animationId;
     this.toggledKey = false;
     this.moveTime = { start: 0, elapsed: 0 };
     this.moveDelayIdx = 0;
+    this.lockDelay = 0;
+    this.interruptAutoDown = false;
     this.commandQueue = [];
+    // to be set
     this.subscriptions = [
       subscribe('lowerPiece', this.updateScore.bind(this)),
       subscribe('clearLines', this.clearLines.bind(this)),
@@ -37,6 +42,7 @@ class Game {
     if (this.gameStatus || this.gameStatus === null) return;
     this.board.getPieces();
     this.gameStatus = true;
+    // client only from here down
     this.animate();
 
     publish('draw', {
@@ -63,6 +69,9 @@ class Game {
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
     }
 
+    this.addLockDelay(key);
+    this.resetAutoDown(key);
+
     if ((key in commands) && this.gameStatus) {
       this.addToCommandQueue(key);
       commands[key]();
@@ -81,8 +90,27 @@ class Game {
     ]);
 
     if (!toggleCommands.has(key) && upDown === 'down')    this.command(key);
-    else if (!this.toggledKey && upDown === 'down')       this.toggledKey = key;
+    else if (upDown === 'down')                           this.toggledKey = key;
     else if (this.toggledKey === key && upDown === 'up')  this.toggledKey = false;
+  }
+
+  addLockDelay(key) {
+    const validKeys = new Set([
+      CONTROLS.LEFT,
+      CONTROLS.RIGHT,
+      CONTROLS.ROTATE_LEFT,
+      CONTROLS.ROTATE_RIGHT,
+    ])
+
+    if(validKeys.has(key)) {
+      let animationDelay = this.getAnimationDelay();
+      this.lockDelay += this.lockDelay ? animationDelay / 4 : animationDelay / 2;
+      this.lockDelay = Math.min(animationDelay * 2, this.lockDelay);
+    }
+  }
+
+  resetAutoDown(key) {
+    if(key === CONTROLS.DOWN) this.interruptAutoDown = true;
   }
 
   /**
@@ -127,6 +155,7 @@ class Game {
   updateScore(points) {
     this.score += points;
 
+    // client only
     publish('updateScore', {
       score: this.score
     })
@@ -139,6 +168,7 @@ class Game {
 
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
 
+    // client only
     publish('updateScore', {
       level: this.level,
       lines: this.lines
@@ -186,9 +216,15 @@ class Game {
     this.time.elapsed = currTime - this.time.start;
     this.moveTime.elapsed = currTime - this.moveTime.start;
 
-    if (this.time.elapsed > this.getAnimationDelay()) {
+    if(this.interruptAutoDown) {
+      this.time.start = currTime;
+      this.interruptAutoDown = false;
+    }
+
+    if (this.time.elapsed > this.getAutoDropDelay()) {
       this.time.start = currTime;
       this.command(CONTROLS.AUTO_DOWN);
+      this.lockDelay = 0;
     }
 
     if (this.toggledKey) {
@@ -202,6 +238,11 @@ class Game {
     }
 
     this.animationId = requestAnimationFrame(this.animate.bind(this));
+  }
+
+  getAutoDropDelay() {
+    const lockDelay = this.board.validMove(0,1) ? 0 : this.lockDelay;
+    return this.getAnimationDelay() + lockDelay;
   }
 
   getAnimationDelay() {
