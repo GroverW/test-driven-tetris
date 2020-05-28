@@ -1,8 +1,8 @@
 const GameServer = require('../js/gameServer');
 const Player = require('../js/player');
-const { mockSend } = require('../helpers/mocks');
 const pubSub = require('../helpers/pubSub');
-const { GAMES, GAME_TYPES } = require('../helpers/data');
+const { GAMES, GAME_TYPES } = require('../helpers/serverConstants');
+const { mockSend } = require('../../common/mockData/mocks')
 
 describe('game server tests', () => {
   let mpGameServer;
