@@ -4,8 +4,8 @@ const {
   MAX_PLAYERS,
   RANKINGS,
   SEED_PIECES
-} = require('../helpers/serverConstants');
-const { randomize } = require('../../common/helpers/utils');
+} = require('backend/helpers/serverConstants');
+const { randomize } = require('common/helpers/utils');
 
 class GameServer {
   constructor(id, gameType) {
@@ -76,6 +76,9 @@ class GameServer {
 
       this.removeSubscriptions(player.id);
       this.players.delete(player);
+
+      if(this.gameStarted) this.nextRanking--;
+      this.checkIfWinner();
 
       this.players.size === 0
         ? GAMES.delete(this.id)
@@ -161,6 +164,26 @@ class GameServer {
     });
 
     this.nextRanking--;
+    this.checkIfWinner();
+  }
+
+  checkIfWinner() {
+    if(!this.gameStarted || this.players.size < 2) return;
+
+    let count = this.players.size;
+    let winner = false;
+    
+    this.players.forEach(p => { 
+      if(p.game.gameStatus) winner = p;
+      else count--;
+    });
+
+    if(count === 1) {
+      winner.pubSub.publish('gameOver', {
+        id: winner.id,
+        board: winner.game.board.grid,
+      })
+    }
   }
 
   gameOverMessage(id) {
