@@ -12,7 +12,7 @@ common                              # Wrapping folder for common js files
 └── js
     └── game                        # Base game class used by frontend and backend
         └── board                   # Base board class used by frontend and backend
-            └── piece               # Created and gets new pieces
+            └── piece               # Creates and gets new pieces
 
 
 frontend                            # Wrapping folder for front-end
