@@ -12,10 +12,6 @@ class Board {
     this.pieceList = new PieceList();
   }
 
-  createEmptyGrid() {
-    return getEmptyBoard();
-  }
-
   getPieces() {
     this.piece = this.nextPiece
       ? this.nextPiece
@@ -30,6 +26,7 @@ class Board {
 
     this.nextPiece = new Piece(this.pieceList.getNextPiece());
 
+    // server only
     if(this.pieceList.almostEmpty()) {
       this.pubSub.publish("getPieces")
     }
@@ -44,7 +41,7 @@ class Board {
       return true;
     }
 
-    if(y > 0) this.drop()
+    if(y > 0 && multiplier !== POINTS.DOWN) this.drop()
 
     return false;
   }
@@ -125,6 +122,7 @@ class Board {
       }
     })
     
+    // server only
     if(numCleared) {
       this.pubSub.publish('clearLines', numCleared);
       this.publishBoardUpdate();
