@@ -1,17 +1,15 @@
 const Board = require('../js/board');
 const { Piece } = require('../js/piece');
 const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT , POINTS } = require('../helpers/constants');
-const { TEST_BOARDS, getTestBoard, getTestPieces } = require('./helpers/mocks');
-const { publish } = require('../../frontend/helpers/pubSub');
+const { TEST_BOARDS, getTestBoard, getTestPieces } = require('../mockData/mocks');
+const pubSub = require('../../frontend/helpers/pubSub');
 
 describe('game board tests', () => {
   let gameBoard;
   let p1, p2, p3, p4, p5;
-  let publishTest;
   
   beforeEach(() => {
-    publishTest = publish;
-    gameBoard = new Board(publishTest);
+    gameBoard = new Board(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
     p2 = new Piece(PIECE_TYPES.O);

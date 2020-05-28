@@ -1,7 +1,7 @@
 const { Piece } = require('../js/piece');
 const Board = require('../js/board');
 const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('../helpers/constants');
-const { getTestPieces } = require('./helpers/mocks');
+const { getTestPieces } = require('../mockData/mocks');
 
 describe('game pieces', () => {
   let p1, p2, p3, p4, p5, p6, p7;
