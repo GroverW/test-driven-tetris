@@ -6,7 +6,7 @@ const GameServer = require('./src/js/gameServer');
 const Player = require('./src/js/player');
 const pubSub = require('./src/helpers/pubSub');
 const { v4: uuid } = require('uuid');
-const { GAME_TYPES } = require('./src/helpers/data');
+const { GAME_TYPES } = require('./src/helpers/serverConstants');
 const wsExpress = require('express-ws')(app);
 
 // serve stuff in static/ folder
