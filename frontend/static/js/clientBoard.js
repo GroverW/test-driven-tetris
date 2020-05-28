@@ -1,33 +1,26 @@
 const Board = require('../../../common/js/board');
-const { publish } = require('../../helpers/pubSub')
 const { POINTS } = require('../../helpers/clientConstants');
 
 class ClientBoard extends Board {
-  constructor(playerId) {
-    super(publish, playerId)
+  constructor(pubSub, playerId) {
+    super(pubSub, playerId)
   }
 
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if(super.movePiece(x, y, multiplier)) {
       if(multiplier < POINTS.HARD_DROP) {
-        this.publish('draw', {
+        this.pubSub.publish('draw', {
           board: this.grid,
           piece: this.piece
         })
       }
     }
   }
-  
-  clearLines() {
-    const numCleared = super.clearLines();
-
-    numCleared && this.publish('clearLines', numCleared);
-  }
 
   publishBoardUpdate() {
-    this.publish('boardChange', this.grid)
+    this.pubSub.publish('boardChange', this.grid)
 
-    this.publish('draw', {
+    this.pubSub.publish('draw', {
       board: this.grid,
       piece: this.piece,
       nextPiece: this.nextPiece
