@@ -1,16 +1,4 @@
-const {
-  BOARD_WIDTH,
-  BOARD_HEIGHT,
-  LINES_PER_LEVEL,
-  ROTATE_LEFT,
-  ROTATE_RIGHT,
-  POINTS,
-  PIECE_TYPES,
-  PIECES,
-  SEED_PIECES,
-  WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I,
-} = require('../../common/helpers/constants');
+const COMMON_CONSTANTS = require('../../common/helpers/constants');
 
 const CELL_SIZE = 30;
 
@@ -72,22 +60,12 @@ const CELL_COLORS = {
 };
 
 module.exports = {
-  BOARD_WIDTH,
-  BOARD_HEIGHT,
+  ...COMMON_CONSTANTS,
   CELL_SIZE,
-  LINES_PER_LEVEL,
-  ROTATE_LEFT,
-  ROTATE_RIGHT,
   CONTROLS,
   COMMAND_QUEUE_MAP,
-  POINTS,
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
   CELL_COLORS,
-  PIECE_TYPES,
-  PIECES,
-  SEED_PIECES,
-  WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I,
 }

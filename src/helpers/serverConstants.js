@@ -1,16 +1,4 @@
-const {
-  BOARD_WIDTH,
-  BOARD_HEIGHT,
-  LINES_PER_LEVEL,
-  ROTATE_LEFT,
-  ROTATE_RIGHT,
-  POINTS,
-  PIECE_TYPES,
-  PIECES,
-  SEED_PIECES,
-  WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I,
-} = require('../../common/helpers/constants');
+const COMMON_CONSTANTS = require('../../common/helpers/constants');
 
 const GAMES = new Map();
 const GAME_TYPES = {
@@ -39,20 +27,10 @@ const RANKINGS = {
 }
 
 module.exports = {
+  ...COMMON_CONSTANTS,
   GAMES,
   GAME_TYPES,
   MAX_PLAYERS,
-  BOARD_WIDTH,
-  BOARD_HEIGHT,
-  LINES_PER_LEVEL,
-  ROTATE_LEFT,
-  ROTATE_RIGHT,
   CONTROLS,
-  POINTS,
   RANKINGS,
-  PIECE_TYPES,
-  PIECES,
-  SEED_PIECES,
-  WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I,
 };
