@@ -10,7 +10,9 @@ class Game {
     this.lines = 0;
     this.linesRemaining = 10;
     this.pubSub = pubSub;
+    // to be passed in
     this.board = new Board(this.pubSub, this.playerId);
+    // to be set
     this.subscriptions = [
       this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this)),
       this.pubSub.subscribe('clearLines', this.clearLines.bind(this)),
