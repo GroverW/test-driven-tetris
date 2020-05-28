@@ -1,4 +1,4 @@
-const Board = require('../../common/js/board');
+const Board = require('common/js/board');
 
 class ServerBoard extends Board {
   constructor(pubSub, playerId) {

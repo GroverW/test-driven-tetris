@@ -1,4 +1,4 @@
-const Game = require('../../common/js/game');
+const Game = require('common/js/game');
 const ServerBoard = require('./serverBoard');
 
 class ServerGame extends Game {
