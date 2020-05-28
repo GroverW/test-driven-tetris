@@ -1,16 +1,15 @@
-const Player = require('../../src/js/player');
-const ClientGame = require('../../frontend/static/js/clientGame');
-const Api = require('../../frontend/helpers/api');
+const Player = require('backend/js/player');
+const ClientGame = require('frontend/static/js/clientGame');
+const Api = require('frontend/helpers/api');
 
-const serverPubSub = require('../../src/helpers/pubSub');
+const serverPubSub = require('backend/helpers/pubSub');
 
-const { CONTROLS } = require('../../frontend/helpers/clientConstants');
-const { GAMES } = require("../../src/helpers/serverConstants");
+const { CONTROLS } = require('frontend/helpers/clientConstants');
+const { GAMES } = require("backend/helpers/serverConstants");
 
-const { webSocketMock } = require("../mockData/mocks");
-const { getMockCtx, getMockDOMSelector, pubSubMocks } = require("../../frontend/mockData/mocks");
-const { MockServerListener, MockClientListener } = require("../mockData/mockWSListeners");
-const { mockSend, getTestBoard } = require('../mockData/mocks');
+const { getMockCtx, getMockDOMSelector, pubSubMocks } = require("frontend/mockData/mocks");
+const { MockServerListener, MockClientListener } = require("common/mockData/mockWSListeners");
+const { mockSend, getTestBoard, webSocketMock } = require('common/mockData/mocks');
 
 
 describe('websocket tests', () => {
