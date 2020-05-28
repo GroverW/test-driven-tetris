@@ -1,4 +1,4 @@
-const Game = require('../../../common/js/game');
+const Game = require('common/js/game');
 const ClientBoard = require('./clientBoard');
 const {
   CONTROLS,
@@ -6,8 +6,8 @@ const {
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
-} = require('../../helpers/clientConstants');
-const { publish, subscribe } = require('../../helpers/pubSub');
+} = require('frontend/helpers/clientConstants');
+const { publish, subscribe } = require('frontend/helpers/pubSub');
 
 class ClientGame extends Game {
   constructor(playerId) {
@@ -88,10 +88,16 @@ class ClientGame extends Game {
     ])
 
     if(validKeys.has(key)) {
-      let animationDelay = this.getAnimationDelay();
-      this.lockDelay += this.lockDelay ? animationDelay / 4 : animationDelay / 2;
-      this.lockDelay = Math.min(animationDelay * 2, this.lockDelay);
+      const INCREMENT = this.getLockDelayIncrement();
+      this.lockDelay = Math.min(INCREMENT * 4, this.lockDelay + INCREMENT);
     }
+  }
+
+  getLockDelayIncrement() {
+    const BASE_DELAY = ANIMATION_SPEED[1];
+    const CURRENT_DELAY = this.getAnimationDelay();
+    // max is BASE_DELAY / 4, min is BASE_DELAY / 8
+    return ((BASE_DELAY / CURRENT_DELAY - 1) / 2 + 1) * CURRENT_DELAY / 4
   }
 
   resetAutoDown(key) {
@@ -173,13 +179,14 @@ class ClientGame extends Game {
   animate(currTime = 0) {
     this.time.elapsed = currTime - this.time.start;
     this.moveTime.elapsed = currTime - this.moveTime.start;
+    const validNextMove = this.board.validMove(0,1);
 
-    if(this.interruptAutoDown) {
+    if(this.interruptAutoDown && validNextMove) {
       this.time.start = currTime;
       this.interruptAutoDown = false;
     }
 
-    if (this.time.elapsed > this.getAutoDropDelay()) {
+    if (this.time.elapsed > this.getAutoDropDelay(validNextMove)) {
       this.time.start = currTime;
       this.command(CONTROLS.AUTO_DOWN);
       this.lockDelay = 0;
@@ -198,8 +205,8 @@ class ClientGame extends Game {
     this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 
-  getAutoDropDelay() {
-    const lockDelay = this.board.validMove(0,1) ? 0 : this.lockDelay;
+  getAutoDropDelay(validNextMove) {
+    const lockDelay = validNextMove ? 0 : this.lockDelay;
     return this.getAnimationDelay() + lockDelay;
   }
 
