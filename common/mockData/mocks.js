@@ -2,6 +2,8 @@ const TEST_BOARDS = require('./sampleBoards');
 const { SEED_PIECES } = require('../helpers/constants');
 const { randomize } = require('../helpers/utils');
 
+const mockSend = () => {};
+
 const getTestBoard = (board) =>
   JSON.parse(JSON.stringify(TEST_BOARDS[board]));
 
@@ -29,6 +31,7 @@ const webSocketMock = {
 
 module.exports = {
   TEST_BOARDS,
+  mockSend,
   getTestBoard,
   getTestPieces,
   webSocketMock,
