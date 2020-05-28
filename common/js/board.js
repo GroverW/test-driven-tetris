@@ -3,12 +3,12 @@ const { getEmptyBoard } = require('../helpers/utils');
 const { PieceList, Piece } = require('./piece');
 
 class Board {
-  constructor(publish, playerId) {
+  constructor(pubSub, playerId) {
     this.playerId = playerId;
     this.grid = getEmptyBoard();
     this.piece;
     this.nextPiece;
-    this.publish = publish;
+    this.pubSub = pubSub;
     this.pieceList = new PieceList();
   }
 
@@ -18,7 +18,7 @@ class Board {
       : new Piece(this.pieceList.getNextPiece());
     
     if(!this.validMove(0,0)) {
-      this.publish("gameOver", {
+      this.pubSub.publish("gameOver", {
         id: this.playerId,
         board: this.grid
       });
@@ -34,7 +34,7 @@ class Board {
     if (validMove) {
       this.piece.move(x, y);
       
-      if(y > 0) this.publish('lowerPiece', y * multiplier)
+      if(y > 0) this.pubSub.publish('lowerPiece', y * multiplier)
     } else if(y > 0 && multiplier !== POINTS.DOWN) {
       this.drop();
     }
@@ -87,9 +87,10 @@ class Board {
     const tests = lookup[direction][this.piece.rotation];
     this.piece.update(direction);
 
-    for(let test of tests) {
-      if(this.validMove(...test)) {
-        this.movePiece(...test, 0);
+    for(let [xChange, yChange] of tests) {
+      if(this.validMove(xChange, yChange)) {
+        const diff = (xChange !== 0 || yChange !== 0);
+        diff && this.movePiece(xChange, yChange, 0);
         return;
       }
     }
@@ -117,6 +118,8 @@ class Board {
         numCleared++;
       }
     })
+
+    numCleared && this.pubSub.publish('clearLines', numCleared);
 
     return numCleared;
   }
