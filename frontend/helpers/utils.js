@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT } = require('./data');
+const { BOARD_WIDTH, BOARD_HEIGHT } = require('./clientConstants');
 const randomize = pieces => {
   let start = pieces.length - 1;
   let randomized = [...pieces];
