@@ -73,19 +73,21 @@ class GameServer {
   leave(player) {
     if (this.players.has(player)) {
       if (player.isHost && this.players.size > 1) this.setNewHost()
-
+      
       this.removeSubscriptions(player.id);
       this.players.delete(player);
 
-      if(this.gameStarted) this.nextRanking--;
-      this.checkIfWinner();
-
-      this.players.size === 0
-        ? GAMES.delete(this.id)
-        : this.sendAllExcept(player, {
-            type: 'removePlayer',
-            data: player.id
-          });
+      if(this.players.size === 0) {
+        GAMES.delete(this.id);
+      } else {
+        this.sendAllExcept(player, {
+          type: 'removePlayer',
+          data: player.id
+        });
+        
+        this.nextRanking--;
+        this.checkIfWinner();
+      }
 
       return true;
     }
@@ -168,7 +170,7 @@ class GameServer {
   }
 
   checkIfWinner() {
-    if(!this.gameStarted || this.players.size < 2) return;
+    if(!this.gameStarted) return;
 
     let count = this.players.size;
     let winner = false;
