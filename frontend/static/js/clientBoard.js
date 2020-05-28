@@ -17,6 +17,15 @@ class ClientBoard extends Board {
     }
   }
 
+  rotatePiece(direction) {
+    super.rotatePiece(direction)
+
+    this.pubSub.publish('draw', {
+      board: this.grid,
+      piece: this.piece
+    })
+  }
+
   publishBoardUpdate() {
     this.pubSub.publish('boardChange', this.grid)
 
