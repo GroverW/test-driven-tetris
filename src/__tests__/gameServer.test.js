@@ -315,6 +315,7 @@ describe('game server tests', () => {
 
       expect(mpGameServer.nextRanking).toBe(0);
 
+      // last player should automatically get a gameOver because they won
       expect(sendAllSpy).toHaveBeenCalledTimes(2);
       expect(p1.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
