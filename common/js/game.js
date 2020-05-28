@@ -9,7 +9,12 @@ class Game {
     this.lines = 0;
     this.linesRemaining = 10;
     this.pubSub = pubSub;
-    this.board = new Board(this.pubSub.publish, playerId);
+    this.board = new Board(pubSub, playerId);
+    this.subscriptions = [
+      this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this)),
+      this.pubSub.subscribe('clearLines', this.clearLines.bind(this)),
+      this.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
+    ]
   }
 
   start() {
