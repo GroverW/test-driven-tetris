@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const Game = require('./game');
+const ClientGame = require('./clientGame');
 const GameDOM = require('./gameDOM');
 const { publish } = require('../../helpers/pubSub');
 const Api = require('../../helpers/api');
@@ -91,7 +91,7 @@ const connectToGame = (gameId) => {
     if (type === 'addPlayer') {
       if (!game) {
         gameDOM = new GameDOM(selectors, data);
-        game = new Game(data);
+        game = new ClientGame(data);
         api = new Api(ws);
         return;
       }
