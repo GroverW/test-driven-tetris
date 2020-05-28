@@ -55,4 +55,4 @@ module.exports = {
   SEED_PIECES,
   WALL_KICK_TESTS,
   WALL_KICK_TESTS_I,
-}
+};
