@@ -1,5 +1,5 @@
 const Player = require('../js/player');
-const Game = require('../js/game');
+const ServerGame = require('../js/serverGame');
 const { mockSend } = require('../helpers/mocks');
 const pubSub = require('../helpers/pubSub');
 
@@ -18,7 +18,7 @@ describe('player tests', () => {
   })
 
   test('setup player', () => {
-    expect(p1.game).toEqual(expect.any(Game));
-    expect(p2.game).toEqual(expect.any(Game));
+    expect(p1.game).toEqual(expect.any(ServerGame));
+    expect(p2.game).toEqual(expect.any(ServerGame));
   });
 });

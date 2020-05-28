@@ -1,4 +1,4 @@
-const Game = require('./game');
+const ServerGame = require('./serverGame');
 
 class Player {
   constructor(send, pubSub) {
@@ -6,7 +6,7 @@ class Player {
     this.isHost = false;
     this._send = send;
     this.pubSub = pubSub;
-    this.game = new Game(this.pubSub);
+    this.game = new ServerGame(this.pubSub);
   }
 
   setId(id) {
