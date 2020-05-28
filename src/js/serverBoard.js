@@ -1,29 +1,25 @@
 const Board = require('../../common/js/board');
 
 class ServerBoard extends Board {
-  constructor(publish, playerId) {
-    super(publish, playerId);
+  constructor(pubSub, playerId) {
+    super(pubSub, playerId);
   }
 
   getPieces() {
     super.getPieces();
     
     if(this.pieceList.almostEmpty()) {
-      this.publish('getPieces');
+      this.pubSub.publish('getPieces');
     }
   }
 
   clearLines() {
     const numCleared = super.clearLines();
-
-    if(numCleared) {
-      this.publish('clearLines', numCleared);
-      this.publishBoardUpdate();
-    } 
+    numCleared && this.publishBoardUpdate();
   }
 
   publishBoardUpdate() {
-    this.publish('updateBoard', {
+    this.pubSub.publish('updateBoard', {
       id: this.id,
       board: this.grid
     })
