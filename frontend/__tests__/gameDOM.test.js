@@ -1,9 +1,9 @@
 const GameDOM = require('../static/js/gameDOM');
-const Game = require('../static/js/game');
-const { Piece } = require('../static/js/piece');
+const ClientGame = require('../static/js/clientGame');
+const { Piece } = require('../../common/js/piece');
 const { publish } = require('../helpers/pubSub');
 const { getNewPlayer } = require('../helpers/utils');
-const { CONTROLS, PIECE_TYPES } = require('../helpers/data');
+const { CONTROLS, PIECE_TYPES } = require('../helpers/clientConstants');
 const { 
   getMockDOMSelector,
   getMockCtx,
@@ -39,7 +39,7 @@ describe('game DOM tests', () => {
     }
 
     gameDOM = new GameDOM(selectors);
-    game = new Game(1);
+    game = new ClientGame(1);
     game.board.pieceList.addSet(getTestPieces());
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
