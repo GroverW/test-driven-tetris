@@ -21,6 +21,19 @@
     "webpack": "^4.43.0"
   },
   "devDependencies": {
+    "module-alias": "^2.2.2",
     "webpack-cli": "^3.3.11"
+  },
+  "_moduleAliases": {
+    "frontend": "frontend/",
+    "backend": "src/",
+    "common": "common/"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^frontend(.*)$": "<rootDir>/frontend$1",
+      "^backend(.*)$": "<rootDir>/src$1",
+      "^common(.*)$": "<rootDir>/common$1"
+    }
   }
 }
