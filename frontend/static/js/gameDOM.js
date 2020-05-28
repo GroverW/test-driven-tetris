@@ -1,10 +1,10 @@
 const GameView = require('./gameView');
-const { subscribe } = require('../../helpers/pubSub');
+const { subscribe } = require('frontend/helpers/pubSub');
 const {
   getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM,
-} = require('../../helpers/clientUtils');
+} = require('frontend/helpers/clientUtils');
 
 class GameDOM {
   constructor(selectors, id) {

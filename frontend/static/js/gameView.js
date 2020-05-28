@@ -1,5 +1,5 @@
-const { subscribe } = require('../../helpers/pubSub');
-const { CELL_COLORS, BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE } = require('../../helpers/clientConstants');
+const { subscribe } = require('frontend/helpers/pubSub');
+const { CELL_COLORS, BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE } = require('frontend/helpers/clientConstants');
 
 class GameView {
   constructor(ctx, ctxNext) {

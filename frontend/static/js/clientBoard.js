@@ -1,5 +1,5 @@
-const Board = require('../../../common/js/board');
-const { POINTS } = require('../../helpers/clientConstants');
+const Board = require('common/js/board');
+const { POINTS } = require('frontend/helpers/clientConstants');
 
 class ClientBoard extends Board {
   constructor(pubSub, playerId) {
