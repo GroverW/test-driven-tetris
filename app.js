@@ -1,5 +1,5 @@
 /** app for multiplayer tetris rooms  */
-
+require('module-alias/register');
 const express = require('express');
 const app = express();
 const GameServer = require('./src/js/gameServer');

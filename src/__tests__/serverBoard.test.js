@@ -1,8 +1,8 @@
-const ServerBoard = require('../js/serverBoard');
-const { Piece } = require('../../common/js/piece');
-const { PIECE_TYPES, SEED_PIECES } = require('../helpers/serverConstants');
-const { getTestBoard, getTestPieces } = require('../../common/mockData/mocks');
-const pubSub = require('../helpers/pubSub');
+const ServerBoard = require('backend/js/serverBoard');
+const { Piece } = require('common/js/piece');
+const { PIECE_TYPES, SEED_PIECES } = require('backend/helpers/serverConstants');
+const { getTestBoard, getTestPieces } = require('common/mockData/mocks');
+const pubSub = require('backend/helpers/pubSub');
 
 describe('server - board tests', () => {
   let gameBoard;

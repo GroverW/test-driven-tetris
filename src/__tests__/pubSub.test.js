@@ -1,4 +1,4 @@
-const pubSub = require('../helpers/pubSub');
+const pubSub = require('backend/helpers/pubSub');
 
 
 describe('publish / subscribe', () => {
