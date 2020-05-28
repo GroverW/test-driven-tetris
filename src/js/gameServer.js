@@ -4,8 +4,8 @@ const {
   MAX_PLAYERS,
   RANKINGS,
   SEED_PIECES
-} = require('../helpers/data');
-const { randomize } = require('../helpers/utils');
+} = require('../helpers/serverConstants');
+const { randomize } = require('../../common/helpers/utils');
 
 class GameServer {
   constructor(id, gameType) {
