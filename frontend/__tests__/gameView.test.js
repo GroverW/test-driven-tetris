@@ -1,11 +1,11 @@
 const GameView = require('../static/js/gameView')
-const Game = require('../static/js/game');
+const ClientGame = require('../static/js/clientGame');
 const {
   CONTROLS,
   BOARD_HEIGHT,
   BOARD_WIDTH,
   CELL_SIZE
-} = require('../helpers/data');
+} = require('../helpers/clientConstants');
 const { getMockCtx, getTestBoard, getTestPieces } = require('../helpers/mocks');
 const { publish } = require('../helpers/pubSub');
 const { getNewPlayer } = require('../helpers/utils');
@@ -31,7 +31,7 @@ describe('game view tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    game = new Game(1);
+    game = new ClientGame(1);
     game.board.pieceList.addSet(getTestPieces());
     gameView = new GameView(mockCtx, mockCtxNext);
 
@@ -64,6 +64,8 @@ describe('game view tests', () => {
 
     game.command(CONTROLS.ROTATE_LEFT);
 
+    // all drawn on game start
+    // board and piece updated on rotate
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
     expect(drawPieceSpy).toHaveBeenCalledTimes(3);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
