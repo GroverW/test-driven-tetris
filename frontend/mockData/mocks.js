@@ -2,8 +2,8 @@ const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
-} = require('../../common/mockData/mocks')
-const { subscribe } = require('../helpers/pubSub');
+} = require('common/mockData/mocks')
+const { subscribe } = require('frontend/helpers/pubSub');
 
 const getMockCtx = () => ({
   canvas: {

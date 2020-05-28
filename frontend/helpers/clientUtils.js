@@ -1,4 +1,4 @@
-const { randomize, getEmptyBoard } = require('../../common/helpers/utils');
+const { randomize, getEmptyBoard } = require('common/helpers/utils');
 
 const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
 
