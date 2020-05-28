@@ -5,20 +5,30 @@
 ### Project Structure - Classes, Helpers, Components, Routes, etc.
 
 ```
+common                          # Wrapping folder for common js files
+├── helpers
+│   ├── constants               # Constants to define game settings
+│   └── utils                   # Utilities (randomize, getEmptyBoard)
+└── js
+    └── game                    # Base game class used by frontend and backend
+        └── board               # Base board class used by frontend and backend
+            └── piece           # Created and gets new pieces
+
+
 frontend                        # Wrapping folder for front-end
 ├── helpers
 │   ├── api                     # Class for sending messages to backend
-│   ├── data                    # Constants to define game settings
+│   ├── clientConstants         # Constants specific to client
 │   ├── pubSub                  # Publish / subscribe helper functions
-│   └── utils                   # Utilities (e.g. getNewPlayer, getNewBoard)
+│   └── clientUtils             # Utilities (e.g. getNewPlayer, getNewBoard)
 └── static
     ├── index                   # Main html file
     ├── css               
     │   └── style               # Main stylesheet
     └── js
-        ├── game                # Manages score, game status, commands, animation
-        │   └── board           # Manages board state and pieces
-        │       └── piece       # Creates and gets new pieces
+        ├── clientGame          # Manages score, commands, etc. (extends common game class)
+        │   └── clientBoard     # Manages board state and pieces (extends common board class)
+        │       └── piece       # Creates and gets new pieces (imported from common)
         ├── gameDOM             # Manages DOM manipulation
         │   └── gameView        # Manages HTML canvas manipulation
         └── main                # Placeholder for event handlers
@@ -26,16 +36,14 @@ frontend                        # Wrapping folder for front-end
 
 src                             # Wrapping folder for back-end classes
 ├── helpers
-│   ├── api                     # Class for sending messages to backend
-│   ├── data                    # Constants to define game settings
-│   ├── pubSub                  # Factory function for creating local pub/sub functions
-│   └── utils                   # Utilities (e.g. getNewPlayer, getNewBoard)
+│   ├── serverConstants         # Constants specific to server
+│   └── pubSub                  # Factory function for creating local pub/sub functions
 └── js
     └── gameServer              # Manages adding / removing players, sending messages
         └── player              # Associates game with gameServer        
-            └── game            # Manages score, game status, executes commands
-                └── board       # Manages board state and pieces
-                    └── piece   # Creates and gets new pieces
+            └── serverGame      # Manages score, executes commands, etc (extends common game class)
+                └── serverBoard # Manages board state and pieces (extends common board class)
+                    └── piece   # Creates and gets new pieces (imported from common)
 
 app                             # Backend-routes
 ```
