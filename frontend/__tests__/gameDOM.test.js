@@ -2,14 +2,14 @@ const GameDOM = require('../static/js/gameDOM');
 const ClientGame = require('../static/js/clientGame');
 const { Piece } = require('../../common/js/piece');
 const { publish } = require('../helpers/pubSub');
-const { getNewPlayer } = require('../helpers/utils');
+const { getNewPlayer } = require('../helpers/clientUtils');
 const { CONTROLS, PIECE_TYPES } = require('../helpers/clientConstants');
 const { 
   getMockDOMSelector,
   getMockCtx,
   getTestBoard,
   getTestPieces
-} = require('../helpers/mocks');
+} = require('../mockData/mocks');
 
 describe('game DOM tests', () => {
   let gameDOM;

@@ -12,7 +12,7 @@ const {
   getTestPieces,
   mockAnimation,
   pubSubMocks,
-} = require('../helpers/mocks');
+} = require('../mockData/mocks');
 
 describe('game tests', () => {
   let game;

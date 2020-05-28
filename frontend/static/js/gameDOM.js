@@ -4,7 +4,7 @@ const {
   getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM,
-} = require('../../helpers/utils');
+} = require('../../helpers/clientUtils');
 
 class GameDOM {
   constructor(selectors, id) {

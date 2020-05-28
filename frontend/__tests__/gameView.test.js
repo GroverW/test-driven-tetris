@@ -6,9 +6,9 @@ const {
   BOARD_WIDTH,
   CELL_SIZE
 } = require('../helpers/clientConstants');
-const { getMockCtx, getTestBoard, getTestPieces } = require('../helpers/mocks');
+const { getMockCtx, getTestBoard, getTestPieces } = require('../mockData/mocks');
 const { publish } = require('../helpers/pubSub');
-const { getNewPlayer } = require('../helpers/utils');
+const { getNewPlayer } = require('../helpers/clientUtils');
 
 describe('game view tests', () => {
   let game;
