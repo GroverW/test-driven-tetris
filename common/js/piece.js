@@ -1,4 +1,4 @@
-const { PIECES, BOARD_WIDTH } = require('../helpers/constants');
+const { PIECES, BOARD_WIDTH } = require('common/helpers/constants');
 
 class PieceList {
   constructor() {

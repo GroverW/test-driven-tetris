@@ -1,5 +1,5 @@
 const { BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I } = require('../helpers/constants');
-const { getEmptyBoard } = require('../helpers/utils');
+const { getEmptyBoard } = require('common/helpers/utils');
 const { PieceList, Piece } = require('./piece');
 
 class Board {

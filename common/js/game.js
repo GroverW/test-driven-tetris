@@ -1,4 +1,4 @@
-const { POINTS, LINES_PER_LEVEL } = require('../helpers/constants');
+const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
 
 class Game {
   constructor(playerId, pubSub, Board) {
