@@ -5,7 +5,7 @@ const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
-} = require('../../common/__tests__/helpers/mocks');
+} = require('../../common/mockData/mocks');
 const pubSub = require('../helpers/pubSub');
 
 describe('game tests', () => {
