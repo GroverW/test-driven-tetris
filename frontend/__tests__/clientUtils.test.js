@@ -3,8 +3,8 @@ const {
   getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM 
-} = require('../helpers/clientUtils');
-const { getTestBoard } = require('../mockData/mocks');
+} = require('frontend/helpers/clientUtils');
+const { getTestBoard } = require('frontend/mockData/mocks');
 
 describe('utils', () => {
   let pieces = [1,2,3,4,5,6,7];

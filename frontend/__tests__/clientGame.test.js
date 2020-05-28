@@ -1,18 +1,18 @@
-const ClientGame = require('../static/js/clientGame');
-const { Piece } = require('../../common/js/piece');
+const ClientGame = require('frontend/static/js/clientGame');
+const { Piece } = require('common/js/piece');
 const {
   PIECE_TYPES,
   CONTROLS,
   ANIMATION_SPEED,
   MAX_SPEED,
-} = require('../helpers/clientConstants');
+} = require('frontend/helpers/clientConstants');
 const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
   mockAnimation,
   pubSubMocks,
-} = require('../mockData/mocks');
+} = require('frontend/mockData/mocks');
 
 describe('game tests', () => {
   let game;

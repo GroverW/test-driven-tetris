@@ -1,9 +1,9 @@
-const GameDOM = require('../static/js/gameDOM');
-const ClientGame = require('../static/js/clientGame');
-const { Piece } = require('../../common/js/piece');
-const { publish } = require('../helpers/pubSub');
-const { getNewPlayer } = require('../helpers/clientUtils');
-const { CONTROLS, PIECE_TYPES } = require('../helpers/clientConstants');
+const GameDOM = require('frontend/static/js/gameDOM');
+const ClientGame = require('frontend/static/js/clientGame');
+const { Piece } = require('common/js/piece');
+const { publish } = require('frontend/helpers/pubSub');
+const { getNewPlayer } = require('frontend/helpers/clientUtils');
+const { CONTROLS, PIECE_TYPES } = require('frontend/helpers/clientConstants');
 const { 
   getMockDOMSelector,
   getMockCtx,

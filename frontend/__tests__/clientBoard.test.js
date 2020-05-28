@@ -1,9 +1,9 @@
-const ClientBoard = require('../static/js/clientBoard');
-const { PIECE_TYPES, ROTATE_LEFT } = require('../helpers/clientConstants');
-const { getTestBoard, getTestPieces } = require('../../common/mockData/mocks');
-const { Piece } = require('../../common/js/piece');
-const pubSub = require('../helpers/pubSub');
-const { pubSubMocks, TEST_BOARDS } = require('../mockData/mocks');
+const ClientBoard = require('frontend/static/js/clientBoard');
+const { PIECE_TYPES, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
+const { getTestBoard, getTestPieces } = require('common/mockData/mocks');
+const { Piece } = require('common/js/piece');
+const pubSub = require('frontend/helpers/pubSub');
+const { pubSubMocks, TEST_BOARDS } = require('frontend/mockData/mocks');
 
 describe('client - game board tests', () => {
   let gameBoard;
