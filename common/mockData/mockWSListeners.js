@@ -4,7 +4,7 @@ const serverPubSub = require('../../src/helpers/pubSub');
 const ClientGame = require('../../frontend/static/js/clientGame');
 const GameDOM = require('../../frontend/static/js/gameDOM');
 const { publish } = require('../../frontend/helpers/pubSub');
-const { GAME_TYPES } = require('../../src/helpers/data');
+const { GAME_TYPES } = require('../../src/helpers/serverConstants');
 
 class MockServerListener {
   constructor(ws, url) {
