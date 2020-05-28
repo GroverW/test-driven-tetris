@@ -1,8 +1,8 @@
-const GameServer = require('../js/gameServer');
-const Player = require('../js/player');
-const pubSub = require('../helpers/pubSub');
-const { GAMES, GAME_TYPES } = require('../helpers/serverConstants');
-const { mockSend } = require('../../common/mockData/mocks')
+const GameServer = require('backend/js/gameServer');
+const Player = require('backend/js/player');
+const pubSub = require('backend/helpers/pubSub');
+const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
+const { mockSend } = require('common/mockData/mocks')
 
 describe('game server tests', () => {
   let mpGameServer;
@@ -212,37 +212,6 @@ describe('game server tests', () => {
   });
 
   describe('game start, game over', () => {
-    test('game over', () => {
-      mpGameServer.join(p1);
-      mpGameServer.join(p2);
-      mpGameServer.join(p3);
-      
-      mpGameServer.startGame(p1);
-  
-      expect(mpGameServer.nextRanking).toBe(3);
-  
-      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
-      const _sendSpy1 = jest.spyOn(p1, '_send');
-      const _sendSpy2 = jest.spyOn(p2, '_send');
-  
-      // this will add the current piece to the board
-      // and try to get a new one on top of it
-      p1.game.board.drop();
-  
-      expect(sendAllSpy).toHaveBeenCalledTimes(1);
-      expect(_sendSpy1).toHaveBeenCalledTimes(1);
-  
-      expect(mpGameServer.nextRanking).toBe(2);
-      
-      p2.game.board.drop();
-  
-      expect(sendAllSpy).toHaveBeenCalledTimes(2);
-      expect(_sendSpy1).toHaveBeenCalledTimes(2);
-      expect(_sendSpy2).toHaveBeenCalledTimes(2);
-  
-      expect(mpGameServer.nextRanking).toBe(1);
-    });
-  
     test('game start - update pieces', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
@@ -260,6 +229,95 @@ describe('game server tests', () => {
       // player who leaves should not get piece updates
       expect(p1.game.board.pieceList.pieces).toEqual(p1.game.board.pieceList.pieces);
       expect(p2.game.board.pieceList.pieces).not.toEqual(p3.game.board.pieceList.pieces);
+    });
+
+    test('game over', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+      
+      mpGameServer.startGame(p1);
+  
+      expect(mpGameServer.nextRanking).toBe(3);
+  
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
+      const _sendSpy1 = jest.spyOn(p1, '_send');
+  
+      // this will add the current piece to the board
+      // and try to get a new one on top of it
+      p1.game.board.drop();
+  
+      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(_sendSpy1).toHaveBeenCalledTimes(1);
+  
+      expect(mpGameServer.nextRanking).toBe(2);
+    });
+
+    test('game over - one player remaining', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+
+      mpGameServer.startGame(p1);
+
+      expect(mpGameServer.nextRanking).toBe(3);
+
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
+
+      expect(p1.game.gameStatus).toBe(true);
+      expect(p2.game.gameStatus).toBe(true);
+      expect(p3.game.gameStatus).toBe(true);
+
+      p1.game.board.drop();
+
+      expect(mpGameServer.nextRanking).toBe(2);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(p1.game.gameStatus).toBe(null);
+      expect(p2.game.gameStatus).toBe(true);
+      expect(p3.game.gameStatus).toBe(true);
+
+      p2.game.board.drop();
+
+      expect(mpGameServer.nextRanking).toBe(0);
+
+      // last player should automatically get a gameOver because they won
+      expect(sendAllSpy).toHaveBeenCalledTimes(3);
+      expect(p2.game.gameStatus).toBe(null);
+      expect(p3.game.gameStatus).toBe(null);
+    });
+  
+    test('game over - 2nd place leaves', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+
+      mpGameServer.startGame(p1);
+
+      expect(mpGameServer.nextRanking).toBe(3);
+
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
+
+      expect(p1.game.gameStatus).toBe(true);
+      expect(p2.game.gameStatus).toBe(true);
+      expect(p3.game.gameStatus).toBe(true);
+
+      p1.game.board.drop();
+
+      expect(mpGameServer.nextRanking).toBe(2);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(p1.game.gameStatus).toBe(null);
+      expect(p2.game.gameStatus).toBe(true);
+      expect(p3.game.gameStatus).toBe(true);
+
+      mpGameServer.leave(p2);
+
+      expect(mpGameServer.nextRanking).toBe(0);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(2);
+      expect(p1.game.gameStatus).toBe(null);
+      expect(p3.game.gameStatus).toBe(null);
     });
   });
 });
