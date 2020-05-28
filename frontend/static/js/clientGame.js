@@ -6,7 +6,7 @@ const {
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
-} = require('../../helpers/data');
+} = require('../../helpers/clientConstants');
 const { publish, subscribe } = require('../../helpers/pubSub');
 
 class ClientGame extends Game {
@@ -121,6 +121,14 @@ class ClientGame extends Game {
       data: this.commandQueue
     });
     this.commandQueue = [];
+  }
+
+  updateScore(points) {
+    super.updateScore(points);
+
+    publish('updateScore', {
+      score: this.score,
+    })
   }
 
   updateLines(lines) {
