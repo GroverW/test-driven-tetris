@@ -7,7 +7,16 @@ const {
 } = require('backend/helpers/serverConstants');
 const { randomize } = require('common/helpers/utils');
 
+
+/**
+ * Represents a game server
+ */
 class GameServer {
+  /**
+   * @constructor
+   * @param {string} id - id of specified game server
+   * @param {string} gameType - single player or multiplayer game
+   */
   constructor(id, gameType) {
     this.id = id;
     this.gameType = gameType;
@@ -18,24 +27,44 @@ class GameServer {
     this.subscriptions = {};
   }
 
+  /**
+   * Gets a specified gameServer instance
+   * @param {string} id - id of game to get
+   * @returns {object|boolean} - either a gameServer or false if not found
+   */
   static getGame(id) {
     if (GAMES.has(id)) return GAMES.get(id);
 
     return false;
   }
 
+  /**
+   * Adds a new game if id does not already exist
+   * @param {string} id - id of game to add
+   * @param {string} gameType - type of game to add (single or multiplayer)
+   * @returns {string} - id of new game
+   */
   static addGame(id, gameType) {
     if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType))
 
     return id;
   }
 
+  /**
+   * Checks whether gameServer is full or game is already started
+   * @returns {boolean} - whether gameServer has space and game is not already started
+   */
   checkGameStatus() {
     const full = this.players.size >= MAX_PLAYERS[this.gameType]; 
 
     return !full && !this.gameStarted;
   }
 
+  /**
+   * Adds player to an existing gameServer
+   * @param {object} player - instance of Player class
+   * @returns {boolean} - whether or not player was added successfully
+   */
   join(player) {
     if (!this.checkGameStatus()) return false;
 
@@ -56,6 +85,10 @@ class GameServer {
     return true;
   }
 
+  /**
+   * Subscribes gameServer to specified player's publish/subscribe object
+   * @param {object} player - instance of Player class
+   */
   addSubscriptions(player) {
     this.subscriptions[player.id] = [
       player.pubSub.subscribe('leave', this.leave.bind(this)),
@@ -66,10 +99,19 @@ class GameServer {
     ]
   }
 
+  /**
+   * Unsubscribes gameServer from specified player's publish/subscribe object
+   * @param {number} id - player id
+   */
   removeSubscriptions(id) {
     this.subscriptions[id].forEach(unsub => unsub());
   }
 
+  /**
+   * Removes specified player from gameServer
+   * @param {object} player - instance of Player class
+   * @returns {boolean} - whether or not player was removed
+   */
   leave(player) {
     if (this.players.has(player)) {
       if (player.isHost && this.players.size > 1) this.setNewHost()
@@ -95,6 +137,9 @@ class GameServer {
     return false;
   }
 
+  /**
+   * Sets next player to be host
+   */
   setNewHost() {
     const playersIterator = this.players.values();
     playersIterator.next()
@@ -102,20 +147,38 @@ class GameServer {
     newHost.isHost = true;
   }
 
+  /**
+   * Sends message over websocket to each player
+   * @param {object} data - type of message and data to send
+   */
   sendAll(data) {
     this.players.forEach(player => this.sendTo(player,data));
   }
 
+  /**
+   * Sends message to all players except specified player
+   * @param {object} exceptPlayer - player to exclude from sending
+   * @param {object} data - type of message and data to send
+   */
   sendAllExcept(exceptPlayer, data) {
     this.players.forEach(player =>
       (player !== exceptPlayer) && this.sendTo(player, data)
     );
   }
 
+  /**
+   * Sends message to specified player
+   * @param {object} player - player to send message to
+   * @param {object} data - type of message and data to send
+   */
   sendTo(player, data) {
     player._send(JSON.stringify(data));
   }
 
+  /**
+   * Starts game
+   * @param {object} player - Player requesting to start game
+   */
   startGame(player) {
     if(player && player.isHost) {
       this.gameStarted = true;
@@ -132,6 +195,10 @@ class GameServer {
     }
   }
 
+  /**
+   * Sends message to all players to update the board for the specified player
+   * @param {object} data - type of message and data to send
+   */
   updatePlayer(data) {
     this.sendAll({
       type: 'updatePlayer',
@@ -142,6 +209,9 @@ class GameServer {
     })
   }
 
+  /**
+   * Sends message to all players to add a new pieceList
+   */
   getPieces() {
     const pieces = randomize(SEED_PIECES);
 
@@ -155,6 +225,10 @@ class GameServer {
     })
   }
 
+  /**
+   * Sends Game Over message to all players when a player's game has ended
+   * @param {object} data - type of message and data to send
+   */
   gameOver(data) {
     this.sendAll({
       type: 'gameOver',
@@ -169,6 +243,9 @@ class GameServer {
     this.checkIfWinner();
   }
 
+  /**
+   * Checks if a win condition has been reached
+   */
   checkIfWinner() {
     if(!this.gameStarted) return;
 
@@ -188,6 +265,11 @@ class GameServer {
     }
   }
 
+  /**
+   * Generates a Game Over message for a specified player
+   * @param {number} id - player id
+   * @returns {object} - message header and body
+   */
   gameOverMessage(id) {
     let message = {};
 
@@ -209,12 +291,20 @@ class GameServer {
     return message;
   }
 
+  /**
+   * Gets a player instance by their id
+   * @param {number} id - player id
+   * @returns {object} - player instance
+   */
   getPlayerById(id) {
     let player;
     this.players.forEach(p => { if(p.id === id) player = p });
     return player;
   }
 
+  /**
+   * Unsubscribe's the gameServer from all players' publish/subscribe objects
+   */
   unsubscribe() {
     Object.values(this.subscriptions)
       .forEach(p => p.forEach(unsub => unsub()));
