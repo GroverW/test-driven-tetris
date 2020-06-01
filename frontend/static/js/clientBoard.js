@@ -1,11 +1,28 @@
 const Board = require('common/js/board');
 const { POINTS } = require('frontend/helpers/clientConstants');
 
+
+/**
+ * Represents a client-side game board
+ * @extends Board
+ */
 class ClientBoard extends Board {
+  /**
+   * @constructor
+   * @param {object} pubSub - Publish / Subscribe object
+   * @param {number} playerId - Id of player on backend
+   */
   constructor(pubSub, playerId) {
     super(pubSub, playerId)
   }
 
+  /**
+   * Moves the current piece to a new place on the board
+   * @param {number} x - The number of spaces to move in the x-direction
+   * @param {number} y - The number of spaces to move in the y-direection
+   * @param {number} multiplier - Points multiplier based on type of movement
+   * @returns {boolean} - Whether or not the move was valid.
+   */
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if(super.movePiece(x, y, multiplier)) {
       if(multiplier < POINTS.HARD_DROP) {
@@ -17,6 +34,10 @@ class ClientBoard extends Board {
     }
   }
 
+    /**
+   * Rotates the current piece clockwise or counter-clockwise
+   * @param {number} direction - (-1) for counter-clockwise, (1) for clockwise
+   */
   rotatePiece(direction) {
     super.rotatePiece(direction)
 
@@ -26,6 +47,9 @@ class ClientBoard extends Board {
     })
   }
 
+    /**
+   * Publishes any board updates
+   */
   publishBoardUpdate() {
     this.pubSub.publish('boardChange', this.grid)
 
