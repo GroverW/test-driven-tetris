@@ -1,6 +1,16 @@
 const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
 
+/**
+ * Represents a Tetris game.
+ */
 class Game {
+  /**
+   * Creates a Game.
+   * @constructor
+   * @param {number} playerId - Id of player linking backend to frontend
+   * @param {object} pubSub - Publish / Subscribe object
+   * @param {class} Board -  Board class to be instantiated
+   */
   constructor(playerId, pubSub, Board) {
     this.playerId = playerId;
     this.gameStatus = false;
@@ -17,6 +27,9 @@ class Game {
     ]
   }
 
+  /**
+   * Starts the game
+   */
   start() {
     if(this.gameStatus || this.gameStatus === null) return false;
     
@@ -25,29 +38,26 @@ class Game {
     return true;
   }
 
+  /**
+   * Executes commands.
+   */
   command() {
     // implemented individually
   }
 
-    /**
-   * SCOREBOARD
-   * 
-   * updateScore
-   * - adds points to score, publishes score
-   * 
-   * updateLines
-   * - updates level
-   * - adds lines lines to lines cleared
-   * - publishes lines and level
-   * 
-   * clearLines
-   * - calls updateScore and updateLines when clearLines is published
+  /**
+   * Updates game score.
+   * @param {number} points - number of points to add to game score
    */
   updateScore(points) {
     this.score += points;
   }
 
-  updateLines(lines) {
+  /**
+   * Updates level, and number of lines remaining until next level.
+   * @param {number} lines - number of lines cleared
+   */
+  updateLinesRemaining(lines) {
     this.lines += lines;
 
     if(this.linesRemaining <= lines) this.level++
@@ -55,13 +65,20 @@ class Game {
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
   }
 
+  /**
+   * Updates score and lines remaining based on number of lines cleared
+   * @param {number} lines - number of lines cleared
+   */
   clearLines(lines) {
     if(POINTS.LINES_CLEARED[lines]) {
       this.updateScore(POINTS.LINES_CLEARED[lines] * this.level);
-      this.updateLines(lines);
+      this.updateLinesRemaining(lines);
     }
   }
 
+  /**
+   * Ends the current game.
+   */
   gameOver() {
     // implemented individually
   }
