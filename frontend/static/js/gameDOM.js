@@ -6,7 +6,22 @@ const {
   getNewPlayerDOM,
 } = require('frontend/helpers/clientUtils');
 
+/**
+ * Represents a client-side DOM manager
+ */
 class GameDOM {
+  /**
+   * @constructor
+   * @param {object} selectors - object of DOM selectors
+   * @param {object} selectors.playerCtx - player canvas context
+   * @param {object} selectors.nexCtx - player next piece canvas context
+   * @param {object} selectors.gameContainer - game container selector
+   * @param {object} selectors.scoreSelector - game score selector
+   * @param {object} selectors.levelSelector - game level selector
+   * @param {object} selectors.linesSelector - game lines cleared selector
+   * @param {object} selectors.playerSelector - player game container selector
+   * @param {number} id - Id of player on backend
+   */
   constructor(selectors, id) {
     this.id = id;
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
@@ -23,6 +38,10 @@ class GameDOM {
     ];
   }
 
+  /**
+   * Adds additional player to the game container
+   * @param {number} id - id of additional player
+   */
   addPlayer(id) {
     if(id === this.id) return;
     // create container div
@@ -39,6 +58,7 @@ class GameDOM {
 
     playerContainer.classList.add(containerClass);
 
+    // creates a new html canvas
     let playerCanvas = document.createElement('canvas');
     playerCanvas.id = `p${id}-board`;
     playerCanvas.classList.add('game-board')
@@ -51,10 +71,15 @@ class GameDOM {
     const playerDOM = getNewPlayerDOM(playerContainer, id);
     const player = getNewPlayer(playerCtx, getEmptyBoard(), id)
 
+    // adds player to player list and gameView
     this.players.push(playerDOM);
     this.gameView.addPlayer(player);
   }
 
+  /**
+   * Removes additional player from game container
+   * @param {number} id - id of player to remove
+   */
   removePlayer(id) {
     if(id === this.id) return;
 
@@ -71,12 +96,28 @@ class GameDOM {
     }
   }
 
+  /**
+   * Updates the current score, level, or lines cleared
+   * @param {object} data - elements of scoreBoard to update
+   * @param {number} [data.score] - game score
+   * @param {number} [data.level] - game level
+   * @param {number} [data.lines] - game lines cleared
+   */
   updateScoreboard(data) {
     if('score' in data) this.scoreSelector.innerText = data.score;
     if('level' in data) this.levelSelector.innerText = data.level;
     if('lines' in data) this.linesSelector.innerText = data.lines;
   }
 
+  /**
+   * Adds game over message and updates board for player whose game is over
+   * @param {object} data - data used to create game over message
+   * @param {number} data.id - player id whose game is over
+   * @param {array} data.board - player's ending game board
+   * @param {object} data.message - game over message
+   * @param {string} data.message.header - game over message header
+   * @param {string[]} data.message.body - list of messages in body
+   */
   gameOver(data) {
     if(data.id === this.id) {
       this.unsubscribe();
@@ -93,6 +134,13 @@ class GameDOM {
     }
   }
 
+  /**
+   * Adds game over message for a specified player
+   * @param {object} container - DOM selector for player container
+   * @param {object} message - message to include
+   * @param {string} message.header - message header
+   * @param {string[]} message.body - list of messages in body
+   */
   addGameOverMessage(container, message) {
     let gameOverMessage = document.createElement('div');
     gameOverMessage.classList.add('game-over');
@@ -114,6 +162,9 @@ class GameDOM {
     container.appendChild(gameOverMessage);
   }
 
+  /**
+   * Unsubscribes gameDOM from all topics
+   */
   unsubscribe() {
     this.subscriptions.forEach(unsub => unsub());
     this.gameView.unsubscribe();
