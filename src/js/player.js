@@ -1,6 +1,14 @@
 const ServerGame = require('./serverGame');
 
+/**
+ * Represents a player on the back-end
+ */
 class Player {
+  /**
+   * @constructor
+   * @param {function} send - the websocket method to send messages for specified player
+   * @param {object} pubSub - the player's publish/subscribe object
+   */
   constructor(send, pubSub) {
     this.id;
     this.isHost = false;
@@ -9,16 +17,26 @@ class Player {
     this.game = new ServerGame(this.pubSub);
   }
 
+  /**
+   * Set's player's id
+   * @param {number} id - player id
+   */
   setId(id) {
     this.id = id;
     this.game.playerId = id;
     this.game.board.playerId = id;
   }
 
+  /**
+   * Publishes a message for the specified player to leave the gameServer
+   */
   leave() {
     this.pubSub.publish('leave', this);
   }
 
+  /**
+   * Publishes a message for the current game to be started
+   */
   startGame() {
     (this.game.gameStatus !== null) && this.pubSub.publish('startGame', this);
   }
