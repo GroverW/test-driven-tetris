@@ -9,7 +9,17 @@ const {
 } = require('frontend/helpers/clientConstants');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
 
+
+/**
+ * Represents a client-side Tetris game
+ * @extends Game
+ */
 class ClientGame extends Game {
+  /**
+   * Creates a ClientGame.
+   * @constructor
+   * @param {number} playerId - Links client to backend Game.
+   */
   constructor(playerId) {
     super(playerId, { publish, subscribe }, ClientBoard);
     this.time = { start: 0, elapsed: 0 };
@@ -25,6 +35,9 @@ class ClientGame extends Game {
     );
   }
 
+  /**
+   * Client-side implentation of start method.
+   */
   start() {
     if(super.start()) {
       this.animate();
@@ -43,6 +56,10 @@ class ClientGame extends Game {
     }
   }
 
+  /**
+   * Executes movement command.
+   * @param {number} key - Keypress identifier
+   */
   command(key) {
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1, 0),
@@ -62,11 +79,17 @@ class ClientGame extends Game {
       commands[key]();
     }
 
+    // if game over and command queue isn't empty, send it
     if (!this.gameStatus && this.commandQueue.length > 0) {
       this.sendCommandQueue();
     }
   }
 
+  /**
+   * Toggles horizontal or vertical movement, otherwise executes command.
+   * @param {number} key - Keypress identifier
+   * @param {string} upDown - Whether key was pressed or released
+   */
   toggleMove(key, upDown) {
     const toggleCommands = new Set([
       CONTROLS.LEFT,
@@ -79,6 +102,10 @@ class ClientGame extends Game {
     else if (this.toggledKey === key && upDown === 'up')  this.toggledKey = false;
   }
 
+  /**
+   * Adds delay before Tetris piece is locked to board.
+   * @param {number} key - Keypress identifier
+   */
   addLockDelay(key) {
     const validKeys = new Set([
       CONTROLS.LEFT,
@@ -93,6 +120,10 @@ class ClientGame extends Game {
     }
   }
 
+  /**
+   * Increments lock delay.
+   * @return {number} - Delay increment in milliseconds
+   */
   getLockDelayIncrement() {
     const BASE_DELAY = ANIMATION_SPEED[1];
     const CURRENT_DELAY = this.getAnimationDelay();
@@ -100,27 +131,27 @@ class ClientGame extends Game {
     return ((BASE_DELAY / CURRENT_DELAY - 1) / 2 + 1) * CURRENT_DELAY / 4
   }
 
+  /**
+   * Resets the timer on auto-down movement.
+   * @param {number} key - Keypress identifier
+   */
   resetAutoDown(key) {
     if(key === CONTROLS.DOWN) this.interruptAutoDown = true;
   }
 
-    /**
-   * COMMAND QUEUE
-   * 
-   * addToCommandQueue
-   * - adds commands to the queue
-   * 
-   * sendCommandQueue
-   * - on boardChange, sends commandQueue to backend
-   * 
+  /**
+   * Adds command to command queue.
+   * @param {number} key - Keypress identifier
    */
-  addToCommandQueue(action) {
-    if (action in COMMAND_QUEUE_MAP) {
-      this.commandQueue.push(COMMAND_QUEUE_MAP[action]);
+  addToCommandQueue(key) {
+    if (key in COMMAND_QUEUE_MAP) {
+      this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
     }
   }
 
-
+  /**
+   * Sends current command queue to backend.
+   */
   sendCommandQueue() {
     publish('sendMessage', {
       type: 'executeCommands',
@@ -129,6 +160,10 @@ class ClientGame extends Game {
     this.commandQueue = [];
   }
 
+  /**
+   * Updates game score.
+   * @param {number} points - number of points to add to game score
+   */
   updateScore(points) {
     super.updateScore(points);
 
@@ -137,8 +172,13 @@ class ClientGame extends Game {
     })
   }
 
-  updateLines(lines) {
-    super.updateLines(lines);
+
+  /**
+   * Updates level, and number of lines remaining until next level.
+   * @param {number} lines - number of lines cleared
+   */
+  updateLinesRemaining(lines) {
+    super.updateLinesRemaining(lines);
 
     publish('updateScore', {
       level: this.level,
@@ -146,14 +186,10 @@ class ClientGame extends Game {
     })
   }
 
-  /**
-   * gameOver
-   * - called when gameOver is published
-   * - unsubscribes from all subs
-   * - changes game status
-   * - cancels animation
-   * - resets animationId
-   */
+/**
+ * Ends the current game.
+ * @param {number} id - id of player whose game is over
+ */
   gameOver({ id }) {
     if (id === this.playerId) {
       this.unsubscribe();
@@ -163,35 +199,38 @@ class ClientGame extends Game {
     }
   }
 
+  /**
+   * Unsubscribes from all pubSub topics.
+   */
   unsubscribe() {
     this.subscriptions.forEach(unsub => unsub());
   }
 
   /**
-   * ANIMATION
-   * 
-   * animate
-   * - animates the current piece on the board
-   * 
-   * getAnimationDelay
-   * - determines how quickly piece should move
+   * Handles Game animation actions
+   * @param {number} currTime - Time elapsed since start of game in milliseconds
    */
   animate(currTime = 0) {
+    // calculate elapsed time for auto-movement and toggled movement
     this.time.elapsed = currTime - this.time.start;
     this.moveTime.elapsed = currTime - this.moveTime.start;
+    
     const validNextMove = this.board.validMove(0,1);
 
+    // resets auto-movement time if interrupted
     if(this.interruptAutoDown && validNextMove) {
       this.time.start = currTime;
       this.interruptAutoDown = false;
     }
 
+    // executes auto-movement if valid
     if (this.time.elapsed > this.getAutoDropDelay(validNextMove)) {
       this.time.start = currTime;
       this.command(CONTROLS.AUTO_DOWN);
       this.lockDelay = 0;
     }
 
+    // executes movement of toggled key
     if (this.toggledKey) {
       if(this.moveTime.elapsed > MOVE_SPEED[this.moveDelayIdx]) {
         this.moveTime.start = currTime;
@@ -202,14 +241,24 @@ class ClientGame extends Game {
       this.moveDelayIdx = 0;
     }
 
+
     this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 
+  /**
+   * Calculates the total delay in milliseconds until the next auto-movement
+   * @param {boolean} validNextMove - Whether or not the next row is blocked
+   * @returns {number} - Total delay in milliseconds
+   */
   getAutoDropDelay(validNextMove) {
     const lockDelay = validNextMove ? 0 : this.lockDelay;
     return this.getAnimationDelay() + lockDelay;
   }
 
+  /**
+   * Calculates the base delay in milliseconds until the next auto-movement
+   * @returns {number} - Base delay in milliseconds
+   */
   getAnimationDelay() {
     return ANIMATION_SPEED[Math.min(this.level, MAX_SPEED)];
   }
