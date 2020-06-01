@@ -1,10 +1,10 @@
-const GameServer = require('../../src/js/gameServer');
-const Player = require('../../src/js/player');
-const serverPubSub = require('../../src/helpers/pubSub');
-const ClientGame = require('../../frontend/static/js/clientGame');
-const GameDOM = require('../../frontend/static/js/gameDOM');
-const { publish } = require('../../frontend/helpers/pubSub');
-const { GAME_TYPES } = require('../../src/helpers/serverConstants');
+const GameServer = require('backend/js/gameServer');
+const Player = require('backend/js/player');
+const serverPubSub = require('backend/helpers/pubSub');
+const ClientGame = require('frontend/static/js/clientGame');
+const GameDOM = require('frontend/static/js/gameDOM');
+const { publish } = require('frontend/helpers/pubSub');
+const { GAME_TYPES } = require('backend/helpers/serverConstants');
 
 class MockServerListener {
   constructor(ws, url) {

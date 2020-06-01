@@ -1,4 +1,4 @@
-const { getEmptyBoard } = require('../helpers/utils');
+const { getEmptyBoard } = require('common/helpers/utils');
 
 const TEST_BOARDS = {
   empty: getEmptyBoard(),

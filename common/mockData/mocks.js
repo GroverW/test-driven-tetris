@@ -1,6 +1,6 @@
 const TEST_BOARDS = require('./sampleBoards');
-const { SEED_PIECES } = require('../helpers/constants');
-const { randomize } = require('../helpers/utils');
+const { SEED_PIECES } = require('common/helpers/constants');
+const { randomize } = require('common/helpers/utils');
 
 const mockSend = () => {};
 
