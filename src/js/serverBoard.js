@@ -36,12 +36,12 @@ class ServerBoard extends Board {
   /**
    * Publishes any board updates
    */
-  publishBoardUpdate() {
-    this.pubSub.publish('updateBoard', {
-      id: this.id,
-      board: this.grid
-    })
-  }
+  // publishBoardUpdate() {
+  //   this.pubSub.publish('updateBoard', {
+  //     id: this.id,
+  //     board: this.grid
+  //   })
+  // }
 }
 
 module.exports = ServerBoard;
