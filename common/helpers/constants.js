@@ -13,7 +13,7 @@ const POINTS = {
     4: 800
   }
 };
-const PIECE_TYPES = { I: 1, O: 2, T: 3, S: 4, Z: 5, L: 6, J: 7 };
+const PIECE_TYPES = { I: 1, O: 2, T: 3, S: 4, Z: 5, L: 6, J: 7, N: 8 };
 const PIECES = {
   [PIECE_TYPES.I]: [
     [
