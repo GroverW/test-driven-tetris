@@ -35,7 +35,7 @@ const COMMAND_QUEUE_MAP = {
   ...PLAYER_CONTROLS_COMMAND_QUEUE,
 };
 
-const POWER_UPS = new Set([
+const POWER_UP_KEY_CODES = new Set([
   ...Object.values(PLAYER_CONTROLS)
 ]);
 
@@ -82,7 +82,7 @@ module.exports = {
   PLAYER_KEYS,
   CONTROLS,
   COMMAND_QUEUE_MAP,
-  POWER_UPS,
+  POWER_UP_KEY_CODES,
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
