@@ -1,8 +1,8 @@
 const GameServer = require('backend/js/gameServer');
 const Player = require('backend/js/player');
 const pubSub = require('backend/helpers/pubSub');
-const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
-const { mockSend } = require('common/mockData/mocks')
+const { GAMES, GAME_TYPES, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
+const { mockSend, getTestBoard } = require('common/mockData/mocks');
 
 describe('game server tests', () => {
   let mpGameServer;
@@ -319,6 +319,30 @@ describe('game server tests', () => {
       expect(sendAllSpy).toHaveBeenCalledTimes(2);
       expect(p1.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
+    });
+  });
+
+  describe('power ups', () => {
+    test('execute power up on publish', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+
+      p1.game.board.grid = getTestBoard('pattern1');
+      p2.game.board.grid = getTestBoard('pattern2');
+
+      p1.game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
+
+      mpGameServer.startGame(p1);
+
+      p1.game.usePowerUp(p2.id);
+
+      expect(p1.game.board.grid).toEqual(getTestBoard('empty'));
+      expect(p2.game.board.grid).toEqual(getTestBoard('pattern1SwappedWith2'));
+
+      p1.game.addPowerUp(POWER_UP_TYPES.CLEAR_BOARD);
+      p1.game.usePowerUp(p2.id);
+
+      expect(p2.game.board.grid).toEqual(getTestBoard('empty'));
     });
   });
 });
