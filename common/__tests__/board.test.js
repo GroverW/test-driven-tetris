@@ -189,4 +189,43 @@ describe('game board tests', () => {
 
     expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
   });
-})
+
+  test('get piece bounds', () => {
+    gameBoard.grid = getTestBoard('empty');
+    gameBoard.piece = p1;
+
+    let bounds = gameBoard.getPieceBounds();
+
+    expect(bounds).toEqual([1,1,3,6])
+
+    gameBoard.rotatePiece(-1);
+
+    bounds = gameBoard.getPieceBounds();
+
+    expect(bounds).toEqual([0,3,4,4])
+  })
+
+  test('replaceBoard - swaps board with new board', () => {
+    gameBoard.grid = getTestBoard('empty');
+    gameBoard.piece = p1;
+
+    gameBoard.movePiece(0,10);
+
+    expect([p1.x, p1.y]).toEqual([3,10]);
+
+    const newBoard = getTestBoard('pattern3');
+
+    gameBoard.replaceBoard(newBoard);
+    
+    expect(gameBoard.grid).toEqual(newBoard);
+    // should maintain a 5 row gap between piece and new board filled spots
+    expect([p1.x, p1.y]).toEqual([3,8]);
+
+    const fullBoard = getTestBoard('fullBoard');
+    
+    gameBoard.replaceBoard(fullBoard)
+    
+    expect(gameBoard.grid).toEqual(fullBoard);
+    expect([p1.x, p1.y]).toEqual([3,-1]);
+  });
+});
