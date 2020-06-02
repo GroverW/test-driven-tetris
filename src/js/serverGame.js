@@ -66,12 +66,16 @@ class ServerGame extends Game {
   /**
    * Removes the first power up and publishes a message to execute it
    * against the specified player
-   * @param {string} id - player id
+   * @param {number} id - player id
    */
   usePowerUp(id) {
     if (this.powerUps.length) {
       const powerUp = this.powerUps.shift();
-      this.pubSub.publish('usePowerUp', { id, powerUp });
+      this.pubSub.publish('usePowerUp', { 
+        player1: this.playerId,
+        player2: id, 
+        powerUp, 
+      });
     }
   }
 
