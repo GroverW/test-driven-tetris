@@ -5,6 +5,7 @@ const {
   CONTROLS,
   ANIMATION_SPEED,
   MAX_SPEED,
+  COMMAND_QUEUE_MAP,
 } = require('frontend/helpers/clientConstants');
 const {
   TEST_BOARDS,
@@ -18,13 +19,12 @@ describe('game tests', () => {
   let game;
   let p1;
   let pubSub;
+  let p2 = 2, p3 = 3, p4 = 4;
 
   beforeEach(() => {
     pubSub = pubSubMocks();
     game = new ClientGame(1);
     p1 = new Piece(PIECE_TYPES.I);
-    p2 = new Piece(PIECE_TYPES.J);
-    p3 = new Piece(PIECE_TYPES.T);
     
     jest.useFakeTimers();
     
@@ -58,6 +58,46 @@ describe('game tests', () => {
     expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(1);
     expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
   });
+
+  test('add player', () => {
+    game.addPlayer(p2);
+    expect(game.players.length).toBe(1);
+    
+    // can't re-add same player
+    game.addPlayer(p2);
+    expect(game.players.length).toBe(1);
+    
+    game.addPlayer(p3);
+    expect(game.players.length).toBe(2);
+    
+    game.addPlayer(p4);
+    expect(game.players.length).toBe(3);
+
+    expect(game.players).toEqual([p2,p3,p4]);
+  });
+
+  test('add player - game started', () => {
+    game.addPlayer(p2);
+    expect(game.players.length).toBe(1);
+
+    game.start();
+
+    game.addPlayer(p3);
+    expect(game.players.length).toBe(1);
+  });
+
+  test('remove player', () => {
+    game.addPlayer(p2);
+    game.addPlayer(p3);
+    game.addPlayer(p4);
+
+    expect(game.players.length).toBe(3);
+
+    game.removePlayer(p3);
+
+    expect(game.players.length).toBe(2);
+    expect(game.players).toEqual([p2,p4])
+  })
 
   test('keyboard controls', () => {
     game.start();
@@ -277,5 +317,38 @@ describe('game tests', () => {
 
     expect(game.commandQueue.length).toBe(0);
     expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(2);
-  })
+  });
+
+  test('power ups - adds to command queue', () => {
+    game.addPlayer(p2);
+    game.addPlayer(p3);
+    game.addPlayer(p4);
+    game.removePlayer(p3);
+    expect(game.players).toEqual([p2,p4])
+
+    game.start();
+
+    game.sendCommandQueue = jest.fn().mockImplementation(() => {});
+
+    game.command(CONTROLS.PLAYER3);
+
+    expect(game.commandQueue).toEqual([COMMAND_QUEUE_MAP.POWER_UP, p4])
+  });
+
+  test('power ups - sends command queue', () => {
+    game.addPlayer(p2);
+    game.addPlayer(p3);
+
+    expect(game.players.length).toBe(2);
+
+    game.start();
+
+    game.command(CONTROLS.PLAYER2);
+
+    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+
+    game.command(CONTROLS.PLAYER4);
+    // should not send if player not found
+    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+  });
 });
