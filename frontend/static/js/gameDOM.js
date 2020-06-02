@@ -5,6 +5,10 @@ const {
   getNewPlayer,
   getNewPlayerDOM,
 } = require('frontend/helpers/clientUtils');
+const {
+  MAX_POWER_UPS,
+  POWER_UPS,
+} = require('frontend/helpers/clientConstants');
 
 /**
  * Represents a client-side DOM manager
@@ -30,11 +34,16 @@ class GameDOM {
     this.levelSelector = selectors.levelSelector;
     this.linesSelector = selectors.linesSelector;
     this.playerSelector = selectors.playerSelector;
+    this.powerUpSelectors = selectors.powerUpSelectors;
+    this.powerUps = [];
     this.players = [];
+    this.powerUps = [];
     this.subscriptions = [
       subscribe('addPlayer', this.addPlayer.bind(this)),
       subscribe('removePlayer', this.removePlayer.bind(this)),
       subscribe('updateScore', this.updateScoreboard.bind(this)),
+      subscribe('addPowerUp', this.addPowerUp.bind(this)),
+      subscribe('usePowerUp', this.usePowerUp.bind(this)),
     ];
   }
 
@@ -107,6 +116,34 @@ class GameDOM {
     if('score' in data) this.scoreSelector.innerText = data.score;
     if('level' in data) this.levelSelector.innerText = data.level;
     if('lines' in data) this.linesSelector.innerText = data.lines;
+  }
+
+  /**
+   * Adds a power up to the list, and sets the class on the DOM
+   * @param {number} powerUp - power up id
+   */
+  addPowerUp(powerUp) {
+    if(POWER_UPS.has(powerUp) && this.powerUps.length < MAX_POWER_UPS) {
+      const nextIdx = this.powerUps.length;
+      this.powerUps.push(powerUp)
+      this.powerUpSelectors[nextIdx].classList.add(`powerUp${powerUp}`)
+    }
+  }
+
+  /**
+   * Removes the first power up from the list. Updates all classes.
+   */
+  usePowerUp() {
+    let i = 0;
+    while(i < this.powerUps.length - 1) {
+      const curr = this.powerUps[i]; 
+      const next = this.powerUps[i+1];
+      this.powerUpSelectors[i].classList.replace(`powerUp${curr}`, `powerUp${next}`);
+      i++;
+    }
+    const curr = this.powerUps[i];
+    curr && this.powerUpSelectors[i].classList.remove(`powerUp${curr}`);
+    this.powerUps.shift();
   }
 
   /**
