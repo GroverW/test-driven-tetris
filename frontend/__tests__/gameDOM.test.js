@@ -3,7 +3,7 @@ const ClientGame = require('frontend/static/js/clientGame');
 const { Piece } = require('common/js/piece');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
-const { CONTROLS, PIECE_TYPES } = require('frontend/helpers/clientConstants');
+const { CONTROLS, PIECE_TYPES, POWER_UP_TYPES } = require('frontend/helpers/clientConstants');
 const { 
   getMockDOMSelector,
   getMockCtx,
@@ -36,6 +36,7 @@ describe('game DOM tests', () => {
       levelSelector: getMockDOMSelector(),
       linesSelector: getMockDOMSelector(),
       playerSelector: getMockDOMSelector(),
+      powerUpSelectors: [getMockDOMSelector(), getMockDOMSelector()],
     }
 
     gameDOM = new GameDOM(selectors);
@@ -176,5 +177,45 @@ describe('game DOM tests', () => {
     publish('clearLines', 4);
 
     expect(gameDOM.levelSelector.innerText).toBe(2);
-  })
+  });
+
+  test('power ups - add power up', () => {
+    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+    
+    expect(gameDOM.powerUps.length).toBe(1);
+
+    publish('addPowerUp', -5);
+
+    expect(gameDOM.powerUps.length).toBe(1);
+
+    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+    
+    expect(gameDOM.powerUps.length).toBe(2);
+
+    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+
+    expect(gameDOM.powerUps.length).toBe(2);
+  });
+
+  test('power ups - use power up', () => {
+    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+    publish('addPowerUp', POWER_UP_TYPES.SCRAMBLE_BOARD);
+
+    const id1 = POWER_UP_TYPES.SWAP_LINES;
+    const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
+    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id1}`)).toBe(true);
+    expect(gameDOM.powerUpSelectors[1].classList.contains(`powerUp${id2}`)).toBe(true);
+
+    publish('usePowerUp');
+
+    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id2}`)).toBe(true);
+    expect(gameDOM.powerUpSelectors[1].classList.contains(`powerUp${id2}`)).toBe(false);
+
+    publish('usePowerUp');
+
+    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id2}`)).toBe(false);
+
+    expect(gameDOM.powerUpSelectors[0].classList.classes.length).toBe(0);
+    expect(gameDOM.powerUpSelectors[1].classList.classes.length).toBe(0);
+  });
 });
