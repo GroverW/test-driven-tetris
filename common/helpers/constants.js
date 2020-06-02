@@ -1,3 +1,14 @@
+const GAME_TYPES = {
+  MULTI: 'Multiplayer',
+  SINGLE: 'Single Player',
+};
+const MAX_PLAYERS = {
+  [GAME_TYPES.MULTI]: 4,
+  [GAME_TYPES.SINGLE]: 1,
+};
+
+const PLAYERS = new Array(MAX_PLAYERS[GAME_TYPES.MULTI]).fill(null).map((v,i) => `PLAYER${i+1}`);
+
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 const LINES_PER_LEVEL = 10;
@@ -189,6 +200,9 @@ const WALL_KICK_TESTS_I = {
 };
 
 module.exports = {
+  GAME_TYPES,
+  MAX_PLAYERS,
+  PLAYERS,
   BOARD_WIDTH,
   BOARD_HEIGHT,
   LINES_PER_LEVEL,
