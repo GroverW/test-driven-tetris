@@ -1,7 +1,7 @@
 const { BOARD_WIDTH, BOARD_HEIGHT } = require('./constants');
-const randomize = pieces => {
-  let start = pieces.length - 1;
-  let randomized = [...pieces];
+const randomize = arr => {
+  let start = arr.length - 1;
+  let randomized = [...arr];
 
   while (start > 0) {
     const swapWith = Math.floor(Math.random() * (start + 1));
