@@ -27,9 +27,9 @@ class Board {
     this.piece = this.nextPiece
       ? this.nextPiece
       : new Piece(this.pieceList.getNextPiece());
-    
+
     // Game Over condition. If a new piece cannot be set because it's blocked
-    if(!this.validMove(0,0)) {
+    if (!this.validMove(0, 0)) {
       this.pubSub.publish("gameOver", {
         id: this.playerId,
         board: this.grid
@@ -51,9 +51,9 @@ class Board {
 
     if (validMove) {
       this.piece.move(x, y);
-      
-      if(y > 0) this.pubSub.publish('lowerPiece', y * multiplier)
-    } else if(y > 0 && multiplier !== POINTS.DOWN) {
+
+      if (y > 0) this.pubSub.publish('lowerPiece', y * multiplier)
+    } else if (y > 0 && multiplier !== POINTS.DOWN) {
       this.drop();
     }
 
@@ -129,7 +129,7 @@ class Board {
    */
   rotatePiece(direction) {
     // determines which set of tests to use based on type of piece
-    const lookup = this.piece.type === 1 
+    const lookup = this.piece.type === 1
       ? WALL_KICK_TESTS_I
       : WALL_KICK_TESTS;
 
@@ -137,8 +137,8 @@ class Board {
     this.piece.update(direction);
 
     // runs tests for current piece to determine if a valid rotation can be made
-    for(let [xChange, yChange] of tests) {
-      if(this.validMove(xChange, yChange)) {
+    for (let [xChange, yChange] of tests) {
+      if (this.validMove(xChange, yChange)) {
         const diff = (xChange !== 0 || yChange !== 0);
         // moves piece if a valid location could be found for it
         diff && this.movePiece(xChange, yChange, 0);
@@ -171,7 +171,7 @@ class Board {
     let numCleared = 0;
 
     this.grid.forEach((row, rowInd) => {
-      if(row.every(cell => cell > 0)) {
+      if (row.every(cell => cell > 0)) {
         this.grid.splice(rowInd, 1);
         this.grid.unshift(Array(BOARD_WIDTH).fill(0));
         numCleared++;
@@ -181,6 +181,62 @@ class Board {
     numCleared && this.pubSub.publish('clearLines', numCleared);
 
     return numCleared;
+  }
+
+  /**
+   * Replaces current grid with new one. Moves current piece if too close to new grid.
+   * @param {array} newGrid - new grid to replace current grid
+   */
+  replaceBoard(newGrid) {
+    const [yStart, yEnd, xStart, xEnd] = this.getPieceBounds();
+
+    let maxHeight = BOARD_HEIGHT;
+
+    // check for first space below piece that is not empty
+    for (let row = 0; row < BOARD_HEIGHT; row++) {
+      for (let col = xStart; col <= xEnd; col++) {
+        if (newGrid[row][col] > 0) {
+          maxHeight = Math.min(maxHeight, row);
+        }
+      }
+    }
+
+    const heightDiff = maxHeight - yEnd;
+    
+    // try to move piece at max 5 spaces from maxHeight if not already
+    if (heightDiff < 5) {
+      const yMove = Math.max(heightDiff - 5, -yStart);
+      this.movePiece(0, yMove, 0)
+    }
+
+    this.grid = newGrid;
+  }
+
+  /**
+   * Gets the minimum and maximum x and y bounds of the current piece
+   * @returns {array} - [yStart, yEnd, xStart, xEnd]
+   */
+  getPieceBounds() {
+    let yMin = BOARD_HEIGHT;
+    let yMax = 0;
+    let xMin = BOARD_WIDTH;
+    let xMax = 0;
+
+    for (let row = 0; row < this.piece.grid.length; row++) {
+      for (let col = 0; col < this.piece.grid[0].length; col++) {
+        const yPosition = this.piece.y + row;
+        const xPosition = this.piece.x + col;
+
+        if (this.piece.grid[row][col] !== 0) {
+          yMin = Math.min(yMin, yPosition);
+          yMax = Math.max(yMax, yPosition);
+          xMin = Math.min(xMin, xPosition);
+          xMax = Math.max(xMax, xPosition);
+        }
+      }
+    }
+
+    return [yMin, yMax, xMin, xMax];
   }
 
   /**
