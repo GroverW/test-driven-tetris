@@ -3,6 +3,7 @@ const ClientBoard = require('./clientBoard');
 const {
   CONTROLS,
   COMMAND_QUEUE_MAP,
+  POWER_UPS,
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
@@ -40,7 +41,7 @@ class ClientGame extends Game {
    * Client-side implentation of start method.
    */
   start() {
-    if(super.start()) {
+    if (super.start()) {
       this.animate();
 
       publish('draw', {
@@ -48,7 +49,7 @@ class ClientGame extends Game {
         piece: this.board.piece,
         nextPiece: this.board.nextPiece,
       });
-  
+
       publish('updateScore', {
         score: this.score,
         level: this.level,
@@ -62,7 +63,7 @@ class ClientGame extends Game {
    * @param {number} id - player id
    */
   addPlayer(id) {
-    if(this.gameStatus || this.players.includes(id)) return;
+    if (this.gameStatus || this.players.includes(id)) return;
 
     this.players.push(id);
   }
@@ -88,17 +89,17 @@ class ClientGame extends Game {
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
-      [CONTROLS.PLAYER1]: () => this.usePowerUp(CONTROLS.PLAYER1),
-      [CONTROLS.PLAYER2]: () => this.usePowerUp(CONTROLS.PLAYER2),
-      [CONTROLS.PLAYER3]: () => this.usePowerUp(CONTROLS.PLAYER3),
-      [CONTROLS.PLAYER4]: () => this.usePowerUp(CONTROLS.PLAYER4),
+      [CONTROLS.PLAYER1]: () => this.usePowerUp(key),
+      [CONTROLS.PLAYER2]: () => this.usePowerUp(key),
+      [CONTROLS.PLAYER3]: () => this.usePowerUp(key),
+      [CONTROLS.PLAYER4]: () => this.usePowerUp(key),
     }
 
     this.addLockDelay(key);
     this.resetAutoDown(key);
 
     if ((key in commands) && this.gameStatus) {
-      this.addToCommandQueue(key);
+      if (!POWER_UPS.has(key)) this.addToCommandQueue(key);
       commands[key]();
     }
 
@@ -120,9 +121,9 @@ class ClientGame extends Game {
       CONTROLS.DOWN,
     ]);
 
-    if (!toggleCommands.has(key) && upDown === 'down')    this.command(key);
-    else if (upDown === 'down')                           this.toggledKey = key;
-    else if (this.toggledKey === key && upDown === 'up')  this.toggledKey = false;
+    if (!toggleCommands.has(key) && upDown === 'down') this.command(key);
+    else if (upDown === 'down') this.toggledKey = key;
+    else if (this.toggledKey === key && upDown === 'up') this.toggledKey = false;
   }
 
   /**
@@ -137,7 +138,7 @@ class ClientGame extends Game {
       CONTROLS.ROTATE_RIGHT,
     ])
 
-    if(validKeys.has(key)) {
+    if (validKeys.has(key)) {
       const INCREMENT = this.getLockDelayIncrement();
       this.lockDelay = Math.min(INCREMENT * 4, this.lockDelay + INCREMENT);
     }
@@ -159,17 +160,16 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   resetAutoDown(key) {
-    if(key === CONTROLS.DOWN) this.interruptAutoDown = true;
+    if (key === CONTROLS.DOWN) this.interruptAutoDown = true;
   }
 
   /**
    * Adds command to command queue.
    * @param {number} key - Keypress identifier
    */
-  addToCommandQueue(key, option=false) {
+  addToCommandQueue(key) {
     if (key in COMMAND_QUEUE_MAP) {
       this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
-      if(option) this.commandQueue.push(option);
     }
   }
 
@@ -184,6 +184,10 @@ class ClientGame extends Game {
     this.commandQueue = [];
   }
 
+  /**
+   * Maps keypress id to player id and sends command queue
+   * @param {number} player - keypress id
+   */
   usePowerUp(player) {
     const playerIds = {
       [CONTROLS.PLAYER1]: this.playerId,
@@ -192,8 +196,10 @@ class ClientGame extends Game {
       [CONTROLS.PLAYER4]: this.players[2],
     }
 
-    if(playerIds[player]) {
-      this.addToCommandQueue(COMMAND_QUEUE_MAP.POWER_UP, playerIds[player]);
+    const id = playerIds[player];
+
+    if (id) {
+      this.addToCommandQueue(CONTROLS[`PLAYER${id}`]);
       this.sendCommandQueue();
     }
   }
@@ -224,10 +230,10 @@ class ClientGame extends Game {
     })
   }
 
-/**
- * Ends the current game.
- * @param {number} id - id of player whose game is over
- */
+  /**
+   * Ends the current game.
+   * @param {number} id - id of player whose game is over
+   */
   gameOver({ id }) {
     if (id === this.playerId) {
       this.unsubscribe();
@@ -252,11 +258,11 @@ class ClientGame extends Game {
     // calculate elapsed time for auto-movement and toggled movement
     this.time.elapsed = currTime - this.time.start;
     this.moveTime.elapsed = currTime - this.moveTime.start;
-    
-    const validNextMove = this.board.validMove(0,1);
+
+    const validNextMove = this.board.validMove(0, 1);
 
     // resets auto-movement time if interrupted
-    if(this.interruptAutoDown && validNextMove) {
+    if (this.interruptAutoDown && validNextMove) {
       this.time.start = currTime;
       this.interruptAutoDown = false;
     }
@@ -270,7 +276,7 @@ class ClientGame extends Game {
 
     // executes movement of toggled key
     if (this.toggledKey) {
-      if(this.moveTime.elapsed > MOVE_SPEED[this.moveDelayIdx]) {
+      if (this.moveTime.elapsed > MOVE_SPEED[this.moveDelayIdx]) {
         this.moveTime.start = currTime;
         this.command(this.toggledKey);
         this.moveDelayIdx = Math.min(this.moveDelayIdx + 1, MOVE_SPEED.length - 1);
