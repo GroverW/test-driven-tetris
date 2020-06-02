@@ -4,7 +4,7 @@ const {
   PLAYER_KEYS,
   CONTROLS,
   COMMAND_QUEUE_MAP,
-  POWER_UPS,
+  POWER_UP_KEY_CODES,
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
@@ -34,7 +34,10 @@ class ClientGame extends Game {
     this.interruptAutoDown = false;
     this.commandQueue = [];
     this.subscriptions.push(
-      subscribe('boardChange', this.sendCommandQueue.bind(this))
+      subscribe('boardChange', this.sendCommandQueue.bind(this)),
+      subscribe('updatePlayerBoard', this.replaceBoard.bind(this)),
+      subscribe('addPlayer', this.addPlayer.bind(this)),
+      subscribe('removePlayer', this.removePlayer.bind(this)),
     );
   }
 
@@ -78,6 +81,16 @@ class ClientGame extends Game {
   }
 
   /**
+   * Replaces the current board with a new one
+   * @param {object} data - id of player, board to update
+   * @param {number} data.id - id of player
+   * @param {array} data.board - board to update
+   */
+  replaceBoard(data) {
+    if(data.id === this.playerId) this.board.replaceBoard(data.board);
+  }
+
+  /**
    * Executes movement command.
    * @param {number} key - Keypress identifier
    */
@@ -99,7 +112,7 @@ class ClientGame extends Game {
     this.resetAutoDown(key);
 
     if ((key in commands) && this.gameStatus) {
-      if (!POWER_UPS.has(key)) this.addToCommandQueue(key);
+      if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
       commands[key]();
     }
 
