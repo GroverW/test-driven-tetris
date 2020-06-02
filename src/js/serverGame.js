@@ -1,5 +1,6 @@
 const Game = require('common/js/game');
 const ServerBoard = require('./serverBoard');
+const { PLAYERS, POWER_UPS, MAX_POWER_UPS, POWER_UP_LIST } = require('backend/helpers/serverConstants');
 
 
 /**
@@ -15,6 +16,7 @@ class ServerGame extends Game {
   constructor(pubSub, playerId) {
     super(playerId, pubSub, ServerBoard);
     this.pubSub = pubSub;
+    this.powerUps = [];
   }
 
   /**
@@ -22,6 +24,8 @@ class ServerGame extends Game {
    * @param {string} action - command to execute
    */
   command(action) {
+    const playerCommands = PLAYERS
+      .reduce((a, p, i) => a = { ...a, [p]: () => this.usePowerUp(i + 1) }, {});
     const commands = {
       LEFT: () => this.board.movePiece(-1, 0),
       RIGHT: () => this.board.movePiece(1, 0),
@@ -30,6 +34,7 @@ class ServerGame extends Game {
       ROTATE_LEFT: () => this.board.rotatePiece(-1),
       ROTATE_RIGHT: () => this.board.rotatePiece(1),
       HARD_DROP: () => this.board.hardDrop(),
+      ...playerCommands
     }
 
     if ((action in commands) && this.gameStatus) commands[action]();
@@ -46,6 +51,47 @@ class ServerGame extends Game {
       id: this.playerId,
       board: this.board.grid,
     });
+  }
+
+  /**
+   * Adds a power up to the current power up list
+   * @param {number} powerUp - power up id
+   */
+  addPowerUp(powerUp) {
+    if (POWER_UPS.has(powerUp) && this.powerUps.length < MAX_POWER_UPS) {
+      this.powerUps.push(powerUp);
+    }
+  }
+
+  /**
+   * Removes the first power up and publishes a message to execute it
+   * against the specified player
+   * @param {string} id - player id
+   */
+  usePowerUp(id) {
+    if (this.powerUps.length) {
+      const powerUp = this.powerUps.shift();
+      this.pubSub.publish('usePowerUp', { id, powerUp });
+    }
+  }
+
+  /**
+   * Adds random power up from power up list
+   * @returns {number} - power up id
+   */
+  getRandomPowerUp() {
+    const idx = Math.floor(Math.random() * POWER_UP_LIST.length);
+    return POWER_UP_LIST[idx];
+  }
+
+  /**
+   * Updates score and lines remaining based on number of lines cleared
+   * Has chance to add random power up
+   * @param {number} lines - number of lines cleared
+   */
+  clearLines(lines) {
+    super.clearLines(lines);
+    lines && this.addPowerUp(this.getRandomPowerUp());
   }
 
   /**
