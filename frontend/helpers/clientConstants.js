@@ -2,6 +2,15 @@ const COMMON_CONSTANTS = require('common/helpers/constants');
 
 const CELL_SIZE = 30;
 
+// map players to keypress ids
+const PLAYER_KEYS = COMMON_CONSTANTS.PLAYERS.map((p,i) => 49 + i);
+// map players to object of [PLAYER]: [keypress]
+const PLAYER_CONTROLS = COMMON_CONSTANTS.PLAYERS
+  .reduce((a, p, i) => a = { ...a, [p]: 49 + i }, {});
+// map player_keys to object of [keypress]: [PLAYER]
+const PLAYER_CONTROLS_COMMAND_QUEUE = PLAYER_KEYS
+  .reduce((a, p, i) => a = { ...a, [p]: `PLAYER${i + 1}` });
+
 const CONTROLS = {
   LEFT: 37,
   RIGHT: 39,
@@ -10,11 +19,10 @@ const CONTROLS = {
   ROTATE_LEFT: 65,
   ROTATE_RIGHT: 83,
   HARD_DROP: 32,
-  PLAYER1: 49,
-  PLAYER2: 50,
-  PLAYER3: 51,
-  PLAYER4: 52,
+  ...PLAYER_CONTROLS,
 };
+
+
 
 const COMMAND_QUEUE_MAP = {
   [CONTROLS.LEFT]: "LEFT",
@@ -24,17 +32,11 @@ const COMMAND_QUEUE_MAP = {
   [CONTROLS.ROTATE_LEFT]: "ROTATE_LEFT",
   [CONTROLS.ROTATE_RIGHT]: "ROTATE_RIGHT",
   [CONTROLS.HARD_DROP]: "HARD_DROP",
-  [CONTROLS.PLAYER1]: "PLAYER1",
-  [CONTROLS.PLAYER2]: "PLAYER2",
-  [CONTROLS.PLAYER3]: "PLAYER3",
-  [CONTROLS.PLAYER4]: "PLAYER4",
+  ...PLAYER_CONTROLS_COMMAND_QUEUE,
 };
 
 const POWER_UPS = new Set([
-  CONTROLS.PLAYER1,
-  CONTROLS.PLAYER2,
-  CONTROLS.PLAYER3,
-  CONTROLS.PLAYER4
+  ...Object.values(PLAYER_CONTROLS)
 ]);
 
 const MOVE_SPEED = [0, 90, 50]; // time in ms
@@ -77,6 +79,7 @@ const CELL_COLORS = {
 module.exports = {
   ...COMMON_CONSTANTS,
   CELL_SIZE,
+  PLAYER_KEYS,
   CONTROLS,
   COMMAND_QUEUE_MAP,
   POWER_UPS,
