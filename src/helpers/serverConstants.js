@@ -16,7 +16,11 @@ const CONTROLS = new Set([
   'AUTO_DOWN',
   'ROTATE_LEFT',
   'ROTATE_RIGHT',
-  'HARD_DROP'
+  'HARD_DROP',
+  'PLAYER_1',
+  'PLAYER_2',
+  'PLAYER_3',
+  'PLAYER_4',
 ]);
 
 const RANKINGS = {
