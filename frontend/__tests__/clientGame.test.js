@@ -332,7 +332,9 @@ describe('game tests', () => {
 
     game.command(CONTROLS.PLAYER3);
 
-    expect(game.commandQueue).toEqual([COMMAND_QUEUE_MAP.POWER_UP, p4])
+    // command queue should contain actual player id, whereas CONTROLS.PLAYER3
+    // represents the player's board position relative to the one using the command
+    expect(game.commandQueue).toEqual(["PLAYER4"])
   });
 
   test('power ups - sends command queue', () => {
