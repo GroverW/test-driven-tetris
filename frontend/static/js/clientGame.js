@@ -22,6 +22,7 @@ class ClientGame extends Game {
    */
   constructor(playerId) {
     super(playerId, { publish, subscribe }, ClientBoard);
+    this.players = [];
     this.time = { start: 0, elapsed: 0 };
     this.animationId;
     this.toggledKey = false;
@@ -57,6 +58,24 @@ class ClientGame extends Game {
   }
 
   /**
+   * Adds an additional player to the game
+   * @param {number} id - player id
+   */
+  addPlayer(id) {
+    if(this.gameStatus || this.players.includes(id)) return;
+
+    this.players.push(id);
+  }
+
+  /**
+   * Removes additional player from the game
+   * @param {numbere} id - player id
+   */
+  removePlayer(id) {
+    this.players = this.players.filter(pId => pId !== id);
+  }
+
+  /**
    * Executes movement command.
    * @param {number} key - Keypress identifier
    */
@@ -69,6 +88,10 @@ class ClientGame extends Game {
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
+      [CONTROLS.PLAYER1]: () => this.usePowerUp(CONTROLS.PLAYER1),
+      [CONTROLS.PLAYER2]: () => this.usePowerUp(CONTROLS.PLAYER2),
+      [CONTROLS.PLAYER3]: () => this.usePowerUp(CONTROLS.PLAYER3),
+      [CONTROLS.PLAYER4]: () => this.usePowerUp(CONTROLS.PLAYER4),
     }
 
     this.addLockDelay(key);
@@ -143,9 +166,10 @@ class ClientGame extends Game {
    * Adds command to command queue.
    * @param {number} key - Keypress identifier
    */
-  addToCommandQueue(key) {
+  addToCommandQueue(key, option=false) {
     if (key in COMMAND_QUEUE_MAP) {
       this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
+      if(option) this.commandQueue.push(option);
     }
   }
 
@@ -158,6 +182,20 @@ class ClientGame extends Game {
       data: this.commandQueue
     });
     this.commandQueue = [];
+  }
+
+  usePowerUp(player) {
+    const playerIds = {
+      [CONTROLS.PLAYER1]: this.playerId,
+      [CONTROLS.PLAYER2]: this.players[0],
+      [CONTROLS.PLAYER3]: this.players[1],
+      [CONTROLS.PLAYER4]: this.players[2],
+    }
+
+    if(playerIds[player]) {
+      this.addToCommandQueue(COMMAND_QUEUE_MAP.POWER_UP, playerIds[player]);
+      this.sendCommandQueue();
+    }
   }
 
   /**
