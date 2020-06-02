@@ -1,7 +1,7 @@
 const ServerGame = require('backend/js/serverGame');
-const { Piece } = require ('common/js/piece');
-const { PIECE_TYPES } = require('backend/helpers/serverConstants');
-const { 
+const { Piece } = require('common/js/piece');
+const { PIECE_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/helpers/serverConstants');
+const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
@@ -34,7 +34,7 @@ describe('game tests', () => {
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
 
     // stacking I pieces on top of each other until they reach the top
-    for(let i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       game.board.nextPiece = new Piece(PIECE_TYPES.I);
       game.command('ROTATE_LEFT');
       game.command('HARD_DROP');
@@ -54,7 +54,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
-    
+
     expect(game.score).toBe(0);
 
     const COMMANDS = [
@@ -87,7 +87,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('clearLines2');
     game.board.piece = p3;
     game.board.nextPiece = p1;
-    
+
     expect(game.score).toBe(0);
 
     const COMMANDS1 = [
@@ -97,8 +97,8 @@ describe('game tests', () => {
       'LEFT',
       'LEFT',
       'HARD_DROP',
-    ]
-    
+    ];
+
     game.executeCommandQueue(COMMANDS1);
 
     // 1 publish to updateBoard for adding piece to board
@@ -108,13 +108,99 @@ describe('game tests', () => {
       'ROTATE_LEFT',
       'AUTO_DOWN',
       'HARD_DROP',
-    ]
+    ];
 
     game.executeCommandQueue(COMMANDS2)
 
     // 1 publish for adding piece to board
     // 1 publish for clearing lines
     expect(publishSpy).toHaveBeenCalledTimes(3);
-
-  })
   });
+
+  describe('power ups', () => {
+    test('add power up', () => {
+      game.addPowerUp(POWER_UP_TYPES.SCRAMBLE_BOARD);
+
+      expect(game.powerUps.length).toBe(1);
+
+      game.addPowerUp('NA');
+
+      expect(game.powerUps.length).toBe(1);
+    });
+
+    test('add power up - max power ups', () => {
+      game.addPowerUp(POWER_UP_TYPES.SCRAMBLE_BOARD);
+
+      expect(game.powerUps.length).toBe(1);
+
+      for (let i = 0; i < 20; i++) {
+        game.addPowerUp(POWER_UP_TYPES.SCRAMBLE_BOARD);
+      }
+
+      expect(game.powerUps.length).toBe(Math.min(MAX_POWER_UPS, 21));
+    });
+
+    test('randomly add power ups from clearing lines', () => {
+      Math.random = jest.fn().mockReturnValue(0);
+      const addPowerUpSpy = jest.spyOn(game, 'addPowerUp');
+      game.start();
+      
+      // duplicate scoring points for tetris
+      game.board.grid = getTestBoard('clearLines2');
+      game.board.piece = new Piece(PIECE_TYPES.T);
+      game.board.nextPiece = new Piece(PIECE_TYPES.I);
+
+      const COMMANDS1 = [
+        'ROTATE_LEFT',
+        'ROTATE_LEFT',
+        'LEFT',
+        'LEFT',
+        'HARD_DROP',
+        'ROTATE_LEFT',
+        'HARD_DROP',
+      ]
+
+      game.executeCommandQueue(COMMANDS1);
+      expect(addPowerUpSpy).toHaveBeenCalledTimes(1);
+      expect(game.powerUps.length).toBe(0);
+
+      Math.random = jest.fn().mockReturnValue(.9);
+
+      game.board.grid = getTestBoard('clearLines2');
+      game.board.piece = new Piece(PIECE_TYPES.T);
+      game.board.nextPiece = new Piece(PIECE_TYPES.I);
+
+      const COMMANDS2 = [
+        'ROTATE_LEFT',
+        'ROTATE_LEFT',
+        'LEFT',
+        'LEFT',
+        'HARD_DROP',
+        'ROTATE_LEFT',
+        'HARD_DROP',
+      ]
+
+      game.executeCommandQueue(COMMANDS2);
+      expect(addPowerUpSpy).toHaveBeenCalledTimes(2);
+      expect(game.powerUps.length).toBe(1);
+    });
+
+    test('command queue - publish power ups', () => {
+      const publishSpy = jest.fn();
+      game.pubSub.subscribe('usePowerUp', publishSpy);
+
+      game.start();
+
+      game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
+
+      const COMMANDS = [
+        'ROTATE_LEFT',
+        'AUTO_DOWN',
+        'PLAYER1',
+      ]
+      game.executeCommandQueue(COMMANDS);
+
+      expect(publishSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+});
