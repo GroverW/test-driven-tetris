@@ -1,6 +1,7 @@
 const Game = require('common/js/game');
 const ClientBoard = require('./clientBoard');
 const {
+  PLAYER_KEYS,
   CONTROLS,
   COMMAND_QUEUE_MAP,
   POWER_UPS,
@@ -81,6 +82,8 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   command(key) {
+    const playerCommands = PLAYER_KEYS.reduce((a, p) =>
+      a = { ...a, [p]: () => this.usePowerUp(key) }, {});
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1, 0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1, 0),
@@ -89,10 +92,7 @@ class ClientGame extends Game {
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
-      [CONTROLS.PLAYER1]: () => this.usePowerUp(key),
-      [CONTROLS.PLAYER2]: () => this.usePowerUp(key),
-      [CONTROLS.PLAYER3]: () => this.usePowerUp(key),
-      [CONTROLS.PLAYER4]: () => this.usePowerUp(key),
+      ...playerCommands,
     }
 
     this.addLockDelay(key);
