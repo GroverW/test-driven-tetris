@@ -35,6 +35,10 @@ const getMockDOMSelector = () => ({
     add(className) {
       this.classes.push(className)
     },
+    remove(className) {
+      const idx = this.classes.indexOf(className);
+      if(idx >= 0) this.classes.splice(idx, 1);
+    },
     replace(class1, class2) {
       const idx = this.classes.indexOf(class1);
       if (idx >= 0) this.classes[idx] = class2;
