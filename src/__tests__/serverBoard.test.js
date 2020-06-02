@@ -12,7 +12,7 @@ describe('server - board tests', () => {
     gameBoard = new ServerBoard(pubSub());
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
-  })
+  });
 
   test('requests new pieces when almost out', () => {
     gameBoard.pubSub.publish = jest.fn();
@@ -25,7 +25,7 @@ describe('server - board tests', () => {
 
     expect(gameBoard.pubSub.publish).toHaveBeenCalled();
     expect(gameBoard.pieceList.almostEmpty()).toBe(true);
-  })
+  });
 
   test('publish board updates', () => {
     const publishSpy = jest.spyOn(gameBoard, 'publishBoardUpdate');
