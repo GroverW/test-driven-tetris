@@ -5,7 +5,7 @@ const Api = require('frontend/helpers/api');
 const serverPubSub = require('backend/helpers/pubSub');
 
 const { CONTROLS } = require('frontend/helpers/clientConstants');
-const { GAMES } = require("backend/helpers/serverConstants");
+const { GAMES, POWER_UP_TYPES } = require("backend/helpers/serverConstants");
 
 const { getMockCtx, getMockDOMSelector, pubSubMocks } = require("frontend/mockData/mocks");
 const { MockServerListener, MockClientListener } = require("common/mockData/mockWSListeners");
@@ -71,6 +71,7 @@ describe('websocket tests', () => {
 
     // no additional players
     expect(serverToClient.gameDOM.players.length).toBe(0);
+    expect(serverToClient.game.players.length).toBe(0);
     expect(sendAllSpy).toHaveBeenCalledTimes(0);
     expect(sendToSpy).toHaveBeenCalledTimes(0);
 
@@ -78,6 +79,7 @@ describe('websocket tests', () => {
 
     // one additional player
     expect(serverToClient.gameDOM.players.length).toBe(1);
+    expect(serverToClient.game.players.length).toBe(1);
     
     expect(sendAllSpy).toHaveBeenCalledTimes(1);
     // player joining should receive all other players in game
@@ -101,11 +103,13 @@ describe('websocket tests', () => {
 
     expect(serverToClient.gameDOM.players.length).toBe(1);
     expect(serverToClient.gameDOM.gameView.players.length).toBe(1);
+    expect(serverToClient.game.players.length).toBe(1);
 
     player2.leave();
 
     expect(serverToClient.gameDOM.players.length).toBe(0);
     expect(serverToClient.gameDOM.gameView.players.length).toBe(0);
+    expect(serverToClient.game.players.length).toBe(0);
   });
 
   test('game start - initiated by client', () => {
@@ -230,5 +234,38 @@ describe('websocket tests', () => {
     clientToServer.player.leave();
 
     expect(GAMES.has(clientToServer.gameServer.id)).toBe(false);
-  })
+  });
+
+  test('power up - server side updates client side board', () => {
+    let player3 = new Player(mockSend, serverPubSub());
+    clientToServer.gameServer.join(player2);
+    clientToServer.gameServer.join(player3);
+    
+    clientToServer.player.game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
+    
+    clientToServer.startGame();
+    
+    clientToServer.player.game.board.grid = getTestBoard('pattern1');
+    serverToClient.game.board.grid = getTestBoard('pattern1');
+    player2.game.board.grid = getTestBoard('pattern2');
+    
+    const serverBoardBefore = clientToServer.player.game.board.grid;
+    const clientBoardBefore = serverToClient.game.board.grid;
+    
+    expect(serverBoardBefore).toEqual(getTestBoard('pattern1'));
+    expect(clientBoardBefore).toEqual(getTestBoard('pattern1'));
+    
+    clientToServer.player.game.usePowerUp(player2.id);
+
+    const serverBoardAfter = clientToServer.player.game.board.grid;
+    const clientBoardAfter = serverToClient.game.board.grid;
+
+    expect(serverBoardAfter).toEqual(getTestBoard('empty'));
+    expect(clientBoardAfter).toEqual(getTestBoard('empty'));
+    expect(player2.game.board.grid).toEqual(getTestBoard('pattern1SwappedWith2'));
+  });
+
+  test('power up - power up is added to client when rewarded to server', () => {
+    Math.random = jest.fn().mockReturnValue(.9);
+  });
 });
