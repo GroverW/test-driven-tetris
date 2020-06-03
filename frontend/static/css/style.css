@@ -168,21 +168,21 @@ body {
 }
 
 .powerUps div {
-  width: 60px;
-  height: 60px;
+  width: 61px;
+  height: 61px;
   margin-right: 5px;
   border: 1px solid white;
 }
 
 .powerUp1 {
-  background: url(../img/PUSL.png)
+  background: url(../img/PUSL.png) no-repeat top left;
 }
 .powerUp2 {
-  background: url(../img/PUSB.png)
+  background: url(../img/PUSB.png) no-repeat top left;
 }
 .powerUp3 {
-  background: url(../img/PUSC.png)
+  background: url(../img/PUSC.png) no-repeat top left;
 }
 .powerUp4 {
-  background: url(../img/PUCB.png)
+  background: url(../img/PUCB.png) no-repeat top left;
 }
