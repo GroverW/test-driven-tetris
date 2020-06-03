@@ -22,6 +22,10 @@ const gameSelectors = {
   levelSelector: document.getElementById('game-level'),
   linesSelector: document.getElementById('game-lines'),
   playerSelector: document.getElementById('p1'),
+  powerUpSelectors: [
+    document.getElementById('pUp1'),
+    document.getElementById('pUp2')
+  ],
 };
 
 module.exports = {
