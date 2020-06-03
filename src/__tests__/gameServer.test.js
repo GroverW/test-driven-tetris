@@ -231,6 +231,20 @@ describe('game server tests', () => {
       expect(p2.game.board.pieceList.pieces).not.toEqual(p3.game.board.pieceList.pieces);
     });
 
+    test('game start - only one player in multiplayer game', () => {
+      mpGameServer.join(p1);
+      
+      mpGameServer.startGame(p1);
+
+      expect(mpGameServer.gameStarted).toBe(false);
+
+      mpGameServer.join(p2);
+
+      mpGameServer.startGame(p1);
+
+      expect(mpGameServer.gameStarted).toBe(true);
+    });
+
     test('game over', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
