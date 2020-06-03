@@ -11,7 +11,7 @@ const swapLines = (board1, board2) => {
   let newBoard1 = [], newBoard2 = [];
   const blankRow = new Array(board1[0].length).fill(0);
 
-  for(let i = board1.length - 4; i < board1.length; i++) {
+  for(let i = board1.length - 2; i < board1.length; i++) {
     if(board1[i].some(cell => cell > 0)) 
       // maps each non-empty cell to a neutral grey cell
       swapped.push(board1[i].map(cell => cell && PIECE_TYPES.N ));
