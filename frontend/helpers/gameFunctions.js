@@ -87,6 +87,9 @@ const connectToGame = gameId => {
       case 'updatePlayer':
         publish('updatePlayerBoard', data);
         break;
+      case 'addPowerUp':
+        publish('addPowerUp', data);
+        break;
       case 'addPieces':
         if(game) game.board.pieceList.addSet(data);
         break;
