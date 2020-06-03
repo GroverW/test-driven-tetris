@@ -161,3 +161,28 @@ body {
 #next-piece {
   border: 1px solid white;
 }
+
+.powerUps {
+  display: flex;
+  flex-direction: row;
+}
+
+.powerUps div {
+  width: 60px;
+  height: 60px;
+  margin-right: 5px;
+  border: 1px solid white;
+}
+
+.powerUp1 {
+  background: url(../img/PUSL.png)
+}
+.powerUp2 {
+  background: url(../img/PUSB.png)
+}
+.powerUp3 {
+  background: url(../img/PUSC.png)
+}
+.powerUp4 {
+  background: url(../img/PUCB.png)
+}
