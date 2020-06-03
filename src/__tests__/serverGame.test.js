@@ -1,6 +1,11 @@
 const ServerGame = require('backend/js/serverGame');
 const { Piece } = require('common/js/piece');
-const { PIECE_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/helpers/serverConstants');
+const {
+  GAME_TYPES,
+  PIECE_TYPES,
+  POWER_UP_TYPES,
+  MAX_POWER_UPS
+} = require('backend/helpers/serverConstants');
 const {
   TEST_BOARDS,
   getTestBoard,
@@ -15,7 +20,7 @@ describe('game tests', () => {
 
   beforeEach(() => {
     pubSubTest = pubSub();
-    game = new ServerGame(pubSubTest, 1);
+    game = new ServerGame(pubSubTest, 1, GAME_TYPES.MULTI);
     game.board.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
     p2 = new Piece(PIECE_TYPES.J);
@@ -158,7 +163,7 @@ describe('game tests', () => {
         'HARD_DROP',
         'ROTATE_LEFT',
         'HARD_DROP',
-      ]
+      ];
 
       game.executeCommandQueue(COMMANDS1);
       expect(addPowerUpSpy).toHaveBeenCalledTimes(1);
@@ -178,7 +183,7 @@ describe('game tests', () => {
         'HARD_DROP',
         'ROTATE_LEFT',
         'HARD_DROP',
-      ]
+      ];
 
       game.executeCommandQueue(COMMANDS2);
       expect(addPowerUpSpy).toHaveBeenCalledTimes(2);
