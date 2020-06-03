@@ -9,7 +9,7 @@ const PLAYER_CONTROLS = COMMON_CONSTANTS.PLAYERS
   .reduce((a, p, i) => a = { ...a, [p]: 49 + i }, {});
 // map player_keys to object of [keypress]: [PLAYER]
 const PLAYER_CONTROLS_COMMAND_QUEUE = PLAYER_KEYS
-  .reduce((a, p, i) => a = { ...a, [p]: `PLAYER${i + 1}` });
+  .reduce((a, p, i) => a = { ...a, [p]: `PLAYER${i + 1}` }, {});
 
 const CONTROLS = {
   LEFT: 37,
@@ -21,8 +21,6 @@ const CONTROLS = {
   HARD_DROP: 32,
   ...PLAYER_CONTROLS,
 };
-
-
 
 const COMMAND_QUEUE_MAP = {
   [CONTROLS.LEFT]: "LEFT",
@@ -74,6 +72,7 @@ const CELL_COLORS = {
   5: "#E6534E",
   6: "#E6A44E",
   7: "#4E6AE6",
+  8: "#AAAAAA",
 };
 
 module.exports = {
