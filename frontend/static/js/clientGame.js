@@ -208,12 +208,12 @@ class ClientGame extends Game {
       [CONTROLS.PLAYER3]: this.players[1],
       [CONTROLS.PLAYER4]: this.players[2],
     }
-
     const id = playerIds[player];
 
     if (id) {
       this.addToCommandQueue(CONTROLS[`PLAYER${id}`]);
       this.sendCommandQueue();
+      this.pubSub.publish('usePowerUp');
     }
   }
 
