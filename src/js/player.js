@@ -27,6 +27,10 @@ class Player {
     this.game.board.playerId = id;
   }
 
+  setGameType(type) {
+    this.game.gameType = type;
+  }
+
   /**
    * Publishes a message for the specified player to leave the gameServer
    */
