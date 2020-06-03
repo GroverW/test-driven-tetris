@@ -1,6 +1,12 @@
 const Game = require('common/js/game');
 const ServerBoard = require('./serverBoard');
-const { PLAYERS, POWER_UPS, MAX_POWER_UPS, POWER_UP_LIST } = require('backend/helpers/serverConstants');
+const {
+  GAME_TYPES,
+  PLAYERS,
+  POWER_UPS,
+  MAX_POWER_UPS,
+  POWER_UP_LIST
+} = require('backend/helpers/serverConstants');
 
 
 /**
@@ -13,8 +19,9 @@ class ServerGame extends Game {
    * @param {object} pubSub - a publish/subscribe object
    * @param {number} playerId - playd id
    */
-  constructor(pubSub, playerId) {
+  constructor(pubSub, playerId, gameType) {
     super(playerId, pubSub, ServerBoard);
+    this.gameType = gameType;
     this.pubSub = pubSub;
     this.powerUps = [];
   }
@@ -58,8 +65,13 @@ class ServerGame extends Game {
    * @param {number} powerUp - power up id
    */
   addPowerUp(powerUp) {
-    if (POWER_UPS.has(powerUp) && this.powerUps.length < MAX_POWER_UPS) {
+    if (
+      this.gameType === GAME_TYPES.MULTI &&
+      POWER_UPS.has(powerUp) && 
+      this.powerUps.length < MAX_POWER_UPS
+    ) {
       this.powerUps.push(powerUp);
+      this.pubSub.publish('addPowerUp', { id: this.playerId, powerUp, });
     }
   }
 
