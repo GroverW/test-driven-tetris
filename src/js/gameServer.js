@@ -75,6 +75,7 @@ class GameServer {
     this.players.add(player);
 
     player.setId(++this.nextPlayerId);
+    player.setGameType(this.gameType);
 
     this.addSubscriptions(player)
 
@@ -98,6 +99,7 @@ class GameServer {
       player.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
       player.pubSub.subscribe('getPieces', this.getPieces.bind(this)),
       player.pubSub.subscribe('updatePlayer', this.updatePlayer.bind(this)),
+      player.pubSub.subscribe('addPowerUp', this.addPowerUp.bind(this)),
       player.pubSub.subscribe('usePowerUp', this.executePowerUp.bind(this)),
     ]
   }
@@ -181,8 +183,11 @@ class GameServer {
   /**
    * Starts game
    * @param {object} player - Player requesting to start game
+   * @returns {boolean|undefined} - returns false if multiplayer game has less than 2 people
    */
   startGame(player) {
+    if(this.gameType === GAME_TYPES.MULTI && this.players.size < 2) return false;
+
     if (player && player.isHost) {
       this.gameStarted = true;
 
@@ -216,6 +221,20 @@ class GameServer {
     include
       ? this.sendAll(sendData)
       : this.sendAllExcept(this.getPlayerById(data.id), sendData)
+  }
+
+  /**
+   * Sends power up to client
+   * @param {object} data - id of player and power up
+   * @param {number} data.id - id of player
+   * @param {number} data.powerUp - id of power up
+   */
+  addPowerUp(data) {
+    const player = this.getPlayerById(data.id);
+    player && this.sendTo(player, {
+      type: 'addPowerUp',
+      data: data.powerUp
+    })
   }
 
   /**
