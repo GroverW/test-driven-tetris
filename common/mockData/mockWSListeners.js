@@ -55,6 +55,7 @@ class MockClientListener {
       ws.on('removePlayer', this.removePlayer.bind(this)),
       ws.on('startGame', this.startGame.bind(this)),
       ws.on('updatePlayer', this.updatePlayer.bind(this)),
+      ws.on('addPowerUp', this.addPowerUp.bind(this)),
       ws.on('addPieces', this.addPieces.bind(this)),
       ws.on('gameOver', this.gameOver.bind(this)),
     ];
@@ -78,6 +79,10 @@ class MockClientListener {
 
   updatePlayer(data) {
     publish('updatePlayerBoard', data);
+  }
+
+  addPowerUp(data) {
+    publish('addPowerUp', data);
   }
 
   addPieces(pieces) {
