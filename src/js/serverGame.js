@@ -7,6 +7,7 @@ const {
   MAX_POWER_UPS,
   POWER_UP_LIST
 } = require('backend/helpers/serverConstants');
+const { mapArrayToObj } = require('common/helpers/utils');
 
 
 /**
@@ -31,8 +32,6 @@ class ServerGame extends Game {
    * @param {string} action - command to execute
    */
   command(action) {
-    const playerCommands = PLAYERS
-      .reduce((a, p, i) => a = { ...a, [p]: () => this.usePowerUp(i + 1) }, {});
     const commands = {
       LEFT: () => this.board.movePiece(-1, 0),
       RIGHT: () => this.board.movePiece(1, 0),
@@ -41,7 +40,7 @@ class ServerGame extends Game {
       ROTATE_LEFT: () => this.board.rotatePiece(-1),
       ROTATE_RIGHT: () => this.board.rotatePiece(1),
       HARD_DROP: () => this.board.hardDrop(),
-      ...playerCommands
+      ...mapArrayToObj(PLAYERS, (p, i) => () => this.usePowerUp(i + 1))
     }
 
     if ((action in commands) && this.gameStatus) commands[action]();
