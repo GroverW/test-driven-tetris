@@ -29,11 +29,11 @@ class GameView {
    * @param {number} width - width of canvas, in cells
    * @param {number} height - height of canvas, in cells
    */
-  initCtx(ctx, cellSize, width=BOARD_WIDTH, height=BOARD_HEIGHT) {
+  initCtx(ctx, cellSize, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
     this.scaleBoardSize(ctx, cellSize, width, height);
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 3 / cellSize;
-    
+
     return ctx;
   }
 
@@ -60,11 +60,13 @@ class GameView {
    * @param {array} board - board grid
    */
   drawBoard(ctx, board) {
-    board.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
-      ctx.strokeRect(colIdx, rowIdx, 1, 1);
-      ctx.fillStyle = CELL_COLORS[cell];
-      ctx.fillRect(colIdx, rowIdx, 1, 1);
-    }))
+    board.forEach((row, rowIdx) =>
+      row.forEach((cell, colIdx) => {
+        ctx.strokeRect(colIdx, rowIdx, 1, 1);
+        ctx.fillStyle = CELL_COLORS[cell];
+        ctx.fillRect(colIdx, rowIdx, 1, 1);
+      })
+    );
   }
 
   /**
@@ -75,13 +77,15 @@ class GameView {
    * @param {number} yStart - y-coordinate to being drawing piece
    */
   drawPiece(ctx, piece, xStart, yStart) {
-    piece.grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
-      if(cell > 0) {
-        ctx.strokeRect(xStart + colIdx, yStart + rowIdx, 1, 1);
-        ctx.fillStyle = CELL_COLORS[cell];
-        ctx.fillRect(xStart + colIdx, yStart + rowIdx, 1, 1);
-      }
-    }))
+    piece.grid.forEach((row, rowIdx) =>
+      row.forEach((cell, colIdx) => {
+        if (cell > 0) {
+          ctx.strokeRect(xStart + colIdx, yStart + rowIdx, 1, 1);
+          ctx.fillStyle = CELL_COLORS[cell];
+          ctx.fillRect(xStart + colIdx, yStart + rowIdx, 1, 1);
+        }
+      })
+    );
   }
 
   /**
@@ -106,7 +110,7 @@ class GameView {
    * @param {number} width - specified width of board, in cells
    * @param {number} height - specified height of board, in cells
    */
-  scaleBoardSize(ctx, cellSize, width=BOARD_WIDTH, height=BOARD_HEIGHT) {
+  scaleBoardSize(ctx, cellSize, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
     ctx.canvas.width = width * cellSize;
     ctx.canvas.height = height * cellSize;
     ctx.lineWidth = 3 / cellSize;
@@ -123,7 +127,7 @@ class GameView {
   addPlayer(player) {
     let cellSize = CELL_SIZE;
 
-    if(this.players.length >= 1) {
+    if (this.players.length >= 1) {
       cellSize /= 2;
       this.scaleBoardSize(this.players[0].ctx, cellSize);
       this.drawBoard(this.players[0].ctx, this.players[0].board);
@@ -143,7 +147,7 @@ class GameView {
     const playerIdx = this.players.findIndex(p => p.id === id);
     (playerIdx >= 0) && this.players.splice(playerIdx, 1);
 
-    if(this.players.length === 1) {
+    if (this.players.length === 1) {
       this.scaleBoardSize(this.players[0].ctx, CELL_SIZE);
       this.drawBoard(this.players[0].ctx, this.players[0].board);
     }
@@ -151,18 +155,15 @@ class GameView {
 
   /**
    * Updates a player's board
-   * @param {object} player.ctx - canvas context of player to update
-   * @param {number} player.id - id of player to update
-   * @param {array} player.board - board of player to update
+   * @param {number} id - id of player to update
+   * @param {array} board - board of player to update
    */
-  updatePlayer(player) {
-    const playerIdx = this.players.findIndex(p => p.id === player.id);
+  updatePlayer({ id, board }) {
+    const player = this.players.find(p => p.id === id);
 
-    if(playerIdx >= 0) {
-      const selectedPlayer = this.players[playerIdx];
-      
-      selectedPlayer.board = player.board;
-      this.drawBoard(selectedPlayer.ctx, selectedPlayer.board);
+    if (player) {
+      player.board = board;
+      this.drawBoard(player.ctx, player.board);
     }
   }
 
