@@ -41,19 +41,19 @@ const getMockDOMSelector = () => ({
   classList: {
     classes: [],
     add(className) {
-      this.classes.push(className)
+      const idx = this.classes.indexOf(className);
+      if (idx < 0) this.classes.push(className)
     },
     remove(className) {
       const idx = this.classes.indexOf(className);
-      if(idx >= 0) this.classes.splice(idx, 1);
+      if (idx > -1) this.classes.splice(idx, 1);
     },
     replace(class1, class2) {
       const idx = this.classes.indexOf(class1);
-      if (idx >= 0) this.classes[idx] = class2;
-      if (idx < 0) this.classes.push(class2);
+      if (idx > -1) this.classes[idx] = class2;
     },
     contains(className) {
-      return this.classes.indexOf(className) >= 0;
+      return this.classes.indexOf(className) > -1;
     }
   },
   getContext: () => getMockCtx(),
@@ -87,7 +87,7 @@ const pubSubMocks = () => {
     updateScoreMock: jest.fn(),
     executeCommandsMock: jest.fn(),
   }
-  
+
   const unsubscribe = [
     subscribe('gameOver', mocks.gameOverMock),
     subscribe('lowerPiece', mocks.lowerPieceMock),
@@ -97,7 +97,7 @@ const pubSubMocks = () => {
     subscribe('updateScore', mocks.updateScoreMock),
     subscribe('sendMessage', mocks.executeCommandsMock),
   ]
-  
+
   const clearMockSubscriptions = () => {
     unsubscribe.forEach(unsub => unsub());
   }
