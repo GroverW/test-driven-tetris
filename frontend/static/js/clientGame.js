@@ -10,6 +10,7 @@ const {
   MAX_SPEED,
 } = require('frontend/helpers/clientConstants');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
+const { mapArrayToObj } = require('common/helpers/utils');
 
 
 /**
@@ -95,8 +96,6 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   command(key) {
-    const playerCommands = PLAYER_KEYS.reduce((a, p) =>
-      a = { ...a, [p]: () => this.usePowerUp(key) }, {});
     const commands = {
       [CONTROLS.LEFT]: () => this.board.movePiece(-1, 0),
       [CONTROLS.RIGHT]: () => this.board.movePiece(1, 0),
@@ -105,7 +104,7 @@ class ClientGame extends Game {
       [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
       [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
       [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
-      ...playerCommands,
+      ...mapArrayToObj(PLAYER_KEYS, () => () => this.usePowerUp(key)),
     }
 
     this.addLockDelay(key);
