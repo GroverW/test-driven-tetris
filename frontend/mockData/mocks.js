@@ -5,6 +5,10 @@ const {
 } = require('common/mockData/mocks')
 const { subscribe } = require('frontend/helpers/pubSub');
 
+/**
+ * Gets a mock html canvas ctx
+ * @returns {object}
+ */
 const getMockCtx = () => ({
   canvas: {
     width: 0,
@@ -24,6 +28,10 @@ const getMockCtx = () => ({
   clearRect: jest.fn(),
 });
 
+/**
+ * Gets a mock DOM selector
+ * @returns {object}
+ */
 const getMockDOMSelector = () => ({
   id: "",
   innerText: "",
@@ -52,6 +60,9 @@ const getMockDOMSelector = () => ({
   appendChild: jest.fn(),
 });
 
+/**
+ * Mocks document.requestAnimationFrame
+ */
 const mockAnimation = () => {
   let t = 0;
   return (callback) => setTimeout(() => {
@@ -60,6 +71,11 @@ const mockAnimation = () => {
   }, 100)
 };
 
+/**
+ * Subscribes objects to pubSub topics so that they can be tracked
+ * in tests when called
+ * @returns {Object[]} - a list of mock functions subscribed to individual topics
+ */
 const pubSubMocks = () => {
   const mocks = {
     gameOverMock: jest.fn(),
