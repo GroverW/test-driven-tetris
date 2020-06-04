@@ -32,11 +32,11 @@ describe('game DOM tests', () => {
       playerCtx: getMockCtx(),
       nextCtx: getMockCtx(),
       gameContainer: getMockDOMSelector(),
-      scoreSelector: getMockDOMSelector(),
-      levelSelector: getMockDOMSelector(),
-      linesSelector: getMockDOMSelector(),
-      playerSelector: getMockDOMSelector(),
-      powerUpSelectors: [getMockDOMSelector(), getMockDOMSelector()],
+      score: getMockDOMSelector(),
+      level: getMockDOMSelector(),
+      lines: getMockDOMSelector(),
+      player: getMockDOMSelector(),
+      powerUps: [getMockDOMSelector(), getMockDOMSelector()],
     }
 
     gameDOM = new GameDOM(selectors);
@@ -57,12 +57,12 @@ describe('game DOM tests', () => {
   test('start new game', () => {
     expect(gameDOM.gameContainer).not.toBe(undefined);
     expect(gameDOM.gameView).not.toBe(undefined);
-    expect(gameDOM.scoreSelector).not.toBe(undefined);
-    expect(gameDOM.levelSelector).not.toBe(undefined);
-    expect(gameDOM.linesSelector).not.toBe(undefined);
-    expect(gameDOM.playerSelector).not.toBe(undefined);
+    expect(gameDOM.score).not.toBe(undefined);
+    expect(gameDOM.level).not.toBe(undefined);
+    expect(gameDOM.lines).not.toBe(undefined);
+    expect(gameDOM.player).not.toBe(undefined);
     expect(gameDOM.players.length).toBe(0);
-  })
+  });
 
   test('add player', () => {
     publish('addPlayer', newPlayer1.id);
@@ -70,23 +70,23 @@ describe('game DOM tests', () => {
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
     expect(gameDOM.players.length).toBe(1);
     expect(gameDOM.gameView.players.length).toBe(1);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
-  })
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+  });
 
   test('add 3rd player resizes 2nd player', () => {
     publish('addPlayer', newPlayer1.id)
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
 
     publish('addPlayer', newPlayer2.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(2);
     expect(gameDOM.players.length).toBe(2);
     expect(gameDOM.gameView.players.length).toBe(2);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(false);
-    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(true);
-  })
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+    expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+  });
 
   test('remove player', () => {
     publish('addPlayer', newPlayer1.id)
@@ -104,32 +104,32 @@ describe('game DOM tests', () => {
     publish('addPlayer', newPlayer1.id)
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
 
     publish('addPlayer', newPlayer2.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(2);
     expect(gameDOM.players.length).toBe(2);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(false);
-    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(true);
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+    expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
 
     publish('removePlayer', newPlayer1.id);
 
     expect(gameDOM.players.length).toBe(1);
-    expect(gameDOM.players[0].selector.classList.contains('item-large')).toBe(true);
-    expect(gameDOM.players[0].selector.classList.contains('item-small')).toBe(false);
+    expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+    expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(false);
   });
 
   test('scoreboard - updates on game start', () => {
-    expect(gameDOM.scoreSelector.innerText).toBe("");
-    expect(gameDOM.levelSelector.innerText).toBe("");
-    expect(gameDOM.linesSelector.innerText).toBe("");
+    expect(gameDOM.score.innerText).toBe("");
+    expect(gameDOM.level.innerText).toBe("");
+    expect(gameDOM.lines.innerText).toBe("");
     
     game.start();
 
-    expect(gameDOM.scoreSelector.innerText).toBe(0);
-    expect(gameDOM.levelSelector.innerText).toBe(1);
-    expect(gameDOM.linesSelector.innerText).toBe(0);
+    expect(gameDOM.score.innerText).toBe(0);
+    expect(gameDOM.level.innerText).toBe(1);
+    expect(gameDOM.lines.innerText).toBe(0);
   });
 
   test('scoreboard - updates points when piece moves down', () => {
@@ -137,7 +137,7 @@ describe('game DOM tests', () => {
     
     game.command(CONTROLS.DOWN);
 
-    expect(gameDOM.scoreSelector.innerText).toBe(1);
+    expect(gameDOM.score.innerText).toBe(1);
   });
 
   test('scoreboard - updates on line clear (tetris)', () => {
@@ -147,8 +147,8 @@ describe('game DOM tests', () => {
     game.board.piece = new Piece(PIECE_TYPES.T);
     game.board.nextPiece = new Piece(PIECE_TYPES.I);
 
-    expect(gameDOM.scoreSelector.innerText).toBe(0);
-    expect(gameDOM.linesSelector.innerText).toBe(0);
+    expect(gameDOM.score.innerText).toBe(0);
+    expect(gameDOM.lines.innerText).toBe(0);
 
     game.command(CONTROLS.ROTATE_LEFT);    
     game.command(CONTROLS.ROTATE_LEFT);    
@@ -159,42 +159,38 @@ describe('game DOM tests', () => {
     game.command(CONTROLS.ROTATE_LEFT);    
     game.command(CONTROLS.HARD_DROP);
 
-    expect(gameDOM.scoreSelector.innerText).toBe(860);
-    expect(gameDOM.linesSelector.innerText).toBe(4);
+    expect(gameDOM.score.innerText).toBe(860);
+    expect(gameDOM.lines.innerText).toBe(4);
   });
 
   test('scoreboard - updates on level increase', () => {
     game.start();
 
-    expect(gameDOM.levelSelector.innerText).toBe(1);
+    expect(gameDOM.level.innerText).toBe(1);
 
     publish('clearLines', 4);
 
-    expect(gameDOM.linesSelector.innerText).toBe(4);
-    expect(gameDOM.levelSelector.innerText).toBe(1);
+    expect(gameDOM.lines.innerText).toBe(4);
+    expect(gameDOM.level.innerText).toBe(1);
 
     publish('clearLines', 4);
     publish('clearLines', 4);
 
-    expect(gameDOM.levelSelector.innerText).toBe(2);
+    expect(gameDOM.level.innerText).toBe(2);
   });
 
   test('power ups - add power up', () => {
     publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
     
-    expect(gameDOM.powerUps.length).toBe(1);
+    expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(1);
 
     publish('addPowerUp', -5);
 
-    expect(gameDOM.powerUps.length).toBe(1);
+    expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(1);
 
     publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
     
-    expect(gameDOM.powerUps.length).toBe(2);
-
-    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
-
-    expect(gameDOM.powerUps.length).toBe(2);
+    expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(2);
   });
 
   test('power ups - use power up', () => {
@@ -203,19 +199,19 @@ describe('game DOM tests', () => {
 
     const id1 = POWER_UP_TYPES.SWAP_LINES;
     const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
-    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id1}`)).toBe(true);
-    expect(gameDOM.powerUpSelectors[1].classList.contains(`powerUp${id2}`)).toBe(true);
+    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id1}`)).toBe(true);
+    expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(true);
 
     publish('usePowerUp');
 
-    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id2}`)).toBe(true);
-    expect(gameDOM.powerUpSelectors[1].classList.contains(`powerUp${id2}`)).toBe(false);
+    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(true);
+    expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(false);
 
     publish('usePowerUp');
 
-    expect(gameDOM.powerUpSelectors[0].classList.contains(`powerUp${id2}`)).toBe(false);
+    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(false);
 
-    expect(gameDOM.powerUpSelectors[0].classList.classes.length).toBe(0);
-    expect(gameDOM.powerUpSelectors[1].classList.classes.length).toBe(0);
+    expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
+    expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
   });
 });

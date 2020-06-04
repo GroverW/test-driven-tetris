@@ -20,24 +20,23 @@ class GameDOM {
    * @param {object} selectors.playerCtx - player canvas context
    * @param {object} selectors.nexCtx - player next piece canvas context
    * @param {object} selectors.gameContainer - game container selector
-   * @param {object} selectors.scoreSelector - game score selector
-   * @param {object} selectors.levelSelector - game level selector
-   * @param {object} selectors.linesSelector - game lines cleared selector
-   * @param {object} selectors.playerSelector - player game container selector
+   * @param {object} selectors.score - game score selector
+   * @param {object} selectors.level - game level selector
+   * @param {object} selectors.lines - game lines cleared selector
+   * @param {object} selectors.player - player game container selector
+   * @param {object[]} selectors.powerUps - list of power up selectors
    * @param {number} id - Id of player on backend
    */
   constructor(selectors, id) {
     this.id = id;
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
     this.gameContainer = selectors.gameContainer;
-    this.scoreSelector = selectors.scoreSelector;
-    this.levelSelector = selectors.levelSelector;
-    this.linesSelector = selectors.linesSelector;
-    this.playerSelector = selectors.playerSelector;
-    this.powerUpSelectors = selectors.powerUpSelectors;
-    this.powerUps = [];
+    this.score = selectors.score;
+    this.level = selectors.level;
+    this.lines = selectors.lines;
+    this.player = selectors.player;
+    this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
-    this.powerUps = [];
     this.subscriptions = [
       subscribe('addPlayer', this.addPlayer.bind(this)),
       subscribe('removePlayer', this.removePlayer.bind(this)),
@@ -52,29 +51,9 @@ class GameDOM {
    * @param {number} id - id of additional player
    */
   addPlayer(id) {
-    if(id === this.id) return;
-    // create container div
-    let playerContainer = document.createElement('div');
-    playerContainer.id = `p${id}`;
+    if (id === this.id) return;
 
-    let containerClass = 'item-large';
-
-    // resize player 2 if they're the only other player
-    if (this.players.length >= 1) {
-      containerClass = 'item-small';
-      this.players[0].selector.classList.replace('item-large', 'item-small');
-    }
-
-    playerContainer.classList.add(containerClass);
-
-    // creates a new html canvas
-    let playerCanvas = document.createElement('canvas');
-    playerCanvas.id = `p${id}-board`;
-    playerCanvas.classList.add('game-board')
-
-    const playerCtx = playerCanvas.getContext('2d');
-
-    playerContainer.appendChild(playerCanvas);
+    const [playerContainer, playerCtx] = this.getNewPlayerContainer(id);
     this.gameContainer.appendChild(playerContainer);
 
     const playerDOM = getNewPlayerDOM(playerContainer, id);
@@ -83,6 +62,56 @@ class GameDOM {
     // adds player to player list and gameView
     this.players.push(playerDOM);
     this.gameView.addPlayer(player);
+
+    // resize player 2 if adding additional players
+    this.resizePlayer2();
+  }
+
+  /**
+   * Resizes player 2 to have a large container if they're the only 
+   * other player, or small if there are more than 2 players
+   */
+  resizePlayer2() {
+    const numPlayers = this.players.length;
+    const large = 'item-large';
+    const small = 'item-small';
+    let p = this.players[0];
+
+    if (numPlayers > 1) p.node.classList.replace(large, small);
+    else if (numPlayers === 1) p.node.classList.replace(small, large);
+  }
+
+  /**
+   * Creates a new div for an additional player
+   * @param {number} id - player id
+   * @returns {object[]} - html node and canvas ctx
+   */
+  getNewPlayerContainer(id) {
+    let container = document.createElement('div');
+    container.id = `p${id}`;
+    const sizeClass = this.players.length > 0 ? 'item-small' : 'item-large';
+    container.classList.add(sizeClass);
+
+    // creates new html canvas
+    const [canvas, ctx] = this.getNewPlayerCanvas(id);
+
+    container.appendChild(canvas);
+
+    return [container, ctx];
+  }
+
+  /**
+   * Creates a new html canvas for an additional player
+   * @param {number} id - player id
+   * @returns {object[]} - canvad DOM node and ctx
+   */
+  getNewPlayerCanvas(id) {
+    let canvas = document.createElement('canvas');
+    canvas.id = `p${id}-board`;
+    canvas.classList.add('game-board');
+    const ctx = canvas.getContext('2d');
+
+    return [canvas, ctx];
   }
 
   /**
@@ -90,19 +119,16 @@ class GameDOM {
    * @param {number} id - id of player to remove
    */
   removePlayer(id) {
-    if(id === this.id) return;
+    if (id === this.id) return;
 
-    const playerIdx = this.players.findIndex(p => p.id === id);
-    
-    if (playerIdx >= 0) {
-      const playerSelector = this.players[playerIdx].selector;
-      playerSelector.parentNode.removeChild(playerSelector);
-      this.players.splice(playerIdx, 1);
+    const player = this.players.find(p => p.id === id);
+
+    if (player) {
+      player.node.parentNode.removeChild(player.node);
+      this.players = this.players.filter(p => p.id !== id);
     }
-    
-    if (this.players.length === 1) {
-      this.players[0].selector.classList.replace('item-small', 'item-large');
-    }
+
+    this.resizePlayer2();
   }
 
   /**
@@ -113,9 +139,18 @@ class GameDOM {
    * @param {number} [data.lines] - game lines cleared
    */
   updateScoreboard(data) {
-    if('score' in data) this.scoreSelector.innerText = data.score;
-    if('level' in data) this.levelSelector.innerText = data.level;
-    if('lines' in data) this.linesSelector.innerText = data.lines;
+    if ('score' in data) this.score.innerText = data.score;
+    if ('level' in data) this.level.innerText = data.level;
+    if ('lines' in data) this.lines.innerText = data.lines;
+  }
+
+  /**
+   * Maps a list of DOM selectors to an array of objects
+   * @param {object[]} selectors - list of DOM selectors
+   * @returns {object[]} - list of objects containing DOM selector and type
+   */
+  mapPowerUps(selectors) {
+    return selectors.map(node => ({ node, type: null })).slice(0, MAX_POWER_UPS);
   }
 
   /**
@@ -123,10 +158,13 @@ class GameDOM {
    * @param {number} powerUp - power up id
    */
   addPowerUp(powerUp) {
-    if(POWER_UPS.has(powerUp) && this.powerUps.length < MAX_POWER_UPS) {
-      const nextIdx = this.powerUps.length;
-      this.powerUps.push(powerUp)
-      this.powerUpSelectors[nextIdx].classList.add(`powerUp${powerUp}`)
+    if (POWER_UPS.has(powerUp)) {
+      let nextPowerUp = this.powerUps.find(p => p.type === null);
+
+      if (nextPowerUp) {
+        nextPowerUp.type = powerUp;
+        nextPowerUp.node.classList.add(`powerUp${powerUp}`)
+      }
     }
   }
 
@@ -134,16 +172,17 @@ class GameDOM {
    * Removes the first power up from the list. Updates all classes.
    */
   usePowerUp() {
-    let i = 0;
-    while(i < this.powerUps.length - 1) {
-      const curr = this.powerUps[i]; 
-      const next = this.powerUps[i+1];
-      this.powerUpSelectors[i].classList.replace(`powerUp${curr}`, `powerUp${next}`);
-      i++;
-    }
-    const curr = this.powerUps[i];
-    curr && this.powerUpSelectors[i].classList.remove(`powerUp${curr}`);
-    this.powerUps.shift();
+    this.powerUps.forEach((p, i, a) => {
+      const next = a[i + 1];
+
+      if (next && next.type !== null) {
+        p.node.classList.replace(`powerUp${p.type}`, `powerUp${next.type}`);
+        p.type = next.type;
+      } else {
+        p.node.classList.remove(`powerUp${p.type}`);
+        p.type = null;
+      }
+    });
   }
 
   /**
@@ -156,18 +195,18 @@ class GameDOM {
    * @param {string[]} data.message.body - list of messages in body
    */
   gameOver(data) {
-    if(data.id === this.id) {
+    if (data.id === this.id) {
       this.unsubscribe();
       this.gameView.drawBoard(this.gameView.ctx, data.board);
-      this.addGameOverMessage(this.playerSelector, data.message);
+      this.addGameOverMessage(this.player, data.message);
       return;
     }
 
-    const playerIdx = this.players.findIndex(p => p.id === data.id);
+    const player = this.players.find(p => p.id === data.id);
 
-    if(playerIdx >= 0) {
+    if (player) {
       this.gameView.updatePlayer(data);
-      this.addGameOverMessage(this.players[playerIdx].selector, data.message);
+      this.addGameOverMessage(player.node, data.message);
     }
   }
 
@@ -181,7 +220,7 @@ class GameDOM {
   addGameOverMessage(container, message) {
     let gameOverMessage = document.createElement('div');
     gameOverMessage.classList.add('game-over');
-    
+
     let gameOverMessageText = document.createElement('div');
     gameOverMessageText.classList.add('game-over-message');
 
