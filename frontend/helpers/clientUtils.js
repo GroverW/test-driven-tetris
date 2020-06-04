@@ -10,10 +10,10 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
 
 /**
  * Creates an object containing a DOM selector and id of a new player
- * @param {object} selector - DOM selector
+ * @param {object} node - DOM node
  * @param {*} id - player id
  */
-const getNewPlayerDOM = (selector, id) => ({ selector, id });
+const getNewPlayerDOM = (node, id) => ({ node, id });
 
 module.exports = {
   randomize,
