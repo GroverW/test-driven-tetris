@@ -17,7 +17,7 @@ describe('websocket tests', () => {
   let player2;
   let serverToClient;
   let clientToServer;
-  let pubSub;
+  let pubSubSpy;
   let api;
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('websocket tests', () => {
     api = new Api(webSocketMock, 1);
     api.sendMessage = jest.fn().mockImplementation(webSocketMock.send);
 
-    pubSub = pubSubMocks();
+    pubSubSpy = pubSubMocks();
 
     const selectors = {
       playerCtx: getMockCtx(),
@@ -55,6 +55,7 @@ describe('websocket tests', () => {
     clientToServer.unsubAll();
     api.unsubscribe();
     GAMES.clear();
+    pubSubSpy.unsubscribeAll();
   })
 
   test('player opens WS connection', () => {
@@ -123,7 +124,7 @@ describe('websocket tests', () => {
 
     expect(clientToServer.gameServer.gameStarted).toBe(true);
     expect(serverToClient.game.gameStatus).toBe(true);
-    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
   });
 
   test('game start - subsequent game starts should fail', () => {
