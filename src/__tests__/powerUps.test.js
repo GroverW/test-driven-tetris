@@ -20,12 +20,12 @@ describe('power ups', () => {
     expect(result1).toEqual(getTestBoard('empty'));
     expect(result2).toEqual(getTestBoard('pattern1SwappedWith2'));
 
-    const board3 = getTestBoard('pattern4')
-    const board4 = getTestBoard('pattern5')
+    const board3 = getTestBoard('pattern5')
+    const board4 = getTestBoard('pattern4')
 
     const [result3, result4] = swapLines(board3, board4);
 
-    expect(result4).toEqual(getTestBoard('pattern4SwappedWith5'));
+    expect(result4).toEqual(getTestBoard('pattern5SwappedWith4'));
   });
 
   test('swap board', () => {
