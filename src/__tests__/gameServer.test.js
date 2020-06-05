@@ -42,24 +42,24 @@ describe('game server tests', () => {
 
         expect(spGameServer.gameType).toBe(GAME_TYPES.SINGLE);
         expect(spGameServer.join(p1)).toBe(true);
-        expect(spGameServer.players.size).toBe(1);
+        expect(spGameServer.players.length).toBe(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(1);
       });
 
       test('join game - game full', () => {
         expect(spGameServer.join(p1)).toBe(true);
-        expect(spGameServer.players.size).toBe(1);
+        expect(spGameServer.players.length).toBe(1);
         expect(spGameServer.join(p2)).toBe(false);
-        expect(spGameServer.players.size).toBe(1);
+        expect(spGameServer.players.length).toBe(1);
       });
 
       test('leave game', () => {
         spGameServer.join(p1);
-        expect(spGameServer.players.size).toBe(1);
+        expect(spGameServer.players.length).toBe(1);
     
         p1.leave();
         
-        expect(spGameServer.players.size).toBe(0);
+        expect(spGameServer.players.length).toBe(0);
         
         expect(GAMES.get(spGameServerId)).toBe(undefined);
       });
@@ -71,7 +71,7 @@ describe('game server tests', () => {
         
         expect(mpGameServer.gameType).toBe(GAME_TYPES.MULTI)
         expect(mpGameServer.join(p1)).toBe(true);
-        expect(mpGameServer.players.size).toBe(1);
+        expect(mpGameServer.players.length).toBe(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(1);
       });
     
@@ -81,11 +81,11 @@ describe('game server tests', () => {
         expect(mpGameServer.join(p3)).toBe(true);
         expect(mpGameServer.join(p4)).toBe(true);
         
-        expect(mpGameServer.players.size).toBe(4);
+        expect(mpGameServer.players.length).toBe(4);
         
         expect(mpGameServer.join(p5)).toBe(false);
     
-        expect(mpGameServer.players.size).toBe(4);
+        expect(mpGameServer.players.length).toBe(4);
       });
     
       test('join game - game started', () => {
@@ -94,11 +94,11 @@ describe('game server tests', () => {
         
         mpGameServer.startGame(p1);
     
-        expect(mpGameServer.players.size).toBe(2);
+        expect(mpGameServer.players.length).toBe(2);
         
         expect(mpGameServer.join(p3)).toBe(false);
     
-        expect(mpGameServer.players.size).toBe(2);
+        expect(mpGameServer.players.length).toBe(2);
       });
     
       test('leave game', () => {
@@ -106,20 +106,20 @@ describe('game server tests', () => {
         
         mpGameServer.join(p1);
         mpGameServer.join(p2);
-        expect(mpGameServer.players.size).toBe(2);
+        expect(mpGameServer.players.length).toBe(2);
     
         p1.leave();
-        expect(mpGameServer.players.size).toBe(1);
+        expect(mpGameServer.players.length).toBe(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(2);
       });
     
       test('leave game - game empty', () => {
         mpGameServer.join(p1);
-        expect(mpGameServer.players.size).toBe(1);
+        expect(mpGameServer.players.length).toBe(1);
     
         p1.leave();
         
-        expect(mpGameServer.players.size).toBe(0);
+        expect(mpGameServer.players.length).toBe(0);
         
         p1.leave();
         expect(GAMES.get(mpGameServerId)).toBe(undefined);
