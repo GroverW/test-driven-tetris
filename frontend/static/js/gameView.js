@@ -62,9 +62,7 @@ class GameView {
   drawBoard(ctx, board) {
     board.forEach((row, rowIdx) =>
       row.forEach((cell, colIdx) => {
-        ctx.strokeRect(colIdx, rowIdx, 1, 1);
-        ctx.fillStyle = CELL_COLORS[cell];
-        ctx.fillRect(colIdx, rowIdx, 1, 1);
+        this.drawCell(ctx, colIdx, rowIdx, 1, 1, CELL_COLORS[cell])
       })
     );
   }
@@ -80,12 +78,39 @@ class GameView {
     piece.grid.forEach((row, rowIdx) =>
       row.forEach((cell, colIdx) => {
         if (cell > 0) {
-          ctx.strokeRect(xStart + colIdx, yStart + rowIdx, 1, 1);
-          ctx.fillStyle = CELL_COLORS[cell];
-          ctx.fillRect(xStart + colIdx, yStart + rowIdx, 1, 1);
+          this.drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell])
         }
       })
     );
+  }
+
+  drawCell(ctx, xStart, yStart, width, height, color) {
+    ctx.save();
+    
+    ctx.fillStyle = color.highlight;
+    ctx.beginPath();
+    ctx.moveTo(xStart, yStart)
+    ctx.lineTo(xStart, yStart + height)
+    ctx.lineTo(xStart + width, yStart + height)
+    ctx.lineTo(xStart + width, yStart)
+    ctx.fill();
+    ctx.clip();
+
+    ctx.fillStyle = color.lowlight;
+    ctx.beginPath();
+    ctx.moveTo(xStart, yStart)
+    ctx.lineTo(xStart, yStart + height)
+    ctx.lineTo(xStart + width, yStart + height)
+    ctx.fill();
+
+    ctx.strokeStyle = color.border;
+    ctx.strokeRect(xStart, yStart, width, height);
+
+    ctx.fillStyle = color.foreground;
+    const inc = .1;
+    ctx.fillRect(xStart + inc, yStart + inc, .8, .8);
+
+    ctx.restore();
   }
 
   /**
