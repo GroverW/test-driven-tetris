@@ -31,11 +31,11 @@ describe('websocket tests', () => {
       playerCtx: getMockCtx(),
       nextCtx: getMockCtx(),
       gameContainer: getMockDOMSelector(),
-      scoreSelector: getMockDOMSelector(),
-      levelSelector: getMockDOMSelector(),
-      linesSelector: getMockDOMSelector(),
-      playerSelector: getMockDOMSelector(),
-      powerUpSelectors: [getMockDOMSelector(), getMockDOMSelector()],
+      score: getMockDOMSelector(),
+      level: getMockDOMSelector(),
+      lines: getMockDOMSelector(),
+      player: getMockDOMSelector(),
+      powerUps: [getMockDOMSelector(), getMockDOMSelector()],
     }
 
     serverToClient = new MockClientListener(webSocketMock, selectors);
@@ -291,12 +291,12 @@ describe('websocket tests', () => {
     ];
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
 
     clientToServer.player.game.executeCommandQueue(COMMANDS2);
 
     expect(clientToServer.player.game.powerUps.length).toBe(1);
-    expect(serverToClient.gameDOM.powerUps.length).toBe(1);
+    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(1);
   });
 
   test('power up - should not add if single player', () => {
@@ -320,11 +320,11 @@ describe('websocket tests', () => {
     ];
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
 
     clientToServer.player.game.executeCommandQueue(COMMANDS2);
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
   });
 });
