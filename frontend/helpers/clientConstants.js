@@ -3,7 +3,7 @@ const COMMON_CONSTANTS = require('common/helpers/constants');
 const CELL_SIZE = 30;
 
 // map players to keypress ids
-const PLAYER_KEYS = COMMON_CONSTANTS.PLAYERS.map((p,i) => 49 + i);
+const PLAYER_KEYS = COMMON_CONSTANTS.PLAYERS.map((p, i) => 49 + i);
 // map players to object of [PLAYER]: [keypress]
 const PLAYER_CONTROLS = COMMON_CONSTANTS.PLAYERS
   .reduce((a, p, i) => a = { ...a, [p]: 49 + i }, {});
@@ -64,15 +64,60 @@ const ANIMATION_SPEED = {
 };
 
 const CELL_COLORS = {
-  0: "#111111",
-  1: "#63BCE6",
-  2: "#E6CE63",
-  3: "#E64EC0",
-  4: "#4EE65B",
-  5: "#E6534E",
-  6: "#E6A44E",
-  7: "#4E6AE6",
-  8: "#AAAAAA",
+  0: {
+    border: '#000000',
+    highlight: '#292929',
+    lowlight: '#1a1a1a',
+    foreground: '#191919'
+  },
+  1: {
+    border: '#11658C',
+    highlight: '#8AD8FC',
+    lowlight: '#2794C7',
+    foreground: '#63BCE6',
+  },
+  2: {
+    border: '#806904',
+    highlight: '#F2DE83',
+    lowlight: '#C4A829',
+    foreground: '#E6CE63',
+  },
+  3: {
+    border: '#880667',
+    highlight: '#F674D5',
+    lowlight: '#CF32A8',
+    foreground: '#E64EC0',
+  },
+  4: {
+    border: '#058010',
+    highlight: '#6AF276',
+    lowlight: '#30CA3D',
+    foreground: '#4EE65B',
+  },
+  5: {
+    border: '#7D0804',
+    highlight: '#F3716D',
+    lowlight: '#CB3A35',
+    foreground: '#E6534E',
+  },
+  6: {
+    border: '#985b0c',
+    highlight: '#f5b869',
+    lowlight: '#de8f29',
+    foreground: '#f6a843',
+  },
+  7: {
+    border: '#051D86',
+    highlight: '#6E87F6',
+    lowlight: '#2F4DD0',
+    foreground: '#4E6AE6',
+  },
+  8: {
+    border: '#333333',
+    highlight: '#bbbbbb',
+    lowlight: '#999999',
+    foreground: '#aaaaaa',
+  },
 };
 
 module.exports = {
