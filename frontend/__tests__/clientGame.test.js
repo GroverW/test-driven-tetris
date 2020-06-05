@@ -18,11 +18,11 @@ const {
 describe('game tests', () => {
   let game;
   let p1;
-  let pubSub;
+  let pubSubSpy;
   let p2 = 2, p3 = 3, p4 = 4;
 
   beforeEach(() => {
-    pubSub = pubSubMocks();
+    pubSubSpy = pubSubMocks();
     game = new ClientGame(1);
     p1 = new Piece(PIECE_TYPES.I);
     
@@ -36,7 +36,7 @@ describe('game tests', () => {
     jest.clearAllMocks();
     jest.clearAllTimers();
     game.unsubscribe()
-    pubSub.clearMockSubscriptions();
+    pubSubSpy.unsubscribeAll();
   });
 
   test('start game', () => {
@@ -46,17 +46,17 @@ describe('game tests', () => {
     expect(game.board.piece).not.toEqual(expect.any(Piece));
     expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
 
-    expect(pubSub.drawMock).not.toHaveBeenCalled();
-    expect(pubSub.updateScoreMock).not.toHaveBeenCalled();
+    expect(pubSubSpy['draw']).not.toHaveBeenCalled();
+    expect(pubSubSpy['updateScore']).not.toHaveBeenCalled();
 
     game.start();
 
     expect(game.board.piece).toEqual(expect.any(Piece));
     expect(game.board.nextPiece).toEqual(expect.any(Piece));
 
-    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
-    expect(pubSub.updateScoreMock).toHaveBeenCalledTimes(1);
-    expect(pubSub.drawMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['updateScore']).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
   });
 
   test('add player', () => {
@@ -200,7 +200,7 @@ describe('game tests', () => {
     
     // only 10 O pieces can fit on the board
     expect(boardMoveSpy).toHaveBeenCalledTimes(10);
-    expect(pubSub.gameOverMock).toHaveBeenCalled();
+    expect(pubSubSpy['gameOver']).toHaveBeenCalled();
 
     game.command(CONTROLS.LEFT);
     // should not get called again
@@ -308,7 +308,7 @@ describe('game tests', () => {
 
     // updating board should send commands and clear queue
     expect(game.commandQueue.length).toBe(0);
-    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.ROTATE_RIGHT);
     game.command(CONTROLS.AUTO_DOWN);
@@ -316,7 +316,7 @@ describe('game tests', () => {
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.commandQueue.length).toBe(0);
-    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(2);
+    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(2);
   });
 
   test('power ups - adds to command queue', () => {
@@ -347,10 +347,10 @@ describe('game tests', () => {
 
     game.command(CONTROLS.PLAYER2);
 
-    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.PLAYER4);
     // should not send if player not found
-    expect(pubSub.executeCommandsMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
   });
 });

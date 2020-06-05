@@ -8,24 +8,28 @@ const { pubSubMocks, TEST_BOARDS } = require('frontend/mockData/mocks');
 describe('client - game board tests', () => {
   let gameBoard;
   let p1;
-  let pubSubListener;
+  let pubSubSpy;
 
   beforeEach(() => {
     gameBoard = new ClientBoard(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
-    pubSubListener = pubSubMocks();
+    pubSubSpy = pubSubMocks();
+  })
+
+  afterEach(() => {
+    pubSubSpy.unsubscribeAll();
   })
 
   test('publishes on points from movement', () => {
     gameBoard.piece = p1;
     gameBoard.movePiece(1,0);
 
-    expect(pubSubListener.drawMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
 
     gameBoard.movePiece(0,1);
     
-    expect(pubSubListener.drawMock).toHaveBeenCalledTimes(2);
+    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(2);
   });
 
   test('publish board updates on line clear', () => {
@@ -39,7 +43,7 @@ describe('client - game board tests', () => {
 
     // 1 for adding piece to board
     // 1 for clearing lines
-    expect(pubSubListener.clearMock).toHaveBeenCalledTimes(1);
-    expect(pubSubListener.boardMock).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['boardChange']).toHaveBeenCalledTimes(1);
   });
 });
