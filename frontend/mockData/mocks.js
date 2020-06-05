@@ -4,6 +4,7 @@ const {
   getTestPieces,
 } = require('common/mockData/mocks')
 const { subscribe } = require('frontend/helpers/pubSub');
+const { mapArrayToObj } = require('common/helpers/utils');
 
 /**
  * Gets a mock html canvas ctx
@@ -77,36 +78,25 @@ const mockAnimation = () => {
  * @returns {Object[]} - a list of mock functions subscribed to individual topics
  */
 const pubSubMocks = () => {
-  const mocks = {
-    gameOverMock: jest.fn(),
-    gameOverMock: jest.fn(),
-    lowerPieceMock: jest.fn(),
-    drawMock: jest.fn(),
-    clearMock: jest.fn(),
-    boardMock: jest.fn(),
-    updateScoreMock: jest.fn(),
-    executeCommandsMock: jest.fn(),
-  }
-
-  const unsubscribe = [
-    subscribe('gameOver', mocks.gameOverMock),
-    subscribe('lowerPiece', mocks.lowerPieceMock),
-    subscribe('draw', mocks.drawMock),
-    subscribe('clearLines', mocks.clearMock),
-    subscribe('boardChange', mocks.boardMock),
-    subscribe('updateScore', mocks.updateScoreMock),
-    subscribe('sendMessage', mocks.executeCommandsMock),
+  const topics = [
+    'gameOver',
+    'lowerPiece',
+    'draw',
+    'clearLines',
+    'boardChange',
+    'updateScore',
+    'sendMessage',
   ]
 
-  const clearMockSubscriptions = () => {
-    unsubscribe.forEach(unsub => unsub());
-  }
+  const mocks = mapArrayToObj(topics, () => jest.fn());
+  const unsubscribe = topics.map(topic => subscribe(topic, mocks[topic]));
+  const unsubscribeAll = () => unsubscribe.forEach(unsub => unsub());
 
   return {
     ...mocks,
-    clearMockSubscriptions
+    unsubscribeAll,
   }
-}
+};
 
 module.exports = {
   TEST_BOARDS,
