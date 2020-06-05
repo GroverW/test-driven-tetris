@@ -25,10 +25,10 @@ class GameDOM {
    * @param {object} selectors.lines - game lines cleared selector
    * @param {object} selectors.player - player game container selector
    * @param {object[]} selectors.powerUps - list of power up selectors
-   * @param {number} id - Id of player on backend
+   * @param {number} playerId - Id of player on backend
    */
-  constructor(selectors, id) {
-    this.id = id;
+  constructor(selectors, playerId) {
+    this.playerId = playerId;
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
     this.gameContainer = selectors.gameContainer;
     this.score = selectors.score;
@@ -51,7 +51,7 @@ class GameDOM {
    * @param {number} id - id of additional player
    */
   addPlayer(id) {
-    if (id === this.id) return;
+    if (id === this.playerId) return;
 
     const [playerContainer, playerCtx] = this.getNewPlayerContainer(id);
     this.gameContainer.appendChild(playerContainer);
@@ -119,7 +119,7 @@ class GameDOM {
    * @param {number} id - id of player to remove
    */
   removePlayer(id) {
-    if (id === this.id) return;
+    if (id === this.playerId) return;
 
     const player = this.players.find(p => p.id === id);
 
@@ -150,7 +150,9 @@ class GameDOM {
    * @returns {object[]} - list of objects containing DOM selector and type
    */
   mapPowerUps(selectors) {
-    return selectors.map(node => ({ node, type: null })).slice(0, MAX_POWER_UPS);
+    return selectors
+      ? selectors.map(node => ({ node, type: null })).slice(0, MAX_POWER_UPS)
+      : false;
   }
 
   /**
@@ -195,7 +197,7 @@ class GameDOM {
    * @param {string[]} data.message.body - list of messages in body
    */
   gameOver(data) {
-    if (data.id === this.id) {
+    if (data.id === this.playerId) {
       this.unsubscribe();
       this.gameView.drawBoard(this.gameView.ctx, data.board);
       this.addGameOverMessage(this.player, data.message);
