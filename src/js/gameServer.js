@@ -47,7 +47,7 @@ class GameServer {
    * @returns {string} - id of new game
    */
   static addGame(id, gameType) {
-    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType))
+    !GAMES.has(id) && GAMES.set(id, new GameServer(id, gameType))
 
     return id;
   }
@@ -70,19 +70,21 @@ class GameServer {
   join(player) {
     if (!this.checkGameStatus()) return false;
 
-    if (!this.players.length) player.isHost = true;
-
     player.setId(++this.nextPlayerId);
     player.setGameType(this.gameType);
 
     this.players.push(player);
     this.addSubscriptions(player)
 
+    // send new player to existing players
     this.sendAll({ type: 'addPlayer', data: player.id });
 
+    // send existing players to new player
     this.players.forEach(p => {
       (p !== player) && this.sendTo(player, { type: 'addPlayer', data: p.id, })
     });
+
+    this.setHost();
 
     return true;
   }
@@ -117,33 +119,37 @@ class GameServer {
    * @returns {boolean} - whether or not player was removed
    */
   leave(player) {
-    if (!this.players.includes(player)) return false;
+    if(!this.removePlayer(player)) return false;
+    this.sendAll({ type: 'removePlayer', data: player.id });
 
-    if (player.isHost && this.players.length > 1) this.setNewHost()
-
-    this.removeSubscriptions(player.id);
-    this.players = this.players.filter(p => p !== player);
-
-    if (!this.players.length) {
-      GAMES.delete(this.id);
-    } else {
-      this.sendAllExcept(player, {
-        type: 'removePlayer',
-        data: player.id
-      });
-
-      this.nextRanking--;
-      this.checkIfWinner();
-    }
+    if (!this.players.length) GAMES.delete(this.id);
+    
+    this.nextRanking--;
+    this.checkIfWinner();
+    this.setHost();
 
     return true;
   }
 
   /**
-   * Sets next player to be host
+   * Removes player from player list
+   * @param {object} player - instance of player class
+   * @returns {boolean} - whether or not removal was successful
    */
-  setNewHost() {
-    this.players[1].isHost = true;
+  removePlayer(player) {
+    if (!this.players.includes(player)) return false;
+
+    this.removeSubscriptions(player.id);
+    this.players = this.players.filter(p => p !== player);
+
+    return true;
+  }
+
+  /**
+   * Sets the first player to be the host
+   */
+  setHost() {
+    if(this.players.length) this.players[0].isHost = true;
   }
 
   /**
@@ -175,35 +181,12 @@ class GameServer {
   }
 
   /**
-   * Starts game
-   * @param {object} player - Player requesting to start game
-   * @returns {boolean|undefined} - returns false if multiplayer game has less than 2 people
-   */
-  startGame(player) {
-    if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) return false;
-
-    if (player && player.isHost) {
-      this.gameStarted = true;
-
-      this.getPieces();
-
-      this.players.forEach(p => p.game.start());
-
-      this.sendAll({
-        type: 'startGame',
-      });
-
-      this.nextRanking = this.players.length;
-    }
-  }
-
-  /**
    * Sends message to all players to update the board for the specified player
    * @param {object} data - data to send
    * @param {number} data.id - id of player to update
    * @param {array} data.board - player board to update
    */
-  updatePlayer(data, include = false) {
+  updatePlayer(data, includePlayer = false) {
     const sendData = {
       type: 'updatePlayer',
       data: {
@@ -212,7 +195,7 @@ class GameServer {
       }
     }
 
-    include
+    includePlayer
       ? this.sendAll(sendData)
       : this.sendAllExcept(this.getPlayerById(data.id), sendData)
   }
@@ -275,18 +258,46 @@ class GameServer {
   }
 
   /**
+   * Starts game
+   * @param {object} player - Player requesting to start game
+   * @returns {boolean} - whether or not game was started
+   */
+  startGame(player) {
+    if(!this.checkStartConditions(player)) return false;
+
+    this.gameStarted = true;
+
+    this.getPieces();
+
+    this.players.forEach(p => p.game.start());
+
+    this.sendAll({ type: 'startGame' });
+
+    this.nextRanking = this.players.length;
+
+    return true;
+  }
+
+  /**
+   * Checks whether or not the game can be started
+   * @param {object} player - instance of player class
+   * @returns {boolean} - whether or not game can be started
+   */
+  checkStartConditions(player) {
+    if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) return false;
+    if (player && player.isHost) return true;
+    return false;
+  }
+
+  /**
    * Sends message to all players to add a new pieceList
    */
   getPieces() {
     const pieces = randomize(SEED_PIECES);
-    this.players.forEach(player => {
-      player.game.board.pieceList.addSet(pieces);
+    
+    this.players.forEach(player => player.game.board.pieceList.addSet(pieces));
 
-      this.sendTo(player, {
-        type: 'addPieces',
-        data: pieces
-      })
-    })
+    this.sendAll({ type: 'addPieces', data: pieces })
   }
 
   /**
