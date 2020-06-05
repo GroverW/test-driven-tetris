@@ -108,9 +108,11 @@ describe('game server tests', () => {
         mpGameServer.join(p2);
         expect(mpGameServer.players.length).toBe(2);
     
+        expect(sendAllSpy).toHaveBeenCalledTimes(2);
+
         p1.leave();
         expect(mpGameServer.players.length).toBe(1);
-        expect(sendAllSpy).toHaveBeenCalledTimes(2);
+        expect(sendAllSpy).toHaveBeenCalledTimes(3);
       });
     
       test('leave game - game empty', () => {
@@ -320,6 +322,7 @@ describe('game server tests', () => {
 
       expect(mpGameServer.nextRanking).toBe(2);
 
+      // 1 for game over
       expect(sendAllSpy).toHaveBeenCalledTimes(1);
       expect(p1.game.gameStatus).toBe(null);
       expect(p2.game.gameStatus).toBe(true);
@@ -330,7 +333,8 @@ describe('game server tests', () => {
       expect(mpGameServer.nextRanking).toBe(0);
 
       // last player should automatically get a gameOver because they won
-      expect(sendAllSpy).toHaveBeenCalledTimes(2);
+      // all players should be notified of player leaving
+      expect(sendAllSpy).toHaveBeenCalledTimes(3);
       expect(p1.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
     });

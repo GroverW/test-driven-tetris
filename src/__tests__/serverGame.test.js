@@ -11,15 +11,18 @@ const {
   getTestBoard,
   getTestPieces,
 } = require('common/mockData/mocks');
+const { pubSubMocks } = require('backend/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
   let game;
   let p1, p2, p3;
   let pubSubTest;
+  let pubSubSpy;
 
   beforeEach(() => {
     pubSubTest = pubSub();
+    pubSubSpy = pubSubMocks(pubSubTest);
     game = new ServerGame(pubSubTest, 1, GAME_TYPES.MULTI);
     game.board.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
@@ -29,6 +32,7 @@ describe('game tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    pubSubSpy.unsubscribeAll();
   });
 
   test('game over', () => {
@@ -86,7 +90,6 @@ describe('game tests', () => {
 
   test('command queue - board updates get published', () => {
     game.start();
-    const publishSpy = jest.spyOn(game.board, 'publishBoardUpdate');
 
     // duplicate scoring points for tetris
     game.board.grid = getTestBoard('clearLines2');
@@ -106,8 +109,8 @@ describe('game tests', () => {
 
     game.executeCommandQueue(COMMANDS1);
 
-    // 1 publish to updateBoard for adding piece to board
-    expect(publishSpy).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['updatePlayer']).toHaveBeenCalledTimes(1);
+    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(0);
 
     const COMMANDS2 = [
       'ROTATE_LEFT',
@@ -117,9 +120,8 @@ describe('game tests', () => {
 
     game.executeCommandQueue(COMMANDS2)
 
-    // 1 publish for adding piece to board
-    // 1 publish for clearing lines
-    expect(publishSpy).toHaveBeenCalledTimes(3);
+    expect(pubSubSpy['updatePlayer']).toHaveBeenCalledTimes(2);
+    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(1);
   });
 
   describe('power ups', () => {
@@ -147,7 +149,6 @@ describe('game tests', () => {
 
     test('randomly add power ups from clearing lines', () => {
       Math.random = jest.fn().mockReturnValue(0);
-      const addPowerUpSpy = jest.spyOn(game, 'addPowerUp');
       game.start();
       
       // duplicate scoring points for tetris
@@ -166,7 +167,8 @@ describe('game tests', () => {
       ];
 
       game.executeCommandQueue(COMMANDS1);
-      expect(addPowerUpSpy).toHaveBeenCalledTimes(1);
+      // should not be called because random power up selected is invalid
+      expect(pubSubSpy['addPowerUp']).toHaveBeenCalledTimes(0);
       expect(game.powerUps.length).toBe(0);
 
       Math.random = jest.fn().mockReturnValue(.9);
@@ -186,14 +188,11 @@ describe('game tests', () => {
       ];
 
       game.executeCommandQueue(COMMANDS2);
-      expect(addPowerUpSpy).toHaveBeenCalledTimes(2);
+      expect(pubSubSpy['addPowerUp']).toHaveBeenCalledTimes(1);
       expect(game.powerUps.length).toBe(1);
     });
 
     test('command queue - publish power ups', () => {
-      const publishSpy = jest.fn();
-      game.pubSub.subscribe('usePowerUp', publishSpy);
-
       game.start();
 
       game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
@@ -205,7 +204,7 @@ describe('game tests', () => {
       ]
       game.executeCommandQueue(COMMANDS);
 
-      expect(publishSpy).toHaveBeenCalledTimes(1);
+      expect(pubSubSpy['usePowerUp']).toHaveBeenCalledTimes(1);
     });
   });
 });
