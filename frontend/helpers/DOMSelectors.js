@@ -18,11 +18,11 @@ const gameSelectors = {
   playerCtx: p1Canvas.getContext('2d'),
   nextCtx: nextPieceCanvas.getContext('2d'),
   gameContainer: document.getElementById('game-container'),
-  scoreSelector: document.getElementById('game-score'),
-  levelSelector: document.getElementById('game-level'),
-  linesSelector: document.getElementById('game-lines'),
-  playerSelector: document.getElementById('p1'),
-  powerUpSelectors: [
+  score: document.getElementById('game-score'),
+  level: document.getElementById('game-level'),
+  lines: document.getElementById('game-lines'),
+  player: document.getElementById('p1'),
+  powerUps: [
     document.getElementById('pUp1'),
     document.getElementById('pUp2')
   ],
