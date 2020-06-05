@@ -7,21 +7,19 @@ const { PIECE_TYPES } = require('common/helpers/constants');
  * @param {array} board2 - board to add lines to
  */
 const swapLines = (board1, board2) => {
-  let swapped = [];
-  let newBoard1 = [], newBoard2 = [];
+  let newBoard1 = [...board1]
+  let newBoard2 = [...board2];
   const blankRow = new Array(board1[0].length).fill(0);
 
-  for(let i = board1.length - 2; i < board1.length; i++) {
-    if(board1[i].some(cell => cell > 0)) 
+  board1.slice(-2).forEach(row => {
+    if(row.some(cell => cell))  {
       // maps each non-empty cell to a neutral grey cell
-      swapped.push(board1[i].map(cell => cell && PIECE_TYPES.N ));
-  }
-
-  for(let i = 0; i < swapped.length; i++) newBoard1.push([...blankRow]);
-  for(let j = 0; j <  board1.length - swapped.length; j++) newBoard1.push([...board1[j]]);
-  
-  for(let i = swapped.length; i < board2.length; i++) newBoard2.push([...board2[i]]);
-  newBoard2.push(...swapped);
+      const addRow = newBoard1.pop().map(cell => cell && PIECE_TYPES.N );
+      newBoard2.push(addRow);
+      newBoard2.shift();
+      newBoard1.unshift([...blankRow]);
+    }
+  })
 
   return [newBoard1, newBoard2];
 }
