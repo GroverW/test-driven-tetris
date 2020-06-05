@@ -14,10 +14,11 @@ const swapLines = (board1, board2) => {
   board1.slice(-2).forEach(row => {
     if(row.some(cell => cell))  {
       // maps each non-empty cell to a neutral grey cell
-      const addRow = newBoard1.pop().map(cell => cell && PIECE_TYPES.N );
+      const addRow = row.map(cell => cell && PIECE_TYPES.N );
       newBoard2.push(addRow);
       newBoard2.shift();
       newBoard1.unshift([...blankRow]);
+      newBoard1.pop();
     }
   })
 
