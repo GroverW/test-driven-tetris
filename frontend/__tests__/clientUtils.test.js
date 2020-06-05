@@ -33,7 +33,7 @@ describe('utils', () => {
 
   test('get new player DOM', () => {
     const testPlayerDOM = {
-      selector: 'test',
+      node: 'test',
       id: 1
     }
 
