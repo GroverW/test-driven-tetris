@@ -4,6 +4,8 @@ const menuSelectors = {
   newMultiplayer: document.getElementById('newMultiplayer'),
   joinMultiplayer: document.getElementById('joinMultiplayer'),
   multiplayerGameId: document.getElementById('multiplayerGameId'),
+  music: document.getElementById('music'),
+  mute: document.getElementById('mute'),
 };
 
 const p1Canvas = document.getElementById('p1-board');
@@ -26,7 +28,10 @@ const gameSelectors = {
     document.getElementById('pUp1'),
     document.getElementById('pUp2')
   ],
+  music: menuSelectors.music,
 };
+
+console.log(menuSelectors, gameSelectors)
 
 module.exports = {
   menuSelectors,
