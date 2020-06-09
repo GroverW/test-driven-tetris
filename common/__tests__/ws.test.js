@@ -8,9 +8,9 @@ const serverPubSub = require('backend/helpers/pubSub');
 const { CONTROLS } = require('frontend/helpers/clientConstants');
 const { GAMES, GAME_TYPES, POWER_UP_TYPES, PIECE_TYPES } = require("backend/helpers/serverConstants");
 
-const { getMockCtx, getMockDOMSelector, pubSubMocks } = require("frontend/mockData/mocks");
+const { getMockCtx, getMockDOMSelector } = require("frontend/mockData/mocks");
 const { MockServerListener, MockClientListener } = require("common/mockData/mockWSListeners");
-const { mockSend, getTestBoard, webSocketMock } = require('common/mockData/mocks');
+const { mockSend, getTestBoard, webSocketMock, pubSubMock } = require('common/mockData/mocks');
 
 
 describe('websocket tests', () => {
@@ -25,7 +25,7 @@ describe('websocket tests', () => {
     api = new Api(webSocketMock, 1);
     api.sendMessage = jest.fn().mockImplementation(webSocketMock.send);
 
-    pubSubSpy = pubSubMocks();
+    pubSubSpy = pubSubMock();
 
     const selectors = {
       playerCtx: getMockCtx(),
@@ -116,6 +116,7 @@ describe('websocket tests', () => {
   });
 
   test('game start - initiated by client', () => {
+    const drawSpy = pubSubSpy.add('draw');
     clientToServer.gameServer.join(player2);
     // user will click button which will send newGame to server
     expect(serverToClient.game.gameStatus).toBe(false);
@@ -124,7 +125,7 @@ describe('websocket tests', () => {
 
     expect(clientToServer.gameServer.gameStarted).toBe(true);
     expect(serverToClient.game.gameStatus).toBe(true);
-    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
+    expect(drawSpy).toHaveBeenCalledTimes(1);
   });
 
   test('game start - subsequent game starts should fail', () => {
