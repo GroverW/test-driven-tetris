@@ -25,3 +25,12 @@ menuSelectors.joinMultiplayer.addEventListener('submit', event => {
   const gameId = menuSelectors.multiplayerGameId.value;
   connectToGame(gameId);
 });
+
+menuSelectors.mute.addEventListener('click', event => {
+  const muteBtn =  event.target;
+  event.preventDefault();
+  muteBtn.blur();
+  muteBtn.classList.toggle('mute');
+  muteBtn.classList.toggle('unmute');
+  menuSelectors.music.muted = !menuSelectors.music.muted;
+})
