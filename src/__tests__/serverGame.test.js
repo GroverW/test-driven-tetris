@@ -10,8 +10,8 @@ const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
+  pubSubMock,
 } = require('common/mockData/mocks');
-const { pubSubMocks } = require('backend/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
@@ -22,7 +22,7 @@ describe('game tests', () => {
 
   beforeEach(() => {
     pubSubTest = pubSub();
-    pubSubSpy = pubSubMocks(pubSubTest);
+    pubSubSpy = pubSubMock(pubSubTest);
     game = new ServerGame(pubSubTest, 1, GAME_TYPES.MULTI);
     game.board.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
@@ -89,6 +89,8 @@ describe('game tests', () => {
   });
 
   test('command queue - board updates get published', () => {
+    const updatePlayerSpy = pubSubSpy.add('updatePlayer');
+    const clearLinesSpy = pubSubSpy.add('clearLines');
     game.start();
 
     // duplicate scoring points for tetris
@@ -109,8 +111,8 @@ describe('game tests', () => {
 
     game.executeCommandQueue(COMMANDS1);
 
-    expect(pubSubSpy['updatePlayer']).toHaveBeenCalledTimes(1);
-    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(0);
+    expect(updatePlayerSpy).toHaveBeenCalledTimes(1);
+    expect(clearLinesSpy).toHaveBeenCalledTimes(0);
 
     const COMMANDS2 = [
       'ROTATE_LEFT',
@@ -120,8 +122,8 @@ describe('game tests', () => {
 
     game.executeCommandQueue(COMMANDS2)
 
-    expect(pubSubSpy['updatePlayer']).toHaveBeenCalledTimes(2);
-    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(1);
+    expect(updatePlayerSpy).toHaveBeenCalledTimes(2);
+    expect(clearLinesSpy).toHaveBeenCalledTimes(1);
   });
 
   describe('power ups', () => {
@@ -167,8 +169,9 @@ describe('game tests', () => {
       ];
 
       game.executeCommandQueue(COMMANDS1);
+      const addPowerUpSpy = pubSubSpy.add('addPowerUp');
       // should not be called because random power up selected is invalid
-      expect(pubSubSpy['addPowerUp']).toHaveBeenCalledTimes(0);
+      expect(addPowerUpSpy).toHaveBeenCalledTimes(0);
       expect(game.powerUps.length).toBe(0);
 
       Math.random = jest.fn().mockReturnValue(.9);
@@ -188,11 +191,12 @@ describe('game tests', () => {
       ];
 
       game.executeCommandQueue(COMMANDS2);
-      expect(pubSubSpy['addPowerUp']).toHaveBeenCalledTimes(1);
+      expect(addPowerUpSpy).toHaveBeenCalledTimes(1);
       expect(game.powerUps.length).toBe(1);
     });
 
     test('command queue - publish power ups', () => {
+      const usePowerUpSpy = pubSubSpy.add('usePowerUp');
       game.start();
 
       game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
@@ -204,7 +208,7 @@ describe('game tests', () => {
       ]
       game.executeCommandQueue(COMMANDS);
 
-      expect(pubSubSpy['usePowerUp']).toHaveBeenCalledTimes(1);
+      expect(usePowerUpSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
