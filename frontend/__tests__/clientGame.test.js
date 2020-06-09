@@ -5,15 +5,14 @@ const {
   CONTROLS,
   ANIMATION_SPEED,
   MAX_SPEED,
-  COMMAND_QUEUE_MAP,
 } = require('frontend/helpers/clientConstants');
 const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
   mockAnimation,
-  pubSubMocks,
 } = require('frontend/mockData/mocks');
+const { pubSubMock } = require('common/mockData/mocks');
 
 describe('game tests', () => {
   let game;
@@ -22,7 +21,7 @@ describe('game tests', () => {
   let p2 = 2, p3 = 3, p4 = 4;
 
   beforeEach(() => {
-    pubSubSpy = pubSubMocks();
+    pubSubSpy = pubSubMock();
     game = new ClientGame(1);
     p1 = new Piece(PIECE_TYPES.I);
     
@@ -40,23 +39,25 @@ describe('game tests', () => {
   });
 
   test('start game', () => {
+    const drawSpy = pubSubSpy.add('draw');
+    const updateScoreSpy = pubSubSpy.add('updateScore');
     expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
     expect(game.board.grid).toEqual(TEST_BOARDS.empty);
 
     expect(game.board.piece).not.toEqual(expect.any(Piece));
     expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
 
-    expect(pubSubSpy['draw']).not.toHaveBeenCalled();
-    expect(pubSubSpy['updateScore']).not.toHaveBeenCalled();
+    expect(drawSpy).not.toHaveBeenCalled();
+    expect(updateScoreSpy).not.toHaveBeenCalled();
 
     game.start();
 
     expect(game.board.piece).toEqual(expect.any(Piece));
     expect(game.board.nextPiece).toEqual(expect.any(Piece));
 
-    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
-    expect(pubSubSpy['updateScore']).toHaveBeenCalledTimes(1);
-    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
+    expect(drawSpy).toHaveBeenCalledTimes(1);
+    expect(updateScoreSpy).toHaveBeenCalledTimes(1);
+    expect(drawSpy).toHaveBeenCalledTimes(1);
   });
 
   test('add player', () => {
@@ -187,6 +188,7 @@ describe('game tests', () => {
   })
 
   test('game over', () => {
+    const gameOverSpy = pubSubSpy.add('gameOver');
     game.start();
     
     game.board.grid = getTestBoard('empty');
@@ -200,7 +202,7 @@ describe('game tests', () => {
     
     // only 10 O pieces can fit on the board
     expect(boardMoveSpy).toHaveBeenCalledTimes(10);
-    expect(pubSubSpy['gameOver']).toHaveBeenCalled();
+    expect(gameOverSpy).toHaveBeenCalled();
 
     game.command(CONTROLS.LEFT);
     // should not get called again
@@ -295,6 +297,7 @@ describe('game tests', () => {
   });
 
   test('command queue - send commands', () => {
+    const sendMessageSpy = pubSubSpy.add('sendMessage');
     game.start();
     
     game.command(CONTROLS.DOWN);
@@ -308,7 +311,7 @@ describe('game tests', () => {
 
     // updating board should send commands and clear queue
     expect(game.commandQueue.length).toBe(0);
-    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.ROTATE_RIGHT);
     game.command(CONTROLS.AUTO_DOWN);
@@ -316,7 +319,7 @@ describe('game tests', () => {
     game.command(CONTROLS.HARD_DROP);
 
     expect(game.commandQueue.length).toBe(0);
-    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(2);
+    expect(sendMessageSpy).toHaveBeenCalledTimes(2);
   });
 
   test('power ups - adds to command queue', () => {
@@ -338,6 +341,7 @@ describe('game tests', () => {
   });
 
   test('power ups - sends command queue', () => {
+    const sendMessageSpy = pubSubSpy.add('sendMessage');
     game.addPlayer(p2);
     game.addPlayer(p3);
 
@@ -347,10 +351,10 @@ describe('game tests', () => {
 
     game.command(CONTROLS.PLAYER2);
 
-    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.PLAYER4);
     // should not send if player not found
-    expect(pubSubSpy['sendMessage']).toHaveBeenCalledTimes(1);
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 });
