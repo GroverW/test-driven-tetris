@@ -1,6 +1,7 @@
 const TEST_BOARDS = require('./sampleBoards');
 const { SEED_PIECES } = require('common/helpers/constants');
 const { randomize } = require('common/helpers/utils');
+const { subscribe } = require('frontend/helpers/pubSub');
 
 /**
  * Used for adding fake websocket .send
@@ -44,10 +45,41 @@ const webSocketMock = {
   }
 };
 
+/**
+ * Observe when a topic is being published to
+ * @param {object} pubSub - publish / subscribe object
+ */
+const pubSubMock = pubSub => {
+  // use frontend pubSub if not specified
+  if(!pubSub) pubSub = { subscribe };
+  let subscriptions = [];
+  
+  /**
+   * Adds topic to be tracked
+   * @param {string} topic - topic to follow
+   */
+  const add = topic => {
+    const newSub = jest.fn();
+    subscriptions.push(pubSub.subscribe(topic, newSub))
+    return newSub;
+  }
+
+  /**
+   * Removes all subscriptions
+   */
+  const unsubscribeAll = () => subscriptions.forEach(unsub => unsub());
+
+  return {
+    add,
+    unsubscribeAll,
+  }
+}
+
 module.exports = {
   TEST_BOARDS,
   mockSend,
   getTestBoard,
   getTestPieces,
   webSocketMock,
+  pubSubMock,
 }
