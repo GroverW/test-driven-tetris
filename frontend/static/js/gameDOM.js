@@ -37,7 +37,9 @@ class GameDOM {
     this.player = selectors.player;
     this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
+    this.music = selectors.music;    
     this.subscriptions = [
+      subscribe('startGame', selectors.music.play.bind(selectors.music)),
       subscribe('addPlayer', this.addPlayer.bind(this)),
       subscribe('removePlayer', this.removePlayer.bind(this)),
       subscribe('updateScore', this.updateScoreboard.bind(this)),
@@ -201,6 +203,7 @@ class GameDOM {
       this.unsubscribe();
       this.gameView.drawBoard(this.gameView.ctx, data.board);
       this.addGameOverMessage(this.player, data.message);
+      this.music.pause();
       return;
     }
 
