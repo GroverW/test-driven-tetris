@@ -1,9 +1,9 @@
 const ClientBoard = require('frontend/static/js/clientBoard');
 const { PIECE_TYPES, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
-const { getTestBoard, getTestPieces } = require('common/mockData/mocks');
+const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
 const { Piece } = require('common/js/piece');
 const pubSub = require('frontend/helpers/pubSub');
-const { pubSubMocks, TEST_BOARDS } = require('frontend/mockData/mocks');
+const { TEST_BOARDS } = require('frontend/mockData/mocks');
 
 describe('client - game board tests', () => {
   let gameBoard;
@@ -14,7 +14,7 @@ describe('client - game board tests', () => {
     gameBoard = new ClientBoard(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
-    pubSubSpy = pubSubMocks();
+    pubSubSpy = pubSubMock();
   })
 
   afterEach(() => {
@@ -22,17 +22,20 @@ describe('client - game board tests', () => {
   })
 
   test('publishes on points from movement', () => {
+    const drawSpy = pubSubSpy.add('draw');
     gameBoard.piece = p1;
     gameBoard.movePiece(1,0);
 
-    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(1);
+    expect(drawSpy).toHaveBeenCalledTimes(1);
 
     gameBoard.movePiece(0,1);
     
-    expect(pubSubSpy['draw']).toHaveBeenCalledTimes(2);
+    expect(drawSpy).toHaveBeenCalledTimes(2);
   });
 
   test('publish board updates on line clear', () => {
+    const clearLinesSpy = pubSubSpy.add('clearLines');
+    const boardChangeSpy = pubSubSpy.add('boardChange');
     gameBoard.grid = getTestBoard('clearLines2');
     gameBoard.piece = p1;
 
@@ -43,7 +46,7 @@ describe('client - game board tests', () => {
 
     // 1 for adding piece to board
     // 1 for clearing lines
-    expect(pubSubSpy['clearLines']).toHaveBeenCalledTimes(1);
-    expect(pubSubSpy['boardChange']).toHaveBeenCalledTimes(1);
+    expect(clearLinesSpy).toHaveBeenCalledTimes(1);
+    expect(boardChangeSpy).toHaveBeenCalledTimes(1);
   });
 });
