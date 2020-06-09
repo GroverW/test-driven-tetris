@@ -48,8 +48,8 @@ const connectToGame = gameId => {
   ws.onopen = evt => {
     console.log(evt);
     console.log('connected');
-    let data = { type: "join", name: 'floop' };
-    ws.send(JSON.stringify(data));
+    // let data = { type: "join", name: 'floop' };
+    // ws.send(JSON.stringify(data));
   }
 
   /**
@@ -82,7 +82,7 @@ const connectToGame = gameId => {
         publish('removePlayer', data);
         break;
       case 'startGame':
-        if(game) game.start(data);
+        publish('startGame');
         break;
       case 'updatePlayer':
         publish('updatePlayerBoard', data);
