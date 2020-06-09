@@ -3,8 +3,6 @@ const {
   getTestBoard,
   getTestPieces,
 } = require('common/mockData/mocks')
-const { subscribe } = require('frontend/helpers/pubSub');
-const { mapArrayToObj } = require('common/helpers/utils');
 
 /**
  * Gets a mock html canvas ctx
@@ -21,12 +19,19 @@ const getMockCtx = () => ({
     this.canvas.xScale = xScale;
     this.canvas.yScale = yScale;
   },
+  save: jest.fn(),
+  restore: jest.fn(),
+  clip: jest.fn(),
   fillStyle: "",
   fillRect: jest.fn(),
   lineWidth: 0,
   strokeStyle: "",
   strokeRect: jest.fn(),
   clearRect: jest.fn(),
+  beginPath: jest.fn(),
+  moveTo: jest.fn(),
+  lineTo: jest.fn(),
+  fill: jest.fn(),
 });
 
 /**
@@ -72,32 +77,6 @@ const mockAnimation = () => {
   }, 100)
 };
 
-/**
- * Subscribes objects to pubSub topics so that they can be tracked
- * in tests when called
- * @returns {Object[]} - a list of mock functions subscribed to individual topics
- */
-const pubSubMocks = () => {
-  const topics = [
-    'gameOver',
-    'lowerPiece',
-    'draw',
-    'clearLines',
-    'boardChange',
-    'updateScore',
-    'sendMessage',
-  ]
-
-  const mocks = mapArrayToObj(topics, () => jest.fn());
-  const unsubscribe = topics.map(topic => subscribe(topic, mocks[topic]));
-  const unsubscribeAll = () => unsubscribe.forEach(unsub => unsub());
-
-  return {
-    ...mocks,
-    unsubscribeAll,
-  }
-};
-
 module.exports = {
   TEST_BOARDS,
   getTestBoard,
@@ -105,5 +84,4 @@ module.exports = {
   getMockCtx,
   getMockDOMSelector,
   mockAnimation,
-  pubSubMocks,
 }
