@@ -35,6 +35,7 @@ class ClientGame extends Game {
     this.interruptAutoDown = false;
     this.commandQueue = [];
     this.subscriptions.push(
+      subscribe('startGame', this.start.bind(this)),
       subscribe('boardChange', this.sendCommandQueue.bind(this)),
       subscribe('updatePlayerBoard', this.replaceBoard.bind(this)),
       subscribe('addPlayer', this.addPlayer.bind(this)),
