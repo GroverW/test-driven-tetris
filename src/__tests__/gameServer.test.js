@@ -362,5 +362,23 @@ describe('game server tests', () => {
 
       expect(p2.game.board.grid).toEqual(getTestBoard('empty'));
     });
+
+    describe('error messages', () => {
+      test('join game - game full', () => {
+
+      });
+
+      test('game start - not host', () => {
+
+      });
+
+      test('get game - game does not exist', () => {
+
+      });
+
+      test('add game - game already exists', () => {
+
+      });
+    });
   });
 });
