@@ -214,4 +214,8 @@ describe('game DOM tests', () => {
     expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
     expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
   });
+
+  test('error messages', () => {
+
+  });
 });
