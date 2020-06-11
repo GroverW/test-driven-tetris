@@ -47,5 +47,9 @@ describe('Routes tests', () => {
 
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
+
+    test('error - game does not exist', () => {
+
+    });
   });
 });
