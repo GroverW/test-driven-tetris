@@ -329,4 +329,8 @@ describe('websocket tests', () => {
     expect(clientToServer.player.game.powerUps.length).toBe(0);
     expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
   });
+
+  test('error messages', () => {
+
+  });
 });
