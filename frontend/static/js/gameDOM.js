@@ -245,12 +245,6 @@ class GameDOM {
     container.appendChild(gameOverMessage);
   }
 
-
-  addError(message) {
-    this.error.innerText = message;
-    this.error.classList.toggle('hide');
-  }
-
   /**
    * Unsubscribes gameDOM from all topics
    */
