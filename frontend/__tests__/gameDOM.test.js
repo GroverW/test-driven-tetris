@@ -6,6 +6,7 @@ const { getNewPlayer } = require('frontend/helpers/clientUtils');
 const { CONTROLS, PIECE_TYPES, POWER_UP_TYPES } = require('frontend/helpers/clientConstants');
 const { 
   getMockDOMSelector,
+  getMockGameDOMSelectors,
   getMockCtx,
   getTestBoard,
   getTestPieces
@@ -28,18 +29,7 @@ describe('game DOM tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    const selectors = {
-      playerCtx: getMockCtx(),
-      nextCtx: getMockCtx(),
-      gameContainer: getMockDOMSelector(),
-      score: getMockDOMSelector(),
-      level: getMockDOMSelector(),
-      lines: getMockDOMSelector(),
-      player: getMockDOMSelector(),
-      powerUps: [getMockDOMSelector(), getMockDOMSelector()],
-    }
-
-    gameDOM = new GameDOM(selectors);
+    gameDOM = new GameDOM(getMockGameDOMSelectors());
     game = new ClientGame(1);
     game.board.pieceList.addSet(getTestPieces());
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
@@ -216,6 +206,12 @@ describe('game DOM tests', () => {
   });
 
   test('error messages', () => {
+    const errorText = 'some error';
+    const hiddenStatus = gameDOM.error.classList.contains('hide');
 
+    publish('addError', errorText);
+
+    expect(gameDOM.error.innerText).toBe(errorText);
+    expect(gameDOM.error.classList.contains('hide')).toBe(!hiddenStatus);
   });
 });
