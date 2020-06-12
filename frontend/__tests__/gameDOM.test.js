@@ -10,7 +10,7 @@ const {
   getMockCtx,
   getTestBoard,
   getTestPieces
-} = require('../mockData/mocks');
+} = require('frontend/mockData/mocks');
 
 describe('game DOM tests', () => {
   let gameDOM;
@@ -203,15 +203,5 @@ describe('game DOM tests', () => {
 
     expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
     expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
-  });
-
-  test('error messages', () => {
-    const errorText = 'some error';
-    const hiddenStatus = gameDOM.error.classList.contains('hide');
-
-    publish('addError', errorText);
-
-    expect(gameDOM.error.innerText).toBe(errorText);
-    expect(gameDOM.error.classList.contains('hide')).toBe(!hiddenStatus);
   });
 });
