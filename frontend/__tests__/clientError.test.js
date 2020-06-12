@@ -4,6 +4,8 @@ const { getMockDOMSelector } = require('frontend/mockData/mocks');
 
 describe('client error message tests', () => {
   let clientError;
+  let errorText = 'some error';
+  let blankError = '';
 
   beforeEach(() => {
     let errorSelector = getMockDOMSelector();
@@ -17,13 +19,25 @@ describe('client error message tests', () => {
   });
 
   test('add error message', () => {
-    const errorText = 'some error';
-
     expect(clientError.error.classList.contains('hide')).toBe(true);
 
     publish('addError', errorText);
 
     expect(clientError.error.innerText).toBe(errorText);
     expect(clientError.error.classList.contains('hide')).toBe(false);
+  });
+
+  test('clear error message', () => {
+    expect(clientError.error.classList.contains('hide')).toBe(true);
+
+    publish('addError', errorText);
+
+    expect(clientError.error.innerText).toBe(errorText);
+    expect(clientError.error.classList.contains('hide')).toBe(false);
+
+    publish('clearError');
+
+    expect(clientError.error.innerText).toBe(blankError);
+    expect(clientError.error.classList.contains('hide')).toBe(true);
   });
 });
