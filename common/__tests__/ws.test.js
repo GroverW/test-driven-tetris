@@ -8,7 +8,7 @@ const serverPubSub = require('backend/helpers/pubSub');
 const { CONTROLS } = require('frontend/helpers/clientConstants');
 const { GAMES, GAME_TYPES, POWER_UP_TYPES, PIECE_TYPES } = require("backend/helpers/serverConstants");
 
-const { getMockCtx, getMockDOMSelector } = require("frontend/mockData/mocks");
+const { getMockDOMSelector, getMockGameDOMSelectors } = require("frontend/mockData/mocks");
 const { MockServerListener, MockClientListener } = require("common/mockData/mockWSListeners");
 const { mockSend, getTestBoard, webSocketMock, pubSubMock } = require('common/mockData/mocks');
 
@@ -27,18 +27,7 @@ describe('websocket tests', () => {
 
     pubSubSpy = pubSubMock();
 
-    const selectors = {
-      playerCtx: getMockCtx(),
-      nextCtx: getMockCtx(),
-      gameContainer: getMockDOMSelector(),
-      score: getMockDOMSelector(),
-      level: getMockDOMSelector(),
-      lines: getMockDOMSelector(),
-      player: getMockDOMSelector(),
-      powerUps: [getMockDOMSelector(), getMockDOMSelector()],
-    }
-
-    serverToClient = new MockClientListener(webSocketMock, selectors);
+    serverToClient = new MockClientListener(webSocketMock, getMockGameDOMSelectors());
     clientToServer = new MockServerListener(webSocketMock, 1);
 
     player2 = new Player(mockSend, serverPubSub());
@@ -330,7 +319,13 @@ describe('websocket tests', () => {
     expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
   });
 
-  test('error messages', () => {
+  describe('error messages', () => {
+    test('join game - game full', () => {
+        
+    });
 
+    test('send error message', () => {
+
+    });
   });
 });
