@@ -5,11 +5,17 @@ class ClientError {
     this.error = errorSelector;
     this.subscriptions = [
       subscribe('addError', this.addError.bind(this)),
+      subscribe('clearError', this.clearError.bind(this)),
     ];
   }
 
   addError(message) {
     this.error.innerText = message;
+    this.error.classList.toggle('hide');
+  }
+
+  clearError() {
+    this.error.innerText = '';
     this.error.classList.toggle('hide');
   }
 
