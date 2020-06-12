@@ -58,12 +58,30 @@ const getMockDOMSelector = () => ({
       const idx = this.classes.indexOf(class1);
       if (idx > -1) this.classes[idx] = class2;
     },
+    toggle(className) {
+      const idx = this.classes.indexOf(className);
+      idx > -1 ? this.remove(className) : this.add(className);
+    },
     contains(className) {
       return this.classes.indexOf(className) > -1;
     }
   },
   getContext: () => getMockCtx(),
   appendChild: jest.fn(),
+  play: jest.fn(),
+});
+
+const getMockGameDOMSelectors = () => ({
+  playerCtx: getMockCtx(),
+  nextCtx: getMockCtx(),
+  gameContainer: getMockDOMSelector(),
+  score: getMockDOMSelector(),
+  level: getMockDOMSelector(),
+  lines: getMockDOMSelector(),
+  player: getMockDOMSelector(),
+  music: getMockDOMSelector(),
+  error: getMockDOMSelector(),
+  powerUps: [getMockDOMSelector(), getMockDOMSelector()],
 });
 
 /**
@@ -83,5 +101,6 @@ module.exports = {
   getTestPieces,
   getMockCtx,
   getMockDOMSelector,
+  getMockGameDOMSelectors,
   mockAnimation,
 }
