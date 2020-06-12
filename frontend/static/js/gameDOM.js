@@ -37,7 +37,8 @@ class GameDOM {
     this.player = selectors.player;
     this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
-    this.music = selectors.music;    
+    this.music = selectors.music;
+    this.error = selectors.error;
     this.subscriptions = [
       subscribe('startGame', selectors.music.play.bind(selectors.music)),
       subscribe('addPlayer', this.addPlayer.bind(this)),
@@ -45,6 +46,7 @@ class GameDOM {
       subscribe('updateScore', this.updateScoreboard.bind(this)),
       subscribe('addPowerUp', this.addPowerUp.bind(this)),
       subscribe('usePowerUp', this.usePowerUp.bind(this)),
+      subscribe('addError', this.addError.bind(this)),
     ];
   }
 
@@ -241,6 +243,12 @@ class GameDOM {
 
     gameOverMessage.appendChild(gameOverMessageText);
     container.appendChild(gameOverMessage);
+  }
+
+
+  addError(message) {
+    this.error.innerText = message;
+    this.error.classList.toggle('hide');
   }
 
   /**
