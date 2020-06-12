@@ -25,6 +25,7 @@ class GameDOM {
    * @param {object} selectors.lines - game lines cleared selector
    * @param {object} selectors.player - player game container selector
    * @param {object[]} selectors.powerUps - list of power up selectors
+   * @param {object} selectors.music - game music selector
    * @param {number} playerId - Id of player on backend
    */
   constructor(selectors, playerId) {
@@ -38,7 +39,6 @@ class GameDOM {
     this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
     this.music = selectors.music;
-    this.error = selectors.error;
     this.subscriptions = [
       subscribe('startGame', selectors.music.play.bind(selectors.music)),
       subscribe('addPlayer', this.addPlayer.bind(this)),
@@ -46,7 +46,6 @@ class GameDOM {
       subscribe('updateScore', this.updateScoreboard.bind(this)),
       subscribe('addPowerUp', this.addPowerUp.bind(this)),
       subscribe('usePowerUp', this.usePowerUp.bind(this)),
-      subscribe('addError', this.addError.bind(this)),
     ];
   }
 

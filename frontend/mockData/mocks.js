@@ -80,7 +80,6 @@ const getMockGameDOMSelectors = () => ({
   lines: getMockDOMSelector(),
   player: getMockDOMSelector(),
   music: getMockDOMSelector(),
-  error: getMockDOMSelector(),
   powerUps: [getMockDOMSelector(), getMockDOMSelector()],
 });
 
