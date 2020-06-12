@@ -284,9 +284,23 @@ class GameServer {
    * @returns {boolean} - whether or not game can be started
    */
   checkStartConditions(player) {
-    if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) return false;
-    if (player && player.isHost) return true;
-    return false;
+    if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) {
+      this.sendTo(player, {
+        type: 'error',
+        data: 'Not enough players to start game.',
+      });
+      return false;
+    }
+    
+    if (!player.isHost) {
+      this.sendTo(player, {
+        type: 'error',
+        data: 'Only the host can start the game.',
+      });
+      return false;
+    }
+    
+    return true;
   }
 
   /**
