@@ -6,7 +6,7 @@ const { subscribe } = require('frontend/helpers/pubSub');
 /**
  * Used for adding fake websocket .send
  */
-const mockSend = () => {};
+const mockSend = () => { };
 
 /**
  * Creates new test board from sampleBoards
@@ -16,10 +16,10 @@ const mockSend = () => {};
 const getTestBoard = (board) =>
   JSON.parse(JSON.stringify(TEST_BOARDS[board]));
 
-  /**
-   * Creates list of piece ids
-   * @returns {array} - new array of piece ids
-   */
+/**
+ * Creates list of piece ids
+ * @returns {array} - new array of piece ids
+ */
 const getTestPieces = () => randomize(SEED_PIECES);
 
 /**
@@ -29,18 +29,18 @@ const webSocketMock = {
   topics: {},
   send(data) {
     const parsed = JSON.parse(data);
-    this.topics[parsed.type] && (
+    if (this.topics[parsed.type] !== undefined) {
       this.topics[parsed.type].forEach(callback => callback(parsed.data))
-    );
+    };
   },
-  on (type, callback) {
+  on(type, callback) {
     this.topics[type]
       ? this.topics[type].push(callback)
       : this.topics[type] = [callback];
-  
+
     const index = this.topics[type].length - 1;
-    const unsubscribe = () => { this.topics[type].splice(index, 1) };
-  
+    const unsubscribe = () => this.topics[type].splice(index, 1);
+
     return unsubscribe;
   }
 };
@@ -51,9 +51,9 @@ const webSocketMock = {
  */
 const pubSubMock = pubSub => {
   // use frontend pubSub if not specified
-  if(!pubSub) pubSub = { subscribe };
+  if (!pubSub) pubSub = { subscribe };
   let subscriptions = [];
-  
+
   /**
    * Adds topic to be tracked
    * @param {string} topic - topic to follow
