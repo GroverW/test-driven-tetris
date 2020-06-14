@@ -2,23 +2,23 @@ const { menuSelectors } = require('frontend/helpers/DOMSelectors');
 const { createGame, connectToGame } = require('frontend/helpers/gameFunctions');
 
 // start a new single player game
-menuSelectors.newSinglePlayer.addEventListener('click', event => {
-  event.target.blur();
+menuSelectors.newSinglePlayer.addEventListener('click', (evt) => {
+  evt.target.blur();
   menuSelectors.menuContainer.classList.toggle('hide');
   createGame('single');
 });
 
 // start a new multiplayer game
-menuSelectors.newMultiplayer.addEventListener('click', event => {
-  event.target.blur();
+menuSelectors.newMultiplayer.addEventListener('click', (evt) => {
+  evt.target.blur();
   menuSelectors.menuContainer.classList.toggle('hide');
   createGame('multi');
 });
 
 // join a multiplayer game
-menuSelectors.joinMultiplayer.addEventListener('submit', event => {
-  event.preventDefault();
-  event.target.blur();
+menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  evt.target.blur();
   
   menuSelectors.menuContainer.classList.toggle('hide');
   
@@ -26,9 +26,9 @@ menuSelectors.joinMultiplayer.addEventListener('submit', event => {
   connectToGame(gameId);
 });
 
-menuSelectors.mute.addEventListener('click', event => {
-  const muteBtn =  event.target;
-  event.preventDefault();
+menuSelectors.mute.addEventListener('click', (evt) => {
+  const muteBtn =  evt.target;
+  evt.preventDefault();
   muteBtn.blur();
   muteBtn.classList.toggle('mute');
   muteBtn.classList.toggle('unmute');
