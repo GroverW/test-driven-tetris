@@ -10,15 +10,17 @@ const pubSub = () => ({
    * @param {*} data - data to publish to topic
    */
   publish(topic, data) {
-    this.subscribers[topic] && this.subscribers[topic].forEach(obj => obj.callback(data));
+    if (this.subscribers[topic] !== undefined) {
+      this.subscribers[topic].forEach((obj) => obj.callback(data));
+    };
   },
 
-/**
- * Adds subscriber to a specified topic
- * @param {string} topic - topic to subscribe to
- * @param {function} callback - function to call when data is published to topic
- * @returns {function} - function to call to unsubscribe from topic
- */
+  /**
+   * Adds subscriber to a specified topic
+   * @param {string} topic - topic to subscribe to
+   * @param {function} callback - function to call when data is published to topic
+   * @returns {function} - function to call to unsubscribe from topic
+   */
   subscribe(topic, callback) {
     const id = this.subscribers[topic]
       ? this.addSubscriber(topic, callback)
@@ -40,7 +42,7 @@ const pubSub = () => ({
   addTopic(topic, callback) {
     const id = 0;
     this.subscribers[topic] = [{ id, callback }];
-    
+
     return id;
   },
 
@@ -53,7 +55,7 @@ const pubSub = () => ({
   addSubscriber(topic, callback) {
     const id = this.subscribers[topic].length;
     this.subscribers[topic].push({ id, callback });
-    
+
     return id;
   },
 
@@ -63,7 +65,7 @@ const pubSub = () => ({
    * @param {number} id - id of subscriber to remove
    */
   removeSubscriber(topic, id) {
-    this.subscribers[topic] = this.subscribers[topic].filter(s => s.id !== id);
+    this.subscribers[topic] = this.subscribers[topic].filter((s) => s.id !== id);
   }
 })
 
