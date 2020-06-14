@@ -34,21 +34,18 @@ app.get('/game/single', (req, res, next) => {
 
 //allow for app.ws routes for websocket routes
 app.ws('/game/:gameId', (ws, req, next) => {
-  try {    
+  try {
     let gameServer;
     let player;
 
     gameServer = GameServer.getGame(req.params.gameId)
 
-    if(!gameServer) {
+    if (!gameServer) {
       ws.close(1008, 'Game not found');
       throw new Error('Invalid GameId');
     }
 
-    player = new Player(
-      ws.send.bind(ws),
-      pubSub()
-    )
+    player = new Player(ws.send.bind(ws), pubSub());
 
     gameServer.join(player);
 
@@ -59,7 +56,7 @@ app.ws('/game/:gameId', (ws, req, next) => {
     });
 
     ws.on('close', () => {
-      player && player.leave();
+      if (player) player.leave();
     });
   }
   catch (err) {
