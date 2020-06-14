@@ -124,11 +124,11 @@ class GameDOM {
   removePlayer(id) {
     if (id === this.playerId) return;
 
-    const player = this.players.find(p => p.id === id);
+    const player = this.players.find((p) => p.id === id);
 
     if (player) {
       player.node.parentNode.removeChild(player.node);
-      this.players = this.players.filter(p => p.id !== id);
+      this.players = this.players.filter((p) => p.id !== id);
     }
 
     this.resizePlayer2();
@@ -150,11 +150,11 @@ class GameDOM {
   /**
    * Maps a list of DOM selectors to an array of objects
    * @param {object[]} selectors - list of DOM selectors
-   * @returns {object[]} - list of objects containing DOM selector and type
+   * @returns {object[]|boolean} - list of objects containing DOM selector and type, otherwise false if empty
    */
   mapPowerUps(selectors) {
     return selectors
-      ? selectors.map(node => ({ node, type: null })).slice(0, MAX_POWER_UPS)
+      ? selectors.map((node) => ({ node, type: null })).slice(0, MAX_POWER_UPS)
       : false;
   }
 
@@ -164,7 +164,7 @@ class GameDOM {
    */
   addPowerUp(powerUp) {
     if (POWER_UPS.has(powerUp)) {
-      let nextPowerUp = this.powerUps.find(p => p.type === null);
+      let nextPowerUp = this.powerUps.find((p) => p.type === null);
 
       if (nextPowerUp) {
         nextPowerUp.type = powerUp;
@@ -180,7 +180,7 @@ class GameDOM {
     this.powerUps.forEach((p, i, a) => {
       const next = a[i + 1];
 
-      if (next && next.type !== null) {
+      if (next !== undefined && next.type !== null) {
         p.node.classList.replace(`powerUp${p.type}`, `powerUp${next.type}`);
         p.type = next.type;
       } else {
@@ -208,7 +208,7 @@ class GameDOM {
       return;
     }
 
-    const player = this.players.find(p => p.id === data.id);
+    const player = this.players.find((p) => p.id === data.id);
 
     if (player) {
       this.gameView.updatePlayer(data);
@@ -234,7 +234,7 @@ class GameDOM {
     messageHeader.innerText = message.header;
     gameOverMessageText.appendChild(messageHeader);
 
-    message.body.forEach(line => {
+    message.body.forEach((line) => {
       let newLine = document.createElement('p');
       newLine.innerText = line;
       gameOverMessageText.appendChild(newLine);
@@ -248,7 +248,7 @@ class GameDOM {
    * Unsubscribes gameDOM from all topics
    */
   unsubscribe() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
     this.gameView.unsubscribe();
   }
 }
