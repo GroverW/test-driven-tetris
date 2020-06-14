@@ -134,8 +134,8 @@ describe('game server tests', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
 
-      const sendSpy1 = jest.spyOn(p1, '_send');
-      const sendSpy2 = jest.spyOn(p2, '_send');
+      const sendSpy1 = jest.spyOn(p1, 'send');
+      const sendSpy2 = jest.spyOn(p2, 'send');
 
       mpGameServer.sendAll(p1, '');
 
@@ -147,8 +147,8 @@ describe('game server tests', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
 
-      const sendSpy1 = jest.spyOn(p1, '_send');
-      const sendSpy2 = jest.spyOn(p2, '_send');
+      const sendSpy1 = jest.spyOn(p1, 'send');
+      const sendSpy2 = jest.spyOn(p2, 'send');
 
       mpGameServer.sendAllExcept(p1, '');
 
@@ -252,14 +252,14 @@ describe('game server tests', () => {
       expect(mpGameServer.nextRanking).toBe(3);
 
       const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
-      const _sendSpy1 = jest.spyOn(p1, '_send');
+      const sendSpy1 = jest.spyOn(p1, 'send');
 
       // this will add the current piece to the board
       // and try to get a new one on top of it
       p1.game.board.drop();
 
       expect(sendAllSpy).toHaveBeenCalledTimes(1);
-      expect(_sendSpy1).toHaveBeenCalledTimes(1);
+      expect(sendSpy1).toHaveBeenCalledTimes(1);
 
       expect(mpGameServer.nextRanking).toBe(2);
     });
@@ -363,7 +363,7 @@ describe('game server tests', () => {
     test('game start - not host', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
-      const sendSpy = jest.spyOn(p2, '_send');
+      const sendSpy = jest.spyOn(p2, 'send');
       expect(sendSpy).toHaveBeenCalledTimes(0);
 
       mpGameServer.startGame(p2);
