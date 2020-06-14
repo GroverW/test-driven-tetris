@@ -12,7 +12,7 @@ class Player {
   constructor(send, pubSub) {
     this.id;
     this.isHost = false;
-    this._send = send;
+    this.send = send;
     this.pubSub = pubSub;
     this.game = new ServerGame(this.pubSub);
   }
@@ -42,7 +42,7 @@ class Player {
    * Publishes a message for the current game to be started
    */
   startGame() {
-    (this.game.gameStatus !== null) && this.pubSub.publish('startGame', this);
+    if (this.game.gameStatus !== null) this.pubSub.publish('startGame', this);
   }
 }
 
