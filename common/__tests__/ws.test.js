@@ -282,12 +282,12 @@ describe('websocket tests', () => {
     ];
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
 
     clientToServer.player.game.executeCommandQueue(COMMANDS2);
 
     expect(clientToServer.player.game.powerUps.length).toBe(1);
-    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(1);
+    expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(1);
   });
 
   test('power up - should not add if single player', () => {
@@ -311,17 +311,19 @@ describe('websocket tests', () => {
     ];
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
 
     clientToServer.player.game.executeCommandQueue(COMMANDS2);
 
     expect(clientToServer.player.game.powerUps.length).toBe(0);
-    expect(serverToClient.gameDOM.powerUps.filter(p => p.type).length).toBe(0);
+    expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
   });
 
   describe('error messages', () => {
     test('join game - game full', () => {
-        
+      const player3 = new Player(mockSend, serverPubSub());
+      const player4 = new Player(mockSend, serverPubSub());
+      const player5 = new Player(mockSend, serverPubSub());
     });
 
     test('send error message', () => {
