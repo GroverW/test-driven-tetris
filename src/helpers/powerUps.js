@@ -7,14 +7,14 @@ const { PIECE_TYPES } = require('common/helpers/constants');
  * @param {array} board2 - board to add lines to
  */
 const swapLines = (board1, board2) => {
-  let newBoard1 = [...board1]
+  let newBoard1 = [...board1];
   let newBoard2 = [...board2];
   const blankRow = new Array(board1[0].length).fill(0);
 
-  board1.slice(-2).forEach(row => {
-    if(row.some(cell => cell))  {
+  board1.slice(-2).forEach((row) => {
+    if(row.some((cell) => cell))  {
       // maps each non-empty cell to a neutral grey cell
-      const addRow = row.map(cell => cell && PIECE_TYPES.N );
+      const addRow = row.map((cell) => cell && PIECE_TYPES.N );
       newBoard2.push(addRow);
       newBoard2.shift();
       newBoard1.unshift([...blankRow]);
@@ -40,7 +40,7 @@ const swapBoards = (board1, board2) => {
  * Scrambles the cells of every row on a board.
  * @param {array} board - board to scramble
  */
-const scrambleBoard = board => board.map(row => randomize(row));
+const scrambleBoard = (board) => board.map((row) => randomize(row));
 
 /**
  * Clears board.
