@@ -6,7 +6,9 @@ let subscribers = {};
  * @param {*} data - data to publish to topic
  */
 const publish = (topic, data) => {
-  subscribers[topic] && subscribers[topic].forEach(obj => obj.callback(data));
+  if (subscribers[topic] !== undefined) {
+    subscribers[topic].forEach((obj) => obj.callback(data));
+  }
 }
 
 /**
@@ -28,19 +30,19 @@ const subscribe = (topic, callback) => {
 const addTopic = (topic, callback) => {
   const id = 0;
   subscribers[topic] = [{ id, callback }];
-  
+
   return id;
 };
 
 const addSubscriber = (topic, callback) => {
   const id = subscribers[topic].length;
   subscribers[topic].push({ id, callback });
-  
+
   return id;
 };
 
 const removeSubscriber = (topic, id) => {
-  subscribers[topic] = subscribers[topic].filter(s => s.id !== id);
+  subscribers[topic] = subscribers[topic].filter((s) => s.id !== id);
 }
 
 module.exports = {
