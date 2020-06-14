@@ -30,9 +30,9 @@ class ServerBoard extends Board {
    */
   clearLines() {
     const numCleared = super.clearLines();
-    numCleared && this.publishBoardUpdate();
+    if (numCleared > 0) this.publishBoardUpdate();
   }
-  
+
   /**
    * Publishes any board updates
    */
