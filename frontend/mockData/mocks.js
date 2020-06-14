@@ -69,6 +69,7 @@ const getMockDOMSelector = () => ({
   getContext: () => getMockCtx(),
   appendChild: jest.fn(),
   play: jest.fn(),
+  pause: jest.fn(),
 });
 
 const getMockGameDOMSelectors = () => ({
