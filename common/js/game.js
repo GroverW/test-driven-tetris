@@ -60,7 +60,7 @@ class Game {
   updateLinesRemaining(lines) {
     this.lines += lines;
 
-    if(this.linesRemaining <= lines) this.level++
+    if(this.linesRemaining <= lines) this.level += 1;
 
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
   }
