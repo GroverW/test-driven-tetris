@@ -19,7 +19,7 @@ const addGameIdToStats = (id) => {
  * Creates a new single, or multiplayer game
  * @param {string} type - 'single' or 'multi'
  */
-const createGame = async type => {
+const createGame = async (type) => {
   try {
     const response = await axios.get(`/game/${type}`);
 
@@ -27,7 +27,7 @@ const createGame = async type => {
 
     connectToGame(gameId);
 
-    (type === 'multi') && addGameIdToStats(gameId);
+    if (type === 'multi') addGameIdToStats(gameId);
   } catch (err) {
     console.log(err.response);
   }
@@ -37,7 +37,7 @@ const createGame = async type => {
  * Connects to an already created game
  * @param {string} gameId - game id
  */
-const connectToGame = gameId => {
+const connectToGame = (gameId) => {
   const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
 
   let game, gameDOM, api;
@@ -45,7 +45,7 @@ const connectToGame = gameId => {
   /**
    * What to do when the websocket is opened
    */
-  ws.onopen = evt => {
+  ws.onopen = (evt) => {
     console.log(evt);
     console.log('connected');
     // let data = { type: "join", name: 'floop' };
@@ -55,7 +55,7 @@ const connectToGame = gameId => {
   /**
    * What to do when the websocket is closed
    */
-  ws.onclose = evt => {
+  ws.onclose = (evt) => {
     console.log('connection closed by server');
     console.log(evt);
   }
@@ -63,7 +63,7 @@ const connectToGame = gameId => {
   /**
    * What to do when receiving a message over the websocket
    */
-  ws.onmessage = evt => {
+  ws.onmessage = (evt) => {
     const { type, data } = JSON.parse(evt.data);
     console.log("WHAT GOT PARSED", type, data);
     
@@ -109,17 +109,17 @@ const connectToGame = gameId => {
  * @param {object} api - instance of Api class
  */
 const createEventListeners = (game, api) => {
-  startButton.addEventListener('click', event => {
-    event.target.blur();
+  startButton.addEventListener('click', (evt) => {
+    evt.target.blur();
     api.sendMessage({ type: 'play', data: '' })
   })
 
-  document.addEventListener('keydown', event => {
-    game.toggleMove(event.which, 'down');
+  document.addEventListener('keydown', (evt) => {
+    game.toggleMove(evt.which, 'down');
   });
 
-  document.addEventListener('keyup', event => {
-    game.toggleMove(event.which, 'up');
+  document.addEventListener('keyup', (evt) => {
+    game.toggleMove(evt.which, 'up');
   })
 }
 
