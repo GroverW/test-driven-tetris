@@ -27,11 +27,11 @@ class PieceList {
    */
   getNextPiece() {
     const currentPiece = this.pieces[this.currSet][this.currIdx];
-    this.currIdx++;
+    this.currIdx += 1;
     
     if(this.currIdx >= this.pieces[this.currSet].length) {
       this.currIdx = 0;
-      this.currSet++;
+      this.currSet += 1;
     }
     
     return currentPiece;
