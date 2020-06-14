@@ -79,7 +79,7 @@ class ClientGame extends Game {
    * @param {numbere} id - player id
    */
   removePlayer(id) {
-    this.players = this.players.filter(pId => pId !== id);
+    this.players = this.players.filter((pId) => pId !== id);
   }
 
   /**
@@ -260,7 +260,7 @@ class ClientGame extends Game {
    * Unsubscribes from all pubSub topics.
    */
   unsubscribe() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
   }
 
   /**
