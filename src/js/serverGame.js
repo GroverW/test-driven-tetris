@@ -51,7 +51,7 @@ class ServerGame extends Game {
    * @param {string[]} commands - list of commands to execute
    */
   executeCommandQueue(commands) {
-    commands.forEach(action => this.command(action));
+    commands.forEach((action) => this.command(action));
 
     this.pubSub.publish('updatePlayer', {
       id: this.playerId,
@@ -66,11 +66,11 @@ class ServerGame extends Game {
   addPowerUp(powerUp) {
     if (
       this.gameType === GAME_TYPES.MULTI &&
-      POWER_UPS.has(powerUp) && 
+      POWER_UPS.has(powerUp) &&
       this.powerUps.length < MAX_POWER_UPS
     ) {
       this.powerUps.push(powerUp);
-      this.pubSub.publish('addPowerUp', { id: this.playerId, powerUp, });
+      this.pubSub.publish('addPowerUp', { powerUp, id: this.playerId, });
     }
   }
 
@@ -82,10 +82,10 @@ class ServerGame extends Game {
   usePowerUp(id) {
     if (this.powerUps.length) {
       const powerUp = this.powerUps.shift();
-      this.pubSub.publish('usePowerUp', { 
+      this.pubSub.publish('usePowerUp', {
+        powerUp,
         player1: this.playerId,
-        player2: id, 
-        powerUp, 
+        player2: id,
       });
     }
   }
@@ -106,7 +106,7 @@ class ServerGame extends Game {
    */
   clearLines(lines) {
     super.clearLines(lines);
-    lines && this.addPowerUp(this.getRandomPowerUp());
+    if (lines > 0) this.addPowerUp(this.getRandomPowerUp());
   }
 
   /**
@@ -121,7 +121,7 @@ class ServerGame extends Game {
    * Unsubscribes from all pubSub topics.
    */
   unsubscribe() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
   }
 }
 
