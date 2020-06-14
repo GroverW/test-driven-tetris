@@ -3,6 +3,7 @@ const Player = require('backend/js/player');
 const serverPubSub = require('backend/helpers/pubSub');
 const ClientGame = require('frontend/static/js/clientGame');
 const GameDOM = require('frontend/static/js/gameDOM');
+const ClientError = require('frontend/static/js/clientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 
@@ -66,7 +67,7 @@ class MockServerListener {
    * Unsubscribes from all websocket messages
    */
   unsubAll() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
   }
 }
 
@@ -83,6 +84,7 @@ class MockClientListener {
   constructor(ws, selectors) {
     this.gameDOM;
     this.game;
+    this.clientError = new ClientError();
     this.selectors = selectors;
     this.subscriptions = [
       ws.on('addPlayer', this.addPlayer.bind(this)),
@@ -162,8 +164,8 @@ class MockClientListener {
    */
   unsubAll() {
     this.subscriptions.forEach(unsub => unsub());
-    this.gameDOM && this.gameDOM.unsubscribe();
-    this.game && this.game.unsubscribe();
+    if (this.gameDOM !== undefined) this.gameDOM.unsubscribe();
+    if (this.game !== undefined) this.game.unsubscribe();
   }
 }
 
