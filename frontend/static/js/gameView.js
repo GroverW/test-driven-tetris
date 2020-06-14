@@ -49,9 +49,9 @@ class GameView {
    * @param {array} [data.nextPiece.grid] - nextPiece grid to draw
    */
   draw(data) {
-    data.board && this.drawBoard(this.ctx, data.board);
-    data.piece && this.drawPiece(this.ctx, data.piece, data.piece.x, data.piece.y);
-    data.nextPiece && this.drawNext(this.ctxNext, data.nextPiece);
+    if (data.board) this.drawBoard(this.ctx, data.board);
+    if (data.piece) this.drawPiece(this.ctx, data.piece, data.piece.x, data.piece.y);
+    if (data.nextPiece) this.drawNext(this.ctxNext, data.nextPiece);
   }
 
   /**
@@ -86,7 +86,7 @@ class GameView {
 
   drawCell(ctx, xStart, yStart, width, height, color) {
     ctx.save();
-    
+
     ctx.fillStyle = color.highlight;
     ctx.beginPath();
     ctx.moveTo(xStart, yStart)
@@ -169,8 +169,8 @@ class GameView {
    * @param {number} id - id of player to remove
    */
   removePlayer(id) {
-    const playerIdx = this.players.findIndex(p => p.id === id);
-    (playerIdx >= 0) && this.players.splice(playerIdx, 1);
+    const playerIdx = this.players.findIndex((p) => p.id === id);
+    if (playerIdx > -1) this.players.splice(playerIdx, 1);
 
     if (this.players.length === 1) {
       this.scaleBoardSize(this.players[0].ctx, CELL_SIZE);
@@ -184,7 +184,7 @@ class GameView {
    * @param {array} board - board of player to update
    */
   updatePlayer({ id, board }) {
-    const player = this.players.find(p => p.id === id);
+    const player = this.players.find((p) => p.id === id);
 
     if (player) {
       player.board = board;
@@ -196,7 +196,7 @@ class GameView {
    * Unsubscribes gameView from all topics
    */
   unsubscribe() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
   }
 }
 
