@@ -47,7 +47,7 @@ class GameServer {
    * @returns {string} - id of new game
    */
   static addGame(id, gameType) {
-    !GAMES.has(id) && GAMES.set(id, new GameServer(id, gameType))
+    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType))
 
     return id;
   }
@@ -70,7 +70,8 @@ class GameServer {
   join(player) {
     if (!this.checkGameStatus()) return false;
 
-    player.setId(++this.nextPlayerId);
+    this.nextPlayerId += 1;
+    player.setId(this.nextPlayerId);
     player.setGameType(this.gameType);
 
     this.players.push(player);
@@ -80,8 +81,8 @@ class GameServer {
     this.sendAll({ type: 'addPlayer', data: player.id });
 
     // send existing players to new player
-    this.players.forEach(p => {
-      (p !== player) && this.sendTo(player, { type: 'addPlayer', data: p.id, })
+    this.players.forEach((p) => {
+      if (p !== player) this.sendTo(player, { type: 'addPlayer', data: p.id, })
     });
 
     this.setHost();
@@ -110,7 +111,7 @@ class GameServer {
    * @param {number} id - player id
    */
   removeSubscriptions(id) {
-    this.subscriptions[id].forEach(unsub => unsub());
+    this.subscriptions[id].forEach((unsub) => unsub());
   }
 
   /**
@@ -119,11 +120,11 @@ class GameServer {
    * @returns {boolean} - whether or not player was removed
    */
   leave(player) {
-    if(!this.removePlayer(player)) return false;
+    if (!this.removePlayer(player)) return false;
     this.sendAll({ type: 'removePlayer', data: player.id });
 
     if (!this.players.length) GAMES.delete(this.id);
-    
+
     this.nextRanking--;
     this.checkIfWinner();
     this.setHost();
@@ -140,7 +141,7 @@ class GameServer {
     if (!this.players.includes(player)) return false;
 
     this.removeSubscriptions(player.id);
-    this.players = this.players.filter(p => p !== player);
+    this.players = this.players.filter((p) => p !== player);
 
     return true;
   }
@@ -149,7 +150,7 @@ class GameServer {
    * Sets the first player to be the host
    */
   setHost() {
-    if(this.players.length) this.players[0].isHost = true;
+    if (this.players.length) this.players[0].isHost = true;
   }
 
   /**
@@ -157,7 +158,7 @@ class GameServer {
    * @param {object} data - type of message and data to send
    */
   sendAll(data) {
-    this.players.forEach(player => this.sendTo(player, data));
+    this.players.forEach((player) => this.sendTo(player, data));
   }
 
   /**
@@ -166,8 +167,9 @@ class GameServer {
    * @param {object} data - type of message and data to send
    */
   sendAllExcept(exceptPlayer, data) {
-    this.players.forEach(player =>
-      (player !== exceptPlayer) && this.sendTo(player, data)
+    this.players.forEach((player) => {
+      if (player !== exceptPlayer) this.sendTo(player, data)
+    }
     );
   }
 
@@ -177,7 +179,7 @@ class GameServer {
    * @param {object} data - type of message and data to send
    */
   sendTo(player, data) {
-    player._send(JSON.stringify(data));
+    player.send(JSON.stringify(data));
   }
 
   /**
@@ -208,7 +210,7 @@ class GameServer {
    */
   addPowerUp(data) {
     const player = this.getPlayerById(data.id);
-    player && this.sendTo(player, {
+    if (player) this.sendTo(player, {
       type: 'addPowerUp',
       data: data.powerUp
     })
@@ -252,8 +254,8 @@ class GameServer {
         default:
           break;
       }
-      result1 && this.updatePlayer({ id: data.player1, board: result1 }, true);
-      result2 && this.updatePlayer({ id: data.player2, board: result2 }, true);
+      if (result1) this.updatePlayer({ id: data.player1, board: result1 }, true);
+      if (result2) this.updatePlayer({ id: data.player2, board: result2 }, true);
     }
   }
 
@@ -263,13 +265,13 @@ class GameServer {
    * @returns {boolean} - whether or not game was started
    */
   startGame(player) {
-    if(!this.checkStartConditions(player)) return false;
+    if (!this.checkStartConditions(player)) return false;
 
     this.gameStarted = true;
 
     this.getPieces();
 
-    this.players.forEach(p => p.game.start());
+    this.players.forEach((p) => p.game.start());
 
     this.sendAll({ type: 'startGame' });
 
@@ -291,7 +293,7 @@ class GameServer {
       });
       return false;
     }
-    
+
     if (!player.isHost) {
       this.sendTo(player, {
         type: 'error',
@@ -299,7 +301,7 @@ class GameServer {
       });
       return false;
     }
-    
+
     return true;
   }
 
@@ -308,8 +310,8 @@ class GameServer {
    */
   getPieces() {
     const pieces = randomize(SEED_PIECES);
-    
-    this.players.forEach(player => player.game.board.pieceList.addSet(pieces));
+
+    this.players.forEach((player) => player.game.board.pieceList.addSet(pieces));
 
     this.sendAll({ type: 'addPieces', data: pieces })
   }
@@ -343,7 +345,7 @@ class GameServer {
     let count = this.players.length;
     let winner = false;
 
-    this.players.forEach(p => {
+    this.players.forEach((p) => {
       if (p.game.gameStatus) winner = p;
       else count--;
     });
@@ -388,7 +390,7 @@ class GameServer {
    * @returns {object} - player instance
    */
   getPlayerById(id) {
-    return this.players.find(p => p.id === id);
+    return this.players.find((p) => p.id === id);
   }
 
   /**
@@ -396,7 +398,7 @@ class GameServer {
    */
   unsubscribe() {
     Object.values(this.subscriptions)
-      .forEach(p => p.forEach(unsub => unsub()));
+      .forEach((p) => p.forEach((unsub) => unsub()));
   }
 }
 
