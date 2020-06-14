@@ -76,9 +76,9 @@ class Board {
    * and adds it to the board.
    */
   hardDrop() {
-    let yChange = 0;
+    let yChange = 1;
 
-    while (this.validMove(0, ++yChange)) continue;
+    while (this.validMove(0, yChange)) yChange += 1;
 
     this.movePiece(0, yChange - 1, POINTS.HARD_DROP);
     this.drop();
@@ -93,14 +93,15 @@ class Board {
   validMove(xChange, yChange) {
     const xStart = this.piece.x + xChange;
     const yStart = this.piece.y + yChange;
-    return this.piece.grid.every((row, yDiff) =>
-      row.every((cell, xDiff) =>
-        (cell === 0
-          || (this.isInBounds(xStart + xDiff, yStart + yDiff)
-            && this.isEmpty(xStart + xDiff, yStart + yDiff))
+    return this.piece.grid.every((row, yDiff) => (
+      row.every((cell, xDiff) => (
+        cell === 0
+        || (
+          this.isInBounds(xStart + xDiff, yStart + yDiff)
+          && this.isEmpty(xStart + xDiff, yStart + yDiff)
         )
-      )
-    )
+      ))
+    ))
   }
 
   /**
@@ -141,7 +142,7 @@ class Board {
       if (this.validMove(xChange, yChange)) {
         const diff = (xChange !== 0 || yChange !== 0);
         // moves piece if a valid location could be found for it
-        diff && this.movePiece(xChange, yChange, 0);
+        if (diff) this.movePiece(xChange, yChange, 0);
         return;
       }
     }
@@ -171,14 +172,14 @@ class Board {
     let numCleared = 0;
 
     this.grid.forEach((row, rowInd) => {
-      if (row.every(cell => cell > 0)) {
+      if (row.every((cell) => cell > 0)) {
         this.grid.splice(rowInd, 1);
         this.grid.unshift(Array(BOARD_WIDTH).fill(0));
-        numCleared++;
+        numCleared += 1;
       }
     })
 
-    numCleared && this.pubSub.publish('clearLines', numCleared);
+    if (numCleared > 0) this.pubSub.publish('clearLines', numCleared);
 
     return numCleared;
   }
@@ -202,7 +203,7 @@ class Board {
     }
 
     const heightDiff = maxHeight - yEnd;
-    
+
     // try to move piece at max 5 spaces from maxHeight if not already
     if (heightDiff < 5) {
       const yMove = Math.max(heightDiff - 5, -yStart);
