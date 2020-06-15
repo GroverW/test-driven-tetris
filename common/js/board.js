@@ -1,6 +1,6 @@
 const { BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I } = require('../helpers/constants');
 const { getEmptyBoard } = require('common/helpers/utils');
-const { PieceList, Piece } = require('./piece');
+const { PieceList, Piece } = require('./Piece');
 
 /**
  * Represents a game board

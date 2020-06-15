@@ -1,9 +1,9 @@
-const GameServer = require('backend/js/gameServer');
-const Player = require('backend/js/player');
+const GameServer = require('backend/js/GameServer');
+const Player = require('backend/js/Player');
 const serverPubSub = require('backend/helpers/pubSub');
-const ClientGame = require('frontend/static/js/clientGame');
-const GameDOM = require('frontend/static/js/gameDOM');
-const ClientError = require('frontend/static/js/clientError');
+const ClientGame = require('frontend/static/js/ClientGame');
+const GameDOM = require('frontend/static/js/GameDOM');
+const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 

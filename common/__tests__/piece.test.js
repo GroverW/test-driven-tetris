@@ -1,5 +1,5 @@
-const { Piece } = require('common/js/piece');
-const Board = require('common/js/board');
+const { Piece } = require('common/js/Piece');
+const Board = require('common/js/Board');
 const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('common/helpers/constants');
 const { getTestPieces } = require('common/mockData/mocks');
 

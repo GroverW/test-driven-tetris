@@ -1,6 +1,6 @@
-const Game = require('common/js/game');
-const Board = require('common/js/board');
-const { Piece } = require('common/js/piece');
+const Game = require('common/js/Game');
+const Board = require('common/js/Board');
+const { Piece } = require('common/js/Piece');
 const {
   PIECE_TYPES,
   ROTATE_LEFT,
