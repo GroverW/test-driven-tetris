@@ -2,8 +2,8 @@
 require('module-alias/register');
 const express = require('express');
 const app = express();
-const GameServer = require('./src/js/gameServer');
-const Player = require('./src/js/player');
+const GameServer = require('./src/js/GameServer');
+const Player = require('./src/js/Player');
 const pubSub = require('./src/helpers/pubSub');
 const { v4: uuid } = require('uuid');
 const { GAME_TYPES } = require('./src/helpers/serverConstants');

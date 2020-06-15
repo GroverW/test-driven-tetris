@@ -1,5 +1,5 @@
 const request = require('supertest');
-const GameServer = require('./src/js/gameServer');
+const GameServer = require('./src/js/GameServer');
 const { GAMES, GAME_TYPES } = require('./src/helpers/serverConstants');
 
 const app = require('./app');
