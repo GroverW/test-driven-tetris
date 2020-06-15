@@ -1,4 +1,4 @@
-const Board = require('common/js/board');
+const Board = require('common/js/Board');
 
 
 /**

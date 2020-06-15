@@ -1,5 +1,5 @@
-const Game = require('common/js/game');
-const ServerBoard = require('./serverBoard');
+const Game = require('common/js/Game');
+const ServerBoard = require('./ServerBoard');
 const {
   GAME_TYPES,
   PLAYERS,

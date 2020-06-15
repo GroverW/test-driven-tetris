@@ -1,4 +1,4 @@
-const ServerGame = require('./serverGame');
+const ServerGame = require('./ServerGame');
 
 /**
  * Represents a player on the back-end

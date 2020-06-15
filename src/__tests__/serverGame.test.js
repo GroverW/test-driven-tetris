@@ -1,5 +1,5 @@
-const ServerGame = require('backend/js/serverGame');
-const { Piece } = require('common/js/piece');
+const ServerGame = require('backend/js/ServerGame');
+const { Piece } = require('common/js/Piece');
 const {
   GAME_TYPES,
   PIECE_TYPES,
