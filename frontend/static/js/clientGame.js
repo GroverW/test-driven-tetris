@@ -1,5 +1,5 @@
-const Game = require('common/js/game');
-const ClientBoard = require('./clientBoard');
+const Game = require('common/js/Game');
+const ClientBoard = require('./ClientBoard');
 const {
   PLAYER_KEYS,
   CONTROLS,

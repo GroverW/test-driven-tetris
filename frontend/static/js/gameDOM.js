@@ -1,4 +1,4 @@
-const GameView = require('./gameView');
+const GameView = require('./GameView');
 const { subscribe } = require('frontend/helpers/pubSub');
 const {
   getEmptyBoard,
