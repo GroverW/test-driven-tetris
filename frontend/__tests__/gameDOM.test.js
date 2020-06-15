@@ -1,6 +1,6 @@
-const GameDOM = require('frontend/static/js/gameDOM');
-const ClientGame = require('frontend/static/js/clientGame');
-const { Piece } = require('common/js/piece');
+const GameDOM = require('frontend/static/js/GameDOM');
+const ClientGame = require('frontend/static/js/ClientGame');
+const { Piece } = require('common/js/Piece');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
 const { CONTROLS, PIECE_TYPES, POWER_UP_TYPES } = require('frontend/helpers/clientConstants');

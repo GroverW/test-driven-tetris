@@ -1,4 +1,4 @@
-const ClientError = require('frontend/static/js/clientError');
+const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 

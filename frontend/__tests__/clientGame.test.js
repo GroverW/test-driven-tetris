@@ -1,5 +1,5 @@
-const ClientGame = require('frontend/static/js/clientGame');
-const { Piece } = require('common/js/piece');
+const ClientGame = require('frontend/static/js/ClientGame');
+const { Piece } = require('common/js/Piece');
 const {
   PIECE_TYPES,
   CONTROLS,

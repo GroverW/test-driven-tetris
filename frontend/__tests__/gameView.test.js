@@ -1,5 +1,5 @@
-const GameView = require('frontend/static/js/gameView')
-const ClientGame = require('frontend/static/js/clientGame');
+const GameView = require('frontend/static/js/GameView')
+const ClientGame = require('frontend/static/js/ClientGame');
 const {
   CONTROLS,
   BOARD_HEIGHT,
