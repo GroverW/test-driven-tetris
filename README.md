@@ -10,9 +10,9 @@ common                              # Wrapping folder for common js files
 │   ├── constants                   # Constants to define game settings
 │   └── utils                       # Utilities (randomize, getEmptyBoard)
 └── js
-    └── game                        # Base game class used by frontend and backend
-        └── board                   # Base board class used by frontend and backend
-            └── piece               # Creates and gets new pieces
+    └── Game                        # Base game class used by frontend and backend
+        └── Board                   # Base board class used by frontend and backend
+            └── Piece               # Creates and gets new pieces
 
 
 frontend                            # Wrapping folder for front-end
@@ -20,17 +20,18 @@ frontend                            # Wrapping folder for front-end
 │   ├── api                         # Class for sending messages to backend
 │   ├── clientConstants             # Constants specific to client
 │   ├── pubSub                      # Publish / subscribe helper functions
+│   ├── DOMSelectors                # Game and Menu DOM selectors
+│   ├── gameFunctions               # Create and Connect to game
 │   └── clientUtils                 # Utilities (e.g. getNewPlayer, getNewBoard)
 └── static
     ├── index                       # Main html file
     ├── css               
     │   └── style                   # Main stylesheet
     └── js
-        ├── clientGame              # Manages score, commands, etc. (extends common game class)
-        │   └── clientBoard         # Manages board state and pieces (extends common board class)
-        │       └── piece           # Creates and gets new pieces (imported from common)
-        ├── gameDOM                 # Manages DOM manipulation
-        │   └── gameView            # Manages HTML canvas manipulation
+        ├── ClientGame              # Manages score, commands, etc. (extends common Game class)
+        │   └── ClientBoard         # Manages board state and pieces (extends common Board class)
+        ├── GameDOM                 # Manages DOM manipulation
+        │   └── GameView            # Manages HTML canvas manipulation
         └── main                    # Placeholder for event handlers
         
 
@@ -39,11 +40,10 @@ src                                 # Wrapping folder for back-end classes
 │   ├── serverConstants             # Constants specific to server
 │   └── pubSub                      # Factory function for creating local pub/sub functions
 └── js
-    └── gameServer                  # Manages adding / removing players, sending messages
-        └── player                  # Associates game with gameServer        
-            └── serverGame          # Manages score, executes commands, etc (extends common game class)
-                └── serverBoard     # Manages board state and pieces (extends common board class)
-                    └── piece       # Creates and gets new pieces (imported from common)
+    └── GameServer                  # Manages adding / removing players, sending messages
+        └── Player                  # Associates game with gameServer        
+            └── ServerGame          # Manages score, executes commands, etc (extends common Game class)
+                └── ServerBoard     # Manages board state and pieces (extends common Board class)
 
 app                                 # Backend-routes
 ```
