@@ -320,13 +320,22 @@ describe('websocket tests', () => {
   });
 
   describe('error messages', () => {
-    test('join game - game full', () => {
-      const player3 = new Player(mockSend, serverPubSub());
-      const player4 = new Player(mockSend, serverPubSub());
-      const player5 = new Player(mockSend, serverPubSub());
+    test('start game - not enough players', () => {
+      const errorSpy = pubSubSpy.add('addError');
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      expect(serverToClient.clientError.error.innerText).toBe('');
+
+      clientToServer.startGame();
+      
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(serverToClient.clientError.error.innerText).not.toBe('');
+      
+      clientToServer.gameServer.join(player2);
     });
 
     test('send error message', () => {
+      const errorSpy = pubSubSpy.add('error');
 
     });
   });
