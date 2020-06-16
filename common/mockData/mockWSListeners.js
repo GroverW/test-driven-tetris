@@ -6,6 +6,7 @@ const GameDOM = require('frontend/static/js/GameDOM');
 const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const { getMockDOMSelector } = require('frontend/mockData/mocks');;
 
 
 /**
@@ -84,7 +85,7 @@ class MockClientListener {
   constructor(ws, selectors) {
     this.gameDOM;
     this.game;
-    this.clientError = new ClientError();
+    this.clientError = new ClientError(getMockDOMSelector());
     this.selectors = selectors;
     this.subscriptions = [
       ws.on('addPlayer', this.addPlayer.bind(this)),
@@ -94,6 +95,7 @@ class MockClientListener {
       ws.on('addPowerUp', this.addPowerUp.bind(this)),
       ws.on('addPieces', this.addPieces.bind(this)),
       ws.on('gameOver', this.gameOver.bind(this)),
+      ws.on('error', this.addError.bind(this)),
     ];
   }
 
@@ -166,6 +168,10 @@ class MockClientListener {
     this.subscriptions.forEach(unsub => unsub());
     if (this.gameDOM !== undefined) this.gameDOM.unsubscribe();
     if (this.game !== undefined) this.game.unsubscribe();
+  }
+
+  addError(data) {
+    publish('addError', data);
   }
 }
 
