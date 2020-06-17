@@ -320,6 +320,18 @@ describe('websocket tests', () => {
   });
 
   describe('error messages', () => {
+    test('send error message', () => {
+      const errorSpy = pubSubSpy.add('addError');
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      expect(serverToClient.clientError.error.innerText).toBe('');
+      
+      clientToServer.gameServer.sendError(clientToServer.player, 'test');
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(serverToClient.clientError.error.innerText).not.toBe('');
+    });
+
     test('start game - not enough players', () => {
       const errorSpy = pubSubSpy.add('addError');
 
@@ -330,13 +342,36 @@ describe('websocket tests', () => {
       
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(serverToClient.clientError.error.innerText).not.toBe('');
+
+      clientToServer.gameServer.join(player2);
+
+      clientToServer.startGame();
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('start game - not host', () => {
+      const errorSpy = pubSubSpy.add('addError');
       
       clientToServer.gameServer.join(player2);
-    });
+      clientToServer.gameServer.players[0].isHost = false;
+      clientToServer.gameServer.players[1].isHost = true;
 
-    test('send error message', () => {
-      const errorSpy = pubSubSpy.add('error');
+      expect(errorSpy).not.toHaveBeenCalled();
+      expect(serverToClient.clientError.error.innerText).toBe('');
 
+      clientToServer.startGame();
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(serverToClient.clientError.error.innerText).not.toBe('');
+
+      clientToServer.gameServer.players[0].isHost = true;
+      clientToServer.gameServer.players[1].isHost = false;
+
+      clientToServer.startGame();
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
     });
+    
   });
 });
