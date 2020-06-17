@@ -89,7 +89,7 @@ class ClientGame extends Game {
    * @param {array} data.board - board to update
    */
   replaceBoard(data) {
-    if(data.id === this.playerId) this.board.replaceBoard(data.board);
+    if (data.id === this.playerId) this.board.replaceBoard(data.board);
   }
 
   /**
@@ -268,9 +268,15 @@ class ClientGame extends Game {
    * @param {number} currTime - Time elapsed since start of game in milliseconds
    */
   animate(currTime = 0) {
-    // calculate elapsed time for auto-movement and toggled movement
+    this.handleAutoDrop(currTime);
+
+    this.handleToggledMovement(currTime);
+
+    this.animationId = requestAnimationFrame(this.animate.bind(this));
+  }
+
+  handleAutoDrop(currTime) {
     this.time.elapsed = currTime - this.time.start;
-    this.moveTime.elapsed = currTime - this.moveTime.start;
 
     const validNextMove = this.board.validMove(0, 1);
 
@@ -286,6 +292,10 @@ class ClientGame extends Game {
       this.command(CONTROLS.AUTO_DOWN);
       this.lockDelay = 0;
     }
+  }
+
+  handleToggledMovement(currTime) {
+    this.moveTime.elapsed = currTime - this.moveTime.start;
 
     // executes movement of toggled key
     if (this.toggledKey) {
@@ -297,11 +307,7 @@ class ClientGame extends Game {
     } else {
       this.moveDelayIdx = 0;
     }
-
-
-    this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
-
   /**
    * Calculates the total delay in milliseconds until the next auto-movement
    * @param {boolean} validNextMove - Whether or not the next row is blocked
