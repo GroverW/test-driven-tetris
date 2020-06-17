@@ -182,6 +182,11 @@ class GameServer {
     player.send(JSON.stringify(data));
   }
 
+  /**
+   * Sends error message to specified player
+   * @param {object} player - player to send error to
+   * @param {string} message - error message
+   */
   sendError(player, message) {
     this.sendTo(player, {
       type: 'error',
