@@ -1,16 +1,34 @@
 const { getTestBoard } = require('common/mockData/mocks');
 const {
+  getFilledRow,
+  getBlankRow,
   swapLines,
   swapBoards,
   scrambleBoard,
   clearBoard,
 } = require('backend/helpers/powerUps');
+const { BOARD_WIDTH } = require('common/helpers/constants');
 
 describe('power ups', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
   
+  test('get filled row', () => {
+    Math.random = jest.fn().mockReturnValue(0);
+
+    const testLine = getFilledRow();
+
+    expect(testLine).toEqual(getTestBoard('filledLine'));
+  });
+
+  test('get blank row', () => {
+    const testRow = getBlankRow();
+    const expectedRow = new Array(BOARD_WIDTH).fill(0);
+
+    expect(testRow).toEqual(expectedRow)
+  })
+
   test('swap lines', () => {
     const board1 = getTestBoard('pattern1');
     const board2 = getTestBoard('pattern2');
