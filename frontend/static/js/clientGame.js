@@ -152,8 +152,8 @@ class ClientGame extends Game {
     ])
 
     if (validKeys.has(key)) {
-      const INCREMENT = this.getLockDelayIncrement();
-      this.lockDelay = Math.min(INCREMENT * 4, this.lockDelay + INCREMENT);
+      const increment = this.getLockDelayIncrement();
+      this.lockDelay = Math.min(increment * 4, this.lockDelay + increment);
     }
   }
 
@@ -162,10 +162,10 @@ class ClientGame extends Game {
    * @return {number} - Delay increment in milliseconds
    */
   getLockDelayIncrement() {
-    const BASE_DELAY = ANIMATION_SPEED[1];
-    const CURRENT_DELAY = this.getAnimationDelay();
-    // max is BASE_DELAY / 4, min is BASE_DELAY / 8
-    return ((BASE_DELAY / CURRENT_DELAY - 1) / 2 + 1) * CURRENT_DELAY / 4
+    const baseDelay = ANIMATION_SPEED[1];
+    const currentDelay = this.getAnimationDelay();
+    // max is baseDelay / 4, min is baseDelay / 8
+    return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4
   }
 
   /**

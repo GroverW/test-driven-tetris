@@ -24,7 +24,7 @@ class Game {
       this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this)),
       this.pubSub.subscribe('clearLines', this.clearLines.bind(this)),
       this.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
-    ]
+    ];
   }
 
   /**
