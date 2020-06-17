@@ -56,8 +56,16 @@ class GameServer {
    * Checks whether gameServer is full or game is already started
    * @returns {boolean} - whether gameServer has space and game is not already started
    */
-  checkGameStatus() {
+  checkGameStatus(player) {
     const full = this.players.length >= MAX_PLAYERS[this.gameType];
+
+    if (full) {
+      this.sendError(player, 'Sorry, that game is full.');
+    }
+
+    if (this.gameStarted) {
+      this.sendError(player, 'That game has already started.');
+    }
 
     return !full && !this.gameStarted;
   }
@@ -68,7 +76,7 @@ class GameServer {
    * @returns {boolean} - whether or not player was added successfully
    */
   join(player) {
-    if (!this.checkGameStatus()) return false;
+    if (!this.checkGameStatus(player)) return false;
 
     this.nextPlayerId += 1;
     player.setId(this.nextPlayerId);
