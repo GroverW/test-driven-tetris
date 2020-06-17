@@ -1,5 +1,17 @@
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
-const { PIECE_TYPES } = require('common/helpers/constants');
+const { BOARD_WIDTH, PIECE_TYPES } = require('common/helpers/constants');
+
+const getFilledRow = () => {
+  let filledRow = new Array(BOARD_WIDTH).fill(PIECE_TYPES.N);
+  
+  const clearCell = Math.floor(Math.random() * filledRow.length);
+
+  filledRow[clearCell] = 0;
+
+  return filledRow;
+}
+
+const getBlankRow = () => Array(BOARD_WIDTH).fill(0);
 
 /**
  * Moves the last (up to) 4 lines from one board to another
@@ -9,15 +21,12 @@ const { PIECE_TYPES } = require('common/helpers/constants');
 const swapLines = (board1, board2) => {
   let newBoard1 = [...board1];
   let newBoard2 = [...board2];
-  const blankRow = new Array(board1[0].length).fill(0);
 
   board1.slice(-2).forEach((row) => {
     if(row.some((cell) => cell))  {
-      // maps each non-empty cell to a neutral grey cell
-      const addRow = row.map((cell) => cell && PIECE_TYPES.N );
-      newBoard2.push(addRow);
+      newBoard2.push(getFilledRow());
       newBoard2.shift();
-      newBoard1.unshift([...blankRow]);
+      newBoard1.unshift(getBlankRow());
       newBoard1.pop();
     }
   })
@@ -48,6 +57,8 @@ const scrambleBoard = (board) => board.map((row) => randomize(row));
 const clearBoard = () => getEmptyBoard();
 
 module.exports = {
+  getFilledRow,
+  getBlankRow,
   swapLines,
   swapBoards,
   scrambleBoard,
