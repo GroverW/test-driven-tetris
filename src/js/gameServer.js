@@ -182,6 +182,13 @@ class GameServer {
     player.send(JSON.stringify(data));
   }
 
+  sendError(player, message) {
+    this.sendTo(player, {
+      type: 'error',
+      data: message,
+    });
+  }
+
   /**
    * Sends message to all players to update the board for the specified player
    * @param {object} data - data to send
@@ -287,18 +294,12 @@ class GameServer {
    */
   checkStartConditions(player) {
     if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) {
-      this.sendTo(player, {
-        type: 'error',
-        data: 'Not enough players to start game.',
-      });
+      this.sendError(player, 'Not enough players to start game.')
       return false;
     }
 
     if (!player.isHost) {
-      this.sendTo(player, {
-        type: 'error',
-        data: 'Only the host can start the game.',
-      });
+      this.sendError(player, 'Only the host can start the game.')
       return false;
     }
 
