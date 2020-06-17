@@ -1,7 +1,10 @@
 const { getEmptyBoard } = require('common/helpers/utils');
 
+const filledLine = [0, 8, 8, 8, 8, 8, 8, 8, 8, 8];
+
 const TEST_BOARDS = {
   empty: getEmptyBoard(),
+  filledLine,
   pattern1: [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -132,7 +135,7 @@ const TEST_BOARDS = {
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 8, 8, 8, 8, 0, 0, 0],
+    [...filledLine],
   ],
   pattern5SwappedWith4: [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -153,8 +156,8 @@ const TEST_BOARDS = {
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 8, 0, 0, 8, 8, 0, 0],
-    [0, 0, 0, 8, 0, 0, 8, 0, 0, 0],
+    [...filledLine],
+    [...filledLine],
   ],
   pattern2Scrambled: [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
