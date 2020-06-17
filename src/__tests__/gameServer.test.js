@@ -360,6 +360,36 @@ describe('game server tests', () => {
   });
   
   describe('error messages', () => {
+    test('join game - game full', () => {
+      const sendErrorSpy = jest.spyOn(mpGameServer, 'sendError');
+      
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+      mpGameServer.join(p4);
+
+      expect(sendErrorSpy).toHaveBeenCalledTimes(0);
+      
+      mpGameServer.join(p5);
+
+      expect(sendErrorSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('join game - game started', () => {
+      const sendErrorSpy = jest.spyOn(mpGameServer, 'sendError');
+
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+
+      mpGameServer.startGame(p1);
+
+      expect(sendErrorSpy).toHaveBeenCalledTimes(0);
+
+      mpGameServer.join(p3);
+
+      expect(sendErrorSpy).toHaveBeenCalledTimes(1);
+    });
+
     test('game start - not host', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
