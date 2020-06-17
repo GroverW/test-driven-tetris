@@ -11,12 +11,12 @@ class ClientError {
 
   addError(message) {
     this.error.innerText = message;
-    this.error.classList.toggle('hide');
+    this.error.classList.remove('hide');
   }
 
   clearError() {
     this.error.innerText = '';
-    this.error.classList.toggle('hide');
+    this.error.classList.add('hide');
   }
 
   unsubscribe() {
