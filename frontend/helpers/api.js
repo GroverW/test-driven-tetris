@@ -1,9 +1,10 @@
 const { subscribe } = require('./pubSub');
+const { SEND_MESSAGE } = require('./clientTopics');
 
 class Api {
   constructor(ws) {
     this.ws = ws;
-    this.unsubSend = subscribe('sendMessage', this.sendMessage.bind(this));
+    this.unsubSend = subscribe(SEND_MESSAGE, this.sendMessage.bind(this));
   }
 
   formatMessage(message) {
