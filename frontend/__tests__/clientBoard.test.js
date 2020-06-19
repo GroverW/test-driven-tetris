@@ -1,5 +1,6 @@
 const ClientBoard = require('frontend/static/js/ClientBoard');
 const { PIECE_TYPES, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
+const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
 const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
 const { Piece } = require('common/js/Piece');
 const pubSub = require('frontend/helpers/pubSub');
@@ -22,7 +23,7 @@ describe('client - game board tests', () => {
   })
 
   test('publishes on points from movement', () => {
-    const drawSpy = pubSubSpy.add('draw');
+    const drawSpy = pubSubSpy.add(DRAW);
     gameBoard.piece = p1;
     gameBoard.movePiece(1,0);
 
@@ -34,8 +35,8 @@ describe('client - game board tests', () => {
   });
 
   test('publish board updates on line clear', () => {
-    const clearLinesSpy = pubSubSpy.add('clearLines');
-    const boardChangeSpy = pubSubSpy.add('boardChange');
+    const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
+    const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
     gameBoard.grid = getTestBoard('clearLines2');
     gameBoard.piece = p1;
 
