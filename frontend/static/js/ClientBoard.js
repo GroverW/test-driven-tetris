@@ -14,7 +14,7 @@ class ClientBoard extends Board {
    * @param {number} playerId - Id of player on backend
    */
   constructor(pubSub, playerId) {
-    super(pubSub, playerId)
+    super(pubSub, playerId);
   }
 
   /**

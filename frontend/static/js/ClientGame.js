@@ -16,6 +16,8 @@ const {
   ADD_PLAYER,
   REMOVE_PLAYER,
   DRAW,
+  ADD_PIECES,
+  EXECUTE_COMMANDS,
   USE_POWER_UP,
   UPDATE_SCORE,
   SEND_MESSAGE,
@@ -51,6 +53,7 @@ class ClientGame extends Game {
       subscribe(UPDATE_PLAYER, this.replaceBoard.bind(this)),
       subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
+      subscribe(ADD_PIECES, this.addPieces.bind(this)),
     );
   }
 
@@ -202,10 +205,14 @@ class ClientGame extends Game {
    */
   sendCommandQueue() {
     publish(SEND_MESSAGE, {
-      type: 'executeCommands',
+      type: EXECUTE_COMMANDS,
       data: this.commandQueue
     });
     this.commandQueue = [];
+  }
+
+  addPieces(pieces) {
+    this.board.pieceList.addSet(pieces);
   }
 
   /**
