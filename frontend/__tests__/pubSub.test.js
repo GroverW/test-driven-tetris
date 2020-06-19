@@ -2,12 +2,14 @@ const { publish, subscribe } = require('frontend/helpers/pubSub');
 
 describe('publish / subscribe', () => {
   let sub1, sub2, sub3;
-
+  const topicMath = 'math';
+  const topicMessage = 'message';
+  
   beforeEach(() => {
     const adder = () => {
       let sum = 0;
 
-      const unsubscribe = subscribe('math', amt => { sum += amt });
+      const unsubscribe = subscribe(topicMath, amt => { sum += amt });
 
       const getSum = () => sum;
       
@@ -17,7 +19,7 @@ describe('publish / subscribe', () => {
     const multiplier = () => {
       let product = 1;
 
-      const unsubscribe = subscribe('math', amt => { product *= amt });
+      const unsubscribe = subscribe(topicMath, amt => { product *= amt });
 
       const getProduct = () => product;
 
@@ -27,7 +29,7 @@ describe('publish / subscribe', () => {
     const messages = () => {
       let messages = [];
 
-      const unsubscribe = subscribe('message', msg => { messages.push(msg) })
+      const unsubscribe = subscribe(topicMessage, msg => { messages.push(msg) })
 
       const getMessages = () => messages;
 
@@ -44,19 +46,19 @@ describe('publish / subscribe', () => {
     expect(sub2.getProduct()).toBe(1);
     expect(sub3.getMessages()).toEqual([]);
 
-    publish('math', 2);
+    publish(topicMath, 2);
 
     expect(sub1.getSum()).toBe(2);
     expect(sub2.getProduct()).toBe(2);
     expect(sub3.getMessages()).toEqual([]);
 
-    publish('math', 4);
+    publish(topicMath, 4);
 
     expect(sub1.getSum()).toBe(6);
     expect(sub2.getProduct()).toBe(8);
     expect(sub3.getMessages()).toEqual([]);
 
-    publish('message', 'hello');
+    publish(topicMessage, 'hello');
 
     expect(sub1.getSum()).toBe(6);
     expect(sub2.getProduct()).toBe(8);
@@ -79,14 +81,14 @@ describe('publish / subscribe', () => {
     expect(sub1.getSum()).toBe(0);
     expect(sub2.getProduct()).toBe(1);
 
-    publish('math', 2);
+    publish(topicMath, 2);
 
     expect(sub1.getSum()).toBe(2);
     expect(sub2.getProduct()).toBe(2);
 
     sub2.unsubscribe();
 
-    publish('math', 3);
+    publish(topicMath, 3);
 
     expect(sub1.getSum()).toBe(5);
     expect(sub2.getProduct()).toBe(2);
