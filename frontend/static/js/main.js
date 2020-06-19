@@ -2,9 +2,10 @@ const ClientError = require('frontend/static/js/clientError');
 const { errorMessage, menuSelectors } = require('frontend/helpers/DOMSelectors');
 const { createGame, connectToGame } = require('frontend/helpers/gameFunctions');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
+const { TOGGLE_MENU, ADD_ERROR } = require('frontend/helpers/clientTopics');
 
 const clientError = new ClientError(errorMessage);
-const unsubToggleMenu = subscribe('toggleMenu', () => {
+const unsubToggleMenu = subscribe(TOGGLE_MENU, () => {
   menuSelectors.menuContainer.classList.toggle('hide');
 })
 
@@ -30,7 +31,7 @@ menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
   if(gameId) {
     connectToGame(gameId);
   } else {
-    publish('addError', 'Game ID cannot be blank.');
+    publish(ADD_ERROR, 'Game ID cannot be blank.');
   }
 });
 
