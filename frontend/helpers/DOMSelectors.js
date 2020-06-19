@@ -1,3 +1,5 @@
+const errorMessage = document.getElementById('error');
+
 const menuSelectors = {
   menuContainer: document.getElementById('menu'),
   newSinglePlayer: document.getElementById('newSinglePlayer'),
@@ -34,6 +36,7 @@ const gameSelectors = {
 console.log(menuSelectors, gameSelectors)
 
 module.exports = {
+  errorMessage,
   menuSelectors,
   p1Canvas,
   nextPieceCanvas,
