@@ -35,10 +35,8 @@ app.get('/game/single', (req, res, next) => {
 //allow for app.ws routes for websocket routes
 app.ws('/game/:gameId', (ws, req, next) => {
   try {
-    let gameServer;
+    let gameServer = GameServer.getGame(req.params.gameId);
     let player;
-
-    gameServer = GameServer.getGame(req.params.gameId)
 
     if (!gameServer) {
       ws.close(1008, 'Game not found');
@@ -47,7 +45,10 @@ app.ws('/game/:gameId', (ws, req, next) => {
 
     player = new Player(ws.send.bind(ws), pubSub());
 
-    gameServer.join(player);
+    if (!gameServer.join(player)) {
+      ws.close(1008, 'Could not join game');
+      throw new Error('Unable to Join Game');
+    }
 
     ws.on('message', m => {
       const msg = JSON.parse(m);
