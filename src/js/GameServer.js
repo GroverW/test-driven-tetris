@@ -6,6 +6,18 @@ const {
   RANKINGS,
   SEED_PIECES
 } = require('backend/helpers/serverConstants');
+const {
+  ADD_ERROR,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  UPDATE_PLAYER,
+  START_GAME,
+  GAME_OVER,
+  GET_PIECES,
+  ADD_PIECES,
+  ADD_POWER_UP,
+  USE_POWER_UP,
+} = require('backend/helpers/serverTopics');
 const { randomize } = require('common/helpers/utils');
 const powerUps = require('backend/helpers/powerUps');
 
@@ -86,11 +98,11 @@ class GameServer {
     this.addSubscriptions(player)
 
     // send new player to existing players
-    this.sendAll({ type: 'addPlayer', data: player.id });
+    this.sendAll({ type: ADD_PLAYER, data: player.id });
 
     // send existing players to new player
     this.players.forEach((p) => {
-      if (p !== player) this.sendTo(player, { type: 'addPlayer', data: p.id, })
+      if (p !== player) this.sendTo(player, { type: ADD_PLAYER, data: p.id, })
     });
 
     this.setHost();
@@ -104,13 +116,13 @@ class GameServer {
    */
   addSubscriptions(player) {
     this.subscriptions[player.id] = [
-      player.pubSub.subscribe('leave', this.leave.bind(this)),
-      player.pubSub.subscribe('startGame', this.startGame.bind(this)),
-      player.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
-      player.pubSub.subscribe('getPieces', this.getPieces.bind(this)),
-      player.pubSub.subscribe('updatePlayer', this.updatePlayer.bind(this)),
-      player.pubSub.subscribe('addPowerUp', this.addPowerUp.bind(this)),
-      player.pubSub.subscribe('usePowerUp', this.executePowerUp.bind(this)),
+      player.pubSub.subscribe(REMOVE_PLAYER, this.leave.bind(this)),
+      player.pubSub.subscribe(START_GAME, this.startGame.bind(this)),
+      player.pubSub.subscribe(GAME_OVER, this.gameOver.bind(this)),
+      player.pubSub.subscribe(GET_PIECES, this.getPieces.bind(this)),
+      player.pubSub.subscribe(UPDATE_PLAYER, this.updatePlayer.bind(this)),
+      player.pubSub.subscribe(ADD_POWER_UP, this.addPowerUp.bind(this)),
+      player.pubSub.subscribe(USE_POWER_UP, this.executePowerUp.bind(this)),
     ]
   }
 
@@ -129,7 +141,7 @@ class GameServer {
    */
   leave(player) {
     if (!this.removePlayer(player)) return false;
-    this.sendAll({ type: 'removePlayer', data: player.id });
+    this.sendAll({ type: REMOVE_PLAYER, data: player.id });
 
     if (!this.players.length) GAMES.delete(this.id);
 
@@ -197,7 +209,7 @@ class GameServer {
    */
   sendError(player, message) {
     this.sendTo(player, {
-      type: 'error',
+      type: ADD_ERROR,
       data: message,
     });
   }
@@ -210,7 +222,7 @@ class GameServer {
    */
   updatePlayer(data, includePlayer = false) {
     const sendData = {
-      type: 'updatePlayer',
+      type: UPDATE_PLAYER,
       data: {
         id: data.id,
         board: data.board,
@@ -231,7 +243,7 @@ class GameServer {
   addPowerUp(data) {
     const player = this.getPlayerById(data.id);
     if (player) this.sendTo(player, {
-      type: 'addPowerUp',
+      type: ADD_POWER_UP,
       data: data.powerUp
     })
   }
@@ -293,7 +305,7 @@ class GameServer {
 
     this.players.forEach((p) => p.game.start());
 
-    this.sendAll({ type: 'startGame' });
+    this.sendAll({ type: START_GAME });
 
     this.nextRanking = this.players.length;
 
@@ -327,7 +339,7 @@ class GameServer {
 
     this.players.forEach((player) => player.game.board.pieceList.addSet(pieces));
 
-    this.sendAll({ type: 'addPieces', data: pieces })
+    this.sendAll({ type: ADD_PIECES, data: pieces })
   }
 
   /**
@@ -338,7 +350,7 @@ class GameServer {
    */
   gameOver(data) {
     this.sendAll({
-      type: 'gameOver',
+      type: GAME_OVER,
       data: {
         id: data.id,
         board: data.board,
@@ -365,7 +377,7 @@ class GameServer {
     });
 
     if (count === 1) {
-      winner.pubSub.publish('gameOver', {
+      winner.pubSub.publish(GAME_OVER, {
         id: winner.id,
         board: winner.game.board.grid,
       })
