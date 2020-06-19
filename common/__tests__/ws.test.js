@@ -239,6 +239,8 @@ describe('websocket tests', () => {
   
   describe('power ups', () => {
     test('server side updates client side board', () => {
+      Math.random = jest.fn().mockReturnValue(0);
+
       let player3 = new Player(mockSend, serverPubSub());
       clientToServer.gameServer.join(player2);
       clientToServer.gameServer.join(player3);
