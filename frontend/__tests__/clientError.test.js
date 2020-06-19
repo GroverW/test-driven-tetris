@@ -1,16 +1,18 @@
 const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
+const { ERROR_TIMEOUT } = require('frontend/helpers/clientConstants');
 
 describe('client error message tests', () => {
   let clientError;
-  let errorText = 'some error';
-  let blankError = '';
+  const errorText = 'some error';
 
   beforeEach(() => {
-    let errorSelector = getMockDOMSelector();
+    const errorSelector = getMockDOMSelector();
     errorSelector.classList.add('hide');
     clientError = new ClientError(errorSelector);
+
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
@@ -37,7 +39,19 @@ describe('client error message tests', () => {
 
     publish('clearError');
 
-    expect(clientError.error.innerText).toBe(blankError);
+    expect(clientError.error.classList.contains('hide')).toBe(true);
+  });
+
+  test('handle error', () => {
+    expect(clientError.error.classList.contains('hide')).toBe(true);
+
+    publish('addError', errorText);
+
+    expect(clientError.error.innerText).toBe(errorText);
+    expect(clientError.error.classList.contains('hide')).toBe(false);
+
+    jest.advanceTimersByTime(ERROR_TIMEOUT);
+;
     expect(clientError.error.classList.contains('hide')).toBe(true);
   });
 });
