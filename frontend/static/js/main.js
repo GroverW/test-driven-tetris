@@ -1,17 +1,22 @@
-const { menuSelectors } = require('frontend/helpers/DOMSelectors');
+const ClientError = require('frontend/static/js/clientError');
+const { errorMessage, menuSelectors } = require('frontend/helpers/DOMSelectors');
 const { createGame, connectToGame } = require('frontend/helpers/gameFunctions');
+const { publish, subscribe } = require('frontend/helpers/pubSub');
+
+const clientError = new ClientError(errorMessage);
+const unsubToggleMenu = subscribe('toggleMenu', () => {
+  menuSelectors.menuContainer.classList.toggle('hide');
+})
 
 // start a new single player game
 menuSelectors.newSinglePlayer.addEventListener('click', (evt) => {
   evt.target.blur();
-  menuSelectors.menuContainer.classList.toggle('hide');
   createGame('single');
 });
 
 // start a new multiplayer game
 menuSelectors.newMultiplayer.addEventListener('click', (evt) => {
   evt.target.blur();
-  menuSelectors.menuContainer.classList.toggle('hide');
   createGame('multi');
 });
 
@@ -20,10 +25,13 @@ menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
   evt.preventDefault();
   evt.target.blur();
   
-  menuSelectors.menuContainer.classList.toggle('hide');
-  
   const gameId = menuSelectors.multiplayerGameId.value;
-  connectToGame(gameId);
+
+  if(gameId) {
+    connectToGame(gameId);
+  } else {
+    publish('addError', 'Game ID cannot be blank.');
+  }
 });
 
 menuSelectors.mute.addEventListener('click', (evt) => {
