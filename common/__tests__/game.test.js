@@ -6,6 +6,7 @@ const {
   ROTATE_LEFT,
   ROTATE_RIGHT,
 } = require('common/helpers/constants');
+const { CLEAR_LINES } = require('common/helpers/commonTopics');
 const {
   TEST_BOARDS,
   getTestBoard,
@@ -162,18 +163,18 @@ describe('game tests', () => {
     game.start();
     expect(game.level).toBe(1);
 
-    pubSubTest.publish('clearLines', 4);
+    pubSubTest.publish(CLEAR_LINES, 4);
 
     expect(game.linesRemaining).toBe(6);
 
-    pubSubTest.publish('clearLines', 4);
-    pubSubTest.publish('clearLines', 4);
+    pubSubTest.publish(CLEAR_LINES, 4);
+    pubSubTest.publish(CLEAR_LINES, 4);
 
     expect(game.level).toBe(2);
     expect(game.linesRemaining).toBe(8);
 
-    pubSubTest.publish('clearLines', 4);
-    pubSubTest.publish('clearLines', 4);
+    pubSubTest.publish(CLEAR_LINES, 4);
+    pubSubTest.publish(CLEAR_LINES, 4);
 
     expect(game.level).toBe(3);
   });
