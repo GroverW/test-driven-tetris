@@ -9,6 +9,17 @@ const {
   ANIMATION_SPEED,
   MAX_SPEED,
 } = require('frontend/helpers/clientConstants');
+const {
+  START_GAME,
+  BOARD_CHANGE,
+  UPDATE_PLAYER,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  DRAW,
+  USE_POWER_UP,
+  UPDATE_SCORE,
+  SEND_MESSAGE,
+} = require('frontend/helpers/clientTopics');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
 const { mapArrayToObj } = require('common/helpers/utils');
 
@@ -35,11 +46,11 @@ class ClientGame extends Game {
     this.interruptAutoDown = false;
     this.commandQueue = [];
     this.subscriptions.push(
-      subscribe('startGame', this.start.bind(this)),
-      subscribe('boardChange', this.sendCommandQueue.bind(this)),
-      subscribe('updatePlayerBoard', this.replaceBoard.bind(this)),
-      subscribe('addPlayer', this.addPlayer.bind(this)),
-      subscribe('removePlayer', this.removePlayer.bind(this)),
+      subscribe(START_GAME, this.start.bind(this)),
+      subscribe(BOARD_CHANGE, this.sendCommandQueue.bind(this)),
+      subscribe(UPDATE_PLAYER, this.replaceBoard.bind(this)),
+      subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
+      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
     );
   }
 
@@ -50,13 +61,13 @@ class ClientGame extends Game {
     if (super.start()) {
       this.animate();
 
-      publish('draw', {
+      publish(DRAW, {
         board: this.board.grid,
         piece: this.board.piece,
         nextPiece: this.board.nextPiece,
       });
 
-      publish('updateScore', {
+      publish(UPDATE_SCORE, {
         score: this.score,
         level: this.level,
         lines: this.lines
@@ -190,7 +201,7 @@ class ClientGame extends Game {
    * Sends current command queue to backend.
    */
   sendCommandQueue() {
-    publish('sendMessage', {
+    publish(SEND_MESSAGE, {
       type: 'executeCommands',
       data: this.commandQueue
     });
@@ -213,7 +224,7 @@ class ClientGame extends Game {
     if (id) {
       this.addToCommandQueue(CONTROLS[`PLAYER${id}`]);
       this.sendCommandQueue();
-      this.pubSub.publish('usePowerUp');
+      this.pubSub.publish(USE_POWER_UP);
     }
   }
 
@@ -224,7 +235,7 @@ class ClientGame extends Game {
   updateScore(points) {
     super.updateScore(points);
 
-    publish('updateScore', {
+    publish(UPDATE_SCORE, {
       score: this.score,
     })
   }
@@ -237,7 +248,7 @@ class ClientGame extends Game {
   updateLinesRemaining(lines) {
     super.updateLinesRemaining(lines);
 
-    publish('updateScore', {
+    publish(UPDATE_SCORE, {
       level: this.level,
       lines: this.lines
     })
