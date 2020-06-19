@@ -2,6 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
+const { GET_PIECES } = require('backend/helpers/serverTopics');
 const { mockSend, getTestBoard, pubSubMock } = require('common/mockData/mocks');
 
 describe('game server tests', () => {
@@ -221,7 +222,7 @@ describe('game server tests', () => {
 
       p3.leave();
 
-      p1.pubSub.publish('getPieces');
+      p1.pubSub.publish(GET_PIECES);
 
       // player who leaves should not get piece updates
       expect(p1.game.board.pieceList.pieces).toEqual(p1.game.board.pieceList.pieces);
@@ -337,6 +338,8 @@ describe('game server tests', () => {
 
   describe('power ups', () => {
     test('execute power up on publish', () => {
+      Math.random = jest.fn().mockReturnValue(0);
+
       mpGameServer.join(p1);
       mpGameServer.join(p2);
 
