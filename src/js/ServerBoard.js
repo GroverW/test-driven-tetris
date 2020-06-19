@@ -1,4 +1,5 @@
 const Board = require('common/js/Board');
+const { GET_PIECES } = require('backend/helpers/serverTopics');
 
 
 /**
@@ -21,7 +22,7 @@ class ServerBoard extends Board {
     super.getPieces();
 
     if (this.pieceList.almostEmpty()) {
-      this.pubSub.publish('getPieces');
+      this.pubSub.publish(GET_PIECES);
     }
   }
 
