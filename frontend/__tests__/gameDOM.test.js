@@ -4,12 +4,19 @@ const { Piece } = require('common/js/Piece');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
 const { CONTROLS, PIECE_TYPES, POWER_UP_TYPES } = require('frontend/helpers/clientConstants');
+const {
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  CLEAR_LINES,
+  ADD_POWER_UP,
+  USE_POWER_UP,
+} = require('frontend/helpers/clientTopics');
 const { 
   getMockDOMSelector,
   getMockGameDOMSelectors,
   getMockCtx,
   getTestBoard,
-  getTestPieces
+  getTestPieces,
 } = require('frontend/mockData/mocks');
 
 describe('game DOM tests', () => {
@@ -55,7 +62,7 @@ describe('game DOM tests', () => {
   });
 
   test('add player', () => {
-    publish('addPlayer', newPlayer1.id);
+    publish(ADD_PLAYER, newPlayer1.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
     expect(gameDOM.players.length).toBe(1);
@@ -64,12 +71,12 @@ describe('game DOM tests', () => {
   });
 
   test('add 3rd player resizes 2nd player', () => {
-    publish('addPlayer', newPlayer1.id)
+    publish(ADD_PLAYER, newPlayer1.id)
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
     expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
 
-    publish('addPlayer', newPlayer2.id);
+    publish(ADD_PLAYER, newPlayer2.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(2);
     expect(gameDOM.players.length).toBe(2);
@@ -79,31 +86,31 @@ describe('game DOM tests', () => {
   });
 
   test('remove player', () => {
-    publish('addPlayer', newPlayer1.id)
+    publish(ADD_PLAYER, newPlayer1.id)
     
     expect(gameDOM.players.length).toBe(1);
     expect(gameDOM.gameView.players.length).toBe(1);
 
-    publish('removePlayer', newPlayer1.id)
+    publish(REMOVE_PLAYER, newPlayer1.id)
 
     expect(gameDOM.players.length).toBe(0);
     expect(gameDOM.gameView.players.length).toBe(0);
   });
 
   test('remove 3rd player resizes 2nd player', () => {
-    publish('addPlayer', newPlayer1.id)
+    publish(ADD_PLAYER, newPlayer1.id)
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(1);
     expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
 
-    publish('addPlayer', newPlayer2.id);
+    publish(ADD_PLAYER, newPlayer2.id);
 
     expect(addPlayerSpy).toHaveBeenCalledTimes(2);
     expect(gameDOM.players.length).toBe(2);
     expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
     expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
 
-    publish('removePlayer', newPlayer1.id);
+    publish(REMOVE_PLAYER, newPlayer1.id);
 
     expect(gameDOM.players.length).toBe(1);
     expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
@@ -158,46 +165,46 @@ describe('game DOM tests', () => {
 
     expect(gameDOM.level.innerText).toBe(1);
 
-    publish('clearLines', 4);
+    publish(CLEAR_LINES, 4);
 
     expect(gameDOM.lines.innerText).toBe(4);
     expect(gameDOM.level.innerText).toBe(1);
 
-    publish('clearLines', 4);
-    publish('clearLines', 4);
+    publish(CLEAR_LINES, 4);
+    publish(CLEAR_LINES, 4);
 
     expect(gameDOM.level.innerText).toBe(2);
   });
 
   test('power ups - add power up', () => {
-    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+    publish(ADD_POWER_UP, POWER_UP_TYPES.SWAP_LINES);
     
     expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(1);
 
-    publish('addPowerUp', -5);
+    publish(ADD_POWER_UP, -5);
 
     expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(1);
 
-    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
+    publish(ADD_POWER_UP, POWER_UP_TYPES.SWAP_LINES);
     
     expect(gameDOM.powerUps.filter(p => p.type !== null).length).toBe(2);
   });
 
   test('power ups - use power up', () => {
-    publish('addPowerUp', POWER_UP_TYPES.SWAP_LINES);
-    publish('addPowerUp', POWER_UP_TYPES.SCRAMBLE_BOARD);
+    publish(ADD_POWER_UP, POWER_UP_TYPES.SWAP_LINES);
+    publish(ADD_POWER_UP, POWER_UP_TYPES.SCRAMBLE_BOARD);
 
     const id1 = POWER_UP_TYPES.SWAP_LINES;
     const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
     expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id1}`)).toBe(true);
     expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(true);
 
-    publish('usePowerUp');
+    publish(USE_POWER_UP);
 
     expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(true);
     expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(false);
 
-    publish('usePowerUp');
+    publish(USE_POWER_UP);
 
     expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(false);
 
