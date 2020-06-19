@@ -7,6 +7,12 @@ const {
   MAX_POWER_UPS
 } = require('backend/helpers/serverConstants');
 const {
+  UPDATE_PLAYER,
+  CLEAR_LINES,
+  ADD_POWER_UP,
+  USE_POWER_UP,
+} = require('backend/helpers/serverTopics');
+const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
@@ -89,8 +95,8 @@ describe('game tests', () => {
   });
 
   test('command queue - board updates get published', () => {
-    const updatePlayerSpy = pubSubSpy.add('updatePlayer');
-    const clearLinesSpy = pubSubSpy.add('clearLines');
+    const updatePlayerSpy = pubSubSpy.add(UPDATE_PLAYER);
+    const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
     game.start();
 
     // duplicate scoring points for tetris
@@ -169,7 +175,7 @@ describe('game tests', () => {
       ];
 
       game.executeCommandQueue(COMMANDS1);
-      const addPowerUpSpy = pubSubSpy.add('addPowerUp');
+      const addPowerUpSpy = pubSubSpy.add(ADD_POWER_UP);
       // should not be called because random power up selected is invalid
       expect(addPowerUpSpy).toHaveBeenCalledTimes(0);
       expect(game.powerUps.length).toBe(0);
@@ -196,7 +202,7 @@ describe('game tests', () => {
     });
 
     test('command queue - publish power ups', () => {
-      const usePowerUpSpy = pubSubSpy.add('usePowerUp');
+      const usePowerUpSpy = pubSubSpy.add(USE_POWER_UP);
       game.start();
 
       game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
