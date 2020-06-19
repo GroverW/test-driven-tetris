@@ -1,5 +1,15 @@
 const { subscribe } = require('frontend/helpers/pubSub');
-const { CELL_COLORS, BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE } = require('frontend/helpers/clientConstants');
+const {
+  CELL_COLORS,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  CELL_SIZE
+} = require('frontend/helpers/clientConstants');
+const {
+  DRAW,
+  REMOVE_PLAYER,
+  UPDATE_PLAYER,
+} = require('frontend/helpers/clientTopics');
 
 
 /**
@@ -15,9 +25,9 @@ class GameView {
     this.ctx = this.initCtx(ctx, CELL_SIZE);
     this.ctxNext = this.initCtx(ctxNext, CELL_SIZE, 4, 4);
     this.subscriptions = [
-      subscribe('draw', this.draw.bind(this)),
-      subscribe('removePlayer', this.removePlayer.bind(this)),
-      subscribe('updatePlayerBoard', this.updatePlayer.bind(this)),
+      subscribe(DRAW, this.draw.bind(this)),
+      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
+      subscribe(UPDATE_PLAYER, this.updatePlayer.bind(this)),
     ];
     this.players = [];
   }
