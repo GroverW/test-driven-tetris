@@ -1,12 +1,13 @@
 const { subscribe } = require('frontend/helpers/pubSub');
 const { ERROR_TIMEOUT } = require('frontend/helpers/clientConstants');
+const { ADD_ERROR, CLEAR_ERROR } = require('frontend/helpers/clientTopics');
 
 class ClientError {
   constructor(errorSelector) {
     this.error = errorSelector;
     this.subscriptions = [
-      subscribe('addError', this.handleError.bind(this)),
-      subscribe('clearError', this.clearError.bind(this)),
+      subscribe(ADD_ERROR, this.handleError.bind(this)),
+      subscribe(CLEAR_ERROR, this.clearError.bind(this)),
     ];
   }
 
