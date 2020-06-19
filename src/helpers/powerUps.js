@@ -1,6 +1,10 @@
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
 const { BOARD_WIDTH, PIECE_TYPES } = require('common/helpers/constants');
 
+/**
+ * Returns a board row with all neutral cells except one blank cell
+ * @returns {array}
+ */
 const getFilledRow = () => {
   let filledRow = new Array(BOARD_WIDTH).fill(PIECE_TYPES.N);
   
@@ -11,12 +15,17 @@ const getFilledRow = () => {
   return filledRow;
 }
 
+/**
+ * Returns a blank board row
+ * @returns {array}
+ */
 const getBlankRow = () => Array(BOARD_WIDTH).fill(0);
 
 /**
  * Moves the last (up to) 4 lines from one board to another
  * @param {array} board1 - board to remove lines from
  * @param {array} board2 - board to add lines to
+ * @returns {array[]} - new boards
  */
 const swapLines = (board1, board2) => {
   let newBoard1 = [...board1];
@@ -24,8 +33,8 @@ const swapLines = (board1, board2) => {
 
   board1.slice(-2).forEach((row) => {
     if(row.some((cell) => cell))  {
-      newBoard2.push(getFilledRow());
       newBoard2.shift();
+      newBoard2.push(getFilledRow());
       newBoard1.unshift(getBlankRow());
       newBoard1.pop();
     }
@@ -38,6 +47,7 @@ const swapLines = (board1, board2) => {
  * Swaps two boards with each other
  * @param {array} board1 
  * @param {array} board2 
+ * @returns {array[]} - new boards
  */
 const swapBoards = (board1, board2) => {
   const newBoard1 = JSON.parse(JSON.stringify(board2));
@@ -48,11 +58,13 @@ const swapBoards = (board1, board2) => {
 /**
  * Scrambles the cells of every row on a board.
  * @param {array} board - board to scramble
+ * @returns {array} - scrambled board
  */
 const scrambleBoard = (board) => board.map((row) => randomize(row));
 
 /**
  * Clears board.
+ * @returns {array} - empty board
  */
 const clearBoard = () => getEmptyBoard();
 
