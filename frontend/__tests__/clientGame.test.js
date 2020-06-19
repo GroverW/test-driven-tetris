@@ -7,6 +7,12 @@ const {
   MAX_SPEED,
 } = require('frontend/helpers/clientConstants');
 const {
+  DRAW,
+  UPDATE_SCORE,
+  GAME_OVER,
+  SEND_MESSAGE,
+} = require('frontend/helpers/clientTopics');
+const {
   TEST_BOARDS,
   getTestBoard,
   getTestPieces,
@@ -39,8 +45,8 @@ describe('game tests', () => {
   });
 
   test('start game', () => {
-    const drawSpy = pubSubSpy.add('draw');
-    const updateScoreSpy = pubSubSpy.add('updateScore');
+    const drawSpy = pubSubSpy.add(DRAW);
+    const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
     expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
     expect(game.board.grid).toEqual(TEST_BOARDS.empty);
 
@@ -188,7 +194,7 @@ describe('game tests', () => {
   })
 
   test('game over', () => {
-    const gameOverSpy = pubSubSpy.add('gameOver');
+    const gameOverSpy = pubSubSpy.add(GAME_OVER);
     game.start();
     
     game.board.grid = getTestBoard('empty');
@@ -297,7 +303,7 @@ describe('game tests', () => {
   });
 
   test('command queue - send commands', () => {
-    const sendMessageSpy = pubSubSpy.add('sendMessage');
+    const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
     game.start();
     
     game.command(CONTROLS.DOWN);
@@ -341,7 +347,7 @@ describe('game tests', () => {
   });
 
   test('power ups - sends command queue', () => {
-    const sendMessageSpy = pubSubSpy.add('sendMessage');
+    const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
     game.addPlayer(p2);
     game.addPlayer(p3);
 
