@@ -1,5 +1,7 @@
 const COMMON_CONSTANTS = require('common/helpers/constants');
 
+const ERROR_TIMEOUT = 3000;
+
 const CELL_SIZE = 30;
 
 // map players to keypress ids
@@ -122,6 +124,7 @@ const CELL_COLORS = {
 
 module.exports = {
   ...COMMON_CONSTANTS,
+  ERROR_TIMEOUT,
   CELL_SIZE,
   PLAYER_KEYS,
   CONTROLS,
