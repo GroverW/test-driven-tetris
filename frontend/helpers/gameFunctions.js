@@ -6,6 +6,15 @@ const GameDOM = require('frontend/static/js/GameDOM');
 const Api = require('./api');
 const { publish } = require('./pubSub');
 const { gameIdSelector, gameSelectors, startButton } = require('./DOMSelectors')
+const {
+  ADD_ERROR,
+  TOGGLE_MENU,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  START_GAME,
+  UPDATE_PLAYER,
+  ADD_POWER_UP,
+} = require('frontend/helpers/clientTopics');
 
 /**
  * Adds game id to stats container for sharing
@@ -56,7 +65,7 @@ const connectToGame = (gameId) => {
   ws.onclose = (evt) => {
     console.log('connection closed by server');
     const data = evt.reason || 'Something went wrong, please try again.';
-    publish('addError', data);
+    publish(ADD_ERROR, data);
   }
 
   /**
@@ -67,38 +76,38 @@ const connectToGame = (gameId) => {
     console.log('WHAT GOT PARSED', type, data);
     
     switch(type) {
-      case 'addPlayer':
+      case ADD_PLAYER:
         if (!game) {
           gameDOM = new GameDOM(gameSelectors, data);
           game = new ClientGame(data);
           api = new Api(ws);
           createEventListeners(game, api);
-          publish('toggleMenu');
+          publish(TOGGLE_MENU);
           return;
         }
-        publish('addPlayer', data);
+        publish(ADD_PLAYER, data);
         break;
-      case 'removePlayer':
-        publish('removePlayer', data);
+      case REMOVE_PLAYER:
+        publish(REMOVE_PLAYER, data);
         break;
-      case 'startGame':
-        publish('startGame');
+      case START_GAME:
+        publish(START_GAME);
         break;
-      case 'updatePlayer':
-        publish('updatePlayerBoard', data);
+      case UPDATE_PLAYER:
+        publish(UPDATE_PLAYER, data);
         break;
-      case 'addPowerUp':
-        publish('addPowerUp', data);
+      case ADD_POWER_UP:
+        publish(ADD_POWER_UP, data);
         break;
       case 'addPieces':
         if(game) game.board.pieceList.addSet(data);
         break;
-      case 'gameOver':
+      case GAME_OVER:
         if(game) game.gameOver(data);
         if(gameDOM) gameDOM.gameOver(data);
         break;
       case 'error':
-        publish('addError', data);
+        publish(ADD_ERROR, data);
         break;
       default:
         break;
