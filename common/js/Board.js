@@ -1,4 +1,15 @@
-const { BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I } = require('../helpers/constants');
+const {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  POINTS,
+  WALL_KICK_TESTS,
+  WALL_KICK_TESTS_I
+} = require('common/helpers/constants');
+const {
+  GAME_OVER,
+  LOWER_PIECE,
+  CLEAR_LINES
+} = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
 const { PieceList, Piece } = require('./Piece');
 
@@ -30,7 +41,7 @@ class Board {
 
     // Game Over condition. If a new piece cannot be set because it's blocked
     if (!this.validMove(0, 0)) {
-      this.pubSub.publish("gameOver", {
+      this.pubSub.publish(GAME_OVER, {
         id: this.playerId,
         board: this.grid
       });
@@ -52,7 +63,7 @@ class Board {
     if (validMove) {
       this.piece.move(x, y);
 
-      if (y > 0) this.pubSub.publish('lowerPiece', y * multiplier)
+      if (y > 0) this.pubSub.publish(LOWER_PIECE, y * multiplier)
     } else if (y > 0 && multiplier !== POINTS.DOWN) {
       this.drop();
     }
@@ -179,7 +190,7 @@ class Board {
       }
     })
 
-    if (numCleared > 0) this.pubSub.publish('clearLines', numCleared);
+    if (numCleared > 0) this.pubSub.publish(CLEAR_LINES, numCleared);
 
     return numCleared;
   }
