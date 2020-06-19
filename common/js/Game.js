@@ -1,4 +1,9 @@
 const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
+const {
+  GAME_OVER,
+  LOWER_PIECE,
+  CLEAR_LINES
+} = require('common/helpers/commonTopics');
 
 /**
  * Represents a Tetris game.
@@ -21,9 +26,9 @@ class Game {
     this.pubSub = pubSub;
     this.board = new Board(pubSub, playerId);
     this.subscriptions = [
-      this.pubSub.subscribe('lowerPiece', this.updateScore.bind(this)),
-      this.pubSub.subscribe('clearLines', this.clearLines.bind(this)),
-      this.pubSub.subscribe('gameOver', this.gameOver.bind(this)),
+      this.pubSub.subscribe(LOWER_PIECE, this.updateScore.bind(this)),
+      this.pubSub.subscribe(CLEAR_LINES, this.clearLines.bind(this)),
+      this.pubSub.subscribe(GAME_OVER, this.gameOver.bind(this)),
     ];
   }
 
