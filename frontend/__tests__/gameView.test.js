@@ -6,6 +6,7 @@ const {
   BOARD_WIDTH,
   CELL_SIZE
 } = require('../helpers/clientConstants');
+const { REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
 const { getMockCtx, getTestBoard, getTestPieces } = require('../mockData/mocks');
 const { publish } = require('../helpers/pubSub');
 const { getNewPlayer } = require('../helpers/clientUtils');
@@ -184,26 +185,11 @@ describe('game view tests', () => {
     expect(gameView.players[0].ctx.canvas.height).toBe(fullBoardHeight);
   });
 
-  // test('server commands - add player', () => {
-  //   game.start();
-
-  //   expect(gameView.players.length).toBe(0);
-
-  //   publish('addPlayer', newPlayer1);
-
-  //   expect(gameView.players.length).toBe(1);
-
-  //   expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-  //   expect(drawPieceSpy).toHaveBeenCalledTimes(2);
-  //   expect(drawNextSpy).toHaveBeenCalledTimes(1);
-  // });
-
   test('server commands - remove player', () => {
     game.start();
 
     expect(gameView.players.length).toBe(0);
 
-    // publish('addPlayer', newPlayer1);
     gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
@@ -212,7 +198,7 @@ describe('game view tests', () => {
     expect(drawPieceSpy).toHaveBeenCalledTimes(2);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
 
-    publish('removePlayer', newPlayer1.id);
+    publish(REMOVE_PLAYER, newPlayer1.id);
 
     expect(gameView.players.length).toBe(0);
   });
@@ -222,14 +208,13 @@ describe('game view tests', () => {
 
     const testBoard = getTestBoard('pattern1');
 
-    // publish('addPlayer', newPlayer1);
     gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
     expect(drawBoardSpy).toHaveBeenCalledTimes(2);
     expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
 
-    publish('updatePlayerBoard', { id: newPlayer1.id, board: testBoard });
+    publish(UPDATE_PLAYER, { id: newPlayer1.id, board: testBoard });
 
     expect(gameView.players[0].board).toEqual(testBoard);
     expect(drawBoardSpy).toHaveBeenCalledTimes(3);
