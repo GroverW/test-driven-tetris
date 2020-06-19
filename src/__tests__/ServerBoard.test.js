@@ -1,6 +1,7 @@
 const ServerBoard = require('backend/js/ServerBoard');
 const { Piece } = require('common/js/Piece');
 const { PIECE_TYPES, SEED_PIECES } = require('backend/helpers/serverConstants');
+const { GET_PIECES, CLEAR_LINES } = require('backend/helpers/serverTopics');
 const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
@@ -19,7 +20,7 @@ describe('server - board tests', () => {
   });
 
   test('requests new pieces when almost out', () => {
-    const getPiecesSpy = pubSubSpy.add('getPieces');
+    const getPiecesSpy = pubSubSpy.add(GET_PIECES);
     expect(getPiecesSpy).not.toHaveBeenCalled();
 
     // can't go the entire length of the list or the index will get reset
@@ -31,7 +32,7 @@ describe('server - board tests', () => {
   });
 
   test('publish board updates', () => {
-    const clearLinesSpy = pubSubSpy.add('clearLines');
+    const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
     gameBoard.grid = getTestBoard('clearLines1');
     gameBoard.piece = p1;
 
