@@ -1,4 +1,5 @@
 const ServerGame = require('./ServerGame');
+const { REMOVE_PLAYER, START_GAME } = require('backend/helpers/serverTopics');
 
 /**
  * Represents a player on the back-end
@@ -35,14 +36,14 @@ class Player {
    * Publishes a message for the specified player to leave the gameServer
    */
   leave() {
-    this.pubSub.publish('leave', this);
+    this.pubSub.publish(REMOVE_PLAYER, this);
   }
 
   /**
    * Publishes a message for the current game to be started
    */
   startGame() {
-    if (this.game.gameStatus !== null) this.pubSub.publish('startGame', this);
+    if (this.game.gameStatus !== null) this.pubSub.publish(START_GAME, this);
   }
 }
 
