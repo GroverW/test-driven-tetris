@@ -6,7 +6,15 @@ const GameDOM = require('frontend/static/js/GameDOM');
 const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
-const { getMockDOMSelector } = require('frontend/mockData/mocks');;
+const { getMockDOMSelector } = require('frontend/mockData/mocks');
+const {
+  ADD_ERROR,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  START_GAME,
+  UPDATE_PLAYER,
+  ADD_POWER_UP,
+} = require('frontend/helpers/clientTopics');
 
 
 /**
@@ -88,11 +96,11 @@ class MockClientListener {
     this.clientError = new ClientError(getMockDOMSelector());
     this.selectors = selectors;
     this.subscriptions = [
-      ws.on('addPlayer', this.addPlayer.bind(this)),
-      ws.on('removePlayer', this.removePlayer.bind(this)),
-      ws.on('startGame', this.startGame.bind(this)),
-      ws.on('updatePlayer', this.updatePlayer.bind(this)),
-      ws.on('addPowerUp', this.addPowerUp.bind(this)),
+      ws.on(ADD_PLAYER, this.addPlayer.bind(this)),
+      ws.on(REMOVE_PLAYER, this.removePlayer.bind(this)),
+      ws.on(START_GAME, this.startGame.bind(this)),
+      ws.on(UPDATE_PLAYER, this.updatePlayer.bind(this)),
+      ws.on(ADD_POWER_UP, this.addPowerUp.bind(this)),
       ws.on('addPieces', this.addPieces.bind(this)),
       ws.on('gameOver', this.gameOver.bind(this)),
       ws.on('error', this.addError.bind(this)),
@@ -108,16 +116,13 @@ class MockClientListener {
       this.gameDOM = new GameDOM(this.selectors, id);
       this.game = new ClientGame(id);
     } else {
-      publish('addPlayer', id);
-    }
-  }
-
-  /**
-   * Removes player from client game
-   * @param {number} id - player id
+      publish(ADD_PLAYER, id);
+    }REMOVE_PLAYERSTART_GAME**
+   * Removes playerUPDATE_PLAYERgame
+   * @param {number} idADD_POWER_UPr id
    */
   removePlayer(id) {
-    publish('removePlayer', id);
+    publish(REMOVE_PLAYER, id);
   }
 
   /**
@@ -133,7 +138,7 @@ class MockClientListener {
    * @param {*} data
    */
   updatePlayer(data) {
-    publish('updatePlayerBoard', data);
+    publish(UPDATE_PLAYER, data);
   }
 
   /**
@@ -141,7 +146,7 @@ class MockClientListener {
    * @param {*} data 
    */
   addPowerUp(data) {
-    publish('addPowerUp', data);
+    publish(ADD_POWER_UP, data);
   }
 
   /**
@@ -171,7 +176,7 @@ class MockClientListener {
   }
 
   addError(data) {
-    publish('addError', data);
+    publish(ADD_ERROR, data);
   }
 }
 
