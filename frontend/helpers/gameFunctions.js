@@ -8,12 +8,9 @@ const { publish } = require('./pubSub');
 const { gameIdSelector, gameSelectors, startButton } = require('./DOMSelectors')
 const {
   ADD_ERROR,
+  PLAY,
   TOGGLE_MENU,
   ADD_PLAYER,
-  REMOVE_PLAYER,
-  START_GAME,
-  UPDATE_PLAYER,
-  ADD_POWER_UP,
 } = require('frontend/helpers/clientTopics');
 
 /**
@@ -63,7 +60,6 @@ const connectToGame = (gameId) => {
    * What to do when the websocket is closed
    */
   ws.onclose = (evt) => {
-    console.log('connection closed by server');
     const data = evt.reason || 'Something went wrong, please try again.';
     publish(ADD_ERROR, data);
   }
@@ -74,44 +70,17 @@ const connectToGame = (gameId) => {
   ws.onmessage = (evt) => {
     const { type, data } = JSON.parse(evt.data);
     console.log('WHAT GOT PARSED', type, data);
-    
-    switch(type) {
-      case ADD_PLAYER:
-        if (!game) {
-          gameDOM = new GameDOM(gameSelectors, data);
-          game = new ClientGame(data);
-          api = new Api(ws);
-          createEventListeners(game, api);
-          publish(TOGGLE_MENU);
-          return;
-        }
-        publish(ADD_PLAYER, data);
-        break;
-      case REMOVE_PLAYER:
-        publish(REMOVE_PLAYER, data);
-        break;
-      case START_GAME:
-        publish(START_GAME);
-        break;
-      case UPDATE_PLAYER:
-        publish(UPDATE_PLAYER, data);
-        break;
-      case ADD_POWER_UP:
-        publish(ADD_POWER_UP, data);
-        break;
-      case 'addPieces':
-        if(game) game.board.pieceList.addSet(data);
-        break;
-      case GAME_OVER:
-        if(game) game.gameOver(data);
-        if(gameDOM) gameDOM.gameOver(data);
-        break;
-      case 'error':
-        publish(ADD_ERROR, data);
-        break;
-      default:
-        break;
+
+    if (type === ADD_PLAYER && !game) {
+      gameDOM = new GameDOM(gameSelectors, data);
+      game = new ClientGame(data);
+      api = new Api(ws);
+      createEventListeners(game, api);
+      publish(TOGGLE_MENU);
+      return;
     }
+
+    publish(type, data);
   }
 }
 
@@ -123,7 +92,7 @@ const connectToGame = (gameId) => {
 const createEventListeners = (game, api) => {
   startButton.addEventListener('click', (evt) => {
     evt.target.blur();
-    api.sendMessage({ type: 'play', data: '' })
+    api.sendMessage({ type: PLAY, data: '' })
   })
 
   document.addEventListener('keydown', (evt) => {
