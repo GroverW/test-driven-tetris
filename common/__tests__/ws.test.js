@@ -1,7 +1,7 @@
 const Player = require('backend/js/Player');
 const { Piece } = require('common/js/Piece');
 const ClientGame = require('frontend/static/js/ClientGame');
-const Api = require('frontend/helpers/api');
+const Api = require('frontend/helpers/Api');
 
 const serverPubSub = require('backend/helpers/pubSub');
 
