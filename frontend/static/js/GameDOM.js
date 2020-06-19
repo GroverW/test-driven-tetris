@@ -9,6 +9,14 @@ const {
   MAX_POWER_UPS,
   POWER_UPS,
 } = require('frontend/helpers/clientConstants');
+const {
+  START_GAME,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  UPDATE_SCORE,
+  ADD_POWER_UP,
+  USE_POWER_UP,
+} = require('frontend/helpers/clientTopics');
 
 /**
  * Represents a client-side DOM manager
@@ -40,12 +48,12 @@ class GameDOM {
     this.players = [];
     this.music = selectors.music;
     this.subscriptions = [
-      subscribe('startGame', selectors.music.play.bind(selectors.music)),
-      subscribe('addPlayer', this.addPlayer.bind(this)),
-      subscribe('removePlayer', this.removePlayer.bind(this)),
-      subscribe('updateScore', this.updateScoreboard.bind(this)),
-      subscribe('addPowerUp', this.addPowerUp.bind(this)),
-      subscribe('usePowerUp', this.usePowerUp.bind(this)),
+      subscribe(START_GAME, selectors.music.play.bind(selectors.music)),
+      subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
+      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
+      subscribe(UPDATE_SCORE, this.updateScoreboard.bind(this)),
+      subscribe(ADD_POWER_UP, this.addPowerUp.bind(this)),
+      subscribe(USE_POWER_UP, this.usePowerUp.bind(this)),
     ];
   }
 
