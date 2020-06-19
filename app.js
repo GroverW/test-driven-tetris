@@ -2,11 +2,12 @@
 require('module-alias/register');
 const express = require('express');
 const app = express();
-const GameServer = require('./src/js/GameServer');
-const Player = require('./src/js/Player');
-const pubSub = require('./src/helpers/pubSub');
+const GameServer = require('backend/js/GameServer');
+const Player = require('backend/js/Player');
+const pubSub = require('backend/helpers/pubSub');
 const { v4: uuid } = require('uuid');
-const { GAME_TYPES } = require('./src/helpers/serverConstants');
+const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const { PLAY, EXECUTE_COMMANDS } = require('backend/helpers/serverTopics');
 const wsExpress = require('express-ws')(app);
 
 // serve stuff in static/ folder
@@ -50,10 +51,10 @@ app.ws('/game/:gameId', (ws, req, next) => {
       throw new Error('Unable to Join Game');
     }
 
-    ws.on('message', m => {
-      const msg = JSON.parse(m);
-      if (msg.type === "play") player.startGame();
-      if (msg.type === "executeCommands") player.game.executeCommandQueue(msg.data);
+    ws.on('message', msg => {
+      const { type, data } = JSON.parse(msg);
+      if (type === PLAY) player.startGame();
+      if (type === EXECUTE_COMMANDS) player.game.executeCommandQueue(data);
     });
 
     ws.on('close', () => {
