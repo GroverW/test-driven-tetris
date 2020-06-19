@@ -1,5 +1,6 @@
 const Board = require('common/js/Board');
 const { POINTS } = require('frontend/helpers/clientConstants');
+const { DRAW, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
 
 
 /**
@@ -26,7 +27,7 @@ class ClientBoard extends Board {
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if(super.movePiece(x, y, multiplier)) {
       if(multiplier < POINTS.HARD_DROP) {
-        this.pubSub.publish('draw', {
+        this.pubSub.publish(DRAW, {
           board: this.grid,
           piece: this.piece
         })
@@ -41,7 +42,7 @@ class ClientBoard extends Board {
   rotatePiece(direction) {
     super.rotatePiece(direction)
 
-    this.pubSub.publish('draw', {
+    this.pubSub.publish(DRAW, {
       board: this.grid,
       piece: this.piece
     })
@@ -51,9 +52,9 @@ class ClientBoard extends Board {
    * Publishes any board updates
    */
   publishBoardUpdate() {
-    this.pubSub.publish('boardChange', this.grid)
+    this.pubSub.publish(BOARD_CHANGE, this.grid)
 
-    this.pubSub.publish('draw', {
+    this.pubSub.publish(DRAW, {
       board: this.grid,
       piece: this.piece,
       nextPiece: this.nextPiece
