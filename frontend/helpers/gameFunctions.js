@@ -3,7 +3,7 @@ const axios = require('axios');
 const ClientGame = require('frontend/static/js/ClientGame');
 const GameDOM = require('frontend/static/js/GameDOM');
 
-const Api = require('./api');
+const Api = require('./Api');
 const { publish } = require('./pubSub');
 const { gameIdSelector, gameSelectors, startButton } = require('./DOMSelectors')
 const {
