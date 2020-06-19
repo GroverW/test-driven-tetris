@@ -11,6 +11,7 @@ const {
 } = require('frontend/helpers/clientConstants');
 const {
   START_GAME,
+  GAME_OVER,
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_SCORE,
@@ -49,6 +50,7 @@ class GameDOM {
     this.music = selectors.music;
     this.subscriptions = [
       subscribe(START_GAME, selectors.music.play.bind(selectors.music)),
+      subscribe(GAME_OVER, this.gameOver.bind(this)),
       subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
       subscribe(UPDATE_SCORE, this.updateScoreboard.bind(this)),
@@ -200,27 +202,28 @@ class GameDOM {
 
   /**
    * Adds game over message and updates board for player whose game is over
-   * @param {object} data - data used to create game over message
-   * @param {number} data.id - player id whose game is over
-   * @param {array} data.board - player's ending game board
-   * @param {object} data.message - game over message
-   * @param {string} data.message.header - game over message header
-   * @param {string[]} data.message.body - list of messages in body
+   * @param {number} id - player id whose game is over
+   * @param {array} board - player's ending game board
+   * @param {object} message - game over message
+   * @param {string} message.header - game over message header
+   * @param {string[]} message.body - list of messages in body
    */
-  gameOver(data) {
-    if (data.id === this.playerId) {
+  gameOver({ id, board, message }) {
+    if (!message) return;
+
+    if (id === this.playerId) {
       this.unsubscribe();
-      this.gameView.drawBoard(this.gameView.ctx, data.board);
-      this.addGameOverMessage(this.player, data.message);
+      this.gameView.drawBoard(this.gameView.ctx, board);
+      this.addGameOverMessage(this.player, message);
       this.music.pause();
       return;
     }
 
-    const player = this.players.find((p) => p.id === data.id);
+    const player = this.players.find((p) => p.id === id);
 
     if (player) {
-      this.gameView.updatePlayer(data);
-      this.addGameOverMessage(player.node, data.message);
+      this.gameView.updatePlayer({ id, board });
+      this.addGameOverMessage(player.node, message);
     }
   }
 
