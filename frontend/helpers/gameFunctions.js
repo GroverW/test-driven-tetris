@@ -48,8 +48,6 @@ const connectToGame = (gameId) => {
   ws.onopen = (evt) => {
     console.log(evt);
     console.log('connected');
-    // let data = { type: "join", name: 'floop' };
-    // ws.send(JSON.stringify(data));
   }
 
   /**
@@ -57,7 +55,8 @@ const connectToGame = (gameId) => {
    */
   ws.onclose = (evt) => {
     console.log('connection closed by server');
-    console.log(evt);
+    const data = evt.reason || 'Something went wrong, please try again.';
+    publish('addError', data);
   }
 
   /**
@@ -65,7 +64,7 @@ const connectToGame = (gameId) => {
    */
   ws.onmessage = (evt) => {
     const { type, data } = JSON.parse(evt.data);
-    console.log("WHAT GOT PARSED", type, data);
+    console.log('WHAT GOT PARSED', type, data);
     
     switch(type) {
       case 'addPlayer':
@@ -74,6 +73,7 @@ const connectToGame = (gameId) => {
           game = new ClientGame(data);
           api = new Api(ws);
           createEventListeners(game, api);
+          publish('toggleMenu');
           return;
         }
         publish('addPlayer', data);
@@ -96,6 +96,9 @@ const connectToGame = (gameId) => {
       case 'gameOver':
         if(game) game.gameOver(data);
         if(gameDOM) gameDOM.gameOver(data);
+        break;
+      case 'error':
+        publish('addError', data);
         break;
       default:
         break;
