@@ -60,7 +60,7 @@ class GameServer {
     const full = this.players.length >= MAX_PLAYERS[this.gameType];
 
     if (full) {
-      this.sendError(player, 'Sorry, that game is full.');
+      this.sendError(player, 'That game is full.');
     }
 
     if (this.gameStarted) {
