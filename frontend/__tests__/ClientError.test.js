@@ -2,6 +2,7 @@ const ClientError = require('frontend/static/js/ClientError');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 const { ERROR_TIMEOUT } = require('frontend/helpers/clientConstants');
+const { ADD_ERROR, CLEAR_ERROR } = require('frontend/helpers/clientTopics');
 
 describe('client error message tests', () => {
   let clientError;
@@ -23,7 +24,7 @@ describe('client error message tests', () => {
   test('add error message', () => {
     expect(clientError.error.classList.contains('hide')).toBe(true);
 
-    publish('addError', errorText);
+    publish(ADD_ERROR, errorText);
 
     expect(clientError.error.innerText).toBe(errorText);
     expect(clientError.error.classList.contains('hide')).toBe(false);
@@ -32,12 +33,12 @@ describe('client error message tests', () => {
   test('clear error message', () => {
     expect(clientError.error.classList.contains('hide')).toBe(true);
 
-    publish('addError', errorText);
+    publish(ADD_ERROR, errorText);
 
     expect(clientError.error.innerText).toBe(errorText);
     expect(clientError.error.classList.contains('hide')).toBe(false);
 
-    publish('clearError');
+    publish(CLEAR_ERROR);
 
     expect(clientError.error.classList.contains('hide')).toBe(true);
   });
@@ -45,7 +46,7 @@ describe('client error message tests', () => {
   test('handle error', () => {
     expect(clientError.error.classList.contains('hide')).toBe(true);
 
-    publish('addError', errorText);
+    publish(ADD_ERROR, errorText);
 
     expect(clientError.error.innerText).toBe(errorText);
     expect(clientError.error.classList.contains('hide')).toBe(false);
