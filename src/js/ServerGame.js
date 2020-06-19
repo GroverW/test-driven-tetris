@@ -7,6 +7,11 @@ const {
   MAX_POWER_UPS,
   POWER_UP_LIST
 } = require('backend/helpers/serverConstants');
+const {
+  UPDATE_PLAYER,
+  ADD_POWER_UP,
+  USE_POWER_UP,
+} = require('backend/helpers/serverTopics');
 const { mapArrayToObj } = require('common/helpers/utils');
 
 
@@ -53,7 +58,7 @@ class ServerGame extends Game {
   executeCommandQueue(commands) {
     commands.forEach((action) => this.command(action));
 
-    this.pubSub.publish('updatePlayer', {
+    this.pubSub.publish(UPDATE_PLAYER, {
       id: this.playerId,
       board: this.board.grid,
     });
@@ -70,7 +75,7 @@ class ServerGame extends Game {
       this.powerUps.length < MAX_POWER_UPS
     ) {
       this.powerUps.push(powerUp);
-      this.pubSub.publish('addPowerUp', { powerUp, id: this.playerId, });
+      this.pubSub.publish(ADD_POWER_UP, { powerUp, id: this.playerId, });
     }
   }
 
@@ -82,7 +87,7 @@ class ServerGame extends Game {
   usePowerUp(id) {
     if (this.powerUps.length) {
       const powerUp = this.powerUps.shift();
-      this.pubSub.publish('usePowerUp', {
+      this.pubSub.publish(USE_POWER_UP, {
         powerUp,
         player1: this.playerId,
         player2: id,
