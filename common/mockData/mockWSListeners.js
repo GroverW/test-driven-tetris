@@ -9,9 +9,13 @@ const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 const {
   ADD_ERROR,
+  PLAY,
   ADD_PLAYER,
   REMOVE_PLAYER,
   START_GAME,
+  GAME_OVER,
+  ADD_PIECES,
+  EXECUTE_COMMANDS,
   UPDATE_PLAYER,
   ADD_POWER_UP,
 } = require('frontend/helpers/clientTopics');
@@ -34,8 +38,8 @@ class MockServerListener {
     this.url = url;
     this.subscriptions = [
       ws.on('open', this.open.bind(this)),
-      ws.on('play', this.startGame.bind(this)),
-      ws.on('executeCommands', this.execCommands.bind(this)),
+      ws.on(PLAY, this.startGame.bind(this)),
+      ws.on(EXECUTE_COMMANDS, this.execCommands.bind(this)),
       ws.on('close', this.close.bind(this)),
     ];
   }
@@ -101,9 +105,9 @@ class MockClientListener {
       ws.on(START_GAME, this.startGame.bind(this)),
       ws.on(UPDATE_PLAYER, this.updatePlayer.bind(this)),
       ws.on(ADD_POWER_UP, this.addPowerUp.bind(this)),
-      ws.on('addPieces', this.addPieces.bind(this)),
-      ws.on('gameOver', this.gameOver.bind(this)),
-      ws.on('error', this.addError.bind(this)),
+      ws.on(ADD_PIECES, this.addPieces.bind(this)),
+      ws.on(GAME_OVER, this.gameOver.bind(this)),
+      ws.on(ADD_ERROR, this.addError.bind(this)),
     ];
   }
 
@@ -117,8 +121,10 @@ class MockClientListener {
       this.game = new ClientGame(id);
     } else {
       publish(ADD_PLAYER, id);
-    }REMOVE_PLAYERSTART_GAME**
-   * Removes playerUPDATE_PLAYERgame
+    }
+  }
+  /**
+   * Removes player from client game
    * @param {number} idADD_POWER_UPr id
    */
   removePlayer(id) {
@@ -154,7 +160,7 @@ class MockClientListener {
    * @param {array} pieces - list of piece ids
    */
   addPieces(pieces) {
-    this.game.board.pieceList.addSet(pieces);
+    publish(ADD_PIECES, pieces);
   }
 
   /**
@@ -162,8 +168,7 @@ class MockClientListener {
    * @param {*} data
    */
   gameOver(data) {
-    this.game.gameOver(data);
-    this.gameDOM.gameOver(data);
+    publish(GAME_OVER, data);
   }
 
   /**
