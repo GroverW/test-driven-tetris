@@ -35,7 +35,7 @@ const createGame = async (type) => {
 
     if (type === 'multi') addGameIdToStats(gameId);
   } catch (err) {
-    console.log(err.response);
+    publish(ADD_ERROR, 'Oops... could not connect');
   }
 }
 
