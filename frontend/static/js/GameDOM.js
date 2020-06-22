@@ -146,15 +146,14 @@ class GameDOM {
 
   /**
    * Updates the current score, level, or lines cleared
-   * @param {object} data - elements of scoreBoard to update
-   * @param {number} [data.score] - game score
-   * @param {number} [data.level] - game level
-   * @param {number} [data.lines] - game lines cleared
+   * @param {number} [score] - game score
+   * @param {number} [level] - game level
+   * @param {number} [lines] - game lines cleared
    */
-  updateScoreboard(data) {
-    if ('score' in data) this.score.innerText = data.score;
-    if ('level' in data) this.level.innerText = data.level;
-    if ('lines' in data) this.lines.innerText = data.lines;
+  updateScoreboard({ score, level, lines }) {
+    if (score !== undefined) this.score.innerText = score;
+    if (level !== undefined) this.level.innerText = level;
+    if (lines !== undefined) this.lines.innerText = lines;
   }
 
   /**
@@ -213,7 +212,7 @@ class GameDOM {
 
     if (id === this.playerId) {
       this.unsubscribe();
-      this.gameView.drawBoard(this.gameView.ctx, board);
+      this.gameView.drawGrid(this.gameView.ctx, board);
       this.addGameOverMessage(this.player, message);
       this.music.pause();
       return;
