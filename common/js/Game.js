@@ -43,6 +43,14 @@ class Game {
     return true;
   }
 
+    /**
+   * Adds new list of pieces to current set
+   * @param {number[]} pieces - list of piece ids
+   */
+  addPieces(pieces) {
+    this.board.pieceList.addSet(pieces);
+  }
+
   /**
    * Executes commands.
    */
