@@ -38,7 +38,7 @@ describe('game DOM tests', () => {
 
     gameDOM = new GameDOM(getMockGameDOMSelectors());
     game = new ClientGame(1);
-    game.board.pieceList.addSet(getTestPieces());
+    game.addPieces(getTestPieces());
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
     document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);

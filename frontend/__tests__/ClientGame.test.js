@@ -33,7 +33,7 @@ describe('game tests', () => {
     
     jest.useFakeTimers();
     
-    game.board.pieceList.addSet(getTestPieces());
+    game.addPieces(getTestPieces());
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   })
 
