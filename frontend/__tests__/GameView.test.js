@@ -16,7 +16,7 @@ describe('game view tests', () => {
   let mockCtx, mockCtxNext;
   let newCtx1, newBoard1, newId1;
   let newCtx2, newBoard2, newId2;
-  let drawBoardSpy, drawPieceSpy;
+  let drawGridSpy, drawNextSpy;
   let newPlayer1, newPlayer2;
 
   beforeEach(() => {
@@ -33,11 +33,10 @@ describe('game view tests', () => {
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
     game = new ClientGame(1);
-    game.board.pieceList.addSet(getTestPieces());
+    game.addPieces(getTestPieces());
     gameView = new GameView(mockCtx, mockCtxNext);
 
-    drawBoardSpy = jest.spyOn(gameView, 'drawBoard');
-    drawPieceSpy = jest.spyOn(gameView, 'drawPiece');
+    drawGridSpy = jest.spyOn(gameView, 'drawGrid');
     drawNextSpy = jest.spyOn(gameView, 'drawNext');
   })
 
@@ -53,22 +52,24 @@ describe('game view tests', () => {
     expect(gameView.ctxNext.canvas.width).toBe(4 * CELL_SIZE);
     expect(gameView.ctxNext.canvas.height).toBe(4 * CELL_SIZE);
 
+    expect(drawGridSpy).toHaveBeenCalledTimes(0);
+
     game.start();
 
-    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    // 1 for board, 1 for piece, 1 for nextPiece
+    expect(drawGridSpy).toHaveBeenCalledTimes(3);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
   });
 
   test('draw elements on piece rotate', () => {
     game.start();
 
+    expect(drawGridSpy).toHaveBeenCalledTimes(3);
+
     game.command(CONTROLS.ROTATE_LEFT);
 
-    // all drawn on game start
     // board and piece updated on rotate
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(3);
+    expect(drawGridSpy).toHaveBeenCalledTimes(5);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -78,16 +79,14 @@ describe('game view tests', () => {
     game.command(CONTROLS.DOWN);
 
     // redraw board and piece once per command
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(3);
+    expect(drawGridSpy).toHaveBeenCalledTimes(5);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
 
     game.command(CONTROLS.HARD_DROP);
 
     // when a new piece is grabbed, board, piece and nextPiece
     // should be drawn
-    expect(drawBoardSpy).toHaveBeenCalledTimes(3);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(5);
+    expect(drawGridSpy).toHaveBeenCalledTimes(8);
     expect(drawNextSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -96,12 +95,13 @@ describe('game view tests', () => {
 
     expect(gameView.players.length).toBe(0);
 
+    expect(drawGridSpy).toHaveBeenCalledTimes(3);
+
     gameView.addPlayer(newPlayer1);
 
     expect(gameView.players.length).toBe(1);
 
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawGridSpy).toHaveBeenCalledTimes(4);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -115,13 +115,13 @@ describe('game view tests', () => {
     const halfCell = CELL_SIZE / 2;
 
     expect(gameView.players.length).toBe(0);
-    expect(drawBoardSpy).toHaveBeenCalledTimes(1);
+    expect(drawGridSpy).toHaveBeenCalledTimes(3);
 
 
     gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(drawGridSpy).toHaveBeenCalledTimes(4);
 
     expect(gameView.players[0].ctx.canvas.width).toBe(fullBoardWidth);
     expect(gameView.players[0].ctx.canvas.height).toBe(fullBoardHeight);
@@ -131,7 +131,8 @@ describe('game view tests', () => {
     gameView.addPlayer(newPlayer2);
 
     expect(gameView.players.length).toBe(2);
-    expect(drawBoardSpy).toHaveBeenCalledTimes(4);
+    // once to add new player, once to rescale player2 board
+    expect(drawGridSpy).toHaveBeenCalledTimes(6);
 
     expect(gameView.players[0].ctx.canvas.width).toBe(halfBoardWidth);
     expect(gameView.players[0].ctx.canvas.height).toBe(halfBoardHeight);
@@ -141,8 +142,7 @@ describe('game view tests', () => {
     expect(gameView.players[1].ctx.canvas.height).toBe(halfBoardHeight);
     expect(gameView.players[1].ctx.canvas.xScale).toBe(halfCell);
     expect(gameView.players[1].ctx.canvas.yScale).toBe(halfCell);
-
-  })
+  });
 
   test('remove player', () => {
     game.start();
@@ -194,8 +194,7 @@ describe('game view tests', () => {
 
     expect(gameView.players.length).toBe(1);
 
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
-    expect(drawPieceSpy).toHaveBeenCalledTimes(2);
+    expect(drawGridSpy).toHaveBeenCalledTimes(4);
     expect(drawNextSpy).toHaveBeenCalledTimes(1);
 
     publish(REMOVE_PLAYER, newPlayer1.id);
@@ -211,12 +210,12 @@ describe('game view tests', () => {
     gameView.addPlayer(newPlayer1)
 
     expect(gameView.players.length).toBe(1);
-    expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+    expect(drawGridSpy).toHaveBeenCalledTimes(4);
     expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
 
     publish(UPDATE_PLAYER, { id: newPlayer1.id, board: testBoard });
 
     expect(gameView.players[0].board).toEqual(testBoard);
-    expect(drawBoardSpy).toHaveBeenCalledTimes(3);
+    expect(drawGridSpy).toHaveBeenCalledTimes(5);
   });
 });
