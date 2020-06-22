@@ -49,51 +49,52 @@ class GameView {
 
   /**
    * Draws the specified board, piece, or nextPiece on the canvas
-   * @param {object} data - data to draw
-   * @param {array} [data.board] - board to draw
-   * @param {object} [data.piece] - piece to draw
-   * @param {array} [data.piece.grid] - piece grid to draw
-   * @param {number} [data.piece.x] - x-coordinate to start drawing piece
-   * @param {number} [data.piece.y] - y-coordinate to start drawing piece
-   * @param {object} [data.nextPiece] - nextPiece to draw
-   * @param {array} [data.nextPiece.grid] - nextPiece grid to draw
+   * @param {array} [board] - board to draw
+   * @param {object} [piece] - piece to draw
+   * @param {array} [piece.grid] - piece grid to draw
+   * @param {number} [piece.x] - x-coordinate to start drawing piece
+   * @param {number} [piece.y] - y-coordinate to start drawing piece
+   * @param {object} [nextPiece] - nextPiece to draw
+   * @param {array} [nextPiece.grid] - nextPiece grid to draw
    */
-  draw(data) {
-    if (data.board) this.drawBoard(this.ctx, data.board);
-    if (data.piece) this.drawPiece(this.ctx, data.piece, data.piece.x, data.piece.y);
-    if (data.nextPiece) this.drawNext(this.ctxNext, data.nextPiece);
+  draw({ board, piece, nextPiece }) {
+    if (board) this.drawGrid(this.ctx, board);
+    if (piece) this.drawGrid(this.ctx, piece.grid, piece.x, piece.y, false);
+    if (nextPiece) this.drawNext(this.ctxNext, nextPiece.grid);
   }
-
+ 
   /**
-   * Draws a specified board on a specified canvas
-   * @param {object} ctx - canvas to draw board on
-   * @param {array} board - board grid
+   * Draws a specified grid on a specified canvas
+   * @param {object} ctx - canvas to draw grid on
+   * @param {array} grid - grid to draw
+   * @param {number} xStart - x-coordinate to begin drawing grid
+   * @param {number} yStart - y-coordinate to being drawing grid
+   * @param {boolean} isBoard - whether or not drawing board
    */
-  drawBoard(ctx, board) {
-    board.forEach((row, rowIdx) =>
+  drawGrid(ctx, grid, xStart=0, yStart=0, isBoard=true) {
+    grid.forEach((row, rowIdx) =>
       row.forEach((cell, colIdx) => {
-        this.drawCell(ctx, colIdx, rowIdx, 1, 1, CELL_COLORS[cell])
-      })
-    );
-  }
-
-  /**
-   * Draws a specified piece on a specified canvas
-   * @param {object} ctx - canvas to draw piece on
-   * @param {array} piece - piece grid
-   * @param {number} xStart - x-coordinate to begin drawing piece
-   * @param {number} yStart - y-coordinate to being drawing piece
-   */
-  drawPiece(ctx, piece, xStart, yStart) {
-    piece.grid.forEach((row, rowIdx) =>
-      row.forEach((cell, colIdx) => {
-        if (cell > 0) {
+        if (isBoard || cell > 0) {
           this.drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell])
         }
       })
     );
   }
 
+  /**
+   * 
+   * @param {object} ctx - canvas to draw cell on
+   * @param {number} xStart - x-coordinate to begin drawing cell
+   * @param {number} yStart - y-coordinate to begin drawing cell
+   * @param {number} width - width of cell, in pixels
+   * @param {number} height - height of cell, in pixels
+   * @param {object} color - object containing color values
+   * @param {string} color - object containing color values
+   * @param {string} color.highlight - highlight hex color value
+   * @param {string} color.lowlight - lowlight hex color value
+   * @param {string} color.border - border hex color value
+   * @param {string} color.foreground - forground hex color value
+   */
   drawCell(ctx, xStart, yStart, width, height, color) {
     ctx.save();
 
@@ -126,16 +127,15 @@ class GameView {
   /**
    * Draws the next piece
    * @param {object} ctx - canvas to draw the next piece
-   * @param {object} piece - next piece
-   * @param {array} piece.grid - next piece grid
+   * @param {array} grid - next piece grid
    */
-  drawNext(ctx, piece) {
+  drawNext(ctx, grid) {
     ctx.clearRect(0, 0, 4, 4);
 
-    const xStart = 2 - piece.grid.length / 2;
-    const yStart = piece.grid.length < 4 ? 1 : .5;
+    const xStart = 2 - grid.length / 2;
+    const yStart = grid.length < 4 ? 1 : .5;
 
-    this.drawPiece(ctx, piece, xStart, yStart)
+    this.drawGrid(ctx, grid, xStart, yStart, false);
   }
 
   /**
@@ -165,13 +165,13 @@ class GameView {
     if (this.players.length >= 1) {
       cellSize /= 2;
       this.scaleBoardSize(this.players[0].ctx, cellSize);
-      this.drawBoard(this.players[0].ctx, this.players[0].board);
+      this.drawGrid(this.players[0].ctx, this.players[0].board);
     }
 
     this.players.push(player)
 
     this.initCtx(player.ctx, cellSize);
-    this.drawBoard(player.ctx, player.board);
+    this.drawGrid(player.ctx, player.board);
   }
 
   /**
@@ -184,7 +184,7 @@ class GameView {
 
     if (this.players.length === 1) {
       this.scaleBoardSize(this.players[0].ctx, CELL_SIZE);
-      this.drawBoard(this.players[0].ctx, this.players[0].board);
+      this.drawGrid(this.players[0].ctx, this.players[0].board);
     }
   }
 
@@ -198,7 +198,7 @@ class GameView {
 
     if (player) {
       player.board = board;
-      this.drawBoard(player.ctx, player.board);
+      this.drawGrid(player.ctx, player.board);
     }
   }
 
