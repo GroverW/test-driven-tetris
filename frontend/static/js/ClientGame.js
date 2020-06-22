@@ -211,10 +211,6 @@ class ClientGame extends Game {
     this.commandQueue = [];
   }
 
-  addPieces(pieces) {
-    this.board.pieceList.addSet(pieces);
-  }
-
   /**
    * Maps keypress id to player id and sends command queue
    * @param {number} player - keypress id
@@ -246,7 +242,6 @@ class ClientGame extends Game {
       score: this.score,
     })
   }
-
 
   /**
    * Updates level, and number of lines remaining until next level.
@@ -293,6 +288,10 @@ class ClientGame extends Game {
     this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 
+  /**
+   * Handles auto-down movement of current piece
+   * @param {number} currTime - time in ms since game start
+   */
   handleAutoDrop(currTime) {
     this.time.elapsed = currTime - this.time.start;
 
@@ -312,6 +311,10 @@ class ClientGame extends Game {
     }
   }
 
+  /**
+   * Handles piece movement when movement key is held down
+   * @param {number} currTime - time in ms since game start
+   */
   handleToggledMovement(currTime) {
     this.moveTime.elapsed = currTime - this.moveTime.start;
 
