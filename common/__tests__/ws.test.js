@@ -207,16 +207,16 @@ describe('websocket tests', () => {
     test('execute commands - player 2 board updates on player 1 DOM', () => {
       clientToServer.gameServer.join(player2);
   
-      const drawBoardSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawBoard');
+      const drawGridSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawGrid');
   
       clientToServer.startGame();
   
-      expect(drawBoardSpy).toHaveBeenCalledTimes(1);
+      expect(drawGridSpy).toHaveBeenCalledTimes(3);
   
       player2.game.board.grid = getTestBoard('pattern1');
       player2.game.executeCommandQueue([]);
   
-      expect(drawBoardSpy).toHaveBeenCalledTimes(2);
+      expect(drawGridSpy).toHaveBeenCalledTimes(4);
     });
   
     test('game over from play', () => {
