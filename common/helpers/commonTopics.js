@@ -2,7 +2,12 @@
 /**
  * Common publish / subscribe topics
  */
-const ADD_ERROR = 'addError';
+const ADD_MESSAGE = 'addMessage';
+const CLEAR_MESSAGE = 'clearMessage';
+const MSG_TYPE = {
+  ERROR: 'error',
+  NOTICE: 'notice',
+};
 
 const PLAY = 'play';
 const START_GAME = 'startGame';
@@ -22,7 +27,9 @@ const ADD_POWER_UP = 'addPowerUp';
 const USE_POWER_UP = 'usePowerUp';
 
 module.exports = {
-  ADD_ERROR,
+  ADD_MESSAGE,
+  CLEAR_MESSAGE,
+  MSG_TYPE,
   PLAY,
   START_GAME,
   GAME_OVER,

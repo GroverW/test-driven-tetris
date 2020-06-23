@@ -6,10 +6,11 @@ const Api = require('frontend/helpers/Api');
 const serverPubSub = require('backend/helpers/pubSub');
 
 const { CONTROLS } = require('frontend/helpers/clientConstants');
-const { GAMES, GAME_TYPES, POWER_UP_TYPES, PIECE_TYPES } = require("backend/helpers/serverConstants");
+const { GAMES, GAME_TYPES, POWER_UP_TYPES, PIECE_TYPES } = require('backend/helpers/serverConstants');
+const { MSG_TYPE } = require('common/helpers/commonTopics');
 
-const { getMockDOMSelector, getMockGameDOMSelectors } = require("frontend/mockData/mocks");
-const { MockServerListener, MockClientListener } = require("common/mockData/mockWSListeners");
+const { getMockDOMSelector, getMockGameDOMSelectors } = require('frontend/mockData/mocks');
+const { MockServerListener, MockClientListener } = require('common/mockData/mockWSListeners');
 const { mockSend, getTestBoard, webSocketMock, pubSubMock } = require('common/mockData/mocks');
 
 
@@ -329,27 +330,28 @@ describe('websocket tests', () => {
 
   describe('error messages', () => {
     test('send error message', () => {
-      const errorSpy = pubSubSpy.add('addError');
+      const errorSpy = pubSubSpy.add('addMessage');
+      const errorText = 'test';
 
       expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientError.error.innerText).toBe('');
+      expect(serverToClient.clientMessage.message.innerText).toBe('');
       
-      clientToServer.gameServer.sendError(clientToServer.player, 'test');
+      clientToServer.gameServer.sendMessage(clientToServer.player, MSG_TYPE.ERROR, errorText);
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientError.error.innerText).not.toBe('');
+      expect(serverToClient.clientMessage.message.innerText).toBe(errorText);
     });
 
     test('start game - not enough players', () => {
-      const errorSpy = pubSubSpy.add('addError');
+      const errorSpy = pubSubSpy.add('addMessage');
 
       expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientError.error.innerText).toBe('');
+      expect(serverToClient.clientMessage.message.innerText).toBe('');
 
       clientToServer.startGame();
       
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientError.error.innerText).not.toBe('');
+      expect(serverToClient.clientMessage.message.innerText).not.toBe('');
 
       clientToServer.gameServer.join(player2);
 
@@ -359,19 +361,19 @@ describe('websocket tests', () => {
     });
 
     test('start game - not host', () => {
-      const errorSpy = pubSubSpy.add('addError');
+      const errorSpy = pubSubSpy.add('addMessage');
       
       clientToServer.gameServer.join(player2);
       clientToServer.gameServer.players[0].isHost = false;
       clientToServer.gameServer.players[1].isHost = true;
 
       expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientError.error.innerText).toBe('');
+      expect(serverToClient.clientMessage.message.innerText).toBe('');
 
       clientToServer.startGame();
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientError.error.innerText).not.toBe('');
+      expect(serverToClient.clientMessage.message.innerText).not.toBe('');
 
       clientToServer.gameServer.players[0].isHost = true;
       clientToServer.gameServer.players[1].isHost = false;

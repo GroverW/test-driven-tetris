@@ -3,12 +3,12 @@ const Player = require('backend/js/Player');
 const serverPubSub = require('backend/helpers/pubSub');
 const ClientGame = require('frontend/static/js/ClientGame');
 const GameDOM = require('frontend/static/js/GameDOM');
-const ClientError = require('frontend/static/js/ClientError');
+const ClientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 const {
-  ADD_ERROR,
+  ADD_MESSAGE,
   PLAY,
   ADD_PLAYER,
   REMOVE_PLAYER,
@@ -97,7 +97,7 @@ class MockClientListener {
   constructor(ws, selectors) {
     this.gameDOM;
     this.game;
-    this.clientError = new ClientError(getMockDOMSelector());
+    this.clientMessage = new ClientMessage(getMockDOMSelector());
     this.selectors = selectors;
     this.subscriptions = [
       ws.on(ADD_PLAYER, this.addPlayer.bind(this)),
@@ -107,7 +107,7 @@ class MockClientListener {
       ws.on(ADD_POWER_UP, this.addPowerUp.bind(this)),
       ws.on(ADD_PIECES, this.addPieces.bind(this)),
       ws.on(GAME_OVER, this.gameOver.bind(this)),
-      ws.on(ADD_ERROR, this.addError.bind(this)),
+      ws.on(ADD_MESSAGE, this.addMessage.bind(this)),
     ];
   }
 
@@ -180,8 +180,14 @@ class MockClientListener {
     if (this.game !== undefined) this.game.unsubscribe();
   }
 
-  addError(data) {
-    publish(ADD_ERROR, data);
+  /**
+   * Sends a message to be displayed on the player's screen
+   * @param {object} data - message data
+   * @param {string} data.type - type of message
+   * @param {string} data.message - message text
+   */
+  addMessage(data) {
+    publish(ADD_MESSAGE, data);
   }
 }
 
