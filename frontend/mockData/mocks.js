@@ -44,7 +44,13 @@ const getMockDOMSelector = () => ({
   parentNode: {
     removeChild: jest.fn()
   },
-  classList: {
+  get classList() {
+    return this._classList;
+  },
+  set classList(list) {
+    this._classList.classes = list.split(' ');
+  },
+  _classList: {
     classes: [],
     add(className) {
       const idx = this.classes.indexOf(className);
