@@ -1,4 +1,4 @@
-const errorMessage = document.getElementById('error');
+const flashMessage = document.getElementById('flash-message');
 
 const menuSelectors = {
   menuContainer: document.getElementById('menu'),
@@ -36,7 +36,7 @@ const gameSelectors = {
 console.log(menuSelectors, gameSelectors)
 
 module.exports = {
-  errorMessage,
+  flashMessage,
   menuSelectors,
   p1Canvas,
   nextPieceCanvas,
