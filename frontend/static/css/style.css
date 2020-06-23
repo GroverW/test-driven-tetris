@@ -20,7 +20,7 @@ body {
   flex-flow: column wrap;
 }
 
-#error {
+#flash-message {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -29,12 +29,19 @@ body {
   box-shadow: 0px 0px 5px 3px rgba(0,0,0,.4);
   z-index: 10;
   color: white;
-  background-color: rgb(226, 90, 90);
   transition: .5s ease-in-out;
 }
 
-#error.hide {
+#flash-message.hide {
   transform: translateX(calc(-100% - 20px));
+}
+
+.error {
+  background-color: rgb(226, 90, 90);
+}
+
+.notice {
+  background-color: rgb(26, 194, 40);
 }
 
 #menu {
