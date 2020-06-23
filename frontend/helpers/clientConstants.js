@@ -1,6 +1,6 @@
 const COMMON_CONSTANTS = require('common/helpers/constants');
 
-const ERROR_TIMEOUT = 3000;
+MESSAGE_TIMEOUT = 3000;
 
 const CELL_SIZE = 30;
 
@@ -124,7 +124,7 @@ const CELL_COLORS = {
 
 module.exports = {
   ...COMMON_CONSTANTS,
-  ERROR_TIMEOUT,
+  MESSAGE_TIMEOUT,
   CELL_SIZE,
   PLAYER_KEYS,
   CONTROLS,

@@ -7,7 +7,7 @@ const Api = require('./Api');
 const { publish } = require('./pubSub');
 const { gameIdSelector, gameSelectors, startButton } = require('./DOMSelectors')
 const {
-  ADD_ERROR,
+  ADD_MESSAGE,
   PLAY,
   TOGGLE_MENU,
   ADD_PLAYER,
@@ -35,7 +35,7 @@ const createGame = async (type) => {
 
     if (type === 'multi') addGameIdToStats(gameId);
   } catch (err) {
-    publish(ADD_ERROR, 'Oops... could not connect');
+    publish(ADD_MESSAGE, 'Oops... could not connect');
   }
 }
 
@@ -61,7 +61,7 @@ const connectToGame = (gameId) => {
    */
   ws.onclose = (evt) => {
     const data = evt.reason || 'Something went wrong, please try again.';
-    publish(ADD_ERROR, data);
+    publish(ADD_MESSAGE, data);
   }
 
   /**
