@@ -7,7 +7,8 @@ const {
   SEED_PIECES
 } = require('backend/helpers/serverConstants');
 const {
-  ADD_ERROR,
+  ADD_MESSAGE,
+  MSG_TYPE,
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_PLAYER,
@@ -72,11 +73,11 @@ class GameServer {
     const full = this.players.length >= MAX_PLAYERS[this.gameType];
 
     if (full) {
-      this.sendError(player, 'That game is full.');
+      this.sendMessage(player, MSG_TYPE.ERROR, 'That game is full.');
     }
 
     if (this.gameStarted) {
-      this.sendError(player, 'That game has already started.');
+      this.sendMessage(player, MSG_TYPE.ERROR, 'That game has already started.');
     }
 
     return !full && !this.gameStarted;
@@ -147,7 +148,7 @@ class GameServer {
 
     this.nextRanking--;
     this.checkIfWinner();
-    this.setHost();
+    this.setHost(true);
 
     return true;
   }
@@ -169,8 +170,18 @@ class GameServer {
   /**
    * Sets the first player to be the host
    */
-  setHost() {
-    if (this.players.length) this.players[0].isHost = true;
+  setHost(onLeave = false) {
+    if (this.players.length) {
+      const newHost = this.players[0];
+
+      if (!newHost.isHost) {
+        newHost.isHost = true;
+
+        if (onLeave) {
+          this.sendMessage(newHost, MSG_TYPE.NOTICE, 'You are now the host');
+        }
+      }
+    }
   }
 
   /**
@@ -203,14 +214,15 @@ class GameServer {
   }
 
   /**
-   * Sends error message to specified player
-   * @param {object} player - player to send error to
-   * @param {string} message - error message
+   * Sends message to specified player to be displayed on screen
+   * @param {object} player - player to send message to
+   * @param {string} type - message type
+   * @param {string} message - message text
    */
-  sendError(player, message) {
+  sendMessage(player, type, message) {
     this.sendTo(player, {
-      type: ADD_ERROR,
-      data: message,
+      type: ADD_MESSAGE,
+      data: { type, message },
     });
   }
 
@@ -319,12 +331,12 @@ class GameServer {
    */
   checkStartConditions(player) {
     if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) {
-      this.sendError(player, 'Not enough players to start game.')
+      this.sendMessage(player, MSG_TYPE.ERROR, 'Not enough players to start game.')
       return false;
     }
 
     if (!player.isHost) {
-      this.sendError(player, 'Only the host can start the game.')
+      this.sendMessage(player, MSG_TYPE.ERROR, 'Only the host can start the game.')
       return false;
     }
 
