@@ -160,6 +160,8 @@ describe('game server tests', () => {
 
   describe('game host', () => {
     test('game host - makes first player host', () => {
+      expect(p1.isHost).toBe(false);
+
       mpGameServer.join(p1);
 
       expect(p1.isHost).toBe(true);
@@ -171,6 +173,7 @@ describe('game server tests', () => {
     });
 
     test('game host - set new host on host leaving', () => {
+      const sendMessageSpy = jest.spyOn(mpGameServer, 'sendMessage');
       mpGameServer.join(p1);
 
       expect(p1.isHost).toBe(true);
@@ -181,10 +184,12 @@ describe('game server tests', () => {
 
       expect(p1.isHost).toBe(true);
       expect(p2.isHost).toBe(false);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(0);
 
       p1.leave()
 
       expect(p2.isHost).toBe(true);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(1);
 
       p2.leave();
 
@@ -364,33 +369,33 @@ describe('game server tests', () => {
   
   describe('error messages', () => {
     test('join game - game full', () => {
-      const sendErrorSpy = jest.spyOn(mpGameServer, 'sendError');
+      const sendMessageSpy = jest.spyOn(mpGameServer, 'sendMessage');
       
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
       mpGameServer.join(p4);
 
-      expect(sendErrorSpy).toHaveBeenCalledTimes(0);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(0);
       
       mpGameServer.join(p5);
 
-      expect(sendErrorSpy).toHaveBeenCalledTimes(1);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     });
 
     test('join game - game started', () => {
-      const sendErrorSpy = jest.spyOn(mpGameServer, 'sendError');
+      const sendMessageSpy = jest.spyOn(mpGameServer, 'sendMessage');
 
       mpGameServer.join(p1);
       mpGameServer.join(p2);
 
       mpGameServer.startGame(p1);
 
-      expect(sendErrorSpy).toHaveBeenCalledTimes(0);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(0);
 
       mpGameServer.join(p3);
 
-      expect(sendErrorSpy).toHaveBeenCalledTimes(1);
+      expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     });
 
     test('game start - not host', () => {
