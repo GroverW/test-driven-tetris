@@ -1,4 +1,4 @@
-const { randomize, getEmptyBoard } = require('common/helpers/utils');
+const commonUtils = require('common/helpers/utils');
 
 /**
  * Creates an object containing new player information
@@ -11,13 +11,13 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
 /**
  * Creates an object containing a DOM selector and id of a new player
  * @param {object} node - DOM node
- * @param {*} id - player id
+ * @param {number} id - player id
+ * @param {object} powerUpId - selector for div used to display key to press to use power up
  */
-const getNewPlayerDOM = (node, id) => ({ node, id });
+const getNewPlayerDOM = (node, id, powerUpId) => ({ node,  id, powerUpId });
 
 module.exports = {
-  randomize,
-  getEmptyBoard,
+  ...commonUtils,
   getNewPlayer,
-  getNewPlayerDOM
-}
+  getNewPlayerDOM,
+};
