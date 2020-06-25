@@ -1,11 +1,11 @@
-const flashMessage = document.getElementById('flash-message');
+const messageSelector = document.getElementById('flash-message');
 
 const menuSelectors = {
   menuContainer: document.getElementById('menu'),
-  newSinglePlayer: document.getElementById('newSinglePlayer'),
-  newMultiplayer: document.getElementById('newMultiplayer'),
-  joinMultiplayer: document.getElementById('joinMultiplayer'),
-  multiplayerGameId: document.getElementById('multiplayerGameId'),
+  newSinglePlayer: document.getElementById('new-single-player'),
+  newMultiplayer: document.getElementById('new-multiplayer'),
+  joinMultiplayer: document.getElementById('join-multiplayer'),
+  multiplayerGameId: document.getElementById('multiplayer-game-id'),
   music: document.getElementById('music'),
   mute: document.getElementById('mute'),
 };
@@ -27,20 +27,27 @@ const gameSelectors = {
   lines: document.getElementById('game-lines'),
   player: document.getElementById('p1'),
   powerUps: [
-    document.getElementById('pUp1'),
-    document.getElementById('pUp2')
+    document.getElementById('p-up1'),
+    document.getElementById('p-up2')
   ],
   music: menuSelectors.music,
 };
 
-console.log(menuSelectors, gameSelectors)
+/**
+ * Adds game id to stats container for sharing
+ * @param {string} id - game id
+ */
+const addGameIdToStats = (id) => {
+  gameIdSelector.innerText = id;
+}
 
 module.exports = {
-  flashMessage,
+  messageSelector,
   menuSelectors,
   p1Canvas,
   nextPieceCanvas,
   gameIdSelector,
   startButton,
   gameSelectors,
+  addGameIdToStats,
 };
