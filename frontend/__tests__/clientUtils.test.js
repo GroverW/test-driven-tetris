@@ -34,10 +34,11 @@ describe('utils', () => {
   test('get new player DOM', () => {
     const testPlayerDOM = {
       node: 'test',
-      id: 1
+      id: 1,
+      powerUpId: 1,
     }
 
-    expect(getNewPlayerDOM('test', 1)).toEqual(testPlayerDOM);
+    expect(getNewPlayerDOM('test', 1, 1)).toEqual(testPlayerDOM);
   });
 
   test('get empty board', () => {
