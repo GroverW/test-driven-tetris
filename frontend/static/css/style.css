@@ -1,3 +1,8 @@
+@font-face {
+  font-family: Kameron;
+  src: url(../fonts/Kameron-Bold.ttf);
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -29,7 +34,7 @@ body {
   box-shadow: 0px 0px 5px 3px rgba(0,0,0,.4);
   z-index: 10;
   color: white;
-  transition: .5s ease-in-out;
+  transition: .3s ease-in-out;
 }
 
 #flash-message.hide {
@@ -67,7 +72,7 @@ body {
   color: white;
 }
 
-#multiplayerGameId {
+#multiplayer-game-id {
   box-sizing: border-box;
   margin: 5px 0px;
   font-size: 14px;
@@ -186,27 +191,41 @@ body {
   border: 1px solid white;
 }
 
-.powerUps {
+.power-ups {
   display: flex;
   flex-direction: row;
 }
 
-.powerUps div {
+.power-ups div {
   width: 61px;
   height: 61px;
   margin-right: 5px;
   border: 1px solid white;
 }
 
-.powerUp1 {
+.power-up1 {
   background: url(../img/PUSL.png) no-repeat top left;
 }
-.powerUp2 {
+.power-up2 {
   background: url(../img/PUSB.png) no-repeat top left;
 }
-.powerUp3 {
+.power-up3 {
   background: url(../img/PUSC.png) no-repeat top left;
 }
-.powerUp4 {
+.power-up4 {
   background: url(../img/PUCB.png) no-repeat top left;
+}
+
+.power-up-target {
+  font-family: Kameron;
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 20px;
+  color: rgb(180,180,180);
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+  cursor: default;
 }
