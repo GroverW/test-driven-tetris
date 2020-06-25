@@ -5,21 +5,15 @@ const GameDOM = require('frontend/static/js/GameDOM');
 
 const Api = require('./Api');
 const { publish } = require('./pubSub');
-const { gameIdSelector, gameSelectors, startButton } = require('./DOMSelectors')
+const { addText, addPowerUpTargetId } = require('./DOMUtils');
+const { gameSelectors, startButton, gameIdSelector } = require('./DOMSelectors')
 const {
   ADD_MESSAGE,
+  MSG_TYPE,
   PLAY,
   TOGGLE_MENU,
   ADD_PLAYER,
 } = require('frontend/helpers/clientTopics');
-
-/**
- * Adds game id to stats container for sharing
- * @param {string} id - game id
- */
-const addGameIdToStats = (id) => {
-  gameIdSelector.innerText = id;
-}
 
 /**
  * Creates a new single, or multiplayer game
@@ -31,11 +25,9 @@ const createGame = async (type) => {
 
     const gameId = response.data.gameId;
 
-    connectToGame(gameId);
-
-    if (type === 'multi') addGameIdToStats(gameId);
+    connectToGame(gameId, type);
   } catch (err) {
-    publish(ADD_MESSAGE, 'Oops... could not connect');
+    publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message: 'Oops... could not connect' });
   }
 }
 
@@ -43,7 +35,12 @@ const createGame = async (type) => {
  * Connects to an already created game
  * @param {string} gameId - game id
  */
-const connectToGame = (gameId) => {
+const connectToGame = (gameId, type) => {
+  if (type === 'multi') {
+    addText(gameIdSelector, gameId);
+    addPowerUpTargetId(gameSelectors.player, 1);
+  }
+
   const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
 
   let game, gameDOM, api;
