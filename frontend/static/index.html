@@ -20,14 +20,19 @@
             <p class="menu-title">
               Welcome to Test Driven Tetris!
             </p>
-            <button id="newSinglePlayer">New Single Player Game</button>
-            <button id="newMultiplayer">New Multiplayer Game</button>
+            <button id="new-single-player">New Single Player Game</button>
+            <button id="new-multiplayer">New Multiplayer Game</button>
           </div>
-          <form id="joinMultiplayer">
+          <form id="join-multiplayer">
             <p class="menu-title">
               Join Multiplayer Game
             </p>
-            <input type="text" placeholder="Enter Game Id" name="multiplayerGameId" id="multiplayerGameId" />
+            <input 
+              type="text"
+              placeholder="Enter Game Id"
+              name="multiplayer-game-id"
+              id="multiplayer-game-id" 
+            />
             <button type="submit">Join Game</button>
           </form>
         </div>
@@ -45,12 +50,12 @@
       <ul>
         <li><span>Score:</span> <span id="game-score"></span></li>
         <li><span>Level:</span> <span id="game-level"></span></li>
-        <li><span>Lines Cleared:</span> <span id="game-lines"></span></li>
+        <li><span>Lines:</span> <span id="game-lines"></span></li>
       </ul>
       <br /><br />
-      <div class="powerUps">
-        <div id="pUp1"></div>
-        <div id="pUp2"></div>
+      <div class="power-ups">
+        <div id="p-up1"></div>
+        <div id="p-up2"></div>
         <br />
       </div>
       <span>Power-Ups</span>
