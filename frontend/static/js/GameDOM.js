@@ -6,6 +6,10 @@ const {
   getNewPlayerDOM,
 } = require('frontend/helpers/clientUtils');
 const {
+  createElement,
+  addPowerUpTargetId,
+} = require('frontend/helpers/DOMUtils');
+const {
   MAX_POWER_UPS,
   POWER_UPS,
 } = require('frontend/helpers/clientConstants');
@@ -69,7 +73,9 @@ class GameDOM {
     const [playerContainer, playerCtx] = this.getNewPlayerContainer(id);
     this.gameContainer.appendChild(playerContainer);
 
-    const playerDOM = getNewPlayerDOM(playerContainer, id);
+    const powerUpTargetId = this.players.length + 2;
+    const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId)
+    const playerDOM = getNewPlayerDOM(playerContainer, id, powerUpTargetSelector);
     const player = getNewPlayer(playerCtx, getEmptyBoard(), id)
 
     // adds player to player list and gameView
@@ -100,10 +106,8 @@ class GameDOM {
    * @returns {object[]} - html node and canvas ctx
    */
   getNewPlayerContainer(id) {
-    let container = document.createElement('div');
-    container.id = `p${id}`;
-    const sizeClass = this.players.length > 0 ? 'item-small' : 'item-large';
-    container.classList.add(sizeClass);
+    const classList = this.players.length > 0 ? 'item-small' : 'item-large';
+    let container = createElement('div', { id: `p${id}`, classList });
 
     // creates new html canvas
     const [canvas, ctx] = this.getNewPlayerCanvas(id);
@@ -119,9 +123,7 @@ class GameDOM {
    * @returns {object[]} - canvad DOM node and ctx
    */
   getNewPlayerCanvas(id) {
-    let canvas = document.createElement('canvas');
-    canvas.id = `p${id}-board`;
-    canvas.classList.add('game-board');
+    let canvas = createElement('canvas', { id: `p${id}-board`, classList: 'game-board' });
     const ctx = canvas.getContext('2d');
 
     return [canvas, ctx];
@@ -142,6 +144,15 @@ class GameDOM {
     }
 
     this.resizePlayer2();
+    this.updatePowerUpTargetIds();
+  }
+
+  /**
+   * Updates the text on each player container to show the correct
+   * key to use to target them with a power up
+   */
+  updatePowerUpTargetIds() {
+    this.players.forEach((p, i) => p.powerUpId.innerText = i + 2);
   }
 
   /**
@@ -177,7 +188,7 @@ class GameDOM {
 
       if (nextPowerUp) {
         nextPowerUp.type = powerUp;
-        nextPowerUp.node.classList.add(`powerUp${powerUp}`)
+        nextPowerUp.node.classList.add(`power-up${powerUp}`)
       }
     }
   }
@@ -190,10 +201,10 @@ class GameDOM {
       const next = a[i + 1];
 
       if (next !== undefined && next.type !== null) {
-        p.node.classList.replace(`powerUp${p.type}`, `powerUp${next.type}`);
+        p.node.classList.replace(`power-up${p.type}`, `power-up${next.type}`);
         p.type = next.type;
       } else {
-        p.node.classList.remove(`powerUp${p.type}`);
+        p.node.classList.remove(`power-up${p.type}`);
         p.type = null;
       }
     });
@@ -234,21 +245,13 @@ class GameDOM {
    * @param {string[]} message.body - list of messages in body
    */
   addGameOverMessage(container, message) {
-    let gameOverMessage = document.createElement('div');
-    gameOverMessage.classList.add('game-over');
+    let gameOverMessage = createElement('div', { classList: 'game-over' });
+    let gameOverMessageText = createElement('div', { classList: 'game-over-message' });
+    createElement('h1', { container: gameOverMessageText, text: message.header });
 
-    let gameOverMessageText = document.createElement('div');
-    gameOverMessageText.classList.add('game-over-message');
-
-    let messageHeader = document.createElement('h1');
-    messageHeader.innerText = message.header;
-    gameOverMessageText.appendChild(messageHeader);
-
-    message.body.forEach((line) => {
-      let newLine = document.createElement('p');
-      newLine.innerText = line;
-      gameOverMessageText.appendChild(newLine);
-    })
+    message.body.forEach((line) => (
+      createElement('p', { container: gameOverMessageText, text: line })
+    ));
 
     gameOverMessage.appendChild(gameOverMessageText);
     container.appendChild(gameOverMessage);
