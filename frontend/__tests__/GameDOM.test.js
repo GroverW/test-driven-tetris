@@ -68,6 +68,8 @@ describe('game DOM tests', () => {
     expect(gameDOM.players.length).toBe(1);
     expect(gameDOM.gameView.players.length).toBe(1);
     expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+    expect(gameDOM.players[0].powerUpId.classList.contains('power-up-target')).toBe(true);
+    expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
   });
 
   test('add 3rd player resizes 2nd player', () => {
@@ -95,6 +97,20 @@ describe('game DOM tests', () => {
 
     expect(gameDOM.players.length).toBe(0);
     expect(gameDOM.gameView.players.length).toBe(0);
+  });
+
+  test('remove player - update power up targets', () => {
+    publish(ADD_PLAYER, newPlayer1.id);
+    publish(ADD_PLAYER, newPlayer2.id);
+
+    expect(gameDOM.players.length).toBe(2);
+    expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+    expect(gameDOM.players[1].powerUpId.innerText).toBe(3);
+
+    publish(REMOVE_PLAYER, newPlayer1.id);
+
+    expect(gameDOM.players.length).toBe(1);
+    expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
   });
 
   test('remove 3rd player resizes 2nd player', () => {
@@ -196,17 +212,17 @@ describe('game DOM tests', () => {
 
     const id1 = POWER_UP_TYPES.SWAP_LINES;
     const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
-    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id1}`)).toBe(true);
-    expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(true);
+    expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id1}`)).toBe(true);
+    expect(gameDOM.powerUps[1].node.classList.contains(`power-up${id2}`)).toBe(true);
 
     publish(USE_POWER_UP);
 
-    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(true);
-    expect(gameDOM.powerUps[1].node.classList.contains(`powerUp${id2}`)).toBe(false);
+    expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id2}`)).toBe(true);
+    expect(gameDOM.powerUps[1].node.classList.contains(`power-up${id2}`)).toBe(false);
 
     publish(USE_POWER_UP);
 
-    expect(gameDOM.powerUps[0].node.classList.contains(`powerUp${id2}`)).toBe(false);
+    expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id2}`)).toBe(false);
 
     expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
     expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
