@@ -33,14 +33,6 @@ const gameSelectors = {
   music: menuSelectors.music,
 };
 
-/**
- * Adds game id to stats container for sharing
- * @param {string} id - game id
- */
-const addGameIdToStats = (id) => {
-  gameIdSelector.innerText = id;
-}
-
 module.exports = {
   messageSelector,
   menuSelectors,
@@ -49,5 +41,4 @@ module.exports = {
   gameIdSelector,
   startButton,
   gameSelectors,
-  addGameIdToStats,
 };
