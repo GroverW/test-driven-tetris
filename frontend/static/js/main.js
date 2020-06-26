@@ -39,7 +39,7 @@ menuSelectors.mute.addEventListener('click', (evt) => {
   const muteBtn =  evt.target;
   evt.preventDefault();
   muteBtn.blur();
-  muteBtn.classList.toggle('mute');
-  muteBtn.classList.toggle('unmute');
+
+  muteBtn.classList.toggle('muted');
   menuSelectors.music.muted = !menuSelectors.music.muted;
 })
