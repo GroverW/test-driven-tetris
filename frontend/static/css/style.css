@@ -126,10 +126,8 @@ body {
 }
 
 .item-large {
-  margin: 20px 0px;
   height: 600px;
   width: 300px;
-  
 }
 
 .item-small {
@@ -162,6 +160,8 @@ body {
 #stats {
   border: none;
   height: 600px;
+  box-sizing: border-box;
+  padding: 0px 12px;
 }
 
 #stats ul {
@@ -170,7 +170,7 @@ body {
 
 #stats button {
   display: block;
-  width: 100%;
+  width: 120px;
   padding: 3px;
   background: none;
   color: white;
@@ -187,8 +187,24 @@ body {
   color: black;
 }
 
-#next-piece {
+#next-piece-container {
+  position: relative;
   border: 1px solid white;
+  width: 120px;
+  height: 120px;
+}
+
+#next-piece {
+  width: 120px;
+  height: 120px;
+}
+
+#next-piece-label {
+  position: absolute;
+  bottom: 3px;
+  left: 5px;
+  color: rgb(225,225,225);
+  font-size: 12px;
 }
 
 .power-ups {
@@ -228,4 +244,24 @@ body {
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
   cursor: default;
+}
+
+#mute {
+  display: block;
+  width: 50px;
+  height: 50px;
+  background: url(../img/Music.png) no-repeat;
+}
+
+#mute:hover {
+  cursor: pointer;
+  background-position: -50px 0px;
+}
+
+#mute.muted {
+  background-position: 0px -50px;
+}
+
+#mute.muted:hover {
+  background-position: -50px -50px;
 }
