@@ -43,16 +43,17 @@
     </div>
     <div id="stats" class="item-small">
       Test-Driven-Tetris
-      <canvas id="next-piece"></canvas>
-      <span>Next Piece</span>
-      <br />
+      <div id="next-piece-container">
+        <canvas id="next-piece"></canvas>
+        <span id="next-piece-label">Next Piece</span>
+      </div>
       <br />
       <ul>
         <li><span>Score:</span> <span id="game-score"></span></li>
         <li><span>Level:</span> <span id="game-level"></span></li>
         <li><span>Lines:</span> <span id="game-lines"></span></li>
       </ul>
-      <br /><br />
+      <br />
       <div class="power-ups">
         <div id="p-up1"></div>
         <div id="p-up2"></div>
@@ -62,7 +63,8 @@
       <br /><br />
       <button id="start">Start Game</button>
       <p id="game-id"></p>
-      <button id="mute">Mute Music</button>
+      <br />
+      <a id="mute"></a>
     </div>
   </div>
   <audio id="music" src="/audio/original_theme.mp3" loop preload="auto">
