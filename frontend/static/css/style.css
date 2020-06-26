@@ -18,6 +18,7 @@ body {
   width: 100%;
   height: 604px;
   padding: 20px 0px;
+  background: url(../img/bg.png) no-repeat top left;
   background-color: black;
   display: flex;
   justify-content: center;
@@ -121,13 +122,23 @@ body {
 .item-large, .item-small {
   position: relative;
   color: white;
-  border: 1px solid #DDD;
-  border: 1px solid #DDD;
+}
+
+.item-large canvas, .item-small canvas {
+  border: 1px solid #4175b1;
+  width: 300px;
+  height: 600px;
+  background-color: black;
 }
 
 .item-large {
-  height: 600px;
-  width: 300px;
+  height: 622px;
+  width: 322px;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: #0e335c;
+  box-shadow: 0px 0px 3px 2px rgba(0,0,0,.4);
+  border: 1px solid #08284c;
 }
 
 .item-small {
@@ -162,6 +173,7 @@ body {
   height: 600px;
   box-sizing: border-box;
   padding: 0px 12px;
+  background: none;
 }
 
 #stats ul {
