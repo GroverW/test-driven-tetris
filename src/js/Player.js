@@ -1,5 +1,5 @@
 const ServerGame = require('./ServerGame');
-const { REMOVE_PLAYER, START_GAME } = require('backend/helpers/serverTopics');
+const { REMOVE_PLAYER, PLAY } = require('backend/helpers/serverTopics');
 
 /**
  * Represents a player on the back-end
@@ -13,6 +13,7 @@ class Player {
   constructor(send, pubSub) {
     this.id;
     this.isHost = false;
+    this.readyToPlay = false;
     this.send = send;
     this.pubSub = pubSub;
     this.game = new ServerGame(this.pubSub);
@@ -43,7 +44,7 @@ class Player {
    * Publishes a message for the current game to be started
    */
   startGame() {
-    if (this.game.gameStatus !== null) this.pubSub.publish(START_GAME, this);
+    if (this.game.gameStatus !== null) this.pubSub.publish(PLAY, this);
   }
 }
 
