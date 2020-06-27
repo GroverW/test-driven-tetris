@@ -18,9 +18,11 @@ app.get('/game/multi/:gameId', (req, res, next) => {
   const gameId = +req.params.gameId;
   const game = GameServer.getGame(gameId);
 
-  return game
-    ? res.status(200).json({ gameId })
-    : res.status(404).json({ error: 'Game not found' })
+  if(game && game.gameType === GAME_TYPES.MULTI) {
+    return res.json({ gameId });
+  }
+  
+  return res.status(404).json({ error: 'Game not found' });
 });
 
 // Create new multiplayer game
