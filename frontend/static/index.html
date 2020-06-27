@@ -42,25 +42,30 @@
       <canvas id="p1-board" class="game-board"></canvas>
     </div>
     <div id="stats" class="item-small">
-      Test-Driven-Tetris
-      <div id="next-piece-container">
+      <div id="next-piece-container" class="card dark">
+        <div class="card-label">next</div>
         <canvas id="next-piece"></canvas>
-        <span id="next-piece-label">Next Piece</span>
       </div>
-      <br />
-      <ul>
-        <li><span>Score:</span> <span id="game-score"></span></li>
-        <li><span>Level:</span> <span id="game-level"></span></li>
-        <li><span>Lines:</span> <span id="game-lines"></span></li>
-      </ul>
-      <br />
-      <div class="power-ups">
-        <div id="p-up1"></div>
-        <div id="p-up2"></div>
-        <br />
+      
+      <div class="card">
+        <div class="card-label">score</div>
+        <div id="game-score" class="card-info">0</div>
       </div>
-      <span>Power-Ups</span>
-      <br /><br />
+      
+      <div class="card">
+        <div class="card-label">level</div>
+        <div id="game-level" class="card-info">0</div>
+        <div class="card-footer">lines to clear: <span id="game-lines">0</span></div>
+      </div>
+
+      <div id="power-up-container" class="card dark hide">
+        <div class="card-label">power-ups</div>
+        <div class="card-info">
+          <div id="p-up1" class='p-up'></div>
+          <div id="p-up2" class='p-up'></div>
+        </div>
+      </div>
+
       <button id="start">Start Game</button>
       <p id="game-id"></p>
       <br />
