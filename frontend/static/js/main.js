@@ -1,8 +1,9 @@
 const ClientMessage = require('frontend/static/js/ClientMessage');
 const { messageSelector, menuSelectors } = require('frontend/helpers/DOMSelectors');
-const { createGame, connectToGame } = require('frontend/helpers/gameFunctions');
-const { publish, subscribe } = require('frontend/helpers/pubSub');
-const { TOGGLE_MENU, ADD_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
+const { createGame, joinGame, connectToGame } = require('frontend/helpers/gameFunctions');
+const { subscribe } = require('frontend/helpers/pubSub');
+const { TOGGLE_MENU } = require('frontend/helpers/clientTopics');
+const { publishError } = require('frontend/helpers/clientUtils');
 
 const clientMessage = new ClientMessage(messageSelector);
 const unsubToggleMenu = subscribe(TOGGLE_MENU, () => {
@@ -29,9 +30,9 @@ menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
   const gameId = menuSelectors.multiplayerGameId.value;
 
   if(gameId) {
-    connectToGame(gameId, 'multi');
+    joinGame(gameId);
   } else {
-    publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message: 'Game ID cannot be blank.' });
+    publishError('Game ID cannot be blank.');
   }
 });
 
