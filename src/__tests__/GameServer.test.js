@@ -1,9 +1,9 @@
 const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
-const { GAMES, GAME_TYPES, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
+const { GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN } = require('backend/helpers/serverConstants');
 const { GET_PIECES, PLAY } = require('backend/helpers/serverTopics');
-const { mockSend, getTestBoard, pubSubMock } = require('common/mockData/mocks');
+const { mockSend, getTestBoard } = require('common/mockData/mocks');
 const { mockAnimation } = require('frontend/mockData/mocks');
 
 describe('game server tests', () => {
@@ -40,14 +40,14 @@ describe('game server tests', () => {
 
     describe('single player', () => {
       test('join game - single player', () => {
-        const sendAllSpy = jest.spyOn(spGameServer, 'sendAll');
+        const animateStartSpy = jest.spyOn(spGameServer, 'animateStart')
 
         expect(spGameServer.gameType).toBe(GAME_TYPES.SINGLE);
         expect(spGameServer.join(p1)).toBe(true);
         expect(spGameServer.players.length).toBe(1);
         
         // animateStart should be automatically called when player joins
-        expect(sendAllSpy).toHaveBeenCalledTimes(2);
+        expect(animateStartSpy).toHaveBeenCalledTimes(1);
       });
 
       test('join game - only one player can join', () => {
@@ -217,7 +217,7 @@ describe('game server tests', () => {
 
       p3.pubSub.publish(PLAY, p3);
 
-      expect(sendAllSpy).toHaveBeenCalledTimes(3);
+      expect(sendAllSpy).toHaveBeenCalledTimes(2);
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -238,7 +238,7 @@ describe('game server tests', () => {
       p2.pubSub.publish(PLAY, p2);
       p3.pubSub.publish(PLAY, p3);
 
-      expect(sendAllSpy).toHaveBeenCalledTimes(5);
+      expect(sendAllSpy).toHaveBeenCalledTimes(4);
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -263,7 +263,6 @@ describe('game server tests', () => {
 
     test('game start - animate start', () => {
       jest.useFakeTimers();
-      requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
       
       mpGameServer.join(p1);
       mpGameServer.join(p2);
@@ -276,17 +275,17 @@ describe('game server tests', () => {
       mpGameServer.animateStart();
 
       expect(mpGameServer.gameStarted).toBe(false);
-      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(sendAllSpy).toHaveBeenCalledTimes(0);
 
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(COUNTDOWN.INTERVAL_LENGTH);
 
       expect(mpGameServer.gameStarted).toBe(false);
       expect(sendAllSpy).toHaveBeenCalledTimes(2);
 
-      jest.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(COUNTDOWN.INTERVAL_LENGTH * COUNTDOWN.NUM_INTERVALS);
 
       expect(mpGameServer.gameStarted).toBe(true);
-      expect(sendAllSpy).toHaveBeenCalledTimes(7);
+      expect(sendAllSpy).toHaveBeenCalledTimes(6);
     });
 
     test('game over', () => {

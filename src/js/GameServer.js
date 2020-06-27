@@ -327,33 +327,27 @@ class GameServer {
    * Animates the countdown for game start
    */
   animateStart() {
-    let currInterval = 0;
-    let animationId;
+    let currInterval = COUNTDOWN.NUM_INTERVALS;
 
-    const animate = (currTime = 0) => {
-      const interval = Math.floor(currTime / COUNTDOWN.INTERVAL_LENGTH);
-      if(interval >= currInterval) {
-        currInterval += 1;
+    const animate = () => setTimeout(() => {
+      currInterval -= 1;
 
-        const intervalsRemaining = COUNTDOWN.NUM_INTERVALS - currInterval;
-
-        if(intervalsRemaining > 1) {
-          this.sendAll({
-            type: 'countdown',
-            data: intervalsRemaining,
-          });
-        } else if(intervalsRemaining === 1) {
-          this.sendAll({
-            type: 'countdown',
-            data: 'Good Luck!'
-          });
-        } else {
-          cancelAnimationFrame(animationId);
-          this.startGame();
-        }
+      if(currInterval > 0) {
+        this.sendAll({
+          type: 'countdown',
+          data: currInterval,
+        });
+        animate();
+      } else if(currInterval === 0) {
+        this.sendAll({
+          type: 'countdown',
+          data: 'Good Luck!'
+        });
+        animate();
+      } else {
+        this.startGame();
       }
-      animationId = requestAnimationFrame(animate);
-    }
+    }, COUNTDOWN.INTERVAL_LENGTH * (currInterval < COUNTDOWN.NUM_INTERVALS));
 
     animate();
   }
