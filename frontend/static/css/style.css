@@ -55,7 +55,7 @@ body {
   background-color: rgb(26, 194, 40);
 }
 
-#menu {
+.menu {
   position: absolute;
   z-index: 2;
   top: 0;
@@ -63,26 +63,11 @@ body {
   display: table;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,.6);
+  background-color: rgba(0,0,0,.4);
 }
 
-#menu.hide {
+.menu.hide {
   display: none;
-}
-
-#join-multi label {
-  color: white;
-}
-
-#multiplayer-game-id {
-  box-sizing: border-box;
-  margin: 5px 0px;
-  font-size: 14px;
-  width: 100%;
-  padding: 7px 10px;
-  background-color: transparent;
-  border: 1px solid white;
-  color: white;
 }
 
 .menu-align {
@@ -93,14 +78,17 @@ body {
 .menu-options {
   margin: 0px auto;
   padding: 20px;
-  border: 2px solid white;
+  border: 1px solid #08284c;
   width: 300px;
   text-align: center;
-  background-color: black;
+  background-color: #124580;
+  border-radius: 3px;
 }
 
 .menu-title {
-  color: white;
+  font-family: Roboto;
+  text-transform: uppercase;
+  color: #b6d8ff;
 }
 
 .menu-options button {
@@ -108,28 +96,40 @@ body {
   font-size: 14px;
   width: 100%;
   padding: 7px 0px;
+  background-color: #b6d8ff;
+  border: none;
+  border-radius: 3px;
 }
 
 .menu-options button:hover {
   cursor: pointer;
-  background-color: #bdbdbd; 
+  background-color: #92afcf;
 }
 
 .menu-options button:focus {
-  background-color: #4a4a4a;
+  background-color: #6a8097;
   color: white;
+}
+
+.menu-options input {
+  font-family: Roboto;
+  box-sizing: border-box;
+  margin: 5px 0px;
+  font-size: 14px;
+  width: 100%;
+  padding: 7px 10px;
+  background-color: #0c325e;
+  border: 1px solid #b6d8ff;
+  color: #b6d8ff;
+}
+
+.menu-options input::placeholder {
+  color: #538cce
 }
 
 .item-large, .item-small {
   position: relative;
   color: white;
-}
-
-.item-large canvas, .item-small canvas {
-  border: 1px solid #4175b1;
-  width: 300px;
-  height: 600px;
-  background-color: black;
 }
 
 .item-large {
@@ -146,6 +146,22 @@ body {
   margin: 0px 10px;
   height: 300px;
   width: 150px;
+  box-shadow: 0px 0px 3px 2px rgba(0,0,0,.4);
+}
+
+.item-large canvas, .item-small canvas {
+  border: 1px solid #4175b1;
+  background-color: black;
+}
+
+.item-large canvas {
+  width: 300px;
+  height: 600px;
+}
+
+.item-small canvas {
+  width: 150px;
+  height: 300px;
 }
 
 .game-over {
@@ -169,6 +185,14 @@ body {
   font-size: 42px;
 }
 
+#opponents {
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  flex-wrap: wrap;
+}
+
 #stats {
   border: none;
   display:flex;
@@ -179,6 +203,7 @@ body {
   box-sizing: border-box;
   padding: 0px 12px;
   background: none;
+  box-shadow: none;
 }
 
 #stats button {
@@ -308,20 +333,20 @@ body {
 
 #mute {
   display: block;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background: url(../img/Music.png) no-repeat;
 }
 
 #mute:hover {
   cursor: pointer;
-  background-position: -50px 0px;
+  background-position: -40px 0px;
 }
 
 #mute.muted {
-  background-position: 0px -50px;
+  background-position: 0px -40px;
 }
 
 #mute.muted:hover {
-  background-position: -50px -50px;
+  background-position: -40px -40px;
 }
