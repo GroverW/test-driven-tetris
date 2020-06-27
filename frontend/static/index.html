@@ -13,7 +13,7 @@
   <div id="game-container">
     <div id="flash-message" class='hide'>
     </div>
-    <div id="menu">
+    <div id="menu-container" class="menu">
       <div class="menu-align">
         <div class="menu-options">
           <div id="game-buttons">
@@ -38,9 +38,11 @@
         </div>
       </div>
     </div>
+
     <div id="p1" class="item-large">
       <canvas id="p1-board" class="game-board"></canvas>
     </div>
+    
     <div id="stats" class="item-small">
       <div id="next-piece-container" class="card dark">
         <div class="card-label">next</div>
@@ -71,6 +73,10 @@
       <br />
       <a id="mute"></a>
     </div>
+    
+    <div id="opponents">
+    </div>
+
   </div>
   <audio id="music" src="/audio/original_theme.mp3" loop preload="auto">
     Your browser does not support HTML5 audio.
