@@ -67,10 +67,10 @@ const ANIMATION_SPEED = {
 
 const CELL_COLORS = {
   0: {
-    border: '#000000',
-    highlight: '#292929',
-    lowlight: '#1a1a1a',
-    foreground: '#191919'
+    border: '#001d3e',
+    highlight: '#060606',
+    lowlight: '#060606',
+    foreground: '#060606'
   },
   1: {
     border: '#11658C',
