@@ -9,11 +9,11 @@ describe('Routes tests', () => {
     GAMES.clear();
   })
 
-  describe('GET game', () => {
+  describe('POST game', () => {
     test('Returns uuid', async () => {
-      const response = await request(app).get('/game/multi');
+      const response = await request(app).post('/game/multi');
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(201);
 
       expect(response.body.gameId).toEqual(expect.any(String));
     });
@@ -21,9 +21,9 @@ describe('Routes tests', () => {
     test('Creates new game with uuid - multiplayer', async () => {
       expect(GAMES.size).toBe(0);
 
-      const response = await request(app).get('/game/multi');
+      const response = await request(app).post('/game/multi');
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(201);
 
       expect(response.body.gameId).toEqual(expect.any(String));
 
@@ -36,9 +36,9 @@ describe('Routes tests', () => {
     test('Creates new game with uuid - single player', async () => {
       expect(GAMES.size).toBe(0);
 
-      const response = await request(app).get('/game/single');
+      const response = await request(app).post('/game/single');
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(201);
 
       expect(response.body.gameId).toEqual(expect.any(String));
 
@@ -47,9 +47,31 @@ describe('Routes tests', () => {
 
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
+  });
 
-    test('error - game does not exist', () => {
+  describe('GET game', () => {
+    test('Gets an existing game - multiplayer', async () => {
+      const gameId = GameServer.addGame(1, GAME_TYPES.MULTI);
+      
+      expect(GAMES.size).toBe(1);
 
+      const response = await request(app).get(`/game/multi/${gameId}`);
+
+      expect(response.statusCode).toBe(200);
+
+      expect(response.body.gameId).toBe(gameId);
     });
+
+    test('error - game does not exist', async () => {
+      const gameId = 1;
+
+      expect(GAMES.size).toBe(0);
+
+      const response = await request(app).get(`/game/multi/${gameId}`);
+
+      expect(response.statusCode).toBe(404);
+
+      expect(response.body.error).toEqual(expect.any(String));
+    })
   });
 });
