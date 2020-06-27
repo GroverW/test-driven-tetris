@@ -51,7 +51,7 @@ describe('Routes tests', () => {
 
   describe('GET game', () => {
     test('gets an existing multiplayer game', async () => {
-      const gameId = GameServer.addGame(1, GAME_TYPES.MULTI);
+      const gameId = GameServer.addGame('1', GAME_TYPES.MULTI);
       
       expect(GAMES.size).toBe(1);
 
