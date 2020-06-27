@@ -14,21 +14,30 @@ const wsExpress = require('express-ws')(app);
 app.use(express.static('frontend/static/'));
 
 
-// Get gameId and create game
-app.get('/game/multi', (req, res, next) => {
+app.get('/game/multi/:gameId', (req, res, next) => {
+  const gameId = +req.params.gameId;
+  const game = GameServer.getGame(gameId);
+
+  return game
+    ? res.status(200).json({ gameId })
+    : res.status(404).json({ error: 'Game not found' })
+});
+
+// Create new multiplayer game
+app.post('/game/multi', (req, res, next) => {
   const newGameId = uuid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.MULTI);
 
-  return res.json({ gameId });
+  return res.status(201).json({ gameId });
 });
 
-app.get('/game/single', (req, res, next) => {
+app.post('/game/single', (req, res, next) => {
   const newGameId = uuid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.SINGLE);
 
-  return res.json({ gameId });
+  return res.status(201).json({ gameId });
 })
 
 /**Handle websocket messages */
