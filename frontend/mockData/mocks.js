@@ -1,8 +1,4 @@
-const {
-  TEST_BOARDS,
-  getTestBoard,
-  getTestPieces,
-} = require('common/mockData/mocks')
+const commonMocks = require('common/mockData/mocks')
 
 /**
  * Gets a mock html canvas ctx
@@ -102,11 +98,9 @@ const mockAnimation = () => {
 };
 
 module.exports = {
-  TEST_BOARDS,
-  getTestBoard,
-  getTestPieces,
+  ...commonMocks,
   getMockCtx,
   getMockDOMSelector,
   getMockGameDOMSelectors,
   mockAnimation,
-}
+};
