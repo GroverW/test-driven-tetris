@@ -6,7 +6,12 @@ const GameDOM = require('frontend/static/js/GameDOM');
 const Api = require('./Api');
 const { publish } = require('./pubSub');
 const { addText, addPowerUpTargetId } = require('./DOMUtils');
-const { gameSelectors, startButton, gameIdSelector } = require('./DOMSelectors')
+const {
+  gameSelectors,
+  startButton,
+  gameIdSelector,
+  powerUpContainer,
+} = require('./DOMSelectors')
 const {
   ADD_MESSAGE,
   MSG_TYPE,
@@ -39,6 +44,7 @@ const connectToGame = (gameId, type) => {
   if (type === 'multi') {
     addText(gameIdSelector, gameId);
     addPowerUpTargetId(gameSelectors.player, 1);
+    powerUpContainer.classList.remove('hide');
   }
 
   const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
