@@ -14,7 +14,7 @@ const {
   REMOVE_PLAYER,
   UPDATE_PLAYER,
   PLAY,
-  PLAYERS_READY,
+  GAME_MESSAGE,
   START_GAME,
   GAME_OVER,
   GET_PIECES,
@@ -110,8 +110,6 @@ class GameServer {
     });
 
     this.setHost();
-
-    if(this.gameType === GAME_TYPES.SINGLE) this.animateStart(player);
 
     return true;
   }
@@ -319,7 +317,7 @@ class GameServer {
     if(this.checkStartConditions(totalReady)) {
       this.animateStart();
     } else {
-      this.sendAll({ type: PLAYERS_READY, data: totalReady, });
+      this.sendGameMessage(totalReady);
     }
   }
 
@@ -333,16 +331,10 @@ class GameServer {
       currInterval -= 1;
 
       if(currInterval > 0) {
-        this.sendAll({
-          type: 'countdown',
-          data: currInterval,
-        });
+        this.sendGameMessage(currInterval);
         animate();
       } else if(currInterval === 0) {
-        this.sendAll({
-          type: 'countdown',
-          data: 'Good Luck!'
-        });
+        this.sendGameMessage('Good Luck!');
         animate();
       } else {
         this.startGame();
@@ -382,12 +374,9 @@ class GameServer {
       return false;
     }
 
-    if (totalReady < this.players.length) return false;
+    if (this.gameType === GAME_TYPES.SINGLE && totalReady > 0) return true;
 
-    // if (!player.isHost) {
-    //   this.sendMessage(player, MSG_TYPE.ERROR, 'Only the host can start the game.')
-    //   return false;
-    // }
+    if (totalReady < this.players.length) return false;
 
     return true;
   }
@@ -469,6 +458,13 @@ class GameServer {
     }
 
     return message;
+  }
+
+  sendGameMessage(header, body = []) {
+    this.sendAll({
+      type: GAME_MESSAGE,
+      data: { header, body }
+    });
   }
 
   /**
