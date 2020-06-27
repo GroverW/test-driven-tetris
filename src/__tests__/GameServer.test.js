@@ -2,7 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
-const { GET_PIECES } = require('backend/helpers/serverTopics');
+const { GET_PIECES, PLAY } = require('backend/helpers/serverTopics');
 const { mockSend, getTestBoard, pubSubMock } = require('common/mockData/mocks');
 const { mockAnimation } = require('frontend/mockData/mocks');
 
@@ -45,10 +45,12 @@ describe('game server tests', () => {
         expect(spGameServer.gameType).toBe(GAME_TYPES.SINGLE);
         expect(spGameServer.join(p1)).toBe(true);
         expect(spGameServer.players.length).toBe(1);
-        expect(sendAllSpy).toHaveBeenCalledTimes(1);
+        
+        // animateStart should be automatically called when player joins
+        expect(sendAllSpy).toHaveBeenCalledTimes(2);
       });
 
-      test('join game - game full', () => {
+      test('join game - only one player can join', () => {
         expect(spGameServer.join(p1)).toBe(true);
         expect(spGameServer.players.length).toBe(1);
         expect(spGameServer.join(p2)).toBe(false);
@@ -94,7 +96,7 @@ describe('game server tests', () => {
         expect(mpGameServer.join(p1)).toBe(true);
         expect(mpGameServer.join(p2)).toBe(true);
 
-        mpGameServer.startGame(p1);
+        mpGameServer.startGame();
 
         expect(mpGameServer.players.length).toBe(2);
 
@@ -196,32 +198,56 @@ describe('game server tests', () => {
 
       expect(p3.isHost).toBe(true);
     });
-
-    test('game host - only game host can start game', () => {
-      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
-
-      mpGameServer.join(p1);
-      mpGameServer.join(p2);
-
-      mpGameServer.startGame(p2);
-
-      expect(mpGameServer.gameStarted).toBe(false);
-      expect(sendAllSpy).toHaveBeenCalledTimes(2);
-
-      mpGameServer.startGame(p1);
-
-      expect(mpGameServer.gameStarted).toBe(true);
-      expect(sendAllSpy).toHaveBeenCalled();
-    });
   });
 
   describe('game start, game over', () => {
+    test('game start - multiplayer - game starts all players ready', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+      
+      const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
+
+      p1.pubSub.publish(PLAY, p1);
+      p2.pubSub.publish(PLAY, p2);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(2);
+      expect(animateStartSpy).toHaveBeenCalledTimes(0);
+
+      p3.pubSub.publish(PLAY, p3);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(3);
+      expect(animateStartSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('game start - multiplayer - game only starts if > 1 player', () => {
+      mpGameServer.join(p1);
+      
+      const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
+
+      p1.pubSub.publish(PLAY, p1);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(animateStartSpy).toHaveBeenCalledTimes(0);
+
+      mpGameServer.join(p2);
+      mpGameServer.join(p3);
+
+      p2.pubSub.publish(PLAY, p2);
+      p3.pubSub.publish(PLAY, p3);
+
+      expect(sendAllSpy).toHaveBeenCalledTimes(5);
+      expect(animateStartSpy).toHaveBeenCalledTimes(1);
+    });
+
     test('game start - update pieces', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       expect(p1.game.board.pieceList.pieces).toEqual(p1.game.board.pieceList.pieces);
       expect(p2.game.board.pieceList.pieces).toEqual(p3.game.board.pieceList.pieces);
@@ -239,41 +265,28 @@ describe('game server tests', () => {
       jest.useFakeTimers();
       requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
       
-      spGameServer.join(p1);
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
       
-      const sendAllSpy = jest.spyOn(spGameServer, 'sendAll');
+      const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
 
-      expect(spGameServer.gameStarted).toBe(false);
+      expect(mpGameServer.gameStarted).toBe(false);
       expect(sendAllSpy).toHaveBeenCalledTimes(0);
 
-      spGameServer.animateStart(p1);
+      mpGameServer.animateStart();
 
-      expect(spGameServer.gameStarted).toBe(false);
+      expect(mpGameServer.gameStarted).toBe(false);
       expect(sendAllSpy).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(1000);
 
-      expect(spGameServer.gameStarted).toBe(false);
+      expect(mpGameServer.gameStarted).toBe(false);
       expect(sendAllSpy).toHaveBeenCalledTimes(2);
 
       jest.advanceTimersByTime(3000);
 
-      expect(spGameServer.gameStarted).toBe(true);
-      expect(sendAllSpy).toHaveBeenCalledTimes(7);
-    });
-
-    test('game start - only one player in multiplayer game', () => {
-      mpGameServer.join(p1);
-
-      mpGameServer.startGame(p1);
-
-      expect(mpGameServer.gameStarted).toBe(false);
-
-      mpGameServer.join(p2);
-
-      mpGameServer.startGame(p1);
-
       expect(mpGameServer.gameStarted).toBe(true);
+      expect(sendAllSpy).toHaveBeenCalledTimes(7);
     });
 
     test('game over', () => {
@@ -281,7 +294,7 @@ describe('game server tests', () => {
       mpGameServer.join(p2);
       mpGameServer.join(p3);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       expect(mpGameServer.nextRanking).toBe(3);
 
@@ -303,7 +316,7 @@ describe('game server tests', () => {
       mpGameServer.join(p2);
       mpGameServer.join(p3);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       expect(mpGameServer.nextRanking).toBe(3);
 
@@ -337,7 +350,7 @@ describe('game server tests', () => {
       mpGameServer.join(p2);
       mpGameServer.join(p3);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       expect(mpGameServer.nextRanking).toBe(3);
 
@@ -381,7 +394,7 @@ describe('game server tests', () => {
 
       p1.game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       p1.game.usePowerUp(p2.id);
 
@@ -417,7 +430,7 @@ describe('game server tests', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
 
-      mpGameServer.startGame(p1);
+      mpGameServer.startGame();
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(0);
 
@@ -426,27 +439,16 @@ describe('game server tests', () => {
       expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('game start - not host', () => {
-      mpGameServer.join(p1);
-      mpGameServer.join(p2);
-      const sendSpy = jest.spyOn(p2, 'send');
-      expect(sendSpy).toHaveBeenCalledTimes(0);
-
-      mpGameServer.startGame(p2);
-      
-      expect(mpGameServer.gameStarted).toBe(false);
-      expect(sendSpy).toHaveBeenCalledTimes(1);
-    });
-
     test('game start - multiplayer - not enough players', () => {
       mpGameServer.join(p1);
       const sendSpy = jest.spyOn(mpGameServer, 'sendTo');
+      const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
       expect(sendSpy).toHaveBeenCalledTimes(0);
       
-      mpGameServer.startGame(p1);
+      p1.pubSub.publish(PLAY, p1);
       
-      expect(mpGameServer.gameStarted).toBe(false);
-      expect(sendSpy).toHaveBeenCalledTimes(1);
+      expect(animateStartSpy).toHaveBeenCalledTimes(0);
+      expect(sendSpy).toHaveBeenCalledTimes(2);
     });
   });
 
