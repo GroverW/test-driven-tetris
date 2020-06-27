@@ -13,12 +13,11 @@ const {
   powerUpContainer,
 } = require('./DOMSelectors')
 const {
-  ADD_MESSAGE,
-  MSG_TYPE,
   PLAY,
   TOGGLE_MENU,
   ADD_PLAYER,
 } = require('frontend/helpers/clientTopics');
+const { publishError } = require('frontend/helpers/clientUtils');
 
 /**
  * Creates a new single, or multiplayer game
@@ -26,13 +25,26 @@ const {
  */
 const createGame = async (type) => {
   try {
-    const response = await axios.get(`/game/${type}`);
+    const response = await axios.post(`/game/${type}`);
 
     const gameId = response.data.gameId;
 
     connectToGame(gameId, type);
   } catch (err) {
-    publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message: 'Oops... could not connect' });
+    publishError('Oops... could not connect')
+  }
+}
+
+const joinGame = async (id) => {
+  try {
+    const response = await axios.get(`/game/multi/${id}`);
+
+    const gameId = response.data.gameId;
+
+    connectToGame(gameId, 'multi');
+  } catch (err) {
+    const message = err.response.data.error || 'Could not join game';
+    publishError(message)
   }
 }
 
@@ -64,7 +76,7 @@ const connectToGame = (gameId, type) => {
    */
   ws.onclose = (evt) => {
     const data = evt.reason || 'Something went wrong, please try again.';
-    publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message: data });
+    publishError(data);
   }
 
   /**
@@ -109,5 +121,6 @@ const createEventListeners = (game, api) => {
 
 module.exports = {
   createGame,
+  joinGame,
   connectToGame,
 };
