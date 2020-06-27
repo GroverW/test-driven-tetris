@@ -2,14 +2,18 @@ const {
   randomize,
   getEmptyBoard,
   getNewPlayer,
-  getNewPlayerDOM 
+  getNewPlayerDOM,
+  publishError,
 } = require('frontend/helpers/clientUtils');
-const { getTestBoard } = require('frontend/mockData/mocks');
+const { getTestBoard, pubSubMock } = require('frontend/mockData/mocks');
+const { ADD_MESSAGE } = require('frontend/helpers/clientTopics');
 
 describe('utils', () => {
   let pieces = [1,2,3,4,5,6,7];
+  let pubSubSpy;
 
   beforeAll(() => {
+    pubSubSpy = pubSubMock();
     Math.random = jest.fn().mockReturnValue(.5)
   });
 
@@ -45,5 +49,15 @@ describe('utils', () => {
     const testBoard = getTestBoard('empty');
 
     expect(getEmptyBoard()).toEqual(testBoard);
-  })
+  });
+
+  test('publish error', () => {
+    const errorSpy = pubSubSpy.add(ADD_MESSAGE);
+
+    expect(errorSpy).toHaveBeenCalledTimes(0);
+
+    publishError('test');
+
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
 });
