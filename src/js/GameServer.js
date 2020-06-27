@@ -13,6 +13,8 @@ const {
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_PLAYER,
+  PLAY,
+  PLAYERS_READY,
   START_GAME,
   GAME_OVER,
   GET_PIECES,
@@ -109,6 +111,8 @@ class GameServer {
 
     this.setHost();
 
+    if(this.gameType === GAME_TYPES.SINGLE) this.animateStart(player);
+
     return true;
   }
 
@@ -119,7 +123,7 @@ class GameServer {
   addSubscriptions(player) {
     this.subscriptions[player.id] = [
       player.pubSub.subscribe(REMOVE_PLAYER, this.leave.bind(this)),
-      player.pubSub.subscribe(START_GAME, this.startGame.bind(this)),
+      player.pubSub.subscribe(PLAY, this.playerReady.bind(this)),
       player.pubSub.subscribe(GAME_OVER, this.gameOver.bind(this)),
       player.pubSub.subscribe(GET_PIECES, this.getPieces.bind(this)),
       player.pubSub.subscribe(UPDATE_PLAYER, this.updatePlayer.bind(this)),
@@ -304,7 +308,25 @@ class GameServer {
     }
   }
 
-  animateStart(player) {
+  /**
+   * Sets player to readyToPlay. Starts game when all players ready
+   * @param {object} player - player who is ready
+   */
+  playerReady(player) {
+    player.readyToPlay = true;
+    const totalReady = this.players.reduce((total, p) => total + p.readyToPlay, 0);
+
+    if(this.checkStartConditions(totalReady)) {
+      this.animateStart();
+    } else {
+      this.sendAll({ type: PLAYERS_READY, data: totalReady, });
+    }
+  }
+
+  /**
+   * Animates the countdown for game start
+   */
+  animateStart() {
     let currInterval = 0;
     let animationId;
 
@@ -327,7 +349,7 @@ class GameServer {
           });
         } else {
           cancelAnimationFrame(animationId);
-          this.startGame(player);
+          this.startGame();
         }
       }
       animationId = requestAnimationFrame(animate);
@@ -338,12 +360,8 @@ class GameServer {
 
   /**
    * Starts game
-   * @param {object} player - Player requesting to start game
-   * @returns {boolean} - whether or not game was started
    */
-  startGame(player) {
-    if (!this.checkStartConditions(player)) return false;
-
+  startGame() {
     this.gameStarted = true;
 
     this.getPieces();
@@ -353,8 +371,6 @@ class GameServer {
     this.sendAll({ type: START_GAME });
 
     this.nextRanking = this.players.length;
-
-    return true;
   }
 
   /**
@@ -362,16 +378,22 @@ class GameServer {
    * @param {object} player - instance of player class
    * @returns {boolean} - whether or not game can be started
    */
-  checkStartConditions(player) {
-    if (this.gameType === GAME_TYPES.MULTI && this.players.length < 2) {
-      this.sendMessage(player, MSG_TYPE.ERROR, 'Not enough players to start game.')
+  checkStartConditions(totalReady) {
+    if (
+      this.gameType === GAME_TYPES.MULTI && 
+      this.players.length === 1 &&
+      totalReady === 1
+      ) {
+      this.sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.')
       return false;
     }
 
-    if (!player.isHost) {
-      this.sendMessage(player, MSG_TYPE.ERROR, 'Only the host can start the game.')
-      return false;
-    }
+    if (totalReady < this.players.length) return false;
+
+    // if (!player.isHost) {
+    //   this.sendMessage(player, MSG_TYPE.ERROR, 'Only the host can start the game.')
+    //   return false;
+    // }
 
     return true;
   }
