@@ -16,6 +16,8 @@ const nextPieceCanvas = document.getElementById('next-piece');
 
 const gameIdSelector = document.getElementById('game-id');
 
+const powerUpContainer = document.getElementById('power-up-container');
+
 const startButton = document.getElementById('start');
 
 const gameSelectors = {
@@ -39,6 +41,7 @@ module.exports = {
   p1Canvas,
   nextPieceCanvas,
   gameIdSelector,
+  powerUpContainer,
   startButton,
   gameSelectors,
 };
