@@ -40,14 +40,9 @@ describe('game server tests', () => {
 
     describe('single player', () => {
       test('join game - single player', () => {
-        const animateStartSpy = jest.spyOn(spGameServer, 'animateStart')
-
         expect(spGameServer.gameType).toBe(GAME_TYPES.SINGLE);
         expect(spGameServer.join(p1)).toBe(true);
         expect(spGameServer.players.length).toBe(1);
-        
-        // animateStart should be automatically called when player joins
-        expect(animateStartSpy).toHaveBeenCalledTimes(1);
       });
 
       test('join game - only one player can join', () => {
@@ -201,6 +196,18 @@ describe('game server tests', () => {
   });
 
   describe('game start, game over', () => {
+    test('game start - single player - game starts when player ready', () => {
+      const animateStartSpy = jest.spyOn(spGameServer, 'animateStart');
+      
+      spGameServer.join(p1);
+
+      expect(animateStartSpy).toHaveBeenCalledTimes(0);
+
+      p1.pubSub.publish(PLAY, p1);
+
+      expect(animateStartSpy).toHaveBeenCalledTimes(1);
+    })
+
     test('game start - multiplayer - game starts all players ready', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
