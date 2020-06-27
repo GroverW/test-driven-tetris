@@ -10,7 +10,7 @@ describe('Routes tests', () => {
   })
 
   describe('POST game', () => {
-    test('Returns uuid', async () => {
+    test('returns uuid', async () => {
       const response = await request(app).post('/game/multi');
 
       expect(response.statusCode).toBe(201);
@@ -18,7 +18,7 @@ describe('Routes tests', () => {
       expect(response.body.gameId).toEqual(expect.any(String));
     });
 
-    test('Creates new game with uuid - multiplayer', async () => {
+    test('creates new game with uuid - multiplayer', async () => {
       expect(GAMES.size).toBe(0);
 
       const response = await request(app).post('/game/multi');
@@ -33,7 +33,7 @@ describe('Routes tests', () => {
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
     
-    test('Creates new game with uuid - single player', async () => {
+    test('creates new game with uuid - single player', async () => {
       expect(GAMES.size).toBe(0);
 
       const response = await request(app).post('/game/single');
@@ -50,7 +50,7 @@ describe('Routes tests', () => {
   });
 
   describe('GET game', () => {
-    test('Gets an existing game - multiplayer', async () => {
+    test('gets an existing multiplayer game', async () => {
       const gameId = GameServer.addGame(1, GAME_TYPES.MULTI);
       
       expect(GAMES.size).toBe(1);
@@ -72,6 +72,18 @@ describe('Routes tests', () => {
       expect(response.statusCode).toBe(404);
 
       expect(response.body.error).toEqual(expect.any(String));
-    })
+    });
+
+    test('error - game is not multiplayer', async () => {
+      const gameId = GameServer.addGame(1, GAME_TYPES.SINGLE);
+
+      expect(GAMES.size).toBe(1);
+
+      const response = await request(app).get(`/game/multi/${gameId}`);
+
+      expect(response.statusCode).toBe(404);
+
+      expect(response.body.error).toEqual(expect.any(String));
+    });
   });
 });
