@@ -15,7 +15,7 @@ app.use(express.static('frontend/static/'));
 
 
 app.get('/game/multi/:gameId', (req, res, next) => {
-  const gameId = +req.params.gameId;
+  const gameId = req.params.gameId;
   const game = GameServer.getGame(gameId);
 
   if(game && game.gameType === GAME_TYPES.MULTI) {
