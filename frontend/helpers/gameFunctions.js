@@ -64,7 +64,7 @@ const connectToGame = (gameId, type) => {
    */
   ws.onclose = (evt) => {
     const data = evt.reason || 'Something went wrong, please try again.';
-    publish(ADD_MESSAGE, data);
+    publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message: data });
   }
 
   /**
