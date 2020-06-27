@@ -4,6 +4,7 @@ const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
 const { GET_PIECES } = require('backend/helpers/serverTopics');
 const { mockSend, getTestBoard, pubSubMock } = require('common/mockData/mocks');
+const { mockAnimation } = require('frontend/mockData/mocks');
 
 describe('game server tests', () => {
   let mpGameServer;
@@ -232,6 +233,33 @@ describe('game server tests', () => {
       // player who leaves should not get piece updates
       expect(p1.game.board.pieceList.pieces).toEqual(p1.game.board.pieceList.pieces);
       expect(p2.game.board.pieceList.pieces).not.toEqual(p3.game.board.pieceList.pieces);
+    });
+
+    test('game start - animate start', () => {
+      jest.useFakeTimers();
+      requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
+      
+      spGameServer.join(p1);
+      
+      const sendAllSpy = jest.spyOn(spGameServer, 'sendAll');
+
+      expect(spGameServer.gameStarted).toBe(false);
+      expect(sendAllSpy).toHaveBeenCalledTimes(0);
+
+      spGameServer.animateStart(p1);
+
+      expect(spGameServer.gameStarted).toBe(false);
+      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(1000);
+
+      expect(spGameServer.gameStarted).toBe(false);
+      expect(sendAllSpy).toHaveBeenCalledTimes(2);
+
+      jest.advanceTimersByTime(3000);
+
+      expect(spGameServer.gameStarted).toBe(true);
+      expect(sendAllSpy).toHaveBeenCalledTimes(7);
     });
 
     test('game start - only one player in multiplayer game', () => {
