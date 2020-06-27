@@ -1,4 +1,6 @@
 const commonUtils = require('common/helpers/utils');
+const { publish } = require('frontend/helpers/pubSub');
+const { ADD_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
 
 /**
  * Creates an object containing new player information
@@ -16,8 +18,13 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
  */
 const getNewPlayerDOM = (node, id, powerUpId) => ({ node,  id, powerUpId });
 
+const publishError = (message) => (
+  publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message })
+);
+
 module.exports = {
   ...commonUtils,
   getNewPlayer,
   getNewPlayerDOM,
+  publishError,
 };
