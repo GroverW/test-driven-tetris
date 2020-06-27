@@ -4,7 +4,8 @@ const {
   MAX_PLAYERS,
   POWER_UP_TYPES,
   RANKINGS,
-  SEED_PIECES
+  SEED_PIECES,
+  COUNTDOWN,
 } = require('backend/helpers/serverConstants');
 const {
   ADD_MESSAGE,
@@ -301,6 +302,38 @@ class GameServer {
       if (result1) this.updatePlayer({ id: data.player1, board: result1 }, true);
       if (result2) this.updatePlayer({ id: data.player2, board: result2 }, true);
     }
+  }
+
+  animateStart(player) {
+    let currInterval = 0;
+    let animationId;
+
+    const animate = (currTime = 0) => {
+      const interval = Math.floor(currTime / COUNTDOWN.INTERVAL_LENGTH);
+      if(interval >= currInterval) {
+        currInterval += 1;
+
+        const intervalsRemaining = COUNTDOWN.NUM_INTERVALS - currInterval;
+
+        if(intervalsRemaining > 1) {
+          this.sendAll({
+            type: 'countdown',
+            data: intervalsRemaining,
+          });
+        } else if(intervalsRemaining === 1) {
+          this.sendAll({
+            type: 'countdown',
+            data: 'Good Luck!'
+          });
+        } else {
+          cancelAnimationFrame(animationId);
+          this.startGame(player);
+        }
+      }
+      animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
   }
 
   /**
