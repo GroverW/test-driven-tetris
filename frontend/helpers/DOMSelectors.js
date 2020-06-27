@@ -1,7 +1,7 @@
 const messageSelector = document.getElementById('flash-message');
 
 const menuSelectors = {
-  menuContainer: document.getElementById('menu'),
+  menuContainer: document.getElementById('menu-container'),
   newSinglePlayer: document.getElementById('new-single-player'),
   newMultiplayer: document.getElementById('new-multiplayer'),
   joinMultiplayer: document.getElementById('join-multiplayer'),
@@ -23,7 +23,7 @@ const startButton = document.getElementById('start');
 const gameSelectors = {
   playerCtx: p1Canvas.getContext('2d'),
   nextCtx: nextPieceCanvas.getContext('2d'),
-  gameContainer: document.getElementById('game-container'),
+  opponents: document.getElementById('opponents'),
   score: document.getElementById('game-score'),
   level: document.getElementById('game-level'),
   lines: document.getElementById('game-lines'),

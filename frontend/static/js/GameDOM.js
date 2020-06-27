@@ -32,7 +32,7 @@ class GameDOM {
    * @param {object} selectors - object of DOM selectors
    * @param {object} selectors.playerCtx - player canvas context
    * @param {object} selectors.nexCtx - player next piece canvas context
-   * @param {object} selectors.gameContainer - game container selector
+   * @param {object} selectors.opponents - game container selector
    * @param {object} selectors.score - game score selector
    * @param {object} selectors.level - game level selector
    * @param {object} selectors.lines - game lines cleared selector
@@ -44,7 +44,7 @@ class GameDOM {
   constructor(selectors, playerId) {
     this.playerId = playerId;
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
-    this.gameContainer = selectors.gameContainer;
+    this.opponents = selectors.opponents;
     this.score = selectors.score;
     this.level = selectors.level;
     this.lines = selectors.lines;
@@ -71,7 +71,7 @@ class GameDOM {
     if (id === this.playerId) return;
 
     const [playerContainer, playerCtx] = this.getNewPlayerContainer(id);
-    this.gameContainer.appendChild(playerContainer);
+    this.opponents.appendChild(playerContainer);
 
     const powerUpTargetId = this.players.length + 2;
     const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId)

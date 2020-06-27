@@ -52,7 +52,7 @@ describe('game DOM tests', () => {
   });
 
   test('start new game', () => {
-    expect(gameDOM.gameContainer).not.toBe(undefined);
+    expect(gameDOM.opponents).not.toBe(undefined);
     expect(gameDOM.gameView).not.toBe(undefined);
     expect(gameDOM.score).not.toBe(undefined);
     expect(gameDOM.level).not.toBe(undefined);

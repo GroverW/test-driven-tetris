@@ -81,7 +81,7 @@ const getMockDOMSelector = () => ({
 const getMockGameDOMSelectors = () => ({
   playerCtx: getMockCtx(),
   nextCtx: getMockCtx(),
-  gameContainer: getMockDOMSelector(),
+  opponents: getMockDOMSelector(),
   score: getMockDOMSelector(),
   level: getMockDOMSelector(),
   lines: getMockDOMSelector(),
