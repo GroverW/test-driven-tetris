@@ -109,9 +109,9 @@ class GameView {
 
     ctx.fillStyle = color.lowlight;
     ctx.beginPath();
-    ctx.moveTo(xStart, yStart)
-    ctx.lineTo(xStart, yStart + height)
+    ctx.moveTo(xStart, yStart + height)
     ctx.lineTo(xStart + width, yStart + height)
+    ctx.lineTo(xStart + width, yStart)
     ctx.fill();
 
     ctx.strokeStyle = color.border;
