@@ -3,7 +3,12 @@ const ClientGame = require('frontend/static/js/ClientGame');
 const { Piece } = require('common/js/Piece');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
-const { CONTROLS, PIECE_TYPES, POWER_UP_TYPES } = require('frontend/helpers/clientConstants');
+const {
+  CONTROLS,
+  PIECE_TYPES,
+  POWER_UP_TYPES,
+  LINES_PER_LEVEL,
+} = require('frontend/helpers/clientConstants');
 const {
   ADD_PLAYER,
   REMOVE_PLAYER,
@@ -142,7 +147,7 @@ describe('game DOM tests', () => {
 
     expect(gameDOM.score.innerText).toBe(0);
     expect(gameDOM.level.innerText).toBe(1);
-    expect(gameDOM.lines.innerText).toBe(0);
+    expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL);
   });
 
   test('scoreboard - updates points when piece moves down', () => {
@@ -161,7 +166,7 @@ describe('game DOM tests', () => {
     game.board.nextPiece = new Piece(PIECE_TYPES.I);
 
     expect(gameDOM.score.innerText).toBe(0);
-    expect(gameDOM.lines.innerText).toBe(0);
+    expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL);
 
     game.command(CONTROLS.ROTATE_LEFT);    
     game.command(CONTROLS.ROTATE_LEFT);    
@@ -173,7 +178,7 @@ describe('game DOM tests', () => {
     game.command(CONTROLS.HARD_DROP);
 
     expect(gameDOM.score.innerText).toBe(860);
-    expect(gameDOM.lines.innerText).toBe(4);
+    expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 4);
   });
 
   test('scoreboard - updates on level increase', () => {
@@ -183,7 +188,7 @@ describe('game DOM tests', () => {
 
     publish(CLEAR_LINES, 4);
 
-    expect(gameDOM.lines.innerText).toBe(4);
+    expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 4);
     expect(gameDOM.level.innerText).toBe(1);
 
     publish(CLEAR_LINES, 4);
