@@ -73,7 +73,7 @@ class ClientGame extends Game {
       publish(UPDATE_SCORE, {
         score: this.score,
         level: this.level,
-        lines: this.lines
+        lines: this.linesRemaining
       });
     }
   }
@@ -252,7 +252,7 @@ class ClientGame extends Game {
 
     publish(UPDATE_SCORE, {
       level: this.level,
-      lines: this.lines
+      lines: this.linesRemaining,
     })
   }
 
