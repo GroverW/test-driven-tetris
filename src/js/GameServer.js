@@ -317,7 +317,9 @@ class GameServer {
     if(this.checkStartConditions(totalReady)) {
       this.animateStart();
     } else {
-      this.sendGameMessage(totalReady);
+      this.sendGameMessage(
+        'Waiting for others',
+        [`${totalReady} out of ${this.players.length} players ready`]);
     }
   }
 
