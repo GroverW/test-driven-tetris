@@ -10,7 +10,7 @@ describe('Routes tests', () => {
   })
 
   describe('POST game', () => {
-    test('returns uuid', async () => {
+    test('returns uniqid', async () => {
       const response = await request(app).post('/game/multi');
 
       expect(response.statusCode).toBe(201);
@@ -18,7 +18,7 @@ describe('Routes tests', () => {
       expect(response.body.gameId).toEqual(expect.any(String));
     });
 
-    test('creates new game with uuid - multiplayer', async () => {
+    test('creates new game with uniqid - multiplayer', async () => {
       expect(GAMES.size).toBe(0);
 
       const response = await request(app).post('/game/multi');
@@ -33,7 +33,7 @@ describe('Routes tests', () => {
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
     
-    test('creates new game with uuid - single player', async () => {
+    test('creates new game with uniqid - single player', async () => {
       expect(GAMES.size).toBe(0);
 
       const response = await request(app).post('/game/single');
