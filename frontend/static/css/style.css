@@ -164,7 +164,7 @@ body {
   height: 300px;
 }
 
-.game-over {
+.game-message {
   position: absolute;
   top: 0;
   left: 0;
@@ -175,13 +175,17 @@ body {
   background-color: rgba(0,0,0,.6);
 }
 
-.game-over-message {
+.game-message.hide {
+  display: none;
+}
+
+.game-message-text {
   display: table-cell;
   text-align: center;
   vertical-align: middle;
 }
 
-.game-over-message h1 {
+.game-message-text h1 {
   font-size: 42px;
 }
 
