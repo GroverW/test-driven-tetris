@@ -41,6 +41,44 @@
 
     <div id="p1" class="item-large">
       <canvas id="p1-board" class="game-board"></canvas>
+      <div class="game-message hide">
+        <div class="game-message-text">
+            <div class="controls">
+              <div class="controls-row">
+                <div>Rotate L / R:</div> 
+                <div>
+                  <span>A</span>
+                  <span>S</span>
+                </div>
+              </div>
+              <div class="controls-row">
+                <div>Movement:</div>
+                <div>
+                  <span>◄</span>
+                  <span>▼</span>
+                  <span>►</span>
+                </div>
+              </div>
+              <div class="controls-row">
+                <div>Drop:</div>
+                <div>
+                  <span class="large-icon">space</span>
+                </div>
+              </div>
+              <div class="controls-row">
+                <div>Power Up:</div>
+                <div>
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                </div>
+              </div>
+            </div>
+            <button id="start">Click When Ready</button>
+            <p id="game-id"></p>
+        </div>
+      </div>
     </div>
     
     <div id="stats" class="item-small">
@@ -67,11 +105,10 @@
           <div id="p-up2" class='p-up'></div>
         </div>
       </div>
-
-      <button id="start">Start Game</button>
-      <p id="game-id"></p>
-      <br />
-      <a id="mute"></a>
+      
+      <div class="buttons">
+        <a id="mute"></a>
+      </div>
     </div>
     
     <div id="opponents">
