@@ -5,7 +5,7 @@ const app = express();
 const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
-const { v4: uuid } = require('uuid');
+const uniqid = require('uniqid');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const { PLAY, EXECUTE_COMMANDS } = require('backend/helpers/serverTopics');
 const wsExpress = require('express-ws')(app);
@@ -27,7 +27,7 @@ app.get('/game/multi/:gameId', (req, res, next) => {
 
 // Create new multiplayer game
 app.post('/game/multi', (req, res, next) => {
-  const newGameId = uuid();
+  const newGameId = uniqid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.MULTI);
 
@@ -35,7 +35,7 @@ app.post('/game/multi', (req, res, next) => {
 });
 
 app.post('/game/single', (req, res, next) => {
-  const newGameId = uuid();
+  const newGameId = uniqid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.SINGLE);
 
