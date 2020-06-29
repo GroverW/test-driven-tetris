@@ -27,10 +27,7 @@ class ClientBoard extends Board {
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if(super.movePiece(x, y, multiplier)) {
       if(multiplier < POINTS.HARD_DROP) {
-        this.pubSub.publish(DRAW, {
-          board: this.grid,
-          piece: this.piece
-        })
+        this.publishDraw(this.grid, this.piece);
       }
     }
   }
@@ -42,10 +39,16 @@ class ClientBoard extends Board {
   rotatePiece(direction) {
     super.rotatePiece(direction)
 
-    this.pubSub.publish(DRAW, {
-      board: this.grid,
-      piece: this.piece
-    })
+    this.publishDraw(this.grid, this.piece);
+  }
+
+  /**
+   * Replaces current grid with new one. Moves current piece if too close to new grid.
+   * @param {array} newGrid - new board grid
+   */
+  replaceBoard(newGrid) {
+    super.replaceBoard(newGrid);
+    this.publishDraw(this.grid, this.piece);
   }
 
     /**
@@ -54,11 +57,11 @@ class ClientBoard extends Board {
   publishBoardUpdate() {
     this.pubSub.publish(BOARD_CHANGE, this.grid)
 
-    this.pubSub.publish(DRAW, {
-      board: this.grid,
-      piece: this.piece,
-      nextPiece: this.nextPiece
-    })
+    this.publishDraw(this.grid, this.piece, this.nextPiece);
+  }
+
+  publishDraw(board, piece, nextPiece) {
+    this.pubSub.publish(DRAW, { board, piece, nextPiece })
   }
 }
 
