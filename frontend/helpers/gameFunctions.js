@@ -54,7 +54,7 @@ const joinGame = async (id) => {
  */
 const connectToGame = (gameId, type) => {
   if (type === 'multi') {
-    addText(gameIdSelector, gameId);
+    addText(gameIdSelector, `Game ID: ${gameId}`);
     addPowerUpTargetId(gameSelectors.player, 1);
     powerUpContainer.classList.remove('hide');
   }
@@ -91,6 +91,7 @@ const connectToGame = (gameId, type) => {
       game = new ClientGame(data);
       api = new Api(ws);
       createEventListeners(game, api);
+      gameSelectors.message.classList.remove('hide');
       publish(TOGGLE_MENU);
       return;
     }
@@ -107,6 +108,7 @@ const connectToGame = (gameId, type) => {
 const createEventListeners = (game, api) => {
   startButton.addEventListener('click', (evt) => {
     evt.target.blur();
+    publish(PLAY);
     api.sendMessage({ type: PLAY, data: '' })
   })
 
