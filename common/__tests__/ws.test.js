@@ -6,7 +6,13 @@ const Api = require('frontend/helpers/Api');
 const serverPubSub = require('backend/helpers/pubSub');
 
 const { CONTROLS } = require('frontend/helpers/clientConstants');
-const { GAMES, GAME_TYPES, POWER_UP_TYPES, PIECE_TYPES } = require('backend/helpers/serverConstants');
+const { 
+  GAMES,
+  GAME_TYPES,
+  POWER_UP_TYPES,
+  PIECE_TYPES,
+  COUNTDOWN,
+} = require('backend/helpers/serverConstants');
 const { MSG_TYPE } = require('common/helpers/commonTopics');
 
 const { getMockDOMSelector, getMockGameDOMSelectors } = require('frontend/mockData/mocks');
@@ -37,6 +43,8 @@ describe('websocket tests', () => {
     document.createElement = jest.fn().mockImplementation(getMockDOMSelector);
 
     clientToServer.open();
+
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
@@ -115,6 +123,7 @@ describe('websocket tests', () => {
       expect(serverToClient.game.gameStatus).toBe(false);
   
       clientToServer.startGame();
+      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
   
       expect(clientToServer.gameServer.gameStarted).toBe(true);
       expect(serverToClient.game.gameStatus).toBe(true);
@@ -128,10 +137,12 @@ describe('websocket tests', () => {
       expect(getPiecesSpy).toHaveBeenCalledTimes(0);
   
       clientToServer.startGame();
+      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
   
       expect(getPiecesSpy).toHaveBeenCalledTimes(1);
   
       clientToServer.startGame();
+      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
   
       expect(getPiecesSpy).toHaveBeenCalledTimes(1);
     });
@@ -147,7 +158,9 @@ describe('websocket tests', () => {
 
     test('game over', () => {
       clientToServer.gameServer.join(player2);
+      
       clientToServer.startGame();
+      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
   
       expect(serverToClient.game.gameStatus).toBe(true);
   
@@ -185,7 +198,7 @@ describe('websocket tests', () => {
 
   describe('gameplay', () => {
     test('execute commands', () => {
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       serverToClient.game.command(CONTROLS.DOWN);
       serverToClient.game.command(CONTROLS.LEFT);
@@ -210,7 +223,7 @@ describe('websocket tests', () => {
   
       const drawGridSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawGrid');
   
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       expect(drawGridSpy).toHaveBeenCalledTimes(3);
   
@@ -222,7 +235,7 @@ describe('websocket tests', () => {
   
     test('game over from play', () => {
       clientToServer.gameServer.join(player2);
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       for (let i = 0; i < 25; i++) {
         serverToClient.game.command(CONTROLS.HARD_DROP);
@@ -248,7 +261,7 @@ describe('websocket tests', () => {
   
       clientToServer.player.game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
   
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       clientToServer.player.game.board.grid = getTestBoard('pattern1');
       serverToClient.game.board.grid = getTestBoard('pattern1');
@@ -273,7 +286,7 @@ describe('websocket tests', () => {
     test('power up is added to client when rewarded to server', () => {
       Math.random = jest.fn().mockReturnValue(.9);
       clientToServer.gameServer.join(player2);
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       clientToServer.player.game.board.grid = getTestBoard('clearLines2');
       clientToServer.player.game.board.piece = new Piece(PIECE_TYPES.T);
@@ -302,7 +315,7 @@ describe('websocket tests', () => {
       Math.random = jest.fn().mockReturnValue(.9);
       clientToServer.gameServer.gameType = GAME_TYPES.SINGLE;
       clientToServer.player.setGameType(GAME_TYPES.SINGLE);
-      clientToServer.startGame();
+      clientToServer.gameServer.startGame();
   
       clientToServer.player.game.board.grid = getTestBoard('clearLines2');
       clientToServer.player.game.board.piece = new Piece(PIECE_TYPES.T);
@@ -359,29 +372,5 @@ describe('websocket tests', () => {
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
     });
-
-    test('start game - not host', () => {
-      const errorSpy = pubSubSpy.add('addMessage');
-      
-      clientToServer.gameServer.join(player2);
-      clientToServer.gameServer.players[0].isHost = false;
-      clientToServer.gameServer.players[1].isHost = true;
-
-      expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientMessage.message.innerText).toBe('');
-
-      clientToServer.startGame();
-
-      expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientMessage.message.innerText).not.toBe('');
-
-      clientToServer.gameServer.players[0].isHost = true;
-      clientToServer.gameServer.players[1].isHost = false;
-
-      clientToServer.startGame();
-
-      expect(errorSpy).toHaveBeenCalledTimes(1);
-    });
-    
   });
 });
