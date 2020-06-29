@@ -1,4 +1,4 @@
-![Screenshot of Gameplay](https://github.com/GroverW/test-driven-tetris/blob/master/readmescreen.png?raw=true)
+![Screenshot of Gameplay](https://github.com/GroverW/test-driven-tetris/blob/master/gameplayscreen.png?raw=true)
 
 # Test Driven Tetris
 
