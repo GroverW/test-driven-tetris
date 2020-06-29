@@ -50,4 +50,17 @@ describe('client - game board tests', () => {
     expect(clearLinesSpy).toHaveBeenCalledTimes(1);
     expect(boardChangeSpy).toHaveBeenCalledTimes(1);
   });
+
+test('publish boards updates when board gets replaced', () => {
+  gameBoard.grid = getTestBoard('empty');
+  gameBoard.piece = p1;
+
+  const newBoard = getTestBoard('pattern3');
+  
+  const drawSpy = pubSubSpy.add(DRAW);
+  
+  gameBoard.replaceBoard(newBoard);
+
+  expect(drawSpy).toHaveBeenCalledTimes(1);
+})
 });
