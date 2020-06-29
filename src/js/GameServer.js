@@ -319,7 +319,10 @@ class GameServer {
     } else {
       this.sendGameMessage(
         'Waiting for others',
-        [`${totalReady} out of ${this.players.length} players ready`]);
+        [
+          `${totalReady} out of ${this.players.length} players ready`,
+          `Game ID: ${this.id}`,
+      ]);
     }
   }
 
