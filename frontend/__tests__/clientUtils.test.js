@@ -37,13 +37,13 @@ describe('utils', () => {
 
   test('get new player DOM', () => {
     const testPlayerDOM = {
-      node: 'test',
       id: 1,
+      node: 'test',
       powerUpId: 1,
       message: 1,
     }
 
-    expect(getNewPlayerDOM('test', 1, 1, 1)).toEqual(testPlayerDOM);
+    expect(getNewPlayerDOM(1, 'test', 1, 1)).toEqual(testPlayerDOM);
   });
 
   test('get empty board', () => {
