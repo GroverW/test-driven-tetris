@@ -1,3 +1,4 @@
+
 const GameView = require('./GameView');
 const { subscribe } = require('frontend/helpers/pubSub');
 const {
@@ -14,8 +15,10 @@ const {
   POWER_UPS,
 } = require('frontend/helpers/clientConstants');
 const {
+  PLAY,
   START_GAME,
   GAME_OVER,
+  GAME_MESSAGE,
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_SCORE,
@@ -49,11 +52,13 @@ class GameDOM {
     this.level = selectors.level;
     this.lines = selectors.lines;
     this.player = selectors.player;
+    this.message = selectors.message;
     this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
     this.music = selectors.music;
     this.subscriptions = [
-      subscribe(START_GAME, selectors.music.play.bind(selectors.music)),
+      subscribe(PLAY, this.playerReady.bind(this)),
+      subscribe(START_GAME, this.startGame.bind(this)),
       subscribe(GAME_OVER, this.gameOver.bind(this)),
       subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
@@ -64,19 +69,30 @@ class GameDOM {
   }
 
   /**
+   * Subscribes user to game messages when ready
+   */
+  playerReady() {
+    this.subscriptions.push(subscribe(GAME_MESSAGE, this.gameMessage.bind(this)))
+  }
+  
+  /**
+   * Clears any game messages and starts music on game start
+   */
+  startGame() {
+    this.music.play();
+    this.clearMessage(this.message);
+  }
+  /**
    * Adds additional player to the game container
    * @param {number} id - id of additional player
    */
   addPlayer(id) {
     if (id === this.playerId) return;
 
-    const [playerContainer, playerCtx] = this.getNewPlayerContainer(id);
-    this.opponents.appendChild(playerContainer);
+    const [canvasCtx, ...DOMElements] = this.getNewPlayerContainer(id);
 
-    const powerUpTargetId = this.players.length + 2;
-    const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId)
-    const playerDOM = getNewPlayerDOM(playerContainer, id, powerUpTargetSelector);
-    const player = getNewPlayer(playerCtx, getEmptyBoard(), id)
+    const playerDOM = getNewPlayerDOM(id, ...DOMElements);
+    const player = getNewPlayer(canvasCtx, getEmptyBoard(), id);
 
     // adds player to player list and gameView
     this.players.push(playerDOM);
@@ -102,19 +118,29 @@ class GameDOM {
 
   /**
    * Creates a new div for an additional player
-   * @param {number} id - player id
+   * @param {number} playerId - player id
    * @returns {object[]} - html node and canvas ctx
    */
-  getNewPlayerContainer(id) {
-    const classList = this.players.length > 0 ? 'item-small' : 'item-large';
-    let container = createElement('div', { id: `p${id}`, classList });
+  getNewPlayerContainer(playerId) {
+    let classList = this.players.length > 0 ? 'item-small' : 'item-large';
+    let id = `p${playerId}`;
+    let container = this.opponents;
+    const playerContainer = createElement('div', { id, container, classList })
+
+    classList = 'game-message hide';
+    container = playerContainer;
+    
+    const message = createElement('div', { container, classList });
+    
+    const powerUpTargetId = this.players.length + 2;
+    const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId);
 
     // creates new html canvas
     const [canvas, ctx] = this.getNewPlayerCanvas(id);
 
-    container.appendChild(canvas);
+    playerContainer.appendChild(canvas);
 
-    return [container, ctx];
+    return [ctx, playerContainer, powerUpTargetSelector, message];
   }
 
   /**
@@ -224,7 +250,7 @@ class GameDOM {
     if (id === this.playerId) {
       this.unsubscribe();
       this.gameView.drawGrid(this.gameView.ctx, board);
-      this.addGameOverMessage(this.player, message);
+      this.addMessage(this.message, message);
       this.music.pause();
       return;
     }
@@ -233,8 +259,18 @@ class GameDOM {
 
     if (player) {
       this.gameView.updatePlayer({ id, board });
-      this.addGameOverMessage(player.node, message);
+      this.addMessage(player.message, message);
     }
+  }
+
+  /**
+   * Adds messages to this player's DOM when GAME_MESSAGE topic is published to
+   * @param {object} message - message header and body
+   * @param {string} message.header - message header
+   * @param {string[]} message.body - list of messages in body
+   */
+  gameMessage(message) {
+    this.addMessage(this.message, message);
   }
 
   /**
@@ -244,17 +280,24 @@ class GameDOM {
    * @param {string} message.header - message header
    * @param {string[]} message.body - list of messages in body
    */
-  addGameOverMessage(container, message) {
-    let gameOverMessage = createElement('div', { classList: 'game-over' });
-    let gameOverMessageText = createElement('div', { classList: 'game-over-message' });
-    createElement('h1', { container: gameOverMessageText, text: message.header });
+  addMessage(container, message) {
+    container.innerText = '';
+    container.classList.remove('hide');
+
+    let messageElementText = createElement('div', { container, classList: 'game-message-text' });
+    createElement('h1', { container: messageElementText, text: message.header });
 
     message.body.forEach((line) => (
-      createElement('p', { container: gameOverMessageText, text: line })
+      createElement('p', { container: messageElementText, text: line })
     ));
+  }
 
-    gameOverMessage.appendChild(gameOverMessageText);
-    container.appendChild(gameOverMessage);
+  /**
+   * Hides any visible game messages on specified container
+   * @param {object} container - DOM selector
+   */
+  clearMessage(container) {
+    container.classList.add('hide');
   }
 
   /**
