@@ -14,7 +14,7 @@ const createElement = (type, { container, id, classList, text }) => {
   let newElement = document.createElement(type);
   
   if (id) newElement.id = id;
-  if (classList) newElement.classList.add(classList);
+  if (classList) newElement.classList.add(...classList.split(' '));
   if (text) addText(newElement, text);
   if (container) container.appendChild(newElement);
 
