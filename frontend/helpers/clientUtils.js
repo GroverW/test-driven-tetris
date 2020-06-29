@@ -15,8 +15,9 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
  * @param {object} node - DOM node
  * @param {number} id - player id
  * @param {object} powerUpId - selector for div used to display key to press to use power up
+ * @param {object} message - selector for div used to display messages
  */
-const getNewPlayerDOM = (node, id, powerUpId) => ({ node,  id, powerUpId });
+const getNewPlayerDOM = (node, id, powerUpId, message) => ({ node,  id, powerUpId, message });
 
 const publishError = (message) => (
   publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message })
