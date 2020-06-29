@@ -82,6 +82,7 @@ const getMockGameDOMSelectors = () => ({
   level: getMockDOMSelector(),
   lines: getMockDOMSelector(),
   player: getMockDOMSelector(),
+  message: getMockDOMSelector(),
   music: getMockDOMSelector(),
   powerUps: [getMockDOMSelector(), getMockDOMSelector()],
 });
