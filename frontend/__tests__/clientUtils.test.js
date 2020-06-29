@@ -40,9 +40,10 @@ describe('utils', () => {
       node: 'test',
       id: 1,
       powerUpId: 1,
+      message: 1,
     }
 
-    expect(getNewPlayerDOM('test', 1, 1)).toEqual(testPlayerDOM);
+    expect(getNewPlayerDOM('test', 1, 1, 1)).toEqual(testPlayerDOM);
   });
 
   test('get empty board', () => {
