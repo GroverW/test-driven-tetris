@@ -20,6 +20,10 @@ const powerUpContainer = document.getElementById('power-up-container');
 
 const startButton = document.getElementById('start');
 
+const playerContainer = document.getElementById('p1');
+
+const messageContainer = playerContainer.querySelector('.game-message');
+
 const gameSelectors = {
   playerCtx: p1Canvas.getContext('2d'),
   nextCtx: nextPieceCanvas.getContext('2d'),
@@ -27,7 +31,8 @@ const gameSelectors = {
   score: document.getElementById('game-score'),
   level: document.getElementById('game-level'),
   lines: document.getElementById('game-lines'),
-  player: document.getElementById('p1'),
+  player: playerContainer,
+  message: messageContainer,
   powerUps: [
     document.getElementById('p-up1'),
     document.getElementById('p-up2')
