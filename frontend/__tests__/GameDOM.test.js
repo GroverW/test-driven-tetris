@@ -10,11 +10,14 @@ const {
   LINES_PER_LEVEL,
 } = require('frontend/helpers/clientConstants');
 const {
+  PLAY,
   ADD_PLAYER,
   REMOVE_PLAYER,
+  START_GAME,
   CLEAR_LINES,
   ADD_POWER_UP,
   USE_POWER_UP,
+  GAME_MESSAGE,
 } = require('frontend/helpers/clientTopics');
 const { 
   getMockDOMSelector,
@@ -57,6 +60,8 @@ describe('game DOM tests', () => {
   });
 
   test('start new game', () => {
+    const clearMessageSpy = jest.spyOn(gameDOM, 'clearMessage');
+
     expect(gameDOM.opponents).not.toBe(undefined);
     expect(gameDOM.gameView).not.toBe(undefined);
     expect(gameDOM.score).not.toBe(undefined);
@@ -64,6 +69,45 @@ describe('game DOM tests', () => {
     expect(gameDOM.lines).not.toBe(undefined);
     expect(gameDOM.player).not.toBe(undefined);
     expect(gameDOM.players.length).toBe(0);
+
+    expect(clearMessageSpy).toHaveBeenCalledTimes(0);
+
+    publish(START_GAME);
+
+    expect(clearMessageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('player ready - gameDOM should subscribe to GAME_MESSAGE topic', () => {
+    const numSubscriptions = gameDOM.subscriptions.length;
+
+    publish(PLAY);
+
+    expect(gameDOM.subscriptions.length).toBeGreaterThan(numSubscriptions);
+  });
+
+  test('start game - plays message and clears message', () => {
+    const clearMessageSpy = jest.spyOn(gameDOM, 'clearMessage');
+    expect(gameDOM.music.play).toHaveBeenCalledTimes(0);
+
+    publish(START_GAME);
+
+    expect(gameDOM.music.play).toHaveBeenCalledTimes(1);
+    expect(clearMessageSpy).toHaveBeenCalledTimes(1);
+  })
+
+  test('game message - gameDOM should add game message when topic published', () => {
+    const testMessage = { header: 'hi', body: [] };
+    
+    expect(gameDOM.message.appendChild).toHaveBeenCalledTimes(0);
+
+    publish(GAME_MESSAGE, testMessage);
+
+    expect(gameDOM.message.appendChild).toHaveBeenCalledTimes(0);
+
+    publish(PLAY);
+    publish(GAME_MESSAGE, testMessage);
+
+    expect(gameDOM.message.appendChild).toHaveBeenCalledTimes(1);
   });
 
   test('add player', () => {
