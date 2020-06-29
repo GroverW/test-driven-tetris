@@ -1,3 +1,5 @@
+![Screenshot of Gameplay](https://github.com/GroverW/test-driven-tetris/blob/master/readmescreen.png?raw=true)
+
 # Test Driven Tetris
 
 ## Project Overview
@@ -10,10 +12,10 @@ common                              # Wrapping folder for common js files
 │   ├── constants                   # Constants to define game settings
 │   └── utils                       # Utilities (randomize, getEmptyBoard)
 └── js
-    └── Game                        # Base game class used by frontend and backend
-        └── Board                   # Base board class used by frontend and backend
-            └── Piece               # Creates and gets new pieces
-
+    ├── Game                        # Base game class used by frontend and backend
+    │   └── Board                   # Base board class used by frontend and backend
+    │       └── Piece               # Creates and gets new pieces
+    └── ClientMessage               # Manages the display of flash messages for errors / notices
 
 frontend                            # Wrapping folder for front-end
 ├── helpers
