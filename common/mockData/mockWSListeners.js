@@ -58,7 +58,7 @@ class MockServerListener {
    * Starts the game
    */
   startGame() {
-    this.player.startGame();
+    this.gameServer.players.forEach((player) => player.startGame());
   }
 
   /**
