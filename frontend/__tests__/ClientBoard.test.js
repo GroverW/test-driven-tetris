@@ -11,10 +11,14 @@ describe('client - game board tests', () => {
   let p1;
   let pubSubSpy;
 
-  beforeEach(() => {
+  beforeAll(() => {
     gameBoard = new ClientBoard(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
+    gameBoard.piece = p1;
+  })
+
+  beforeEach(() => {
     pubSubSpy = pubSubMock();
   })
 
@@ -24,7 +28,7 @@ describe('client - game board tests', () => {
 
   test('publishes on points from movement', () => {
     const drawSpy = pubSubSpy.add(DRAW);
-    gameBoard.piece = p1;
+
     gameBoard.movePiece(1,0);
 
     expect(drawSpy).toHaveBeenCalledTimes(1);
@@ -35,10 +39,12 @@ describe('client - game board tests', () => {
   });
 
   test('publish board updates on line clear', () => {
+    gameBoard.movePiece(-1,0)
+    
     const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
     const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
+
     gameBoard.grid = getTestBoard('clearLines2');
-    gameBoard.piece = p1;
 
     gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.hardDrop();
@@ -52,9 +58,6 @@ describe('client - game board tests', () => {
   });
 
 test('publish boards updates when board gets replaced', () => {
-  gameBoard.grid = getTestBoard('empty');
-  gameBoard.piece = p1;
-
   const newBoard = getTestBoard('pattern3');
   
   const drawSpy = pubSubSpy.add(DRAW);
