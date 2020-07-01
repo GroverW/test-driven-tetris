@@ -16,17 +16,22 @@ describe('client message tests', () => {
     message: messageText,
   }
 
-  beforeEach(() => {
+  beforeAll(() => {
     const messageSelector = getMockDOMSelector();
     messageSelector.classList.add('hide');
     clientMessage = new ClientMessage(messageSelector);
+  });
 
+  afterAll(() => {
+    clientMessage.unsubscribe();
+  });
+
+  beforeEach(() => {
     jest.useFakeTimers();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
-    clientMessage.unsubscribe();
   });
 
   test('add error message', () => {
@@ -40,8 +45,6 @@ describe('client message tests', () => {
   });
 
   test('add notice message', () => {
-    expect(clientMessage.message.classList.contains('hide')).toBe(true);
-
     publish(ADD_MESSAGE, noticeData);
 
     expect(clientMessage.message.innerText).toBe(messageText);
@@ -50,28 +53,19 @@ describe('client message tests', () => {
   });
 
   test('clear error message', () => {
-    expect(clientMessage.message.classList.contains('hide')).toBe(true);
-
-    publish(ADD_MESSAGE, errorData);
-
-    expect(clientMessage.message.innerText).toBe(messageText);
-    expect(clientMessage.message.classList.contains('hide')).toBe(false);
-
     publish(CLEAR_MESSAGE);
 
     expect(clientMessage.message.classList.contains('hide')).toBe(true);
   });
 
   test('handle error', () => {
-    expect(clientMessage.message.classList.contains('hide')).toBe(true);
-
     publish(ADD_MESSAGE, errorData);
 
     expect(clientMessage.message.innerText).toBe(messageText);
     expect(clientMessage.message.classList.contains('hide')).toBe(false);
 
     jest.advanceTimersByTime(MESSAGE_TIMEOUT);
-;
+    
     expect(clientMessage.message.classList.contains('hide')).toBe(true);
   });
 });
