@@ -55,7 +55,7 @@ class ClientBoard extends Board {
    * Publishes any board updates
    */
   publishBoardUpdate() {
-    this.pubSub.publish(BOARD_CHANGE, this.grid)
+    this.pubSub.publish(BOARD_CHANGE)
 
     this.publishDraw(this.grid, this.piece, this.nextPiece);
   }
