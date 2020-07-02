@@ -19,6 +19,10 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
  */
 const getNewPlayerDOM = (id, node, powerUpId, message) => ({ id, node, powerUpId, message });
 
+/**
+ * Publishes an error
+ * @param {string} message - message text to publish
+ */
 const publishError = (message) => (
   publish(ADD_MESSAGE, { type: MSG_TYPE.ERROR, message })
 );
