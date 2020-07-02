@@ -110,7 +110,7 @@ const createEventListeners = (game, api) => {
     evt.target.blur();
     publish(PLAY);
     api.sendMessage({ type: PLAY, data: '' })
-  })
+  });
 
   document.addEventListener('keydown', (evt) => {
     game.toggleMove(evt.which, 'down');
@@ -118,7 +118,7 @@ const createEventListeners = (game, api) => {
 
   document.addEventListener('keyup', (evt) => {
     game.toggleMove(evt.which, 'up');
-  })
+  });
 }
 
 module.exports = {
