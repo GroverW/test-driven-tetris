@@ -2,13 +2,12 @@ const Game = require('common/js/Game');
 const Board = require('common/js/Board');
 const { Piece } = require('common/js/Piece');
 const {
+  LINES_PER_LEVEL,
   PIECE_TYPES,
-  ROTATE_LEFT,
-  ROTATE_RIGHT,
+  POINTS,
 } = require('common/helpers/constants');
 const { CLEAR_LINES } = require('common/helpers/commonTopics');
 const {
-  TEST_BOARDS,
   getTestBoard,
   getTestPieces,
 } = require('common/mockData/mocks');
@@ -16,16 +15,21 @@ const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
   let game;
-  let p1, p2, p3;
+  let p1
   let pubSubTest;
 
-  beforeEach(() => {
+  beforeAll(() => {
     pubSubTest = pubSub();
     game = new Game(1, pubSubTest, Board);
-    game.board.pieceList.pieces.push(getTestPieces());
+    game.addPieces(getTestPieces());
+  })
+
+  afterAll(() => {
+    game.unsubscribe();
+  });
+
+  beforeEach(() => {
     p1 = new Piece(PIECE_TYPES.I);
-    p2 = new Piece(PIECE_TYPES.J);
-    p3 = new Piece(PIECE_TYPES.T);
   })
 
   afterEach(() => {
@@ -34,7 +38,7 @@ describe('game tests', () => {
 
   test('start game', () => {
     expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
-    expect(game.board.grid).toEqual(TEST_BOARDS.empty);
+    expect(game.board.grid).toEqual(getTestBoard('empty'));
 
     expect(game.board.piece).not.toEqual(expect.any(Piece));
     expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
@@ -46,7 +50,6 @@ describe('game tests', () => {
   });
 
   test('score points by moving piece down', () => {
-    game.start();
     game.board.piece = p1;
 
     game.board.movePiece(0, 10);
@@ -60,122 +63,63 @@ describe('game tests', () => {
   });
 
   test('score points for single line', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines1');
-    game.board.piece = p1;
+    const currScore = game.score;
 
-    game.board.hardDrop();
+    game.clearLines(1);
 
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
-
-    // I piece will hard drop 18. 36 + 100    
-    expect(game.score).toBe(136)
+    expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[1]);
   });
 
   test('score points for double line', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines3');
-    game.board.piece = p2;
+    const currScore = game.score;
 
-    expect(game.score).toBe(0);
+    game.clearLines(2);
 
-    game.board.rotatePiece(ROTATE_RIGHT);
-    game.board.movePiece(3, 0);
-    game.board.hardDrop();
-
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
-
-    // J piece will hard drop 16. 32 + 300
-    expect(game.score).toBe(332);
+    expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[2]);
   });
 
   test('score points for triple line', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines2');
-    game.board.piece = p1;
+    const currScore = game.score;
 
-    expect(game.score).toBe(0);
+    game.clearLines(3);
 
-    game.board.rotatePiece(ROTATE_LEFT);
-    game.board.hardDrop();
-
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
-
-    // I piece will hard drop 16. 32 + 500
-    expect(game.score).toBe(532);
+    expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[3]);
   });
 
   test('score points for tetris', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines2');
-    game.board.piece = p3;
-    game.board.nextPiece = p1;
+    const currScore = game.score;
 
-    expect(game.score).toBe(0);
+    game.clearLines(4);
 
-    game.board.rotatePiece(ROTATE_LEFT);
-    game.board.rotatePiece(ROTATE_LEFT);
-    game.board.movePiece(-2, 0);
-    game.board.hardDrop();
-
-    game.board.rotatePiece(ROTATE_LEFT);
-    game.board.hardDrop();
-
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
-
-    // T will hard drop 14, I will hard drop 16
-    // 28 + 32 + 800 for tetris
-    expect(game.score).toBe(860);
+    expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[4]);
   });
 
   test('score points with level modifier', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines1');
-    game.board.piece = p1;
+    const currScore = game.score;
+
     game.level = 2;
+    game.clearLines(2);
 
-    expect(game.score).toBe(0);
-
-    game.board.hardDrop();
-
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
-
-    // I piece will hard drop 18. 36 + 200
-    expect(game.score).toBe(236);
+    expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[2] * game.level);
   });
 
-  test('clearing lines updates lines cleared', () => {
-    game.start();
-    game.board.grid = getTestBoard('clearLines3');
-    game.board.piece = p2;
+  test('clearing lines updates lines cleared and lines remaining', () => {
+    const currLines = game.lines;
+    const currRemain = game.linesRemaining;
 
-    game.board.rotatePiece(ROTATE_RIGHT);
-    game.board.movePiece(3, 0);
-    game.board.hardDrop();
+    game.clearLines(1);
 
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
+    const expectedRemaining = currRemain === 1 ? LINES_PER_LEVEL : currRemain - 1;
 
-    // J piece will hard drop 16. 32 + 300
-    expect(game.lines).toBe(2)
+    expect(game.lines).toBe(currLines + 1);
+    expect(game.linesRemaining).toBe(expectedRemaining);
   });
 
   test('clearing lines updates level', () => {
-    game.start();
-    expect(game.level).toBe(1);
+    const currLevel = game.level;
 
-    pubSubTest.publish(CLEAR_LINES, 4);
+    for(let i = 0; i < 3; i++) game.clearLines(4);
 
-    expect(game.linesRemaining).toBe(6);
-
-    pubSubTest.publish(CLEAR_LINES, 4);
-    pubSubTest.publish(CLEAR_LINES, 4);
-
-    expect(game.level).toBe(2);
-    expect(game.linesRemaining).toBe(8);
-
-    pubSubTest.publish(CLEAR_LINES, 4);
-    pubSubTest.publish(CLEAR_LINES, 4);
-
-    expect(game.level).toBe(3);
+    expect(game.level).toBe(currLevel + 1);
   });
 });
