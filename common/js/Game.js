@@ -95,6 +95,13 @@ class Game {
   gameOver() {
     // implemented individually
   }
+
+  /**
+   * Unsubscribes from all pubSub topics.
+   */
+  unsubscribe() {
+    this.subscriptions.forEach((unsub) => unsub());
+  }  
 }
 
 module.exports = Game;

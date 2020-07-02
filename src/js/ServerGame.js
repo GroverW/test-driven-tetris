@@ -121,13 +121,6 @@ class ServerGame extends Game {
     this.unsubscribe();
     this.gameStatus = null;
   }
-
-  /**
-   * Unsubscribes from all pubSub topics.
-   */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
-  }
 }
 
 module.exports = ServerGame;

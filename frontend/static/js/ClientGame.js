@@ -269,13 +269,6 @@ class ClientGame extends Game {
   }
 
   /**
-   * Unsubscribes from all pubSub topics.
-   */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
-  }
-
-  /**
    * Handles Game animation actions
    * @param {number} currTime - Time elapsed since start of game in milliseconds
    */
