@@ -144,7 +144,7 @@ describe('game tests', () => {
 
       pubSubTest.publish(CLEAR_LINES, 1);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[1]);
+      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[1] * game.level);
       expect(game.lines).toBe(currLines + 1);
     });
   });
