@@ -30,13 +30,13 @@ describe('game board tests', () => {
     gameBoard.piece = p2;
     expect([p2.x, p2.y]).toEqual([4,0]);
     
-    gameBoard.movePiece(-1,0)
+    gameBoard.movePiece(-1,0);
     expect([p2.x, p2.y]).toEqual([3,0]);
     
-    p2.move(-3, 0)
+    p2.move(-3, 0);
     expect([p2.x, p2.y]).toEqual([0,0]);
     
-    gameBoard.movePiece(-1,0)
+    gameBoard.movePiece(-1,0);
     expect([p2.x, p2.y]).toEqual([0,0]);
   });
 
@@ -110,7 +110,7 @@ describe('game board tests', () => {
     gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.hardDrop();
 
-    expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern2)
+    expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern2);
 
     gameBoard.piece = p4;
     gameBoard.hardDrop();
@@ -196,16 +196,16 @@ describe('game board tests', () => {
 
     let bounds = gameBoard.getPieceBounds();
 
-    expect(bounds).toEqual([1,1,3,6])
+    expect(bounds).toEqual([1,1,3,6]);
 
     gameBoard.rotatePiece(-1);
 
     bounds = gameBoard.getPieceBounds();
 
-    expect(bounds).toEqual([0,3,4,4])
+    expect(bounds).toEqual([0,3,4,4]);
   })
 
-  test('replaceBoard - swaps board with new board', () => {
+  test('replace board - swaps board with new board', () => {
     gameBoard.grid = getTestBoard('empty');
     gameBoard.piece = p1;
 
@@ -223,7 +223,7 @@ describe('game board tests', () => {
 
     const fullBoard = getTestBoard('fullBoard');
     
-    gameBoard.replaceBoard(fullBoard)
+    gameBoard.replaceBoard(fullBoard);
     
     expect(gameBoard.grid).toEqual(fullBoard);
     expect([p1.x, p1.y]).toEqual([3,-1]);
