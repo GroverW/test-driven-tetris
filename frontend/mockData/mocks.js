@@ -2,7 +2,7 @@ const commonMocks = require('common/mockData/mocks')
 
 /**
  * Gets a mock html canvas ctx
- * @returns {object}
+ * @returns {object} - mock ctx
  */
 const getMockCtx = () => ({
   canvas: {
@@ -32,7 +32,7 @@ const getMockCtx = () => ({
 
 /**
  * Gets a mock DOM selector
- * @returns {object}
+ * @returns {object} - mock DOM selector
  */
 const getMockDOMSelector = () => ({
   id: "",
@@ -74,6 +74,9 @@ const getMockDOMSelector = () => ({
   pause: jest.fn(),
 });
 
+/**
+ * Returns list of mock DOM selectors to be used in testing for GameDOM
+ */
 const getMockGameDOMSelectors = () => ({
   playerCtx: getMockCtx(),
   nextCtx: getMockCtx(),
