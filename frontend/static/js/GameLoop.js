@@ -1,8 +1,25 @@
+const { subscribe } = require('frontend/helpers/pubSub');
+const {
+  START_GAME,
+  GAME_OVER,
+  SET_COMMAND,
+  SET_AUTO_COMMAND,
+  CLEAR_COMMAND,
+} = require('frontend/helpers/clientTopics');
+
 class GameLoop {
-  constructor() {
+  constructor(playerId) {
+    this.playerId = playerId;
     this.command;
     this.autoCommand;
     this.animationId;
+    this.subscriptions = [
+      subscribe(START_GAME, this.animate.bind(this)),
+      subscribe(GAME_OVER, this.gameOver.bind(this)),
+      subscribe(SET_COMMAND, this.setCommand.bind(this)),
+      subscribe(SET_AUTO_COMMAND, this.setAutoCommand.bind(this)),
+      subscribe(CLEAR_COMMAND, this.clearCommand.bind(this)),
+    ];
   }
 
   setCommand(command) {
@@ -26,6 +43,22 @@ class GameLoop {
     if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
 
     this.animationId = requestAnimationFrame(this.animate.bind(this))
+  }
+
+  stop() {
+    cancelAnimationFrame(this.animationId);
+    this.animationId = undefined;
+  }
+
+  unsubscribe() {
+    this.subscriptions.forEach((unsub) => unsub());
+  }
+
+  gameOver({ id }) {
+    if (id === this.playerId) {
+      this.stop();
+      this.unsubscribe();
+    }
   }
 }
 
