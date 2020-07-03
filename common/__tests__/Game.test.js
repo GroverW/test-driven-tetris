@@ -129,7 +129,7 @@ describe('game tests', () => {
     });
   });
 
-  describe('publish changes', () => {
+  describe('publish / subscribe', () => {
     test('LOWER_PIECE updates score', () => {
       const currScore = game.score;
 
@@ -146,6 +146,19 @@ describe('game tests', () => {
 
       expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[1] * game.level);
       expect(game.lines).toBe(currLines + 1);
+    });
+
+    test('unsubscribe - publishing should stop updating game', () => {
+      const currScore = game.score;
+      const currLines = game.lines;
+  
+      game.unsubscribe();
+  
+      pubSubTest.publish(CLEAR_LINES, 1);
+      pubSubTest.publish(LOWER_PIECE, 1);
+  
+      expect(game.score).toBe(currScore);
+      expect(game.lines).toBe(currLines);
     });
   });
 });
