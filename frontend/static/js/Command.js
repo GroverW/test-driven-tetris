@@ -17,6 +17,7 @@ class Command {
 
     if(time >= this.startTime + this.delay) {
       this.callback();
+      this.startTime = time;
 
       if(this.toggle) {
         this.handleToggle();
