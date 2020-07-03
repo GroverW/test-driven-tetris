@@ -20,13 +20,10 @@ class Command {
 
       if(this.toggle) {
         this.handleToggle();
-        return true;
       } else {
-        return false;
+        this.delay = Infinity;
       }
     }
-
-    return true;
   }
 
   handleToggle() {
