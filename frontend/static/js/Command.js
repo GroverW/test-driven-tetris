@@ -25,6 +25,8 @@ class Command {
         return false;
       }
     }
+
+    return true;
   }
 
   handleToggle() {
