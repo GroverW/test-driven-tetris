@@ -1,5 +1,6 @@
 const Game = require('common/js/Game');
 const ClientBoard = require('./ClientBoard');
+const Command = require('./Command');
 const {
   PLAYER_KEYS,
   CONTROLS,
@@ -40,10 +41,6 @@ class ClientGame extends Game {
     super(playerId, { publish, subscribe }, ClientBoard);
     this.players = [];
     this.time = { start: 0, elapsed: 0 };
-    this.animationId;
-    this.toggledKey = false;
-    this.moveTime = { start: 0, elapsed: 0 };
-    this.moveDelayIdx = 0;
     this.lockDelay = 0;
     this.interruptAutoDown = false;
     this.commandQueue = [];
@@ -62,8 +59,6 @@ class ClientGame extends Game {
    */
   start() {
     if (super.start()) {
-      this.animate();
-
       publish(DRAW, {
         board: this.board.grid,
         piece: this.board.piece,
@@ -90,7 +85,7 @@ class ClientGame extends Game {
 
   /**
    * Removes additional player from the game
-   * @param {numbere} id - player id
+   * @param {number} id - player id
    */
   removePlayer(id) {
     this.players = this.players.filter((pId) => pId !== id);
@@ -105,28 +100,32 @@ class ClientGame extends Game {
     if (id === this.playerId) this.board.replaceBoard(board);
   }
 
+  mapCommands() {
+    const { LEFT, RIGHT, DOWN, AUTO_DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
+    this.commands = {
+      [LEFT]: new Command(LEFT, this.handleMovement.bind(this, -1, 0, 0), MOVE_SPEED),
+      [RIGHT]: new Command(RIGHT, this.handleMovement.bind(this, 1, 0, 0), MOVE_SPEED),
+      [DOWN]: new Command(DOWN, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
+      [AUTO_DOWN]: new Command(AUTO_DOWN, this.handleAutoDrop.bind(this)),
+      [ROTATE_LEFT]: new Command(ROTATE_LEFT, this.handleMovement.bind(this, 0, 0, -1)),
+      [ROTATE_RIGHT]: new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 0, 0, 1)),
+      [HARD_DROP]: new Command(HARD_DROP, this.board.hardDrop.bind(this)),
+      ...mapArrayToObj(PLAYER_KEYS, (PKEY) => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
+    }
+  }
   /**
    * Executes movement command.
    * @param {number} key - Keypress identifier
    */
-  command(key) {
-    const commands = {
-      [CONTROLS.LEFT]: () => this.board.movePiece(-1, 0),
-      [CONTROLS.RIGHT]: () => this.board.movePiece(1, 0),
-      [CONTROLS.DOWN]: () => this.board.movePiece(0, 1),
-      [CONTROLS.AUTO_DOWN]: () => this.board.movePiece(0, 1, 0),
-      [CONTROLS.ROTATE_LEFT]: () => this.board.rotatePiece(-1),
-      [CONTROLS.ROTATE_RIGHT]: () => this.board.rotatePiece(1),
-      [CONTROLS.HARD_DROP]: () => this.board.hardDrop(),
-      ...mapArrayToObj(PLAYER_KEYS, () => () => this.usePowerUp(key)),
-    }
-
+  command(key, upDown) {
     this.addLockDelay(key);
     this.resetAutoDown(key);
 
-    if ((key in commands) && this.gameStatus) {
+    if ((key in this.commands) && this.gameStatus) {
       if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
-      commands[key]();
+
+      const topic = upDown === 'down' ? ADD_COMMAND : CLEAR_COMMAND;
+      this.pubSub.publish(topic, commands[key]);
     }
 
     // if game over and command queue isn't empty, send it
@@ -135,39 +134,19 @@ class ClientGame extends Game {
     }
   }
 
-  /**
-   * Toggles horizontal or vertical movement, otherwise executes command.
-   * @param {number} key - Keypress identifier
-   * @param {string} upDown - Whether key was pressed or released
-   */
-  toggleMove(key, upDown) {
-    const toggleCommands = new Set([
-      CONTROLS.LEFT,
-      CONTROLS.RIGHT,
-      CONTROLS.DOWN,
-    ]);
-
-    if (!toggleCommands.has(key) && upDown === 'down') this.command(key);
-    else if (upDown === 'down') this.toggledKey = key;
-    else if (this.toggledKey === key && upDown === 'up') this.toggledKey = false;
+  handleMovement(xChange, yChange, rotation) {
+    (yChange === 1) ? this.resetAutoDown() : this.addLockDelay();
+    (rotation === 0)
+      ? this.board.movePiece(xChange, yChange)
+      : this.board.rotatePiece(rotation);
   }
-
   /**
    * Adds delay before Tetris piece is locked to board.
    * @param {number} key - Keypress identifier
    */
-  addLockDelay(key) {
-    const validKeys = new Set([
-      CONTROLS.LEFT,
-      CONTROLS.RIGHT,
-      CONTROLS.ROTATE_LEFT,
-      CONTROLS.ROTATE_RIGHT,
-    ])
-
-    if (validKeys.has(key)) {
-      const increment = this.getLockDelayIncrement();
-      this.lockDelay = Math.min(increment * 4, this.lockDelay + increment);
-    }
+  addLockDelay() {
+    const increment = this.getLockDelayIncrement();
+    this.lockDelay = Math.min(increment * 4, this.lockDelay + increment);
   }
 
   /**
@@ -178,7 +157,7 @@ class ClientGame extends Game {
     const baseDelay = ANIMATION_SPEED[1];
     const currentDelay = this.getAnimationDelay();
     // max is baseDelay / 4, min is baseDelay / 8
-    return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4
+    return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4;
   }
 
   /**
@@ -186,7 +165,7 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   resetAutoDown(key) {
-    if (key === CONTROLS.DOWN) this.interruptAutoDown = true;
+    this.interruptAutoDown = true;
   }
 
   /**
@@ -263,21 +242,7 @@ class ClientGame extends Game {
     if (id === this.playerId) {
       this.unsubscribe();
       this.gameStatus = null;
-      cancelAnimationFrame(this.animationId);
-      this.animationId = undefined;
     }
-  }
-
-  /**
-   * Handles Game animation actions
-   * @param {number} currTime - Time elapsed since start of game in milliseconds
-   */
-  animate(currTime = 0) {
-    this.handleAutoDrop(currTime);
-
-    this.handleToggledMovement(currTime);
-
-    this.animationId = requestAnimationFrame(this.animate.bind(this));
   }
 
   /**
@@ -300,25 +265,6 @@ class ClientGame extends Game {
       this.time.start = currTime;
       this.command(CONTROLS.AUTO_DOWN);
       this.lockDelay = 0;
-    }
-  }
-
-  /**
-   * Handles piece movement when movement key is held down
-   * @param {number} currTime - time in ms since game start
-   */
-  handleToggledMovement(currTime) {
-    this.moveTime.elapsed = currTime - this.moveTime.start;
-
-    // executes movement of toggled key
-    if (this.toggledKey) {
-      if (this.moveTime.elapsed > MOVE_SPEED[this.moveDelayIdx]) {
-        this.moveTime.start = currTime;
-        this.command(this.toggledKey);
-        this.moveDelayIdx = Math.min(this.moveDelayIdx + 1, MOVE_SPEED.length - 1);
-      }
-    } else {
-      this.moveDelayIdx = 0;
     }
   }
   /**
