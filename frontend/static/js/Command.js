@@ -1,5 +1,5 @@
 class Command {
-  constructor(key, callback, delay=0, toggle=false) {
+  constructor(key, callback, toggle=false, delay=0) {
     this.key = key;
     this.callback = callback;
     this.toggle = toggle;

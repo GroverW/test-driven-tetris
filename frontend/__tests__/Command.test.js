@@ -7,8 +7,8 @@ describe('Command Tests', () => {
   beforeAll(() => {
     callback = jest.fn();
     callbackToggle = jest.fn();
-    command = new Command(1, callback, 1);
-    commandToggle = new Command(2, callback, 0, [10,100,200]);
+    command = new Command(1, callback, false, 1);
+    commandToggle = new Command(2, callback, [10,100,200]);
   });
 
   afterAll(() => {
