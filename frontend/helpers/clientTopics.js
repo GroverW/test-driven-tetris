@@ -11,6 +11,10 @@ const UPDATE_SCORE = 'updateScore';
 
 const SEND_MESSAGE = 'sendMessage';
 
+const SET_COMMAND = 'setCommand';
+const SET_AUTO_COMMAND = 'setAutoCommand';
+const CLEAR_COMMAND = 'clearCommand';
+
 module.exports = {
   ...COMMON_TOPICS,
   TOGGLE_MENU,
@@ -18,4 +22,7 @@ module.exports = {
   BOARD_CHANGE,
   UPDATE_SCORE,
   SEND_MESSAGE,
+  SET_COMMAND,
+  SET_AUTO_COMMAND,
+  CLEAR_COMMAND,
 };
