@@ -31,7 +31,7 @@ describe('Game Loop tests', () => {
 
   afterAll(() => {
     jest.clearAllMocks();
-    jest.cleaarFakeTimers();
+    jest.clearFakeTimers();
   });
 
   describe('set / clear commands', () => {
