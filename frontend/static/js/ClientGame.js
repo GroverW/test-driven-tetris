@@ -102,6 +102,7 @@ class ClientGame extends Game {
 
   mapCommands() {
     const { LEFT, RIGHT, DOWN, AUTO_DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
+    
     this.commands = {
       [LEFT]: new Command(LEFT, this.handleMovement.bind(this, -1, 0, 0), MOVE_SPEED),
       [RIGHT]: new Command(RIGHT, this.handleMovement.bind(this, 1, 0, 0), MOVE_SPEED),
@@ -111,7 +112,7 @@ class ClientGame extends Game {
       [ROTATE_RIGHT]: new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 0, 0, 1)),
       [HARD_DROP]: new Command(HARD_DROP, this.board.hardDrop.bind(this)),
       ...mapArrayToObj(PLAYER_KEYS, (PKEY) => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
-    }
+    };
   }
   /**
    * Executes movement command.
