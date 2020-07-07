@@ -1,14 +1,16 @@
 const {
   ANIMATION_SPEED,
   MAX_SPEED,
+  CONTROLS,
 } = require('frontend/helpers/clientConstants');
 const {
   UPDATE_SCORE,
+  ADD_TO_QUEUE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
   GAME_OVER,
 } = require('frontend/helpers/clientTopics');
-const { subscribe } = require('frontend/helpers/pubSub');
+const { publish, subscribe } = require('frontend/helpers/pubSub');
 
 
 class Gravity {
@@ -70,6 +72,7 @@ class Gravity {
     if(currTime >= this.start + this.delay) {
       this.start = currTime;
       this.lowerPiece();
+      publish(ADD_TO_QUEUE, CONTROLS.AUTO_DOWN);
       this.lockDelay = 0;
     }
   }
