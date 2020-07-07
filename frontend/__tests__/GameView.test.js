@@ -1,18 +1,25 @@
 const GameView = require('frontend/static/js/GameView')
-const ClientGame = require('frontend/static/js/ClientGame');
+const GameLoop = require('frontend/static/js/GameLoop');
 const {
   CONTROLS,
   BOARD_HEIGHT,
   BOARD_WIDTH,
   CELL_SIZE
-} = require('../helpers/clientConstants');
+} = require('frontend/helpers/clientConstants');
 const { DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
-const { getMockCtx, getTestBoard, getTestPieces } = require('../mockData/mocks');
-const { publish } = require('../helpers/pubSub');
-const { getNewPlayer } = require('../helpers/clientUtils');
+const {
+  getMockCtx,
+  getTestBoard,
+  getNewTestGame,
+  runCommand,
+  mockAnimation,
+} = require('frontend/mockData/mocks');
+const { publish } = require('frontend/helpers/pubSub');
+const { getNewPlayer } = require('frontend/helpers/clientUtils');
 
 describe('game view tests', () => {
   let game;
+  let gameLoop;
   let mockCtx, mockCtxNext;
   let newCtx1, newBoard1, newId1;
   let newCtx2, newBoard2, newId2;
@@ -32,8 +39,8 @@ describe('game view tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    game = new ClientGame(1);
-    game.addPieces(getTestPieces());
+    game = getNewTestGame(game);
+    gameLoop = new GameLoop(2);
     gameView = new GameView(mockCtx, mockCtxNext);
 
   });
@@ -41,11 +48,14 @@ describe('game view tests', () => {
   afterAll(() => {
     game.unsubscribe();
     gameView.unsubscribe();
+    gameLoop.unsubscribe();
   });
 
   beforeEach(() => {
     drawGridSpy = jest.spyOn(gameView, 'drawGrid');
     drawNextSpy = jest.spyOn(gameView, 'drawNext');
+    jest.useFakeTimers();
+    requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   })
 
   afterEach(() => {
@@ -62,6 +72,7 @@ describe('game view tests', () => {
       expect(drawGridSpy).toHaveBeenCalledTimes(0);
   
       game.start();
+      gameLoop.animate();
   
       // 1 for board, 1 for piece, 1 for nextPiece
       expect(drawGridSpy).toHaveBeenCalledTimes(3);
@@ -71,7 +82,7 @@ describe('game view tests', () => {
     test('draw elements on piece rotate', () => {
       expect(drawGridSpy).toHaveBeenCalledTimes(0);
   
-      game.command(CONTROLS.ROTATE_LEFT);
+      runCommand(game, CONTROLS.ROTATE_LEFT);
   
       // board and piece updated on rotate
       expect(drawGridSpy).toHaveBeenCalledTimes(2);
@@ -79,13 +90,13 @@ describe('game view tests', () => {
     });
   
     test('only draw nextPiece when piece dropped', () => {
-      game.command(CONTROLS.DOWN);
+      runCommand(game, CONTROLS.DOWN);
   
       // redraw board and piece once per command
       expect(drawGridSpy).toHaveBeenCalledTimes(2);
       expect(drawNextSpy).toHaveBeenCalledTimes(0);
   
-      game.command(CONTROLS.HARD_DROP);
+      runCommand(game, CONTROLS.HARD_DROP);
   
       // when a new piece is grabbed, board, piece and nextPiece
       // should be drawn
