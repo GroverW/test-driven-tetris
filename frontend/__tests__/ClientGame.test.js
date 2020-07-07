@@ -1,16 +1,14 @@
 const ClientGame = require('frontend/static/js/ClientGame');
+const GameLoop = require('frontend/static/js/GameLoop');
 const { Piece } = require('common/js/Piece');
-const {
-  PIECE_TYPES,
-  CONTROLS,
-  ANIMATION_SPEED,
-  MAX_SPEED,
-} = require('frontend/helpers/clientConstants');
+const { PIECE_TYPES, CONTROLS } = require('frontend/helpers/clientConstants');
 const {
   DRAW,
   UPDATE_SCORE,
   GAME_OVER,
   SEND_MESSAGE,
+  SET_COMMAND,
+  CLEAR_COMMAND,
 } = require('frontend/helpers/clientTopics');
 const {
   TEST_BOARDS,
@@ -22,7 +20,7 @@ const { pubSubMock } = require('common/mockData/mocks');
 
 const getNewTestGame = (game, testPiece = false, ...players) => {
   if(game) game.unsubscribe();
-  game = new ClientGame(1);
+  game = new ClientGame(1)
   
   game.board.grid = getTestBoard('empty')
   
@@ -34,13 +32,21 @@ const getNewTestGame = (game, testPiece = false, ...players) => {
   return game;
 }
 
+const runCommand = (game, command) => {
+  game.command(command, 'down');
+  jest.advanceTimersByTime(100);
+  game.command(command, 'up');
+}
+
 describe('game tests', () => {
   let game;
+  let gameLoop;
   let pubSubSpy;
   let p2 = 2, p3 = 3, p4 = 4;
 
   beforeAll(() => {
     game = getNewTestGame(game);
+    gameLoop = new GameLoop(1);
   });
 
   afterAll(() => {
@@ -98,6 +104,7 @@ describe('game tests', () => {
       expect(updateScoreSpy).not.toHaveBeenCalled();
   
       game.start();
+      gameLoop.animate();
   
       expect(game.board.piece).toEqual(expect.any(Piece));
       expect(game.board.nextPiece).toEqual(expect.any(Piece));
@@ -117,90 +124,18 @@ describe('game tests', () => {
     });
   
     test('keyboard controls', () => {
-      let testPiece = new Piece(PIECE_TYPES.I);
-      game.board.piece = testPiece;
+      const setCommandSpy = pubSubSpy.add(SET_COMMAND);
+      const clearCommandSpy = pubSubSpy.add(CLEAR_COMMAND);
   
-      expect([testPiece.x, testPiece.y]).toEqual([3, 0]);
+      game.command(CONTROLS.DOWN, 'down');
   
-      game.command(CONTROLS.DOWN);
-  
-      expect([testPiece.x, testPiece.y]).toEqual([3, 1]);
-  
-      game.command(CONTROLS.LEFT);
-  
-      expect([testPiece.x, testPiece.y]).toEqual([2, 1]);
-  
-      game.command(CONTROLS.RIGHT);
-  
-      expect([testPiece.x, testPiece.y]).toEqual([3, 1]);
-  
-      expect(game.board.piece.grid).toEqual([
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ])
-  
-      game.command(CONTROLS.ROTATE_LEFT);
-  
-      expect(game.board.piece.grid).toEqual([
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-      ])
-  
-      game.command(CONTROLS.ROTATE_RIGHT);
-  
-      expect(game.board.piece.grid).toEqual([
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ])
-  
-      game.command(CONTROLS.HARD_DROP);
-  
-      expect(game.board.grid).toEqual(TEST_BOARDS.pattern1);
-    });
-  
-    test('toggle vs keypress movement', () => {
-      const commandSpy = jest.spyOn(game, 'command');
-  
-      // should only toggle with basic movement
-      game.toggleMove(CONTROLS.HARD_DROP, 'down');
-  
-      expect(game.toggledKey).toBe(false);
-      expect(commandSpy).toHaveBeenCalledTimes(1);
-  
-      game.toggleMove(CONTROLS.DOWN, 'down');
-  
-      expect(game.toggledKey).toBe(CONTROLS.DOWN);
-      expect(commandSpy).toHaveBeenCalledTimes(1);
-    });
-  
-    test('toggle on keydown vs up', () => {
-      game.toggleMove(CONTROLS.DOWN, 'down');
-      expect(game.toggledKey).toBe(CONTROLS.DOWN);
-  
-      game.toggleMove(CONTROLS.LEFT, 'down');
+      expect(setCommandSpy).toHaveBeenCalledTimes(1);
+      expect(clearCommandSpy).toHaveBeenCalledTimes(0);
       
-      // should overwrite current key with additional key
-      expect(game.toggledKey).toBe(CONTROLS.LEFT);
-  
-      // should not release toggle if non-toggled key released
-      game.toggleMove(CONTROLS.DOWN, 'up');
-      expect(game.toggledKey).toBe(CONTROLS.LEFT);
-  
-      game.toggleMove(CONTROLS.LEFT, 'up');
-      expect(game.toggledKey).toBe(false);
-  
-      const commandSpy = jest.spyOn(game, 'command');
-      game.toggleMove(CONTROLS.HARD_DROP, 'down');
-      expect(commandSpy).toHaveBeenCalledTimes(1);
-  
-      game.toggleMove(CONTROLS.HARD_DROP, 'up');
-      expect(commandSpy).toHaveBeenCalledTimes(1);
+      game.command(CONTROLS.DOWN, 'up');
+      
+      expect(setCommandSpy).toHaveBeenCalledTimes(1);
+      expect(clearCommandSpy).toHaveBeenCalledTimes(1);
     });
   
     test('game over', () => {
@@ -211,14 +146,15 @@ describe('game tests', () => {
   
       for (let i = 0; i < 15; i++) {
         game.board.nextPiece = new Piece(PIECE_TYPES.O);
-        game.command(CONTROLS.HARD_DROP);
+        runCommand(game, CONTROLS.HARD_DROP);
       }
-      
+
       // only 10 O pieces can fit on the board
       expect(boardMoveSpy).toHaveBeenCalledTimes(10);
       expect(gameOverSpy).toHaveBeenCalled();
   
-      game.command(CONTROLS.LEFT);
+      runCommand(game, CONTROLS.LEFT);
+
       // should not get called again
       expect(boardMoveSpy).toHaveBeenCalledTimes(10);
     });
@@ -229,34 +165,33 @@ describe('game tests', () => {
       game = getNewTestGame(game, true, p2, p4);
       game.start();
   
-      game.command(CONTROLS.LEFT);
-      game.command(CONTROLS.RIGHT);
-      game.command(CONTROLS.DOWN);
-      game.command(CONTROLS.AUTO_DOWN);
-      game.command(CONTROLS.ROTATE_LEFT);
-      game.command(CONTROLS.ROTATE_RIGHT);
+      runCommand(game, CONTROLS.LEFT);
+      runCommand(game, CONTROLS.RIGHT);
+      runCommand(game, CONTROLS.DOWN);
+      runCommand(game, CONTROLS.ROTATE_LEFT);
+      runCommand(game, CONTROLS.ROTATE_RIGHT);
   
       expect(game.commandQueue).toEqual([
-        "LEFT", "RIGHT", "DOWN", "AUTO_DOWN", "ROTATE_LEFT", "ROTATE_RIGHT"
+        "LEFT", "RIGHT", "DOWN", "ROTATE_LEFT", "ROTATE_RIGHT"
       ]);
     });
   
     test('send commands', () => {
       const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
   
-      expect(game.commandQueue.length).toBe(6);
+      expect(game.commandQueue.length).toBe(5);
   
-      game.command(CONTROLS.HARD_DROP);
+      runCommand(game, CONTROLS.HARD_DROP);
   
       // updating board should send commands and clear queue
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   
 
-      game.command(CONTROLS.ROTATE_RIGHT);
-      game.command(CONTROLS.AUTO_DOWN);
-      game.command(CONTROLS.LEFT);
-      game.command(CONTROLS.HARD_DROP);
+      runCommand(game, CONTROLS.ROTATE_RIGHT);
+      runCommand(game, CONTROLS.AUTO_DOWN);
+      runCommand(game, CONTROLS.LEFT);
+      runCommand(game, CONTROLS.HARD_DROP);
 
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(2);
@@ -267,7 +202,7 @@ describe('game tests', () => {
     test('adds to command queue', () => {
       game.sendCommandQueue = jest.fn().mockImplementation(() => {});
   
-      game.command(CONTROLS.PLAYER3);
+      runCommand(game, CONTROLS.PLAYER3);
   
       // command queue should contain actual player id, whereas CONTROLS.PLAYER3
       // represents the player's board position relative to the one using the command
@@ -277,76 +212,13 @@ describe('game tests', () => {
     test('sends command queue', () => {
       game.sendCommandQueue = jest.fn();
       
-      game.command(CONTROLS.PLAYER2);
+      runCommand(game, CONTROLS.PLAYER2);
   
       expect(game.sendCommandQueue).toHaveBeenCalledTimes(1);
   
-      game.command(CONTROLS.PLAYER4);
+      runCommand(game, CONTROLS.PLAYER4);
       // should not send if player not found
       expect(game.sendCommandQueue).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('animate', () => {
-    test('animates on start', () => {
-      game = getNewTestGame(game, true);
-      const animateSpy = jest.spyOn(game, 'animate');
-  
-      expect(game.animationId).toBe(undefined);
-  
-      game.start();
-  
-      expect(game.animationId).toEqual(expect.any(Number));
-      expect(animateSpy).toHaveBeenCalledTimes(1);
-    });
-  
-    test('moves piece at set intervals', () => {
-      requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
-      const movePieceSpy = jest.spyOn(game.board, 'movePiece');
-      const autoDropSpy = jest.spyOn(game, 'handleAutoDrop');
-
-      jest.advanceTimersByTime(1000);
-  
-      expect(autoDropSpy).toHaveBeenCalledTimes(10);
-      expect(movePieceSpy).toHaveBeenCalledTimes(3);
-    });
-  
-    test('moves piece with toggled key', () => {
-      // have to restart game because timers carry over from previous test
-      game = getNewTestGame(game, true);
-      game.start();
-      const movePieceSpy = jest.spyOn(game.board, 'movePiece');
-      const toggledMoveSpy = jest.spyOn(game, 'handleToggledMovement');
-
-      game.toggleMove(CONTROLS.DOWN, 'down');
-  
-      expect(movePieceSpy).toHaveBeenCalledTimes(0);
-  
-      jest.advanceTimersByTime(200);
-  
-      expect(toggledMoveSpy).toHaveBeenCalledTimes(2);
-      expect(movePieceSpy).toHaveBeenCalledTimes(2);
-    });
-  
-    test('animation speed', () => {
-      expect(game.level).toBe(1);
-  
-      expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[game.level]);
-  
-      game.level = 10;
-      expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[10]);
-  
-      game.level = 100;
-      expect(game.getAnimationDelay()).toBe(ANIMATION_SPEED[MAX_SPEED]);
-    });
-  
-    test('clears animation on game over', () => {
-      const cancelAnimationSpy = jest.spyOn(window, 'cancelAnimationFrame');
-  
-      game.gameOver({ id: 1 });
-  
-      expect(cancelAnimationSpy).toHaveBeenCalledTimes(1);
-      expect(game.animationId).toBe(undefined);
     });
   });
 });
