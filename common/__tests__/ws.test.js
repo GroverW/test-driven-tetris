@@ -15,9 +15,16 @@ const {
 } = require('backend/helpers/serverConstants');
 const { MSG_TYPE } = require('common/helpers/commonTopics');
 
-const { getMockDOMSelector, getMockGameDOMSelectors } = require('frontend/mockData/mocks');
+const { getMockDOMSelector, getMockGameDOMSelectors, runCommand, mockAnimation } = require('frontend/mockData/mocks');
 const { MockServerListener, MockClientListener } = require('common/mockData/mockWSListeners');
 const { mockSend, getTestBoard, webSocketMock, pubSubMock } = require('common/mockData/mocks');
+
+const startGame = (clientToServer, ...additionalPlayers) => {
+  additionalPlayers.forEach(player => clientToServer.gameServer.join(player));
+      
+  clientToServer.startGame();
+  jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
+}
 
 
 describe('websocket tests', () => {
@@ -45,6 +52,7 @@ describe('websocket tests', () => {
     clientToServer.open();
 
     jest.useFakeTimers();
+    requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
   });
 
   afterEach(() => {
@@ -118,12 +126,11 @@ describe('websocket tests', () => {
   describe('game start / game over', () => {
     test('game start - initiated by client', () => {
       const drawSpy = pubSubSpy.add('draw');
-      clientToServer.gameServer.join(player2);
+
       // user will click button which will send newGame to server
       expect(serverToClient.game.gameStatus).toBe(false);
   
-      clientToServer.startGame();
-      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
+      startGame(clientToServer, player2);
   
       expect(clientToServer.gameServer.gameStarted).toBe(true);
       expect(serverToClient.game.gameStatus).toBe(true);
@@ -131,24 +138,21 @@ describe('websocket tests', () => {
     });
   
     test('game start - subsequent game starts should fail', () => {
-      clientToServer.gameServer.join(player2);
       const getPiecesSpy = jest.spyOn(serverToClient.game.board, 'getPieces');
   
       expect(getPiecesSpy).toHaveBeenCalledTimes(0);
   
-      clientToServer.startGame();
-      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
+      startGame(clientToServer, player2);
   
       expect(getPiecesSpy).toHaveBeenCalledTimes(1);
   
-      clientToServer.startGame();
-      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
+      startGame(clientToServer, player2);
   
       expect(getPiecesSpy).toHaveBeenCalledTimes(1);
     });
 
     test('game start - add pieces', () => {
-      clientToServer.startGame();
+      startGame(clientToServer, player2);
   
       const serverPieces = clientToServer.player.game.board.pieceList.pieces;
       const clientPieces = serverToClient.game.board.pieceList.pieces;
@@ -157,12 +161,10 @@ describe('websocket tests', () => {
     });
 
     test('game over', () => {
-      clientToServer.gameServer.join(player2);
-      
-      clientToServer.startGame();
-      jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
+      startGame(clientToServer, player2);
   
       expect(serverToClient.game.gameStatus).toBe(true);
+      expect(serverToClient.gameLoop.animationId).toEqual(expect.any(Number));
   
       const gameOverData = {
         id: clientToServer.player.id,
@@ -172,25 +174,29 @@ describe('websocket tests', () => {
       clientToServer.gameServer.gameOver(gameOverData);
   
       expect(serverToClient.game.gameStatus).toBe(null);
-      expect(serverToClient.game.animationId).toBe(undefined);
+      expect(serverToClient.gameLoop.animationId).toBe(undefined);
     });
 
     test('game started - remove game after last player leaves', () => {
       // this would be caused by player closing their browser or leaving the page
-      clientToServer.startGame();
+      startGame(clientToServer, player2);
   
-      serverToClient.game.command(CONTROLS.DOWN);
-      serverToClient.game.command(CONTROLS.LEFT);
-      serverToClient.game.command(CONTROLS.ROTATE_RIGHT);
-      serverToClient.game.command(CONTROLS.AUTO_DOWN);
-      serverToClient.game.command(CONTROLS.HARD_DROP);
-  
+      const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
+
+      runCommand(serverToClient.game, CONTROLS.DOWN);
+      runCommand(serverToClient.game, CONTROLS.LEFT);
+      runCommand(serverToClient.game, CONTROLS.ROTATE_RIGHT);
+      runCommand(serverToClient.game, CONTROLS.AUTO_DOWN);
+      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+      
       const serverBoard = clientToServer.player.game.board.grid;
       const clientBoard = serverToClient.game.board.grid;
-  
+      
+      expect(startingClientBoard).not.toEqual(clientBoard);
       expect(serverBoard).toEqual(clientBoard);
   
       clientToServer.player.leave();
+      player2.leave();
   
       expect(GAMES.has(clientToServer.gameServer.id)).toBe(false);
     });
@@ -198,47 +204,48 @@ describe('websocket tests', () => {
 
   describe('gameplay', () => {
     test('execute commands', () => {
-      clientToServer.gameServer.startGame();
+      startGame(clientToServer, player2);
+
+      const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
   
-      serverToClient.game.command(CONTROLS.DOWN);
-      serverToClient.game.command(CONTROLS.LEFT);
-      serverToClient.game.command(CONTROLS.ROTATE_RIGHT);
-      serverToClient.game.command(CONTROLS.AUTO_DOWN);
-      serverToClient.game.command(CONTROLS.HARD_DROP);
+      runCommand(serverToClient.game, CONTROLS.DOWN);
+      runCommand(serverToClient.game, CONTROLS.LEFT);
+      runCommand(serverToClient.game, CONTROLS.ROTATE_RIGHT);
+      runCommand(serverToClient.game, CONTROLS.AUTO_DOWN);
+      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
   
       const serverBoard = clientToServer.player.game.board.grid;
       const clientBoard = serverToClient.game.board.grid;
+      
+      expect(startingClientBoard).not.toEqual(clientBoard);
       expect(serverBoard).toEqual(clientBoard);
   
-      serverToClient.game.command(CONTROLS.LEFT);
-      serverToClient.game.command(CONTROLS.ROTATE_LEFT);
-      serverToClient.game.command(CONTROLS.HARD_DROP);
-  
+      runCommand(serverToClient.game, CONTROLS.LEFT);
+      runCommand(serverToClient.game, CONTROLS.ROTATE_LEFT);
+      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+
       expect(serverBoard).toEqual(clientBoard);
       expect(clientToServer.player.game.score).toEqual(serverToClient.game.score);
     });
   
     test('execute commands - player 2 board updates on player 1 DOM', () => {
-      clientToServer.gameServer.join(player2);
-  
+      startGame(clientToServer, player2);
+      
       const drawGridSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawGrid');
-  
-      clientToServer.gameServer.startGame();
-  
-      expect(drawGridSpy).toHaveBeenCalledTimes(3);
+      
+      expect(drawGridSpy).toHaveBeenCalledTimes(0);
   
       player2.game.board.grid = getTestBoard('pattern1');
       player2.game.executeCommandQueue([]);
   
-      expect(drawGridSpy).toHaveBeenCalledTimes(4);
+      expect(drawGridSpy).toHaveBeenCalledTimes(1);
     });
   
     test('game over from play', () => {
-      clientToServer.gameServer.join(player2);
-      clientToServer.gameServer.startGame();
+      startGame(clientToServer, player2);
   
       for (let i = 0; i < 25; i++) {
-        serverToClient.game.command(CONTROLS.HARD_DROP);
+        runCommand(serverToClient.game, CONTROLS.HARD_DROP);
       }
   
       const serverBoard = clientToServer.player.game.board.grid;
@@ -255,13 +262,10 @@ describe('websocket tests', () => {
     test('server side updates client side board', () => {
       Math.random = jest.fn().mockReturnValue(0);
 
-      let player3 = new Player(mockSend, serverPubSub());
-      clientToServer.gameServer.join(player2);
-      clientToServer.gameServer.join(player3);
-  
       clientToServer.player.game.addPowerUp(POWER_UP_TYPES.SWAP_LINES);
-  
-      clientToServer.gameServer.startGame();
+      
+      let player3 = new Player(mockSend, serverPubSub());
+      startGame(clientToServer, player2, player3);
   
       clientToServer.player.game.board.grid = getTestBoard('pattern1');
       serverToClient.game.board.grid = getTestBoard('pattern1');
@@ -285,8 +289,7 @@ describe('websocket tests', () => {
   
     test('power up is added to client when rewarded to server', () => {
       Math.random = jest.fn().mockReturnValue(.9);
-      clientToServer.gameServer.join(player2);
-      clientToServer.gameServer.startGame();
+      startGame(clientToServer, player2);
   
       clientToServer.player.game.board.grid = getTestBoard('clearLines2');
       clientToServer.player.game.board.piece = new Piece(PIECE_TYPES.T);
@@ -315,7 +318,7 @@ describe('websocket tests', () => {
       Math.random = jest.fn().mockReturnValue(.9);
       clientToServer.gameServer.gameType = GAME_TYPES.SINGLE;
       clientToServer.player.setGameType(GAME_TYPES.SINGLE);
-      clientToServer.gameServer.startGame();
+      startGame(clientToServer);
   
       clientToServer.player.game.board.grid = getTestBoard('clearLines2');
       clientToServer.player.game.board.piece = new Piece(PIECE_TYPES.T);
