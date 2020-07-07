@@ -1,18 +1,23 @@
 const Command = require('frontend/static/js/Command');
+const { pubSubMock } = require('frontend/mockData/mocks');
+const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
 
 describe('Command Tests', () => {
   let command, commandToggle;
   let callback, callbackToggle;
+  let pubSubSpy;
 
   beforeAll(() => {
     callback = jest.fn();
     callbackToggle = jest.fn();
     command = new Command(1, callback, false, 1);
     commandToggle = new Command(2, callback, [10,100,200]);
+    pubSubSpy = pubSubMock();
   });
 
   afterAll(() => {
     jest.clearAllMocks();
+    pubSubSpy.unsubscribeAll();
   });
 
   describe('setup', () => {
@@ -42,6 +47,14 @@ describe('Command Tests', () => {
       expect(callback).toHaveBeenCalledTimes(1);
     });
   
+    test('publishes to command queue', () => {
+      const addToQueueSpy = pubSubSpy.add(ADD_TO_QUEUE)
+
+      command.execute(Infinity);
+
+      expect(addToQueueSpy).toHaveBeenCalledTimes(1);
+    });
+
     test('delay time not met', () => {
       expect(callbackToggle).toHaveBeenCalledTimes(0);
   
