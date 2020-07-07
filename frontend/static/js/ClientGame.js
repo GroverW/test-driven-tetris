@@ -44,8 +44,6 @@ class ClientGame extends Game {
   constructor(playerId) {
     super(playerId, { publish, subscribe }, ClientBoard);
     this.players = [];
-    this.lockDelay = 0;
-    this.interruptAutoDown = false;
     this.commandQueue = [];
     this.subscriptions.push(
       subscribe(START_GAME, this.start.bind(this)),
@@ -57,7 +55,7 @@ class ClientGame extends Game {
     );
     publish(
       SET_AUTO_COMMAND,
-      new Gravity(this.playerId, this.autoDrop.bind(this), this.validDrop.bind(this))
+      new Gravity(this.playerId, this.autoDrop.bind(this), this.isValidDrop.bind(this)),
     );
     this.mapCommands();
   }
@@ -117,7 +115,7 @@ class ClientGame extends Game {
       [DOWN]: () => new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
       [ROTATE_LEFT]: () => new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
       [ROTATE_RIGHT]: () => new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
-      [HARD_DROP]: () => new Command(HARD_DROP, this.board.hardDrop.bind(this)),
+      [HARD_DROP]: () => new Command(HARD_DROP, this.board.hardDrop.bind(this.board)),
       ...mapArrayToObj(PLAYER_KEYS, (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
     };
   }
@@ -126,11 +124,14 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   command(key, upDown) {
-    if ((key in this.commands) && this.gameStatus) {
-      if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
-
-      const topic = upDown === 'down' ? SET_COMMAND : CLEAR_COMMAND;
-      this.pubSub.publish(topic, commands[key]());
+    if ((key in this.commands) && this.gameStatus) {      
+      if(upDown === 'down') {
+        if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
+        this.pubSub.publish(SET_COMMAND, this.commands[key]());
+      } else {
+        this.pubSub.publish(CLEAR_COMMAND, key);
+      }
+      
     }
   }
 
@@ -144,11 +145,11 @@ class ClientGame extends Game {
   }
 
   autoDrop() {
-    this.addToCommandQueue(AUTO_DOWN);
+    this.addToCommandQueue(CONTROLS.AUTO_DOWN);
     this.handleMovement(0, 0, 1, 0);
   }
 
-  validDrop() {
+  isValidDrop() {
     return this.board.validMove(0, 1);
   }
 
