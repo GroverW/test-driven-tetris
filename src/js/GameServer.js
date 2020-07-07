@@ -93,6 +93,7 @@ class GameServer {
    */
   join(player) {
     if (!this.checkGameStatus(player)) return false;
+    if (this.players.includes(player)) return false;
 
     this.nextPlayerId += 1;
     player.setId(this.nextPlayerId);
