@@ -2,6 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const serverPubSub = require('backend/helpers/pubSub');
 const ClientGame = require('frontend/static/js/ClientGame');
+const GameLoop = require('frontend/static/js/GameLoop');
 const GameDOM = require('frontend/static/js/GameDOM');
 const ClientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
@@ -97,6 +98,7 @@ class MockClientListener {
   constructor(ws, selectors) {
     this.gameDOM;
     this.game;
+    this.gameLoop;
     this.clientMessage = new ClientMessage(getMockDOMSelector());
     this.selectors = selectors;
     this.subscriptions = [
@@ -119,13 +121,14 @@ class MockClientListener {
     if (!this.game) {
       this.gameDOM = new GameDOM(this.selectors, id);
       this.game = new ClientGame(id);
+      this.gameLoop = new GameLoop(id);
     } else {
       publish(ADD_PLAYER, id);
     }
   }
   /**
    * Removes player from client game
-   * @param {number} idADD_POWER_UPr id
+   * @param {number} id - player id
    */
   removePlayer(id) {
     publish(REMOVE_PLAYER, id);
@@ -133,10 +136,10 @@ class MockClientListener {
 
   /**
    * Starts client game
-   * @param {*} data 
    */
-  startGame(data) {
-    this.game.start(data);
+  startGame() {
+    this.game.start();
+    this.gameLoop.animate();
   }
 
   /**
@@ -178,6 +181,7 @@ class MockClientListener {
     this.subscriptions.forEach(unsub => unsub());
     if (this.gameDOM !== undefined) this.gameDOM.unsubscribe();
     if (this.game !== undefined) this.game.unsubscribe();
+    if (this.gameLoop !== undefined) this.gameLoop.unsubscribe();
   }
 
   /**
