@@ -1,4 +1,3 @@
-const ClientGame = require('frontend/static/js/ClientGame');
 const GameLoop = require('frontend/static/js/GameLoop');
 const { Piece } = require('common/js/Piece');
 const { PIECE_TYPES, CONTROLS } = require('frontend/helpers/clientConstants');
@@ -12,31 +11,12 @@ const {
 } = require('frontend/helpers/clientTopics');
 const {
   TEST_BOARDS,
-  getTestBoard,
-  getTestPieces,
   mockAnimation,
+  getNewTestGame,
+  runCommand,
 } = require('frontend/mockData/mocks');
 const { pubSubMock } = require('common/mockData/mocks');
 
-const getNewTestGame = (game, testPiece = false, ...players) => {
-  if(game) game.unsubscribe();
-  game = new ClientGame(1)
-  
-  game.board.grid = getTestBoard('empty')
-  
-  if(testPiece) game.board.piece = new Piece(PIECE_TYPES.I);
-  
-  game.addPieces(getTestPieces());
-  players.forEach(player => game.addPlayer(player));
-
-  return game;
-}
-
-const runCommand = (game, command) => {
-  game.command(command, 'down');
-  jest.advanceTimersByTime(100);
-  game.command(command, 'up');
-}
 
 describe('game tests', () => {
   let game;
@@ -52,6 +32,7 @@ describe('game tests', () => {
 
   afterAll(() => {
     game.unsubscribe();
+    gameLoop.unsubscribe();
   })
 
   beforeEach(() => {

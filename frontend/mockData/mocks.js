@@ -1,4 +1,10 @@
 const commonMocks = require('common/mockData/mocks')
+const ClientGame = require('frontend/static/js/ClientGame');
+const { Piece } = require('common/js/Piece');
+const { PIECE_TYPES } = require('frontend/helpers/clientConstants');
+
+// time in ms for one requestAnimationFrame call
+const GAME_TIME_INTERVAL = 100;
 
 /**
  * Gets a mock html canvas ctx
@@ -96,10 +102,30 @@ const getMockGameDOMSelectors = () => ({
 const mockAnimation = () => {
   let t = 0;
   return (callback) => setTimeout(() => {
-    t += 100;
+    t += GAME_TIME_INTERVAL;
     callback(t);
-  }, 100)
+  }, GAME_TIME_INTERVAL)
 };
+
+const getNewTestGame = (game, testPiece = false, ...players) => {
+  if (game) game.unsubscribe();
+  game = new ClientGame(1)
+
+  game.board.grid = commonMocks.getTestBoard('empty')
+
+  if (testPiece) game.board.piece = new Piece(PIECE_TYPES.I);
+
+  game.addPieces(commonMocks.getTestPieces());
+  players.forEach(player => game.addPlayer(player));
+
+  return game;
+}
+
+const runCommand = (game, command) => {
+  game.command(command, 'down');
+  jest.advanceTimersByTime(GAME_TIME_INTERVAL);
+  game.command(command, 'up');
+}
 
 module.exports = {
   ...commonMocks,
@@ -107,4 +133,6 @@ module.exports = {
   getMockDOMSelector,
   getMockGameDOMSelectors,
   mockAnimation,
+  getNewTestGame,
+  runCommand,
 };
