@@ -15,6 +15,9 @@ const SET_COMMAND = 'setCommand';
 const SET_AUTO_COMMAND = 'setAutoCommand';
 const CLEAR_COMMAND = 'clearCommand';
 
+const ADD_LOCK_DELAY = 'addLockDelay';
+const INTERRUPT_DELAY = 'interruptDelay';
+
 module.exports = {
   ...COMMON_TOPICS,
   TOGGLE_MENU,
@@ -25,4 +28,6 @@ module.exports = {
   SET_COMMAND,
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
+  ADD_LOCK_DELAY,
+  INTERRUPT_DELAY,
 };
