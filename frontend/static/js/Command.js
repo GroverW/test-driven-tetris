@@ -1,3 +1,6 @@
+const { publish } = require('frontend/helpers/pubSub');
+const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
+
 class Command {
   constructor(key, callback, toggle=false, delay=0) {
     this.key = key;
@@ -17,6 +20,7 @@ class Command {
 
     if(time >= this.startTime + this.delay) {
       this.callback();
+      publish(ADD_TO_QUEUE, this.key);
       this.startTime = time;
 
       if(this.toggle) {
