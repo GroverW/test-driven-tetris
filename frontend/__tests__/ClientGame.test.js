@@ -46,7 +46,8 @@ describe('game tests', () => {
 
   beforeAll(() => {
     game = getNewTestGame(game);
-    gameLoop = new GameLoop(1);
+    // setting id to 2 so that it never receives GAME_OVER
+    gameLoop = new GameLoop(2);
   });
 
   afterAll(() => {
@@ -141,9 +142,11 @@ describe('game tests', () => {
     test('game over', () => {
       game = getNewTestGame(game, true);
       game.start();
+      game.board.piece = new Piece(PIECE_TYPES.O);
       const gameOverSpy = pubSubSpy.add(GAME_OVER);
       const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
-  
+      
+      
       for (let i = 0; i < 15; i++) {
         game.board.nextPiece = new Piece(PIECE_TYPES.O);
         runCommand(game, CONTROLS.HARD_DROP);
@@ -164,6 +167,7 @@ describe('game tests', () => {
     test('add commands', () => {
       game = getNewTestGame(game, true, p2, p4);
       game.start();
+      gameLoop.autoCommand = undefined;
   
       runCommand(game, CONTROLS.LEFT);
       runCommand(game, CONTROLS.RIGHT);
@@ -187,7 +191,6 @@ describe('game tests', () => {
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   
-
       runCommand(game, CONTROLS.ROTATE_RIGHT);
       runCommand(game, CONTROLS.AUTO_DOWN);
       runCommand(game, CONTROLS.LEFT);
