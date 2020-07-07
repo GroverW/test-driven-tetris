@@ -8,8 +8,6 @@ const {
   COMMAND_QUEUE_MAP,
   POWER_UP_KEY_CODES,
   MOVE_SPEED,
-  ANIMATION_SPEED,
-  MAX_SPEED,
 } = require('frontend/helpers/clientConstants');
 const {
   START_GAME,
@@ -114,13 +112,13 @@ class ClientGame extends Game {
     const { LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
 
     this.commands = {
-      [LEFT]: new Command(LEFT, this.handleMovement.bind(this, 0, -1, 0), MOVE_SPEED),
-      [RIGHT]: new Command(RIGHT, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
-      [DOWN]: new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
-      [ROTATE_LEFT]: new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
-      [ROTATE_RIGHT]: new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
-      [HARD_DROP]: new Command(HARD_DROP, this.board.hardDrop.bind(this)),
-      ...mapArrayToObj(PLAYER_KEYS, (PKEY) => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
+      [LEFT]: () => new Command(LEFT, this.handleMovement.bind(this, 0, -1, 0), MOVE_SPEED),
+      [RIGHT]: () => new Command(RIGHT, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
+      [DOWN]: () => new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
+      [ROTATE_LEFT]: () => new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
+      [ROTATE_RIGHT]: () => new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
+      [HARD_DROP]: () => new Command(HARD_DROP, this.board.hardDrop.bind(this)),
+      ...mapArrayToObj(PLAYER_KEYS, (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
     };
   }
   /**
@@ -132,12 +130,14 @@ class ClientGame extends Game {
       if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
 
       const topic = upDown === 'down' ? SET_COMMAND : CLEAR_COMMAND;
-      this.pubSub.publish(topic, commands[key]);
+      this.pubSub.publish(topic, commands[key]());
     }
   }
 
   handleMovement(rotation, xChange, yChange, multiplier = undefined) {
-    (yChange === 1) ? publish(INTERRUPT_DELAY) : publish(ADD_LOCK_DELAY);
+    const topic = yChange === 1 ? INTERRUPT_DELAY : ADD_LOCK_DELAY;
+    this.pubSub.publish(topic);
+
     (rotation === 0)
       ? this.board.movePiece(xChange, yChange, multiplier)
       : this.board.rotatePiece(rotation);
