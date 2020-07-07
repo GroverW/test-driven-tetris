@@ -15,6 +15,7 @@ common                              # Wrapping folder for common js files
     ├── Game                        # Base game class used by frontend and backend
     │   └── Board                   # Base board class used by frontend and backend
     │       └── Piece               # Creates and gets new pieces
+    ├── GameLoop                    # Manages animation of client side commands
     └── ClientMessage               # Manages the display of flash messages for errors / notices
 
 frontend                            # Wrapping folder for front-end
@@ -31,9 +32,12 @@ frontend                            # Wrapping folder for front-end
     │   └── style                   # Main stylesheet
     └── js
         ├── ClientGame              # Manages score, commands, etc. (extends common Game class)
+        │   ├── Command             # Object sent by ClientGame to GameLoop to be executed
+        │   ├── Gravity             # Manages automatic dropping of current piece
         │   └── ClientBoard         # Manages board state and pieces (extends common Board class)
         ├── GameDOM                 # Manages DOM manipulation
         │   └── GameView            # Manages HTML canvas manipulation
+        ├── GameLoop                # Manages animation of client side commands
         └── main                    # Placeholder for event handlers
         
 
