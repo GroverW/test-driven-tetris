@@ -1,19 +1,14 @@
 const GameDOM = require('frontend/static/js/GameDOM');
 const GameLoop = require('frontend/static/js/GameLoop');
-const { Piece } = require('common/js/Piece');
+
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
-const {
-  CONTROLS,
-  PIECE_TYPES,
-  POWER_UP_TYPES,
-  LINES_PER_LEVEL,
-} = require('frontend/helpers/clientConstants');
+
+const { CONTROLS, POWER_UP_TYPES, LINES_PER_LEVEL } = require('frontend/helpers/clientConstants');
 const {
   PLAY,
   ADD_PLAYER,
   REMOVE_PLAYER,
-  START_GAME,
   CLEAR_LINES,
   ADD_POWER_UP,
   USE_POWER_UP,
@@ -23,7 +18,6 @@ const {
   getMockDOMSelector,
   getMockGameDOMSelectors,
   getMockCtx,
-  getTestBoard,
   getNewTestGame,
   runCommand,
   mockAnimation,
