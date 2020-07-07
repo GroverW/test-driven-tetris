@@ -1,5 +1,6 @@
 const Game = require('common/js/Game');
 const ClientBoard = require('./ClientBoard');
+const Gravity = require('./Gravity');
 const Command = require('./Command');
 const {
   PLAYER_KEYS,
@@ -22,6 +23,11 @@ const {
   USE_POWER_UP,
   UPDATE_SCORE,
   SEND_MESSAGE,
+  SET_COMMAND,
+  SET_AUTO_COMMAND,
+  CLEAR_COMMAND,
+  ADD_LOCK_DELAY,
+  INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
 const { mapArrayToObj } = require('common/helpers/utils');
@@ -40,7 +46,6 @@ class ClientGame extends Game {
   constructor(playerId) {
     super(playerId, { publish, subscribe }, ClientBoard);
     this.players = [];
-    this.time = { start: 0, elapsed: 0 };
     this.lockDelay = 0;
     this.interruptAutoDown = false;
     this.commandQueue = [];
@@ -52,6 +57,11 @@ class ClientGame extends Game {
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
       subscribe(ADD_PIECES, this.addPieces.bind(this)),
     );
+    publish(
+      SET_AUTO_COMMAND,
+      new Gravity(this.playerId, this.autoDrop.bind(this), this.validDrop.bind(this))
+    );
+    this.mapCommands();
   }
 
   /**
@@ -101,15 +111,14 @@ class ClientGame extends Game {
   }
 
   mapCommands() {
-    const { LEFT, RIGHT, DOWN, AUTO_DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
-    
+    const { LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
+
     this.commands = {
-      [LEFT]: new Command(LEFT, this.handleMovement.bind(this, -1, 0, 0), MOVE_SPEED),
-      [RIGHT]: new Command(RIGHT, this.handleMovement.bind(this, 1, 0, 0), MOVE_SPEED),
-      [DOWN]: new Command(DOWN, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
-      [AUTO_DOWN]: new Command(AUTO_DOWN, this.handleAutoDrop.bind(this)),
-      [ROTATE_LEFT]: new Command(ROTATE_LEFT, this.handleMovement.bind(this, 0, 0, -1)),
-      [ROTATE_RIGHT]: new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 0, 0, 1)),
+      [LEFT]: new Command(LEFT, this.handleMovement.bind(this, 0, -1, 0), MOVE_SPEED),
+      [RIGHT]: new Command(RIGHT, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
+      [DOWN]: new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
+      [ROTATE_LEFT]: new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
+      [ROTATE_RIGHT]: new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
       [HARD_DROP]: new Command(HARD_DROP, this.board.hardDrop.bind(this)),
       ...mapArrayToObj(PLAYER_KEYS, (PKEY) => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
     };
@@ -119,54 +128,28 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   command(key, upDown) {
-    this.addLockDelay(key);
-    this.resetAutoDown(key);
-
     if ((key in this.commands) && this.gameStatus) {
       if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
 
-      const topic = upDown === 'down' ? ADD_COMMAND : CLEAR_COMMAND;
+      const topic = upDown === 'down' ? SET_COMMAND : CLEAR_COMMAND;
       this.pubSub.publish(topic, commands[key]);
     }
-
-    // if game over and command queue isn't empty, send it
-    if (!this.gameStatus && this.commandQueue.length > 0) {
-      this.sendCommandQueue();
-    }
   }
 
-  handleMovement(xChange, yChange, rotation) {
-    (yChange === 1) ? this.resetAutoDown() : this.addLockDelay();
+  handleMovement(rotation, xChange, yChange, multiplier = undefined) {
+    (yChange === 1) ? publish(INTERRUPT_DELAY) : publish(ADD_LOCK_DELAY);
     (rotation === 0)
-      ? this.board.movePiece(xChange, yChange)
+      ? this.board.movePiece(xChange, yChange, multiplier)
       : this.board.rotatePiece(rotation);
   }
-  /**
-   * Adds delay before Tetris piece is locked to board.
-   * @param {number} key - Keypress identifier
-   */
-  addLockDelay() {
-    const increment = this.getLockDelayIncrement();
-    this.lockDelay = Math.min(increment * 4, this.lockDelay + increment);
+
+  autoDrop() {
+    this.addToCommandQueue(AUTO_DOWN);
+    this.handleMovement(0, 0, 1, 0);
   }
 
-  /**
-   * Increments lock delay.
-   * @return {number} - Delay increment in milliseconds
-   */
-  getLockDelayIncrement() {
-    const baseDelay = ANIMATION_SPEED[1];
-    const currentDelay = this.getAnimationDelay();
-    // max is baseDelay / 4, min is baseDelay / 8
-    return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4;
-  }
-
-  /**
-   * Resets the timer on auto-down movement.
-   * @param {number} key - Keypress identifier
-   */
-  resetAutoDown(key) {
-    this.interruptAutoDown = true;
+  validDrop() {
+    return this.board.validMove(0, 1);
   }
 
   /**
@@ -241,49 +224,11 @@ class ClientGame extends Game {
    */
   gameOver({ id }) {
     if (id === this.playerId) {
+      if (this.commandQueue.length) this.sendCommandQueue();
+
       this.unsubscribe();
       this.gameStatus = null;
     }
-  }
-
-  /**
-   * Handles auto-down movement of current piece
-   * @param {number} currTime - time in ms since game start
-   */
-  handleAutoDrop(currTime) {
-    this.time.elapsed = currTime - this.time.start;
-
-    const validNextMove = this.board.validMove(0, 1);
-
-    // resets auto-movement time if interrupted
-    if (this.interruptAutoDown && validNextMove) {
-      this.time.start = currTime;
-      this.interruptAutoDown = false;
-    }
-
-    // executes auto-movement if valid
-    if (this.time.elapsed > this.getAutoDropDelay(validNextMove)) {
-      this.time.start = currTime;
-      this.command(CONTROLS.AUTO_DOWN);
-      this.lockDelay = 0;
-    }
-  }
-  /**
-   * Calculates the total delay in milliseconds until the next auto-movement
-   * @param {boolean} validNextMove - Whether or not the next row is blocked
-   * @returns {number} - Total delay in milliseconds
-   */
-  getAutoDropDelay(validNextMove) {
-    const lockDelay = validNextMove ? 0 : this.lockDelay;
-    return this.getAnimationDelay() + lockDelay;
-  }
-
-  /**
-   * Calculates the base delay in milliseconds until the next auto-movement
-   * @returns {number} - Base delay in milliseconds
-   */
-  getAnimationDelay() {
-    return ANIMATION_SPEED[Math.min(this.level, MAX_SPEED)];
   }
 }
 
