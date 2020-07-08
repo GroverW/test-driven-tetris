@@ -4,6 +4,7 @@ const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
 class Command {
   constructor(key, callback, toggle=false, delay=0) {
     this.key = key;
+    this.type = toggle ? 'toggleCommand' : 'command';
     this.callback = callback;
     this.toggle = toggle;
     this.toggleIdx = 0;
