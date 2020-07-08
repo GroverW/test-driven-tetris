@@ -43,6 +43,7 @@ const getMockCtx = () => ({
 const getMockDOMSelector = () => ({
   id: "",
   innerText: "",
+  children: [],
   parentNode: {
     removeChild: jest.fn()
   },
@@ -75,7 +76,7 @@ const getMockDOMSelector = () => ({
     }
   },
   getContext: () => getMockCtx(),
-  appendChild: jest.fn(),
+  appendChild(selector) { this.children.push(selector) },
   play: jest.fn(),
   pause: jest.fn(),
 });
