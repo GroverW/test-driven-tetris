@@ -6,7 +6,6 @@ const {
   PLAYER_KEYS,
   CONTROLS,
   COMMAND_QUEUE_MAP,
-  POWER_UP_KEY_CODES,
   MOVE_SPEED,
 } = require('frontend/helpers/clientConstants');
 const {
@@ -24,6 +23,7 @@ const {
   SET_COMMAND,
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
+  ADD_TO_QUEUE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
@@ -44,6 +44,7 @@ class ClientGame extends Game {
   constructor(playerId) {
     super(playerId, { publish, subscribe }, ClientBoard);
     this.players = [];
+    this.playerTargets = {};
     this.commandQueue = [];
     this.subscriptions.push(
       subscribe(START_GAME, this.start.bind(this)),
@@ -52,10 +53,7 @@ class ClientGame extends Game {
       subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
       subscribe(ADD_PIECES, this.addPieces.bind(this)),
-    );
-    publish(
-      SET_AUTO_COMMAND,
-      new Gravity(this.playerId, this.autoDrop.bind(this), this.isValidDrop.bind(this)),
+      subscribe(ADD_TO_QUEUE, this.addToCommandQueue.bind(this)),
     );
     this.mapCommands();
   }
@@ -76,6 +74,11 @@ class ClientGame extends Game {
         level: this.level,
         lines: this.linesRemaining
       });
+
+      publish(
+        SET_AUTO_COMMAND,
+        new Gravity(this.playerId, this.autoDrop.bind(this), this.isValidDrop.bind(this)),
+      );
     }
   }
 
@@ -87,6 +90,7 @@ class ClientGame extends Game {
     if (this.gameStatus || this.players.includes(id)) return;
 
     this.players.push(id);
+    this.mapPlayerTargets();
   }
 
   /**
@@ -95,6 +99,7 @@ class ClientGame extends Game {
    */
   removePlayer(id) {
     this.players = this.players.filter((pId) => pId !== id);
+    this.mapPlayerTargets();
   }
 
   /**
@@ -106,6 +111,14 @@ class ClientGame extends Game {
     if (id === this.playerId) this.board.replaceBoard(board);
   }
 
+  mapPlayerTargets() {
+    this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => {
+      return this.players[i-1] ? `PLAYER${this.players[i-1]}` : false;
+    });
+    
+    this.playerTargets[PLAYER_KEYS[0]] = `PLAYER${this.playerId}`;
+  }
+
   mapCommands() {
     const { LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
 
@@ -115,7 +128,7 @@ class ClientGame extends Game {
       [DOWN]: () => new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
       [ROTATE_LEFT]: () => new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
       [ROTATE_RIGHT]: () => new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
-      [HARD_DROP]: () => new Command(HARD_DROP, this.board.hardDrop.bind(this.board)),
+      [HARD_DROP]: () => new Command(HARD_DROP, this.hardDrop.bind(this)),
       ...mapArrayToObj(PLAYER_KEYS, (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
     };
   }
@@ -125,17 +138,21 @@ class ClientGame extends Game {
    */
   command(key, upDown) {
     if ((key in this.commands) && this.gameStatus) {      
-      if(upDown === 'down') {
-        if (!POWER_UP_KEY_CODES.has(key)) this.addToCommandQueue(key);
-        this.pubSub.publish(SET_COMMAND, this.commands[key]());
-      } else {
-        this.pubSub.publish(CLEAR_COMMAND, key);
-      }
-      
+      (upDown === 'down')
+        ? this.pubSub.publish(SET_COMMAND, this.commands[key]())
+        : this.pubSub.publish(CLEAR_COMMAND, key);
     }
   }
 
+  hardDrop() {
+    if(!this.gameStatus) return;
+    
+    this.board.hardDrop();
+  }
+
   handleMovement(rotation, xChange, yChange, multiplier = undefined) {
+    if(!this.gameStatus) return;
+    
     const topic = yChange === 1 ? INTERRUPT_DELAY : ADD_LOCK_DELAY;
     this.pubSub.publish(topic);
 
@@ -158,9 +175,11 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   addToCommandQueue(key) {
-    if (key in COMMAND_QUEUE_MAP) {
-      this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
-    }
+      if(key in this.playerTargets) {
+        this.commandQueue.push(this.playerTargets[key]);
+      } else if (key in COMMAND_QUEUE_MAP) {
+        this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
+      }
   }
 
   /**
@@ -179,16 +198,7 @@ class ClientGame extends Game {
    * @param {number} player - keypress id
    */
   usePowerUp(player) {
-    const playerIds = {
-      [CONTROLS.PLAYER1]: this.playerId,
-      [CONTROLS.PLAYER2]: this.players[0],
-      [CONTROLS.PLAYER3]: this.players[1],
-      [CONTROLS.PLAYER4]: this.players[2],
-    }
-    const id = playerIds[player];
-
-    if (id) {
-      this.addToCommandQueue(CONTROLS[`PLAYER${id}`]);
+    if (this.playerTargets[player]) {
       this.sendCommandQueue();
       this.pubSub.publish(USE_POWER_UP);
     }
