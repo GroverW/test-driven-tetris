@@ -18,6 +18,7 @@ const publish = (topic, data) => {
  * @returns {function} - function to call to unsubscribe from topic
  */
 const subscribe = (topic, callback) => {
+  // console.log(topic, subscribers[topic])
   const id = subscribers[topic]
     ? addSubscriber(topic, callback)
     : addTopic(topic, callback);
@@ -47,7 +48,7 @@ const addTopic = (topic, callback) => {
  * @returns {number} - id of subscriber
  */
 const addSubscriber = (topic, callback) => {
-  const id = subscribers[topic].length;
+  const id = subscribers[topic].reduce((max,sub) => Math.max(max, sub.id), 0);
   subscribers[topic].push({ id, callback });
 
   return id;
