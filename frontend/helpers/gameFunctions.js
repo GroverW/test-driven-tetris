@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const ClientGame = require('frontend/static/js/ClientGame');
+const GameLoop = require('frontend/static/js/GameLoop');
 const GameDOM = require('frontend/static/js/GameDOM');
 
 const Api = require('./Api');
@@ -61,7 +62,7 @@ const connectToGame = (gameId, type) => {
 
   const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
 
-  let game, gameDOM, api;
+  let game, gameLoop, gameDOM, api;
 
   /**
    * What to do when the websocket is opened
@@ -89,6 +90,7 @@ const connectToGame = (gameId, type) => {
     if (type === ADD_PLAYER && !game) {
       gameDOM = new GameDOM(gameSelectors, data);
       game = new ClientGame(data);
+      gameLoop = new GameLoop(data);
       api = new Api(ws);
       createEventListeners(game, api);
       gameSelectors.message.classList.remove('hide');
@@ -113,11 +115,11 @@ const createEventListeners = (game, api) => {
   });
 
   document.addEventListener('keydown', (evt) => {
-    game.toggleMove(evt.which, 'down');
+    game.command(evt.which, 'down');
   });
 
   document.addEventListener('keyup', (evt) => {
-    game.toggleMove(evt.which, 'up');
+    game.command(evt.which, 'up');
   });
 }
 
