@@ -48,7 +48,7 @@ const addTopic = (topic, callback) => {
  * @returns {number} - id of subscriber
  */
 const addSubscriber = (topic, callback) => {
-  const id = subscribers[topic].reduce((max,sub) => Math.max(max, sub.id), 0);
+  const id = subscribers[topic].reduce((max,sub) => Math.max(max, sub.id), 0) + 1;
   subscribers[topic].push({ id, callback });
 
   return id;
