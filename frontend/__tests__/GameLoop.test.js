@@ -37,18 +37,21 @@ describe('Game Loop tests', () => {
   describe('set / clear commands', () => {
     test('should set commands', () => {
       expect(gameLoop.autoCommand).toBe(undefined);
+      expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
   
       gameLoop.setCommand(testCommand);
+      gameLoop.setCommand(testToggleCommand);
       gameLoop.setAutoCommand(testAutoCommand);
   
       expect(gameLoop.command).toBe(testCommand);
+      expect(gameLoop.toggleCommand).toBe(testToggleCommand);
       expect(gameLoop.autoCommand).toBe(testAutoCommand);
     });
   
     test('should not overwrite existing command with same key', () => {
       let newCallback = jest.fn();
-      let newCommand = new Command(1, newCallback, 400);
+      let newCommand = new Command(1, newCallback, false, 400);
   
       gameLoop.setCommand(newCommand);
       expect(testCommand).not.toBe(newCommand);
@@ -56,13 +59,18 @@ describe('Game Loop tests', () => {
     })
   
     test('should clear commands if key matches', () => {
-      gameLoop.clearCommand(2);
-  
+      gameLoop.clearCommand(3);
+
+      expect(gameLoop.toggleCommand).toBe(testToggleCommand);
       expect(gameLoop.command).toBe(testCommand);
+
+      gameLoop.clearCommand(gameLoop.toggleCommand.key);
+      gameLoop.clearCommand(gameLoop.command.key);
   
-      gameLoop.clearCommand(1);
-  
+      expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
+
+      gameLoop.setCommand(testToggleCommand);
     });
   });
   
@@ -76,13 +84,12 @@ describe('Game Loop tests', () => {
     });
 
     test('calls commands each frame', () => {
-      gameLoop.setCommand(testToggleCommand);
       expect(testToggleCallback).toHaveBeenCalledTimes(0);
       expect(testAutoCallback).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(1000);
 
-      expect(testToggleCallback).toHaveBeenCalledTimes(9);
+      expect(testToggleCallback).toHaveBeenCalledTimes(10);
       expect(testAutoCallback).toHaveBeenCalledTimes(11);
     });
 
@@ -124,17 +131,18 @@ describe('Game Loop tests', () => {
     });
 
     test('SET_COMMAND should set command', () => {
+      const newCommand = new Command(0, testCallback)
       expect(gameLoop.command).toBe(testCommand)
 
-      publish(SET_COMMAND, testToggleCommand);
+      publish(SET_COMMAND, newCommand);
 
-      expect(gameLoop.command).toBe(testToggleCommand);
+      expect(gameLoop.command).toBe(newCommand);
     });
 
     test('CLEAR_COMMAND should clear command', () => {
       publish(CLEAR_COMMAND, testToggleCommand.key);
 
-      expect(gameLoop.command).toBe(undefined);
+      expect(gameLoop.toggleCommand).toBe(undefined);
     });
 
     test('GAME_OVER should stop animation and unsubscribe if correct playerId', () => {
