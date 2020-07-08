@@ -12,6 +12,7 @@ const MSG_TYPE = {
 const PLAY = 'play';
 const START_GAME = 'startGame';
 const GAME_OVER = 'gameOver';
+const END_GAME = 'endGame';
 
 const GAME_MESSAGE = 'gameMessage';
 
@@ -36,6 +37,7 @@ module.exports = {
   GAME_MESSAGE,
   START_GAME,
   GAME_OVER,
+  END_GAME,
   ADD_PIECES,
   LOWER_PIECE,
   CLEAR_LINES,
