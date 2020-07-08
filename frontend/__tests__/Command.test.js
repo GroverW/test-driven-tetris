@@ -28,6 +28,11 @@ describe('Command Tests', () => {
       expect(command.delay).toBe(1);
       expect(commandToggle.delay).toBe(10);
     });
+
+    test('command types', () => {
+      expect(command.type).toBe('command');
+      expect(commandToggle.type).toBe('toggleCommand');
+    })
   });
 
   describe('execute command', () => {
