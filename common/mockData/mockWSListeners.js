@@ -36,7 +36,7 @@ class MockServerListener {
     this.player;
     this.gameServer;
     this.ws = ws;
-    this.url = url;
+    this.url = this.getNewUrl(url);
     this.subscriptions = [
       ws.on('open', this.open.bind(this)),
       ws.on(PLAY, this.startGame.bind(this)),
@@ -45,10 +45,17 @@ class MockServerListener {
     ];
   }
 
+  getNewUrl(url = 1) {
+    while(GameServer.getGame(url)) url += 1;
+    
+    return url;
+  }
+
   /**
    * Creates a new gameServer and Player. Adds the Player to the gameServer
    */
   open() {
+
     GameServer.addGame(this.url, GAME_TYPES.MULTI)
     this.gameServer = GameServer.getGame(this.url);
     this.player = new Player(this.ws.send.bind(this.ws), serverPubSub());
@@ -82,6 +89,7 @@ class MockServerListener {
    */
   unsubAll() {
     this.subscriptions.forEach((unsub) => unsub());
+    if (this.gameServer !== undefined) this.gameServer.unsubscribe();
   }
 }
 
@@ -131,6 +139,7 @@ class MockClientListener {
    * @param {number} id - player id
    */
   removePlayer(id) {
+    publish(GAME_OVER, { id });
     publish(REMOVE_PLAYER, id);
   }
 
@@ -181,7 +190,7 @@ class MockClientListener {
     this.subscriptions.forEach(unsub => unsub());
     if (this.gameDOM !== undefined) this.gameDOM.unsubscribe();
     if (this.game !== undefined) this.game.unsubscribe();
-    if (this.gameLoop !== undefined) this.gameLoop.unsubscribe();
+    if (this.gameLoop !== undefined) this.gameLoop.gameOver({ id: this.gameLoop.playerId });
   }
 
   /**
