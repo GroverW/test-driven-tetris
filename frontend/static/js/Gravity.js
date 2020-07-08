@@ -17,10 +17,10 @@ class Gravity {
     this.level = 1;
     this.start = 0;
     this.interrupt = false;
-    this.lockDelay = 0;
     this.lowerPiece = lowerPiece;
     this.isValidNextMove = true;
     this.checkValidNextMove = validNextMove;
+    this.resetLockDelay();
     this.subscriptions = [
       subscribe(UPDATE_SCORE, this.updateLevel.bind(this)),
       subscribe(ADD_LOCK_DELAY, this.incrementLockDelay.bind(this)),
@@ -48,7 +48,7 @@ class Gravity {
 
   incrementLockDelay() {
     const increment = this.getLockDelayIncrement();
-    this.lockDelay = Math.min(increment * 4, this.lockDelay + increment);
+    this.lockDelay = Math.min(increment * 5, this.lockDelay + increment);
   }
 
   getLockDelayIncrement() {
@@ -57,6 +57,10 @@ class Gravity {
 
     // max is baseDelay / 4, min is baseDelay / 8
     return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4;
+  }
+
+  resetLockDelay() {
+    this.lockDelay = this.getLockDelayIncrement();
   }
 
   execute(currTime) {
@@ -70,7 +74,7 @@ class Gravity {
     if(currTime >= this.start + this.delay) {
       this.start = currTime;
       this.lowerPiece();
-      this.lockDelay = 0;
+      this.resetLockDelay();
     }
   }
 

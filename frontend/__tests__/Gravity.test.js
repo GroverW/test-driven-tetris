@@ -5,7 +5,6 @@ const {
 } = require('frontend/helpers/clientConstants');
 const {
   UPDATE_SCORE,
-  ADD_TO_QUEUE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
   GAME_OVER,
@@ -87,12 +86,13 @@ describe('gravity tests', () => {
     test('calls callback when delay threshhold met, resets start time and lock delay', () => {
       const currStart = gravity.start;
       const currDelay = gravity.delay;
+      const currLockDelay = gravity.lockDelay;
       
       gravity.execute(currStart + currDelay);
 
       expect(fakeCallback).toHaveBeenCalledTimes(1);
       expect(gravity.start).toBe(currStart + currDelay);
-      expect(gravity.lockDelay).toBe(0);
+      expect(gravity.lockDelay).toBeLessThan(currLockDelay);
     });
 
     test('interrupt delay resets start time if valid next move', () => {
