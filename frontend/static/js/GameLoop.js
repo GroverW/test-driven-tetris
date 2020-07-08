@@ -11,6 +11,7 @@ class GameLoop {
   constructor(playerId) {
     this.playerId = playerId;
     this.command;
+    this.toggleCommand;
     this.autoCommand;
     this.animationId;
     this.subscriptions = [
@@ -23,8 +24,14 @@ class GameLoop {
   }
 
   setCommand(command) {
-    if (this.command === undefined || this.command.key !== command.key) {
-      this.command = command;
+    if (command.type === 'command') {
+      if(this.command === undefined || this.command.key !== command.key) {
+        this.command = command;
+      }
+    } else if (command.type === 'toggleCommand') {
+      if(this.toggleCommand === undefined || this.toggleCommand.key !== command.key) {
+        this.toggleCommand = command;
+      }
     }
   }
 
@@ -35,11 +42,14 @@ class GameLoop {
   clearCommand(key) {
     if (this.command !== undefined && key === this.command.key) {
       this.command = undefined;
+    } else if (this.toggleCommand !== undefined && key === this.toggleCommand.key) {
+      this.toggleCommand = undefined;
     }
   }
 
   animate(currTime = 0) {
     if (this.command !== undefined) this.command.execute(currTime);
+    if (this.toggleCommand !== undefined) this.toggleCommand.execute(currTime);
     if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
 
     this.animationId = requestAnimationFrame(this.animate.bind(this))
