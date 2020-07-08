@@ -116,20 +116,6 @@ describe('gravity tests', () => {
   });
 
   describe('publish / subscribe', () => {
-    test('ADD_TO_QUEUE shoudl be published when executed successfully', () => {
-      const addToQueueSpy = pubSubSpy.add(ADD_TO_QUEUE);
-
-      let { start, delay } = gravity;
-
-      gravity.execute(0);
-
-      expect(addToQueueSpy).toHaveBeenCalledTimes(0);
-
-      gravity.execute(start + delay);
-
-      expect(addToQueueSpy).toHaveBeenCalledTimes(1);
-    });
-
     test('UPDATE_SCORE should update level if level included', () => {
       const currLevel = gravity.level;
 
