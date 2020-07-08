@@ -10,8 +10,10 @@ const {
   ADD_PLAYER,
   REMOVE_PLAYER,
   CLEAR_LINES,
+  UPDATE_SCORE,
   ADD_POWER_UP,
   USE_POWER_UP,
+  END_GAME,
   GAME_MESSAGE,
 } = require('frontend/helpers/clientTopics');
 const { 
@@ -232,6 +234,18 @@ describe('game DOM tests', () => {
   
       expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
       expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
+    });
+  });
+
+  describe('end game', () => {
+    test('should unsubscribe and stop updating after game ends', () => {
+      const currScore = gameDOM.score.innerText;
+
+      publish(END_GAME);
+
+      publish(UPDATE_SCORE, { score: currScore + 1 });
+
+      expect(gameDOM.score.innerText).toBe(currScore);
     });
   });
 });
