@@ -17,6 +17,7 @@ const {
   GAME_MESSAGE,
   START_GAME,
   GAME_OVER,
+  END_GAME,
   GET_PIECES,
   ADD_PIECES,
   ADD_POWER_UP,
@@ -436,10 +437,14 @@ class GameServer {
       winner.pubSub.publish(GAME_OVER, {
         id: winner.id,
         board: winner.game.board.grid,
-      })
-    }
+      });
+      this.endGame();
+    } else if(this.gameType === GAME_TYPES.SINGLE) this.endGame();
   }
 
+  endGame() {
+    this.sendAll({ type: END_GAME, data: {} });
+  }
   /**
    * Generates a Game Over message for a specified player
    * @param {number} id - player id

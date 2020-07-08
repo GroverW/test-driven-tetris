@@ -295,7 +295,7 @@ describe('game server tests', () => {
       expect(sendAllSpy).toHaveBeenCalledTimes(6);
     });
 
-    test('game over', () => {
+    test('game over sent when player loses', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
@@ -317,7 +317,7 @@ describe('game server tests', () => {
       expect(mpGameServer.nextRanking).toBe(2);
     });
 
-    test('game over - one player remaining', () => {
+    test('game over and end game sent when one player remaining', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
@@ -345,13 +345,13 @@ describe('game server tests', () => {
 
       expect(mpGameServer.nextRanking).toBe(0);
 
-      // last player should automatically get a gameOver because they won
-      expect(sendAllSpy).toHaveBeenCalledTimes(3);
+      // p2 and p3 should be sent gameOver, and all should be sent endGame
+      expect(sendAllSpy).toHaveBeenCalledTimes(4);
       expect(p2.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
     });
 
-    test('game over - 2nd place leaves', () => {
+    test('game over and end game sent when 2nd place leaves', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
@@ -382,7 +382,7 @@ describe('game server tests', () => {
 
       // last player should automatically get a gameOver because they won
       // all players should be notified of player leaving
-      expect(sendAllSpy).toHaveBeenCalledTimes(3);
+      expect(sendAllSpy).toHaveBeenCalledTimes(4);
       expect(p1.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
     });
@@ -457,5 +457,4 @@ describe('game server tests', () => {
       expect(sendSpy).toHaveBeenCalledTimes(2);
     });
   });
-
 });
