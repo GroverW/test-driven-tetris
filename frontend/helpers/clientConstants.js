@@ -4,7 +4,7 @@ MESSAGE_TIMEOUT = 3000;
 
 const CELL_SIZE = 30;
 
-// map players to keypress ids
+// map players to keypress ids => [49, 50, 51, 52]
 const PLAYER_KEYS = COMMON_CONSTANTS.PLAYERS.map((p, i) => 49 + i);
 // map players to object of [PLAYER]: [keypress]
 const PLAYER_CONTROLS = COMMON_CONSTANTS.PLAYERS
