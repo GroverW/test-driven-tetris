@@ -6,7 +6,7 @@ const {
   PIECE_TYPES,
   POINTS,
 } = require('common/helpers/constants');
-const { LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
+const { LOWER_PIECE, CLEAR_LINES, END_GAME } = require('common/helpers/commonTopics');
 const {
   getTestBoard,
   getTestPieces,
@@ -148,11 +148,11 @@ describe('game tests', () => {
       expect(game.lines).toBe(currLines + 1);
     });
 
-    test('unsubscribe - publishing should stop updating game', () => {
+    test('END_GAME should unsubscribe and publishing should stop updating game', () => {
       const currScore = game.score;
       const currLines = game.lines;
   
-      game.unsubscribe();
+      pubSubTest.publish(END_GAME);
   
       pubSubTest.publish(CLEAR_LINES, 1);
       pubSubTest.publish(LOWER_PIECE, 1);
