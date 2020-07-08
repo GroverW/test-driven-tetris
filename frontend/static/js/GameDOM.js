@@ -211,10 +211,10 @@ class GameDOM {
   addPowerUp(powerUp) {
     if (POWER_UPS.has(powerUp)) {
       let nextPowerUp = this.powerUps.find((p) => p.type === null);
-
+      
       if (nextPowerUp) {
         nextPowerUp.type = powerUp;
-        nextPowerUp.node.classList.add(`power-up${powerUp}`)
+        nextPowerUp.node.classList.add(`power-up${powerUp}`);
       }
     }
   }
