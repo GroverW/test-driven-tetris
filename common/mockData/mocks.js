@@ -50,7 +50,7 @@ const webSocketMock = {
     return id;
   },
   addSub(type, callback) {
-    const id = this.topics[type].reduce((max, obj) => Math.max(max, obj.id), 0);
+    const id = this.topics[type].reduce((max, obj) => Math.max(max, obj.id), 0) + 1;
     this.topics[type].push({ id, callback });
 
     return id;
