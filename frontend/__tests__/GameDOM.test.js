@@ -149,11 +149,11 @@ describe('game DOM tests', () => {
     test('gameDOM should add game message when topic published', () => {
       const testMessage = { header: 'hi', body: [] };
       
-      expect(gameDOM.message.appendChild).toHaveBeenCalledTimes(0);
+      expect(gameDOM.message.children.length).toBe(0);
   
       publish(GAME_MESSAGE, testMessage);
   
-      expect(gameDOM.message.appendChild).toHaveBeenCalledTimes(1);
+      expect(gameDOM.message.children.length).toBeGreaterThan(0);
     });
   });
 
