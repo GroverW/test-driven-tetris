@@ -18,6 +18,7 @@ const {
   PLAY,
   START_GAME,
   GAME_OVER,
+  END_GAME,
   GAME_MESSAGE,
   ADD_PLAYER,
   REMOVE_PLAYER,
@@ -60,6 +61,7 @@ class GameDOM {
       subscribe(PLAY, this.playerReady.bind(this)),
       subscribe(START_GAME, this.startGame.bind(this)),
       subscribe(GAME_OVER, this.gameOver.bind(this)),
+      subscribe(END_GAME, this.unsubscribe.bind(this)),
       subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
       subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
       subscribe(UPDATE_SCORE, this.updateScoreboard.bind(this)),
@@ -248,7 +250,6 @@ class GameDOM {
     if (!message) return;
 
     if (id === this.playerId) {
-      this.unsubscribe();
       this.gameView.drawGrid(this.gameView.ctx, board);
       this.addMessage(this.message, message);
       this.music.pause();
