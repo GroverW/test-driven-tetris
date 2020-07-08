@@ -161,6 +161,8 @@ describe('websocket tests', () => {
     });
 
     test('game over', () => {
+      
+      expect(serverToClient.gameDOM.message.children.length).toBe(0);
       expect(serverToClient.game.gameStatus).toBe(true);
       expect(serverToClient.gameLoop.animationId).toEqual(expect.any(Number));
   
@@ -171,6 +173,7 @@ describe('websocket tests', () => {
   
       clientToServer.gameServer.gameOver(gameOverData);
   
+      expect(serverToClient.gameDOM.message.children.length).toBeGreaterThan(0);
       expect(serverToClient.game.gameStatus).toBe(null);
       expect(serverToClient.gameLoop.animationId).toBe(undefined);
     });
