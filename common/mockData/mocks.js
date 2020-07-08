@@ -30,19 +30,34 @@ const webSocketMock = {
   send(data) {
     const parsed = JSON.parse(data);
     if (this.topics[parsed.type] !== undefined) {
-      this.topics[parsed.type].forEach(callback => callback(parsed.data))
+      this.topics[parsed.type].forEach((sub) => sub.callback(parsed.data))
     };
   },
   on(type, callback) {
-    this.topics[type]
-      ? this.topics[type].push(callback)
-      : this.topics[type] = [callback];
+    const id = this.topics[type]
+      ? this.addSub(type, callback)
+      : this.addTopic(type, callback);
 
-    const index = this.topics[type].length - 1;
-    const unsubscribe = () => this.topics[type].splice(index, 1);
+    const unsubscribe = () => {
+      this.removeSub(type, id);
+    };
 
     return unsubscribe;
-  }
+  },
+  addTopic(type, callback) {
+    const id = 0;
+    this.topics[type] = [{ id, callback }];
+    return id;
+  },
+  addSub(type, callback) {
+    const id = this.topics[type].reduce((max, obj) => Math.max(max, obj.id), 0);
+    this.topics[type].push({ id, callback });
+
+    return id;
+  },
+  removeSub(type, id) {
+    this.topics[type] = this.topics[type].filter((s) => s.id !== id);
+  },
 };
 
 /**
