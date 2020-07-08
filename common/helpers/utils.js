@@ -31,7 +31,10 @@ const getEmptyBoard = () => new Array(BOARD_HEIGHT).fill(null).map(() => Array(B
  * @returns {object} - object with keys mapped to values
  */
 const mapArrayToObj = (keysArr, callback, resObj = {}) => {
-  keysArr.forEach((key, idx, keysArr) => { resObj[key] = callback(key, idx, keysArr) });
+  keysArr.forEach((key, idx, keysArr) => {
+    const result = callback(key, idx, keysArr);
+    if (result) resObj[key] = result;
+  });
 
   return resObj;
 }
