@@ -19,8 +19,8 @@ class Command {
     if(this.startTime === undefined) this.startTime = time;
 
     if(time >= this.startTime + this.delay) {
-      this.callback();
       publish(ADD_TO_QUEUE, this.key);
+      this.callback();
       this.startTime = time;
 
       if(this.toggle) {
