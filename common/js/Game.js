@@ -1,6 +1,7 @@
 const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
 const {
   GAME_OVER,
+  END_GAME,
   LOWER_PIECE,
   CLEAR_LINES
 } = require('common/helpers/commonTopics');
@@ -29,6 +30,7 @@ class Game {
       this.pubSub.subscribe(LOWER_PIECE, this.updateScore.bind(this)),
       this.pubSub.subscribe(CLEAR_LINES, this.clearLines.bind(this)),
       this.pubSub.subscribe(GAME_OVER, this.gameOver.bind(this)),
+      this.pubSub.subscribe(END_GAME, this.unsubscribe.bind(this)),
     ];
   }
 
