@@ -111,6 +111,9 @@ class ClientGame extends Game {
     if (id === this.playerId) this.board.replaceBoard(board);
   }
 
+  /**
+   * Maps keyboard controls to actual player ids
+   */
   mapPlayerTargets() {
     this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => {
       return this.players[i-1] ? `PLAYER${this.players[i-1]}` : false;
@@ -119,6 +122,9 @@ class ClientGame extends Game {
     this.playerTargets[PLAYER_KEYS[0]] = `PLAYER${this.playerId}`;
   }
 
+  /**
+   * Maps keyboard commands to ClientGame commands
+   */
   mapCommands() {
     const { LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
 
@@ -141,15 +147,25 @@ class ClientGame extends Game {
       (upDown === 'down')
         ? this.pubSub.publish(SET_COMMAND, this.commands[key]())
         : this.pubSub.publish(CLEAR_COMMAND, key);
-    }
+    } else if (!this.gameStatus) this.sendCommandQueue();
   }
 
+  /**
+   * Command to hard drop current piece
+   */
   hardDrop() {
     if(!this.gameStatus) return;
     
     this.board.hardDrop();
   }
 
+  /**
+   * Handles rotation nad piece movement
+   * @param {number} rotation - clockwise or counterclockwise rotation
+   * @param {number} xChange - movement in horizontal direction
+   * @param {number} yChange  - movement in vertical direction
+   * @param {number} multiplier - points multiplier to distinguish commanded vs auto movement
+   */
   handleMovement(rotation, xChange, yChange, multiplier = undefined) {
     if(!this.gameStatus) return;
     
@@ -161,11 +177,18 @@ class ClientGame extends Game {
       : this.board.rotatePiece(rotation);
   }
 
+  /**
+   * Command to auto move piece downwards
+   */
   autoDrop() {
     this.addToCommandQueue(CONTROLS.AUTO_DOWN);
     this.handleMovement(0, 0, 1, 0);
   }
 
+  /**
+   * Checks if the next move down is valid
+   * @returns {boolean} - whether or not the next move is valid
+   */
   isValidDrop() {
     return this.board.validMove(0, 1);
   }
@@ -235,9 +258,6 @@ class ClientGame extends Game {
    */
   gameOver({ id }) {
     if (id === this.playerId) {
-      if (this.commandQueue.length) this.sendCommandQueue();
-
-      this.unsubscribe();
       this.gameStatus = null;
     }
   }
