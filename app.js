@@ -44,6 +44,8 @@ app.post('/game/single', (req, res, next) => {
 
 /**Handle websocket messages */
 
+wsExpress.getWss().on('connection', (ws) => console.log('conenction open'));
+
 //allow for app.ws routes for websocket routes
 app.ws('/game/:gameId', (ws, req, next) => {
   try {

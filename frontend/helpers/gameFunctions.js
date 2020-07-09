@@ -61,7 +61,7 @@ const connectToGame = (gameId, type) => {
   }
 
   const urlParts = document.URL.split('/')
-  const ws = new WebSocket(`ws://${urlParts[2]}/game/${gameId}`);
+  const ws = new WebSocket(`wss://${urlParts[2]}/game/${gameId}`);
 
   let game, gameLoop, gameDOM, api;
 
