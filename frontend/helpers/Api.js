@@ -1,5 +1,6 @@
 const { subscribe } = require('./pubSub');
 const { SEND_MESSAGE } = require('./clientTopics');
+const { publishError } = require('frontend/helpers/clientUtils');
 
 class Api {
   constructor(ws) {
@@ -19,7 +20,7 @@ class Api {
       this.ws.send(this.formatMessage(message));
     }
     catch (err) {
-      console.log(err);
+      publishError('Could not send message to backend.')
     }
   };
 

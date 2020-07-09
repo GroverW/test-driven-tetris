@@ -18,7 +18,6 @@ const publish = (topic, data) => {
  * @returns {function} - function to call to unsubscribe from topic
  */
 const subscribe = (topic, callback) => {
-  // console.log(topic, subscribers[topic])
   const id = subscribers[topic]
     ? addSubscriber(topic, callback)
     : addTopic(topic, callback);
