@@ -66,14 +66,6 @@ const connectToGame = (gameId, type) => {
   let game, gameLoop, gameDOM, api;
 
   /**
-   * What to do when the websocket is opened
-   */
-  ws.onopen = (evt) => {
-    console.log(evt);
-    console.log('connected');
-  }
-
-  /**
    * What to do when the websocket is closed
    */
   ws.onclose = (evt) => {
@@ -86,7 +78,6 @@ const connectToGame = (gameId, type) => {
    */
   ws.onmessage = (evt) => {
     const { type, data } = JSON.parse(evt.data);
-    console.log('WHAT GOT PARSED', type, data);
 
     if (type === ADD_PLAYER && !game) {
       gameDOM = new GameDOM(gameSelectors, data);
