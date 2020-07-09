@@ -20,6 +20,12 @@ const {
 } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
 
+const getBaseURL = () => {
+  const [httpProtocol,,hostname] = document.URL.split('/');
+  const wsProtocol = httpProtocol === 'https' ? 'wss' : 'ws';
+  return `${wsProtocol}://${hostname}`
+}
+
 /**
  * Creates a new single, or multiplayer game
  * @param {string} type - 'single' or 'multi'
@@ -60,8 +66,8 @@ const connectToGame = (gameId, type) => {
     powerUpContainer.classList.remove('hide');
   }
 
-  const urlParts = document.URL.split('/')
-  const ws = new WebSocket(`wss://${urlParts[2]}/game/${gameId}`);
+  const baseURL = getBaseURL();
+  const ws = new WebSocket(`${baseURL}/game/${gameId}`);
 
   let game, gameLoop, gameDOM, api;
 
