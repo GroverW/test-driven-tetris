@@ -26,9 +26,9 @@
     "webpack-cli": "^3.3.11"
   },
   "_moduleAliases": {
-    "frontend": "frontend/",
-    "backend": "src/",
-    "common": "common/"
+    "frontend": "frontend",
+    "backend": "src",
+    "common": "common"
   },
   "jest": {
     "moduleNameMapper": {

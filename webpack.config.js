@@ -14,5 +14,5 @@ module.exports = {
     },
     extensions: ['.js', '.css', '.html'],
   },
-  watch: true
+  watch: false
 };
