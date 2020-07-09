@@ -20,10 +20,16 @@ const {
 } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
 
+/**
+ * Gets the base url of the current environment and converts it to 
+ * a web socket url
+ * @returns {string} - base url (e.g. wss://www.example.com/)
+ */
 const getBaseURL = () => {
   const [httpProtocol,,hostname] = document.URL.split('/');
-  const wsProtocol = httpProtocol === 'https' ? 'wss' : 'ws';
-  return `${wsProtocol}://${hostname}`
+  const wsProtocol = httpProtocol === 'https:' ? 'wss:' : 'ws:';
+  
+  return `${wsProtocol}//${hostname}`
 }
 
 /**
@@ -42,6 +48,10 @@ const createGame = async (type) => {
   }
 }
 
+/**
+ * Joins an existing multiplayer game
+ * @param {string} id - game id
+ */
 const joinGame = async (id) => {
   try {
     const response = await axios.get(`/game/multi/${id}`);
