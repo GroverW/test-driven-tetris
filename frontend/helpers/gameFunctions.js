@@ -60,7 +60,8 @@ const connectToGame = (gameId, type) => {
     powerUpContainer.classList.remove('hide');
   }
 
-  const ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
+  const urlParts = document.URL.split('/')
+  const ws = new WebSocket(`ws://${urlParts[2]}/game/${gameId}`);
 
   let game, gameLoop, gameDOM, api;
 
