@@ -7,6 +7,7 @@ const { getNewPlayer } = require('frontend/helpers/clientUtils');
 const { CONTROLS, POWER_UP_TYPES, LINES_PER_LEVEL } = require('frontend/helpers/clientConstants');
 const {
   PLAY,
+  START_GAME,
   ADD_PLAYER,
   REMOVE_PLAYER,
   CLEAR_LINES,
@@ -165,8 +166,8 @@ describe('game DOM tests', () => {
       expect(gameDOM.level.innerText).toBe("");
       expect(gameDOM.lines.innerText).toBe("");
       
-      game.start();
-      gameLoop.animate();
+      game[START_GAME]();
+      gameLoop[START_GAME]();
   
       expect(gameDOM.score.innerText).toBe(0);
       expect(gameDOM.level.innerText).toBe(1);
