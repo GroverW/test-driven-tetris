@@ -12,11 +12,10 @@ common                              # Wrapping folder for common js files
 │   ├── constants                   # Constants to define game settings
 │   └── utils                       # Utilities (randomize, getEmptyBoard)
 └── js
-    ├── Game                        # Base game class used by frontend and backend
-    │   └── Board                   # Base board class used by frontend and backend
-    │       └── Piece               # Creates and gets new pieces
-    ├── GameLoop                    # Manages animation of client side commands
-    └── ClientMessage               # Manages the display of flash messages for errors / notices
+    ├── SubscriberBase              # All subscribers inherit from this class
+    └── Game                        # Base game class used by frontend and backend
+        └── Board                   # Base board class used by frontend and backend
+            └── Piece               # Creates and gets new pieces
 
 frontend                            # Wrapping folder for front-end
 ├── helpers
@@ -31,13 +30,14 @@ frontend                            # Wrapping folder for front-end
     ├── css               
     │   └── style                   # Main stylesheet
     └── js
-        ├── ClientGame              # Manages score, commands, etc. (extends common Game class)
+        ├── ClientGame              # Manages score, commands, etc. 
         │   ├── Command             # Object sent by ClientGame to GameLoop to be executed
         │   ├── Gravity             # Manages automatic dropping of current piece
-        │   └── ClientBoard         # Manages board state and pieces (extends common Board class)
+        │   └── ClientBoard         # Manages board state and pieces
         ├── GameDOM                 # Manages DOM manipulation
         │   └── GameView            # Manages HTML canvas manipulation
         ├── GameLoop                # Manages animation of client side commands
+        ├── ClientMessage           # Manages the display of flash messages
         └── main                    # Placeholder for event handlers
         
 
@@ -48,10 +48,22 @@ src                                 # Wrapping folder for back-end classes
 └── js
     └── GameServer                  # Manages adding / removing players, sending messages
         └── Player                  # Associates game with gameServer        
-            └── ServerGame          # Manages score, executes commands, etc (extends common Game class)
-                └── ServerBoard     # Manages board state and pieces (extends common Board class)
+            └── ServerGame          # Manages score, executes commands, etc
+                └── ServerBoard     # Manages board state and pieces 
 
 app                                 # Backend-routes
+```
+
+### Class Inheritance Structure
+```
+SubscriberBase
+├── Game                            # Common Game class
+│   ├── ClientGame
+│   └── ServerGame
+├── GameDOM                         
+├── GameView                        
+├── GameLoop                        
+└── Gravity                         
 ```
 
 ### Technologies Used
