@@ -1,6 +1,8 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 const pubSub = require('frontend/helpers/pubSub');
 
+const { GAME_OVER, END_GAME } = require('common/helpers/commonTopics');
+
 describe('SubscriberBase tests', () => {
   let subscriberBase;
   const TOPIC1 = 'topic1';
@@ -15,6 +17,10 @@ describe('SubscriberBase tests', () => {
     subscriberBase[TOPIC2] = function() { this.val2 += 2 };
   });
 
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   test('should not initially be subscribed to topics', () => {
     expect(subscriberBase.val1).toBe(0);
     expect(subscriberBase.val2).toBe(0);
@@ -27,7 +33,7 @@ describe('SubscriberBase tests', () => {
   });
 
   test('maps subscribers to topics', () => {
-    expect(subscriberBase.subscriptions.length).toBe(0);
+    const numSubs = subscriberBase.subscriptions.length;
 
     subscriberBase.mapSubscriptions(topics);
 
@@ -36,6 +42,27 @@ describe('SubscriberBase tests', () => {
 
     expect(subscriberBase.val1).toBe(1);
     expect(subscriberBase.val2).toBe(2);
+    expect(subscriberBase.subscriptions.length).toBe(numSubs + 2);
+  });
+
+  test('GAME_OVER should call gameOverAction if correct id', () => {
+    const gameOverActionSpy = jest.spyOn(subscriberBase, 'gameOverAction');
+
+    pubSub.publish(GAME_OVER, { id: Infinity });
+
+    expect(gameOverActionSpy).toHaveBeenCalledTimes(0);
+
+    pubSub.publish(GAME_OVER, { id: subscriberBase.playerId });
+
+    expect(gameOverActionSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('END_GAME should call endGameAction', () => {
+    const endGameActionSpy = jest.spyOn(subscriberBase, 'endGameAction');
+
+    pubSub.publish(END_GAME);
+
+    expect(endGameActionSpy).toHaveBeenCalledTimes(1);
   });
 
   test('unsubscribes from topics', () => {
