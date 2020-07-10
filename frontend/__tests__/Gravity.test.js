@@ -39,7 +39,7 @@ describe('gravity tests', () => {
     });
 
     test('delay changes with level', () => {
-      gravity.updateLevel({ level: 2 });
+      gravity[UPDATE_SCORE]({ level: 2 });
 
       expect(gravity.level).toBe(2);
       expect(gravity.delay).toBe(ANIMATION_SPEED[2]);
@@ -52,13 +52,13 @@ describe('gravity tests', () => {
 
     test('sets flag to interrupt delay', () => {
       expect(gravity.interrupt).toBe(false);
-      gravity.interruptDelay();
+      gravity[INTERRUPT_DELAY]();
       expect(gravity.interrupt).toBe(true);
     });
 
     test('increments lock delay', () => {
       const lockDelay = gravity.lockDelay;
-      gravity.incrementLockDelay();
+      gravity[ADD_LOCK_DELAY]();
       expect(gravity.lockDelay).toBeGreaterThan(lockDelay);
     });
     
