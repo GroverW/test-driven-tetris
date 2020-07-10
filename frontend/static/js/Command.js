@@ -11,26 +11,23 @@ class Command {
    * @constructor
    * @param {number|string} key - keypress identifying command
    * @param {function} callback - executes the command
-   * @param {boolean|number[]} [toggle] - list of delay timings in ms
-   * @param {number} [delay] - delay in ms
+   * @param {number[]} [delay] - list of delay timings in ms
    */
-  constructor(key, callback, toggle=false, delay=0) {
+  constructor(key, callback, delay=[0]) {
     this.key = key;
-    this.type = toggle ? 'toggleCommand' : 'command';
+    this.type = (delay.length > 1) ? 'toggleCommand' : 'command';
     this.callback = callback;
-    this.toggle = toggle;
-    this.toggleIdx = 0;
     this.startTime;
-    this.delay = this.getInitialDelay(delay);
+    this._delayIdx = 0;
+    this._delay = delay;
   }
 
   /**
-   * Gets the initial delay in ms
-   * @param {number} delay - delay in ms
-   * @returns {number} - initial delay
+   * Gets the current delay in ms
+   * @returns {number} - current delay in ms
    */
-  getInitialDelay(delay) {
-    return this.toggle ? this.toggle[this.toggleIdx] : delay;
+  get delay() {
+    return this._delay[this._delayIdx];
   }
 
   /**
@@ -45,20 +42,19 @@ class Command {
       this.callback();
       this.startTime = currTime;
 
-      if(this.toggle) {
-        this.handleToggle();
-      } else {
-        this.delay = Infinity;
-      }
+      this.updateDelay();
     }
   }
 
   /**
-   * Increments toggle index and updates delay
+   * Iterates through delay list
    */
-  handleToggle() {
-    this.toggleIdx = Math.min(this.toggle.length - 1, this.toggleIdx + 1);
-    this.delay = this.toggle[this.toggleIdx];
+  updateDelay() {
+    if(this.type === 'toggleCommand') {
+      this._delayIdx = Math.min(this._delay.length - 1, this._delayIdx + 1);
+    } else {
+      this._delay[this._delayIdx] = Infinity;
+    }
   }
 }
 
