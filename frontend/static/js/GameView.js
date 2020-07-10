@@ -1,4 +1,6 @@
-const { subscribe } = require('frontend/helpers/pubSub');
+const SubscriberBase = require('common/js/SubscriberBase');
+
+const pubSub = require('frontend/helpers/pubSub');
 const {
   CELL_COLORS,
   BOARD_WIDTH,
@@ -15,20 +17,17 @@ const {
 /**
  * Represents a client-side HTML canvas manager
  */
-class GameView {
+class GameView extends SubscriberBase {
   /**
    * @constructor
    * @param {object} ctx - player canvas context
    * @param {object} ctxNext - next piece canvas context
    */
   constructor(ctx, ctxNext) {
+    super(null, pubSub);
     this.ctx = this.initCtx(ctx, CELL_SIZE);
     this.ctxNext = this.initCtx(ctxNext, CELL_SIZE, 4, 4);
-    this.subscriptions = [
-      subscribe(DRAW, this.draw.bind(this)),
-      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
-      subscribe(UPDATE_PLAYER, this.updatePlayer.bind(this)),
-    ];
+    this.mapSubscriptions([DRAW, REMOVE_PLAYER, UPDATE_PLAYER]);
     this.players = [];
   }
 
@@ -57,7 +56,7 @@ class GameView {
    * @param {object} [nextPiece] - nextPiece to draw
    * @param {array} [nextPiece.grid] - nextPiece grid to draw
    */
-  draw({ board, piece, nextPiece }) {
+  [DRAW]({ board, piece, nextPiece }) {
     if (board) this.drawGrid(this.ctx, board);
     if (piece) this.drawGrid(this.ctx, piece.grid, piece.x, piece.y, false);
     if (nextPiece) this.drawNext(this.ctxNext, nextPiece.grid);
@@ -178,7 +177,7 @@ class GameView {
    * Removes a player from the player list
    * @param {number} id - id of player to remove
    */
-  removePlayer(id) {
+  [REMOVE_PLAYER](id) {
     const playerIdx = this.players.findIndex((p) => p.id === id);
     if (playerIdx > -1) this.players.splice(playerIdx, 1);
 
@@ -193,7 +192,7 @@ class GameView {
    * @param {number} id - id of player to update
    * @param {array} board - board of player to update
    */
-  updatePlayer({ id, board }) {
+  [UPDATE_PLAYER]({ id, board }) {
     const player = this.players.find((p) => p.id === id);
 
     if (player) {
@@ -202,11 +201,8 @@ class GameView {
     }
   }
 
-  /**
-   * Unsubscribes gameView from all topics
-   */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
+  endGameAction() {
+    this.unsubscribe();
   }
 }
 
