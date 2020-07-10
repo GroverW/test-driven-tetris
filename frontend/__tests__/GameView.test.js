@@ -6,7 +6,7 @@ const {
   BOARD_WIDTH,
   CELL_SIZE
 } = require('frontend/helpers/clientConstants');
-const { DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
+const { START_GAME, DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
 const {
   getMockCtx,
   getTestBoard,
@@ -71,8 +71,8 @@ describe('game view tests', () => {
   
       expect(drawGridSpy).toHaveBeenCalledTimes(0);
   
-      game.start();
-      gameLoop.animate();
+      game[START_GAME]();
+      gameLoop[START_GAME]();
   
       // 1 for board, 1 for piece, 1 for nextPiece
       expect(drawGridSpy).toHaveBeenCalledTimes(3);
