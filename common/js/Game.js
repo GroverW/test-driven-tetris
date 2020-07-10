@@ -1,15 +1,12 @@
+const SubscriberBase = require('common/js/SubscriberBase');
+
 const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
-const {
-  GAME_OVER,
-  END_GAME,
-  LOWER_PIECE,
-  CLEAR_LINES
-} = require('common/helpers/commonTopics');
+const { LOWER_PIECE, CLEAR_LINES, ADD_PIECES } = require('common/helpers/commonTopics');
 
 /**
  * Represents a Tetris game.
  */
-class Game {
+class Game extends SubscriberBase {
   /**
    * Creates a Game.
    * @constructor
@@ -18,20 +15,14 @@ class Game {
    * @param {class} Board -  Board class to be instantiated
    */
   constructor(playerId, pubSub, Board) {
-    this.playerId = playerId;
+    super(playerId, pubSub);
     this.gameStatus = false;
     this.score = 0;
     this.level = 1;
     this.lines = 0;
     this.linesRemaining = 10;
-    this.pubSub = pubSub;
     this.board = new Board(pubSub, playerId);
-    this.subscriptions = [
-      this.pubSub.subscribe(LOWER_PIECE, this.updateScore.bind(this)),
-      this.pubSub.subscribe(CLEAR_LINES, this.clearLines.bind(this)),
-      this.pubSub.subscribe(GAME_OVER, this.gameOver.bind(this)),
-      this.pubSub.subscribe(END_GAME, this.unsubscribe.bind(this)),
-    ];
+    this.mapSubscriptions([LOWER_PIECE, CLEAR_LINES, ADD_PIECES]);
   }
 
   /**
@@ -49,7 +40,7 @@ class Game {
    * Adds new list of pieces to current set
    * @param {number[]} pieces - list of piece ids
    */
-  addPieces(pieces) {
+  [ADD_PIECES](pieces) {
     this.board.pieceList.addSet(pieces);
   }
 
@@ -64,7 +55,7 @@ class Game {
    * Updates game score.
    * @param {number} points - number of points to add to game score
    */
-  updateScore(points) {
+  [LOWER_PIECE](points) {
     this.score += points;
   }
 
@@ -84,26 +75,16 @@ class Game {
    * Updates score and lines remaining based on number of lines cleared
    * @param {number} lines - number of lines cleared
    */
-  clearLines(lines) {
+  [CLEAR_LINES](lines) {
     if(POINTS.LINES_CLEARED[lines]) {
-      this.updateScore(POINTS.LINES_CLEARED[lines] * this.level);
+      this[LOWER_PIECE](POINTS.LINES_CLEARED[lines] * this.level);
       this.updateLinesRemaining(lines);
     }
   }
 
-  /**
-   * Ends the current game.
-   */
-  gameOver() {
-    // implemented individually
+  endGameAction() {
+    this.unsubscribe();
   }
-
-  /**
-   * Unsubscribes from all pubSub topics.
-   */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
-  }  
 }
 
 module.exports = Game;
