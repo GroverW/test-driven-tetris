@@ -1,6 +1,8 @@
 
+const SubscriberBase = require('common/js/SubscriberBase');
 const GameView = require('./GameView');
-const { subscribe } = require('frontend/helpers/pubSub');
+
+const pubSub = require('frontend/helpers/pubSub');
 const {
   getEmptyBoard,
   getNewPlayer,
@@ -30,7 +32,7 @@ const {
 /**
  * Represents a client-side DOM manager
  */
-class GameDOM {
+class GameDOM extends SubscriberBase {
   /**
    * @constructor
    * @param {object} selectors - object of DOM selectors
@@ -46,7 +48,7 @@ class GameDOM {
    * @param {number} playerId - Id of player on backend
    */
   constructor(selectors, playerId) {
-    this.playerId = playerId;
+    super(playerId, pubSub);
     this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
     this.opponents = selectors.opponents;
     this.score = selectors.score;
@@ -57,30 +59,30 @@ class GameDOM {
     this.powerUps = this.mapPowerUps(selectors.powerUps);
     this.players = [];
     this.music = selectors.music;
-    this.subscriptions = [
-      subscribe(PLAY, this.playerReady.bind(this)),
-      subscribe(START_GAME, this.startGame.bind(this)),
-      subscribe(GAME_OVER, this.gameOver.bind(this)),
-      subscribe(END_GAME, this.unsubscribe.bind(this)),
-      subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
-      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
-      subscribe(UPDATE_SCORE, this.updateScoreboard.bind(this)),
-      subscribe(ADD_POWER_UP, this.addPowerUp.bind(this)),
-      subscribe(USE_POWER_UP, this.usePowerUp.bind(this)),
-    ];
+    this.mapSubscriptions([
+      PLAY,
+      START_GAME,
+      GAME_OVER,
+      END_GAME,
+      ADD_PLAYER,
+      REMOVE_PLAYER,
+      UPDATE_SCORE,
+      ADD_POWER_UP,
+      USE_POWER_UP,
+    ]);
   }
 
   /**
    * Subscribes user to game messages when ready
    */
-  playerReady() {
-    this.subscriptions.push(subscribe(GAME_MESSAGE, this.gameMessage.bind(this)))
+  [PLAY]() {
+    this.addSubscription(GAME_MESSAGE);
   }
   
   /**
    * Clears any game messages and starts music on game start
    */
-  startGame() {
+  [START_GAME]() {
     this.music.play();
     this.clearMessage(this.message);
   }
@@ -88,7 +90,7 @@ class GameDOM {
    * Adds additional player to the game container
    * @param {number} id - id of additional player
    */
-  addPlayer(id) {
+  [ADD_PLAYER](id) {
     if (id === this.playerId) return;
 
     const [canvasCtx, ...DOMElements] = this.getNewPlayerContainer(id);
@@ -161,7 +163,7 @@ class GameDOM {
    * Removes additional player from game container
    * @param {number} id - id of player to remove
    */
-  removePlayer(id) {
+  [REMOVE_PLAYER](id) {
     if (id === this.playerId) return;
 
     const player = this.players.find((p) => p.id === id);
@@ -189,7 +191,7 @@ class GameDOM {
    * @param {number} [level] - game level
    * @param {number} [lines] - game lines cleared
    */
-  updateScoreboard({ score, level, lines }) {
+  [UPDATE_SCORE]({ score, level, lines }) {
     if (score !== undefined) this.score.innerText = score;
     if (level !== undefined) this.level.innerText = level;
     if (lines !== undefined) this.lines.innerText = lines;
@@ -210,7 +212,7 @@ class GameDOM {
    * Adds a power up to the list, and sets the class on the DOM
    * @param {number} powerUp - power up id
    */
-  addPowerUp(powerUp) {
+  [ADD_POWER_UP](powerUp) {
     if (POWER_UPS.has(powerUp)) {
       let nextPowerUp = this.powerUps.find((p) => p.type === null);
       
@@ -224,7 +226,7 @@ class GameDOM {
   /**
    * Removes the first power up from the list. Updates all classes.
    */
-  usePowerUp() {
+  [USE_POWER_UP]() {
     this.powerUps.forEach((p, i, a) => {
       const next = a[i + 1];
 
@@ -246,7 +248,7 @@ class GameDOM {
    * @param {string} message.header - game over message header
    * @param {string[]} message.body - list of messages in body
    */
-  gameOver({ id, board, message }) {
+  [GAME_OVER]({ id, board, message }) {
     if (!message) return;
 
     if (id === this.playerId) {
@@ -270,7 +272,7 @@ class GameDOM {
    * @param {string} message.header - message header
    * @param {string[]} message.body - list of messages in body
    */
-  gameMessage(message) {
+  [GAME_MESSAGE](message) {
     this.addMessage(this.message, message);
   }
 
@@ -304,9 +306,8 @@ class GameDOM {
   /**
    * Unsubscribes gameDOM from all topics
    */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
-    this.gameView.unsubscribe();
+  endGameAction() {
+    this.unsubscribe();
   }
 }
 
