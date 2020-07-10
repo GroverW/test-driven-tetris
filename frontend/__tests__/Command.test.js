@@ -10,7 +10,7 @@ describe('Command Tests', () => {
   beforeAll(() => {
     callback = jest.fn();
     callbackToggle = jest.fn();
-    command = new Command(1, callback, false, 1);
+    command = new Command(1, callback, [1]);
     commandToggle = new Command(2, callback, [10,100,200]);
     pubSubSpy = pubSubMock();
   });
@@ -22,9 +22,6 @@ describe('Command Tests', () => {
 
   describe('setup', () => {
     test('get initial delay', () => {
-      const delay = command.getInitialDelay(100);
-      expect(delay).toBe(100);
-  
       expect(command.delay).toBe(1);
       expect(commandToggle.delay).toBe(10);
     });
@@ -69,35 +66,35 @@ describe('Command Tests', () => {
     });
   });
 
-  describe('toggle command', () => {
-    test('handles toggling', () => {
-      expect(commandToggle.delay).toBe(10);
+  describe('update delay', () => {
+    test('iterates through delay', () => {
+      expect(commandToggle.delay).toBe(commandToggle._delay[0]);
   
-      commandToggle.handleToggle();
+      commandToggle.updateDelay();
   
-      expect(commandToggle.delay).toBe(100);
+      expect(commandToggle.delay).toBe(commandToggle._delay[1]);
     });
   
     test('handles toggling on successful execute', () => {
-      const handleToggleSpy = jest.spyOn(commandToggle, 'handleToggle');
+      const updateDelaySpy = jest.spyOn(commandToggle, 'updateDelay');
   
       commandToggle.execute(50);
       
-      expect(handleToggleSpy).toHaveBeenCalledTimes(0);
+      expect(updateDelaySpy).toHaveBeenCalledTimes(0);
       
       commandToggle.execute(150);
   
-      expect(handleToggleSpy).toHaveBeenCalledTimes(1);
+      expect(updateDelaySpy).toHaveBeenCalledTimes(1);
   
       expect(commandToggle.delay).toBe(200);
     });
   
     test('does not go over max delay', () => {
-      expect(commandToggle.toggleIdx).toBe(2);
+      expect(commandToggle._delayIdx).toBe(2);
 
-      commandToggle.handleToggle();
+      commandToggle.updateDelay();
       
-      expect(commandToggle.toggleIdx).toBe(2);
+      expect(commandToggle._delayIdx).toBe(2);
     });
   });
 });
