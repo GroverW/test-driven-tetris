@@ -147,8 +147,8 @@ class MockClientListener {
    * Starts client game
    */
   startGame() {
-    this.game.start();
-    this.gameLoop.animate();
+    this.game[START_GAME]();
+    this.gameLoop[START_GAME]();
   }
 
   /**
