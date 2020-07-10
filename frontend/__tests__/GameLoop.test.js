@@ -40,9 +40,9 @@ describe('Game Loop tests', () => {
       expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
 
-      gameLoop.setCommand(testCommand);
-      gameLoop.setCommand(testToggleCommand);
-      gameLoop.setAutoCommand(testAutoCommand);
+      gameLoop[SET_COMMAND](testCommand);
+      gameLoop[SET_COMMAND](testToggleCommand);
+      gameLoop[SET_AUTO_COMMAND](testAutoCommand);
 
       expect(gameLoop.command).toBe(testCommand);
       expect(gameLoop.toggleCommand).toBe(testToggleCommand);
@@ -53,24 +53,24 @@ describe('Game Loop tests', () => {
       let newCallback = jest.fn();
       let newCommand = new Command(1, newCallback, [400]);
 
-      gameLoop.setCommand(newCommand);
+      gameLoop[SET_COMMAND](newCommand);
       expect(testCommand).not.toBe(newCommand);
       expect(gameLoop.command).toBe(testCommand);
     })
 
     test('should clear commands if key matches', () => {
-      gameLoop.clearCommand(3);
+      gameLoop[CLEAR_COMMAND](3);
 
       expect(gameLoop.toggleCommand).toBe(testToggleCommand);
       expect(gameLoop.command).toBe(testCommand);
 
-      gameLoop.clearCommand(gameLoop.toggleCommand.key);
-      gameLoop.clearCommand(gameLoop.command.key);
+      gameLoop[CLEAR_COMMAND](gameLoop.toggleCommand.key);
+      gameLoop[CLEAR_COMMAND](gameLoop.command.key);
 
       expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
 
-      gameLoop.setCommand(testToggleCommand);
+      gameLoop[SET_COMMAND](testToggleCommand);
     });
   });
 
@@ -78,7 +78,7 @@ describe('Game Loop tests', () => {
     test('sets animation id', () => {
       expect(gameLoop.animationId).toBe(undefined);
 
-      gameLoop.animate();
+      gameLoop[START_GAME]();
 
       expect(gameLoop.animationId).toEqual(expect.any(Number));
     });
@@ -94,7 +94,7 @@ describe('Game Loop tests', () => {
     });
 
     test('non-toggled commands should only execute once', () => {
-      gameLoop.setCommand(testCommand);
+      gameLoop[SET_COMMAND](testCommand);
 
       expect(testCallback).toHaveBeenCalledTimes(0);
 
