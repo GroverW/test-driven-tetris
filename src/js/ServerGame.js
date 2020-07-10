@@ -9,6 +9,7 @@ const {
 } = require('backend/helpers/serverConstants');
 const {
   UPDATE_PLAYER,
+  CLEAR_LINES,
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
@@ -109,15 +110,15 @@ class ServerGame extends Game {
    * Has chance to add random power up
    * @param {number} lines - number of lines cleared
    */
-  clearLines(lines) {
-    super.clearLines(lines);
+  [CLEAR_LINES](lines) {
+    super[CLEAR_LINES](lines);
     if (lines > 0) this.addPowerUp(this.getRandomPowerUp());
   }
 
   /**
  * Ends the current game.
  */
-  gameOver() {
+  gameOverAction() {
     this.unsubscribe();
     this.gameStatus = null;
   }
