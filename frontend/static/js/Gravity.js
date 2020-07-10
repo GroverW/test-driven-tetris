@@ -1,19 +1,15 @@
-const {
-  ANIMATION_SPEED,
-  MAX_SPEED,
-} = require('frontend/helpers/clientConstants');
-const {
-  UPDATE_SCORE,
-  ADD_LOCK_DELAY,
-  INTERRUPT_DELAY,
-  GAME_OVER,
-} = require('frontend/helpers/clientTopics');
-const { subscribe } = require('frontend/helpers/pubSub');
+const SubscriberBase = require('common/js/SubscriberBase');
+
+const pubSub = require('frontend/helpers/pubSub');
+
+const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/helpers/clientConstants');
+const { UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
+
 
 /**
  * Represents in-game gravity. Automatically moves the current piece downwards.
  */
-class Gravity {
+class Gravity extends SubscriberBase {
   /**
    * Creates a Gravity object
    * @constructor
@@ -22,7 +18,7 @@ class Gravity {
    * @param {callback} validNextMove - checks whether the next move is valid
    */
   constructor(playerId, lowerPiece, validNextMove) {
-    this.playerId = playerId;
+    super(playerId, pubSub);
     this.level = 1;
     this.start = 0;
     this.interrupt = false;
@@ -30,12 +26,7 @@ class Gravity {
     this.isValidNextMove = true;
     this.checkValidNextMove = validNextMove;
     this.resetLockDelay();
-    this.subscriptions = [
-      subscribe(UPDATE_SCORE, this.updateLevel.bind(this)),
-      subscribe(ADD_LOCK_DELAY, this.incrementLockDelay.bind(this)),
-      subscribe(INTERRUPT_DELAY, this.interruptDelay.bind(this)),
-      subscribe(GAME_OVER, this.gameOver.bind(this)),
-    ];
+    this.mapSubscriptions([UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY]);
   }
 
   /**
@@ -52,7 +43,7 @@ class Gravity {
    * Updates the game level, which is used to determine delay time
    * @param {number} level - current game level
    */
-  updateLevel({ level }) {
+  [UPDATE_SCORE]({ level }) {
     if(level !== undefined) this.level = level;
   }
 
@@ -67,14 +58,14 @@ class Gravity {
   /**
    * Sets the interrupt flag to reset the delay timer
    */
-  interruptDelay() {
+  [INTERRUPT_DELAY]() {
     this.interrupt = true;
   }
 
   /**
    * Increments lock delay
    */
-  incrementLockDelay() {
+  [ADD_LOCK_DELAY]() {
     const increment = this.getLockDelayIncrement();
     this.lockDelay = Math.min(increment * 5, this.lockDelay + increment);
   }
@@ -119,17 +110,9 @@ class Gravity {
 
   /**
    * Unsubscribes from all messages if player linked to Gravity loses
-   * @param {number} id - player id whose game is over
    */
-  gameOver({ id }) {
-    if(id === this.playerId) this.unsubscribe();
-  }
-
-  /**
-   * Unsubscribes from all messages
-   */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
+  gameOverAction() {
+    this.unsubscribe();
   }
 }
 
