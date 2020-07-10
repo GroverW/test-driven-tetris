@@ -24,7 +24,7 @@ class Command {
 
   /**
    * Gets the current delay in ms
-   * @returns {number} - current delay in ms
+   * @returns {number}
    */
   get delay() {
     return this._delay[this._delayIdx];
