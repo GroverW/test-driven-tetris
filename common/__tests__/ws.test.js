@@ -1,6 +1,4 @@
 const Player = require('backend/js/Player');
-const { Piece } = require('common/js/Piece');
-const ClientGame = require('frontend/static/js/ClientGame');
 const Api = require('frontend/helpers/Api');
 
 const serverPubSub = require('backend/helpers/pubSub');
@@ -10,7 +8,6 @@ const {
   GAMES,
   GAME_TYPES,
   POWER_UP_TYPES,
-  PIECE_TYPES,
   COUNTDOWN,
 } = require('backend/helpers/serverConstants');
 const { MSG_TYPE } = require('common/helpers/commonTopics');
@@ -39,13 +36,15 @@ const getNewListeners = (clientListener, serverListener) => {
 const getNewPlayer = () => new Player(mockSend, serverPubSub());
 
 const resetAll = (clientListener, serverListener, ...players) => {
-  ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
+  ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
 
   serverListener.open();
 
-  players = players.map(player => getNewPlayer());
+  players.map(() => getNewPlayer())
 
-  startGame(clientListener, ...players);
+  startGame(serverListener, ...players);
+
+  return [clientListener, serverListener, ...players];
 }
 
 
@@ -180,11 +179,7 @@ describe('websocket tests', () => {
 
     test('game started - remove game after last player leaves', () => {
       // this would be caused by player closing their browser or leaving the page
-      ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
-      clientToServer.open();
-      
-      player2 = getNewPlayer();
-      startGame(clientToServer, player2);
+      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2));
   
       const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
 
@@ -209,11 +204,7 @@ describe('websocket tests', () => {
 
   describe('gameplay', () => {
     test('execute commands', () => {
-      ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
-      clientToServer.open();
-
-      player2 = getNewPlayer();
-      startGame(clientToServer, player2);
+      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2));
 
       const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
 
@@ -267,14 +258,8 @@ describe('websocket tests', () => {
     test('power up is added to client when rewarded to server', () => {
       Math.random = jest.fn().mockReturnValue(.9);
   
-      ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
-      clientToServer.open();
-      
-      player2 = getNewPlayer();
       let player3 = getNewPlayer();
-
-      startGame(clientToServer, player2, player3);
-
+      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2, player3));
 
       expect(clientToServer.player.game.powerUps.length).toBe(0);
       expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
