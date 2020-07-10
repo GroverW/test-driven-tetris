@@ -18,6 +18,7 @@ const {
   ADD_PIECES,
   EXECUTE_COMMANDS,
   USE_POWER_UP,
+  LOWER_PIECE,
   UPDATE_SCORE,
   SEND_MESSAGE,
   SET_COMMAND,
@@ -27,7 +28,7 @@ const {
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
-const { publish, subscribe } = require('frontend/helpers/pubSub');
+const pubSub = require('frontend/helpers/pubSub');
 const { mapArrayToObj } = require('common/helpers/utils');
 
 
@@ -42,40 +43,34 @@ class ClientGame extends Game {
    * @param {number} playerId - Links client to backend Game.
    */
   constructor(playerId) {
-    super(playerId, { publish, subscribe }, ClientBoard);
+    super(playerId, pubSub, ClientBoard);
     this.players = [];
     this.playerTargets = {};
     this.commandQueue = [];
-    this.subscriptions.push(
-      subscribe(START_GAME, this.start.bind(this)),
-      subscribe(BOARD_CHANGE, this.sendCommandQueue.bind(this)),
-      subscribe(UPDATE_PLAYER, this.replaceBoard.bind(this)),
-      subscribe(ADD_PLAYER, this.addPlayer.bind(this)),
-      subscribe(REMOVE_PLAYER, this.removePlayer.bind(this)),
-      subscribe(ADD_PIECES, this.addPieces.bind(this)),
-      subscribe(ADD_TO_QUEUE, this.addToCommandQueue.bind(this)),
-    );
+    this.mapSubscriptions([
+      START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE
+    ]);
     this.mapCommands();
   }
 
   /**
    * Client-side implentation of start method.
    */
-  start() {
-    if (super.start()) {
-      publish(DRAW, {
+  [START_GAME]() {
+    if (this.start()) {
+      this.pubSub.publish(DRAW, {
         board: this.board.grid,
         piece: this.board.piece,
         nextPiece: this.board.nextPiece,
       });
 
-      publish(UPDATE_SCORE, {
+      this.pubSub.publish(UPDATE_SCORE, {
         score: this.score,
         level: this.level,
         lines: this.linesRemaining
       });
 
-      publish(
+      this.pubSub.publish(
         SET_AUTO_COMMAND,
         new Gravity(this.playerId, this.autoDrop.bind(this), this.isValidDrop.bind(this)),
       );
@@ -86,7 +81,7 @@ class ClientGame extends Game {
    * Adds an additional player to the game
    * @param {number} id - player id
    */
-  addPlayer(id) {
+  [ADD_PLAYER](id) {
     if (this.gameStatus || this.players.includes(id)) return;
 
     this.players.push(id);
@@ -97,7 +92,7 @@ class ClientGame extends Game {
    * Removes additional player from the game
    * @param {number} id - player id
    */
-  removePlayer(id) {
+  [REMOVE_PLAYER](id) {
     this.players = this.players.filter((pId) => pId !== id);
     this.mapPlayerTargets();
   }
@@ -107,7 +102,7 @@ class ClientGame extends Game {
    * @param {number} id - id of player
    * @param {array} board - board to update
    */
-  replaceBoard({ id, board }) {
+  [UPDATE_PLAYER]({ id, board }) {
     if (id === this.playerId) this.board.replaceBoard(board);
   }
 
@@ -181,7 +176,7 @@ class ClientGame extends Game {
    * Command to auto move piece downwards
    */
   autoDrop() {
-    this.addToCommandQueue(CONTROLS.AUTO_DOWN);
+    this[ADD_TO_QUEUE](CONTROLS.AUTO_DOWN);
     this.handleMovement(0, 0, 1, 0);
   }
 
@@ -193,11 +188,15 @@ class ClientGame extends Game {
     return this.board.validMove(0, 1);
   }
 
+  [BOARD_CHANGE]() {
+    this.sendCommandQueue();
+  }
+
   /**
    * Adds command to command queue.
    * @param {number} key - Keypress identifier
    */
-  addToCommandQueue(key) {
+  [ADD_TO_QUEUE](key) {
       if(key in this.playerTargets) {
         this.commandQueue.push(this.playerTargets[key]);
       } else if (key in COMMAND_QUEUE_MAP) {
@@ -209,7 +208,7 @@ class ClientGame extends Game {
    * Sends current command queue to backend.
    */
   sendCommandQueue() {
-    publish(SEND_MESSAGE, {
+    this.pubSub.publish(SEND_MESSAGE, {
       type: EXECUTE_COMMANDS,
       data: this.commandQueue
     });
@@ -231,10 +230,10 @@ class ClientGame extends Game {
    * Updates game score.
    * @param {number} points - number of points to add to game score
    */
-  updateScore(points) {
-    super.updateScore(points);
+  [LOWER_PIECE](points) {
+    super[LOWER_PIECE](points);
 
-    publish(UPDATE_SCORE, {
+    this.pubSub.publish(UPDATE_SCORE, {
       score: this.score,
     })
   }
@@ -246,7 +245,7 @@ class ClientGame extends Game {
   updateLinesRemaining(lines) {
     super.updateLinesRemaining(lines);
 
-    publish(UPDATE_SCORE, {
+    this.pubSub.publish(UPDATE_SCORE, {
       level: this.level,
       lines: this.linesRemaining,
     })
