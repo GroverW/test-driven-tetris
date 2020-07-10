@@ -4,6 +4,7 @@ const { PIECE_TYPES, CONTROLS } = require('frontend/helpers/clientConstants');
 const {
   DRAW,
   UPDATE_SCORE,
+  START_GAME,
   GAME_OVER,
   SEND_MESSAGE,
   SET_COMMAND,
@@ -85,8 +86,8 @@ describe('game tests', () => {
       expect(drawSpy).not.toHaveBeenCalled();
       expect(updateScoreSpy).not.toHaveBeenCalled();
   
-      game.start();
-      gameLoop.animate();
+      game[START_GAME]();
+      gameLoop[START_GAME]();
   
       expect(game.board.piece).toEqual(expect.any(Piece));
       expect(game.board.nextPiece).toEqual(expect.any(Piece));
