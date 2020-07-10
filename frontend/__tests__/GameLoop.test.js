@@ -2,7 +2,7 @@ const GameLoop = require('frontend/static/js/GameLoop');
 const Command = require('frontend/static/js/Command');
 const { publish } = require('frontend/helpers/pubSub');
 const { mockAnimation } = require('frontend/mockData/mocks');
-const { 
+const {
   START_GAME,
   GAME_OVER,
   SET_COMMAND,
@@ -21,8 +21,8 @@ describe('Game Loop tests', () => {
     testToggleCallback = jest.fn();
     testAutoCallback = jest.fn();
     testCommand = new Command(1, testCallback);
-    testToggleCommand = new Command(2, testToggleCallback, [10]);
-    testAutoCommand = new Command(false, testAutoCallback, [0]);
+    testToggleCommand = new Command(2, testToggleCallback, [10, 10]);
+    testAutoCommand = new Command(false, testAutoCallback, [0, 0, 0]);
     jest.useFakeTimers();
 
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
@@ -39,25 +39,25 @@ describe('Game Loop tests', () => {
       expect(gameLoop.autoCommand).toBe(undefined);
       expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
-  
+
       gameLoop.setCommand(testCommand);
       gameLoop.setCommand(testToggleCommand);
       gameLoop.setAutoCommand(testAutoCommand);
-  
+
       expect(gameLoop.command).toBe(testCommand);
       expect(gameLoop.toggleCommand).toBe(testToggleCommand);
       expect(gameLoop.autoCommand).toBe(testAutoCommand);
     });
-  
+
     test('should not overwrite existing command with same key', () => {
       let newCallback = jest.fn();
-      let newCommand = new Command(1, newCallback, false, 400);
-  
+      let newCommand = new Command(1, newCallback, [400]);
+
       gameLoop.setCommand(newCommand);
       expect(testCommand).not.toBe(newCommand);
       expect(gameLoop.command).toBe(testCommand);
     })
-  
+
     test('should clear commands if key matches', () => {
       gameLoop.clearCommand(3);
 
@@ -66,20 +66,20 @@ describe('Game Loop tests', () => {
 
       gameLoop.clearCommand(gameLoop.toggleCommand.key);
       gameLoop.clearCommand(gameLoop.command.key);
-  
+
       expect(gameLoop.toggleCommand).toBe(undefined);
       expect(gameLoop.command).toBe(undefined);
 
       gameLoop.setCommand(testToggleCommand);
     });
   });
-  
+
   describe('animate', () => {
     test('sets animation id', () => {
       expect(gameLoop.animationId).toBe(undefined);
-  
+
       gameLoop.animate();
-  
+
       expect(gameLoop.animationId).toEqual(expect.any(Number));
     });
 
@@ -105,7 +105,7 @@ describe('Game Loop tests', () => {
 
     test('cancel animation', () => {
       expect(cancelAnimationFrame).toHaveBeenCalledTimes(0);
-      
+
       gameLoop.stop();
 
       expect(cancelAnimationFrame).toHaveBeenCalledTimes(1);
@@ -116,9 +116,9 @@ describe('Game Loop tests', () => {
   describe('publish / subscribe', () => {
     test('START_GAME should start animation', () => {
       expect(gameLoop.animationId).toBe(undefined);
-    
+
       publish(START_GAME);
-  
+
       expect(gameLoop.animationId).toEqual(expect.any(Number));
     });
 
@@ -147,17 +147,17 @@ describe('Game Loop tests', () => {
 
     test('GAME_OVER should stop animation and unsubscribe if correct playerId', () => {
       const unsubSpy = jest.spyOn(gameLoop, 'unsubscribe');
-      
+
       expect(cancelAnimationFrame).toHaveBeenCalledTimes(1);
       expect(unsubSpy).toHaveBeenCalledTimes(0);
-      
+
       publish(GAME_OVER, { id: 2 });
-      
+
       expect(cancelAnimationFrame).toHaveBeenCalledTimes(1);
       expect(unsubSpy).toHaveBeenCalledTimes(0);
-      
+
       publish(GAME_OVER, { id: 1 });
-      
+
       expect(cancelAnimationFrame).toHaveBeenCalledTimes(2);
       expect(unsubSpy).toHaveBeenCalledTimes(1);
     });
