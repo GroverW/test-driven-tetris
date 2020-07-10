@@ -1,7 +1,8 @@
-const { subscribe } = require('frontend/helpers/pubSub');
+const SubscriberBase = require('common/js/SubscriberBase');
+const pubSub = require('frontend/helpers/pubSub');
+
 const {
   START_GAME,
-  GAME_OVER,
   SET_COMMAND,
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
@@ -11,32 +12,26 @@ const {
 /**
  * Represents a Game Loop
  */
-class GameLoop {
+class GameLoop extends SubscriberBase {
   /**
    * Creates a Game Loop
    * @contructor
    * @param {number} playerId - Links client to backend Game
    */
   constructor(playerId) {
-    this.playerId = playerId;
+    super(playerId, pubSub);
     this.command;
     this.toggleCommand;
     this.autoCommand;
     this.animationId;
-    this.subscriptions = [
-      subscribe(START_GAME, this.animate.bind(this)),
-      subscribe(GAME_OVER, this.gameOver.bind(this)),
-      subscribe(SET_COMMAND, this.setCommand.bind(this)),
-      subscribe(SET_AUTO_COMMAND, this.setAutoCommand.bind(this)),
-      subscribe(CLEAR_COMMAND, this.clearCommand.bind(this)),
-    ];
+    this.mapSubscriptions([START_GAME, SET_COMMAND, SET_AUTO_COMMAND, CLEAR_COMMAND]);
   }
 
   /**
    * Sets the current command or toggleCommand
    * @param {object} command - Command class instance
    */
-  setCommand(command) {
+  [SET_COMMAND](command) {
     if (command.type === 'command') {
       if(this.command === undefined || this.command.key !== command.key) {
         this.command = command;
@@ -52,7 +47,7 @@ class GameLoop {
    * Sets the current autoCommand
    * @param {object} command - Gravity class instance
    */
-  setAutoCommand(command) {
+  [SET_AUTO_COMMAND](command) {
     this.autoCommand = command;
   }
 
@@ -60,7 +55,7 @@ class GameLoop {
    * Clears the current command or toggleCommand
    * @param {number|string} key 
    */
-  clearCommand(key) {
+  [CLEAR_COMMAND](key) {
     if (this.command !== undefined && key === this.command.key) {
       this.command = undefined;
     } else if (this.toggleCommand !== undefined && key === this.toggleCommand.key) {
@@ -72,12 +67,12 @@ class GameLoop {
    * Starts game loop and executes commands
    * @param {number} currTime - current time in ms
    */
-  animate(currTime = 0) {
+ [START_GAME](currTime = 0) {
     if (this.command !== undefined) this.command.execute(currTime);
     if (this.toggleCommand !== undefined) this.toggleCommand.execute(currTime);
     if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
 
-    this.animationId = requestAnimationFrame(this.animate.bind(this))
+    this.animationId = requestAnimationFrame(this[START_GAME].bind(this))
   }
 
   /**
@@ -89,21 +84,11 @@ class GameLoop {
   }
 
   /**
-   * Unsubscribes from all pubSub topics.
+   * Stops animation and ends the current game.
    */
-  unsubscribe() {
-    this.subscriptions.forEach((unsub) => unsub());
-  }
-
-  /**
-   * Ends the current game.
-   * @param {number} id - id of player whose game is over
-   */
-  gameOver({ id }) {
-    if (id === this.playerId) {
-      this.stop();
-      this.unsubscribe();
-    }
+  gameOverAction() {
+    this.stop();
+    this.unsubscribe();
   }
 }
 
