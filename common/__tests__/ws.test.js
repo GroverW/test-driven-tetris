@@ -4,12 +4,7 @@ const Api = require('frontend/helpers/Api');
 const serverPubSub = require('backend/helpers/pubSub');
 
 const { CONTROLS } = require('frontend/helpers/clientConstants');
-const { 
-  GAMES,
-  GAME_TYPES,
-  POWER_UP_TYPES,
-  COUNTDOWN,
-} = require('backend/helpers/serverConstants');
+const { GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN } = require('backend/helpers/serverConstants');
 const { MSG_TYPE } = require('common/helpers/commonTopics');
 
 const { getMockDOMSelector, getMockGameDOMSelectors, runCommand, mockAnimation } = require('frontend/mockData/mocks');
