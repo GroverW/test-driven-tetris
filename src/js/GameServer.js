@@ -394,7 +394,7 @@ class GameServer {
   getPieces() {
     const pieces = randomize(SEED_PIECES);
 
-    this.players.forEach((player) => player.game.addPieces(pieces));
+    this.players.forEach((player) => player.pubSub.publish(ADD_PIECES, pieces));
 
     this.sendAll({ type: ADD_PIECES, data: pieces })
   }
