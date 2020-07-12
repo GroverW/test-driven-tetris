@@ -1,4 +1,4 @@
-const commonMocks = require('common/mockData/mocks')
+const commonMocks = require('common/mockData/mocks');
 const ClientGame = require('frontend/static/js/ClientGame');
 const { Piece } = require('common/js/Piece');
 const { PIECE_TYPES } = require('frontend/helpers/clientConstants');
@@ -15,7 +15,7 @@ const getMockCtx = () => ({
     width: 0,
     height: 0,
     xScale: 1,
-    yScale: 1
+    yScale: 1,
   },
   scale(xScale, yScale) {
     this.canvas.xScale = xScale;
@@ -24,10 +24,10 @@ const getMockCtx = () => ({
   save: jest.fn(),
   restore: jest.fn(),
   clip: jest.fn(),
-  fillStyle: "",
+  fillStyle: '',
   fillRect: jest.fn(),
   lineWidth: 0,
-  strokeStyle: "",
+  strokeStyle: '',
   strokeRect: jest.fn(),
   clearRect: jest.fn(),
   beginPath: jest.fn(),
@@ -41,11 +41,11 @@ const getMockCtx = () => ({
  * @returns {object} - mock DOM selector
  */
 const getMockDOMSelector = () => ({
-  id: "",
-  innerText: "",
+  id: '',
+  innerText: '',
   children: [],
   parentNode: {
-    removeChild: jest.fn()
+    removeChild: jest.fn(),
   },
   get classList() {
     return this._classList;
@@ -57,7 +57,7 @@ const getMockDOMSelector = () => ({
     classes: [],
     add(className) {
       const idx = this.classes.indexOf(className);
-      if (idx < 0) this.classes.push(className)
+      if (idx < 0) this.classes.push(className);
     },
     remove(className) {
       const idx = this.classes.indexOf(className);
@@ -73,10 +73,10 @@ const getMockDOMSelector = () => ({
     },
     contains(className) {
       return this.classes.indexOf(className) > -1;
-    }
+    },
   },
   getContext: () => getMockCtx(),
-  appendChild(selector) { this.children.push(selector) },
+  appendChild(selector) { this.children.push(selector); },
   play: jest.fn(),
   pause: jest.fn(),
 });
@@ -105,28 +105,28 @@ const mockAnimation = () => {
   return (callback) => setTimeout(() => {
     t += GAME_TIME_INTERVAL;
     callback(t);
-  }, GAME_TIME_INTERVAL)
+  }, GAME_TIME_INTERVAL);
 };
 
 const getNewTestGame = (game, testPiece = false, ...players) => {
   if (game) game.unsubscribe();
-  game = new ClientGame(1)
+  game = new ClientGame(1);
 
-  game.board.grid = commonMocks.getTestBoard('empty')
+  game.board.grid = commonMocks.getTestBoard('empty');
 
   if (testPiece) game.board.piece = new Piece(PIECE_TYPES.I);
 
   game.addPieces(commonMocks.getTestPieces());
-  players.forEach(player => game.addPlayer(player));
+  players.forEach((player) => game.addPlayer(player));
 
   return game;
-}
+};
 
 const runCommand = (game, command) => {
   game.command(command, 'down');
   jest.advanceTimersByTime(GAME_TIME_INTERVAL);
   game.command(command, 'up');
-}
+};
 
 module.exports = {
   ...commonMocks,
