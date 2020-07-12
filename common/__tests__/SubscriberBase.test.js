@@ -7,14 +7,14 @@ describe('SubscriberBase tests', () => {
   let subscriberBase;
   const TOPIC1 = 'topic1';
   const TOPIC2 = 'topic2';
-  const topics = [TOPIC1, TOPIC2]
+  const topics = [TOPIC1, TOPIC2];
 
   beforeAll(() => {
     subscriberBase = new SubscriberBase(1, pubSub);
     subscriberBase.val1 = 0;
     subscriberBase.val2 = 0;
-    subscriberBase[TOPIC1] = function() { this.val1 += 1 };
-    subscriberBase[TOPIC2] = function() { this.val2 += 2 };
+    subscriberBase[TOPIC1] = function () { this.val1 += 1; };
+    subscriberBase[TOPIC2] = function () { this.val2 += 2; };
   });
 
   afterAll(() => {

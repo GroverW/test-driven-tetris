@@ -1,10 +1,13 @@
 const { Piece } = require('common/js/Piece');
 const Board = require('common/js/Board');
-const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('common/helpers/constants');
+const {
+  PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT,
+} = require('common/helpers/constants');
 const { getTestPieces } = require('common/mockData/mocks');
 
 describe('game pieces', () => {
-  let p1, p2, p3, p4, p5, p6, p7;
+  let p1; let p2; let p3; let p4; let p5; let p6; let
+    p7;
   let board;
 
   beforeEach(() => {
@@ -24,7 +27,7 @@ describe('game pieces', () => {
     const p2 = new Piece(board.pieceList.getNextPiece());
     const p3 = new Piece(board.pieceList.getNextPiece());
     const p4 = new Piece(board.pieceList.getNextPiece());
-    
+
     expect(PIECES[p1.type]).toContainEqual(p1.grid);
     expect(PIECES[p2.type]).toContainEqual(p2.grid);
     expect(PIECES[p3.type]).toContainEqual(p3.grid);
@@ -42,54 +45,54 @@ describe('game pieces', () => {
   });
 
   test('can move piece', () => {
-    expect([p1.x, p1.y]).toEqual([3,0]);
+    expect([p1.x, p1.y]).toEqual([3, 0]);
 
-    p1.move(0,1);
-    expect([p1.x, p1.y]).toEqual([3,1]);
+    p1.move(0, 1);
+    expect([p1.x, p1.y]).toEqual([3, 1]);
 
-    p1.move(-1,0);
-    expect([p1.x, p1.y]).toEqual([2,1]);
+    p1.move(-1, 0);
+    expect([p1.x, p1.y]).toEqual([2, 1]);
 
-    p1.move(1,0);
-    expect([p1.x, p1.y]).toEqual([3,1]);
-    
-    p1.move(0,1);
-    expect([p1.x, p1.y]).toEqual([3,2]);
+    p1.move(1, 0);
+    expect([p1.x, p1.y]).toEqual([3, 1]);
+
+    p1.move(0, 1);
+    expect([p1.x, p1.y]).toEqual([3, 2]);
   });
 
   test('can rotate piece', () => {
     expect(p1.grid).toEqual([
-      [0,0,0,0],
-      [1,1,1,1],
-      [0,0,0,0],
-      [0,0,0,0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
     ]);
-    
+
     p1.update(ROTATE_LEFT);
 
     expect(p1.grid).toEqual([
-      [0,1,0,0],
-      [0,1,0,0],
-      [0,1,0,0],
-      [0,1,0,0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
     ]);
 
     p1.update(ROTATE_RIGHT);
     p1.update(ROTATE_RIGHT);
 
     expect(p1.grid).toEqual([
-      [0,0,1,0],
-      [0,0,1,0],
-      [0,0,1,0],
-      [0,0,1,0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
     ]);
 
     p6.update(ROTATE_LEFT);
 
     expect(p6.grid).toEqual([
-      [6,6,0],
-      [0,6,0],
-      [0,6,0],
+      [6, 6, 0],
+      [0, 6, 0],
+      [0, 6, 0],
     ]);
   });
 });
