@@ -1,8 +1,8 @@
 const pubSub = require('backend/helpers/pubSub');
 
-
 describe('publish / subscribe', () => {
-  let sub1, sub2, sub3;
+  let sub1; let sub2; let
+    sub3;
   let pubSubTest;
 
   beforeEach(() => {
@@ -11,32 +11,32 @@ describe('publish / subscribe', () => {
     const adder = () => {
       let sum = 0;
 
-      const unsubscribe = pubSubTest.subscribe('math', amt => { sum += amt });
+      const unsubscribe = pubSubTest.subscribe('math', (amt) => { sum += amt; });
 
       const getSum = () => sum;
 
       return { getSum, unsubscribe };
-    }
+    };
 
     const multiplier = () => {
       let product = 1;
 
-      const unsubscribe = pubSubTest.subscribe('math', amt => { product *= amt });
+      const unsubscribe = pubSubTest.subscribe('math', (amt) => { product *= amt; });
 
       const getProduct = () => product;
 
       return { getProduct, unsubscribe };
-    }
+    };
 
     const messages = () => {
-      let messages = [];
+      const messages = [];
 
-      const unsubscribe = pubSubTest.subscribe('message', msg => { messages.push(msg) })
+      const unsubscribe = pubSubTest.subscribe('message', (msg) => { messages.push(msg); });
 
       const getMessages = () => messages;
 
       return { getMessages, unsubscribe };
-    }
+    };
 
     sub1 = adder();
     sub2 = multiplier();
@@ -94,5 +94,5 @@ describe('publish / subscribe', () => {
 
     expect(sub1.getSum()).toBe(5);
     expect(sub2.getProduct()).toBe(2);
-  })
+  });
 });

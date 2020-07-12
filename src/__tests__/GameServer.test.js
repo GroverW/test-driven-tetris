@@ -1,7 +1,9 @@
 const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
-const { GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN } = require('backend/helpers/serverConstants');
+const {
+  GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN,
+} = require('backend/helpers/serverConstants');
 const { GET_PIECES, PLAY } = require('backend/helpers/serverTopics');
 const { mockSend, getTestBoard } = require('common/mockData/mocks');
 const { mockAnimation } = require('frontend/mockData/mocks');
@@ -11,7 +13,8 @@ describe('game server tests', () => {
   let mpGameServerId;
   let spGameServer;
   let spGameServerId;
-  let p1, p2, p3, p4, p5;
+  let p1; let p2; let p3; let p4; let
+    p5;
 
   beforeEach(() => {
     p1 = new Player(mockSend, pubSub());
@@ -20,16 +23,16 @@ describe('game server tests', () => {
     p4 = new Player(mockSend, pubSub());
     p5 = new Player(mockSend, pubSub());
     mpGameServerId = GameServer.addGame(1, GAME_TYPES.MULTI);
-    mpGameServer = GameServer.getGame(mpGameServerId)
+    mpGameServer = GameServer.getGame(mpGameServerId);
     spGameServerId = GameServer.addGame(2, GAME_TYPES.SINGLE);
-    spGameServer = GameServer.getGame(spGameServerId)
-  })
+    spGameServer = GameServer.getGame(spGameServerId);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
     GAMES.clear();
     mpGameServer.unsubscribe();
-  })
+  });
 
   describe('get, join, leave games', () => {
     test('get game', () => {
@@ -68,7 +71,7 @@ describe('game server tests', () => {
       test('join game - multiplayer', () => {
         const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
 
-        expect(mpGameServer.gameType).toBe(GAME_TYPES.MULTI)
+        expect(mpGameServer.gameType).toBe(GAME_TYPES.MULTI);
         expect(mpGameServer.join(p1)).toBe(true);
         expect(mpGameServer.players.length).toBe(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(1);
@@ -184,7 +187,7 @@ describe('game server tests', () => {
       expect(p2.isHost).toBe(false);
       expect(sendMessageSpy).toHaveBeenCalledTimes(0);
 
-      p1.leave()
+      p1.leave();
 
       expect(p2.isHost).toBe(true);
       expect(sendMessageSpy).toHaveBeenCalledTimes(1);
@@ -198,7 +201,7 @@ describe('game server tests', () => {
   describe('game start, game over', () => {
     test('game start - single player - game starts when player ready', () => {
       const animateStartSpy = jest.spyOn(spGameServer, 'animateStart');
-      
+
       spGameServer.join(p1);
 
       expect(animateStartSpy).toHaveBeenCalledTimes(0);
@@ -206,13 +209,13 @@ describe('game server tests', () => {
       p1.pubSub.publish(PLAY, p1);
 
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
-    })
+    });
 
     test('game start - multiplayer - game starts all players ready', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
-      
+
       const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
       const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
 
@@ -230,7 +233,7 @@ describe('game server tests', () => {
 
     test('game start - multiplayer - game only starts if > 1 player', () => {
       mpGameServer.join(p1);
-      
+
       const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
       const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
 
@@ -270,10 +273,10 @@ describe('game server tests', () => {
 
     test('game start - animate start', () => {
       jest.useFakeTimers();
-      
+
       mpGameServer.join(p1);
       mpGameServer.join(p2);
-      
+
       const sendAllSpy = jest.spyOn(mpGameServer, 'sendAll');
 
       expect(mpGameServer.gameStarted).toBe(false);
@@ -413,18 +416,18 @@ describe('game server tests', () => {
       expect(p2.game.board.grid).toEqual(getTestBoard('empty'));
     });
   });
-  
+
   describe('error messages', () => {
     test('join game - game full', () => {
       const sendMessageSpy = jest.spyOn(mpGameServer, 'sendMessage');
-      
+
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
       mpGameServer.join(p4);
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(0);
-      
+
       mpGameServer.join(p5);
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1);
@@ -450,9 +453,9 @@ describe('game server tests', () => {
       const sendSpy = jest.spyOn(mpGameServer, 'sendTo');
       const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
       expect(sendSpy).toHaveBeenCalledTimes(0);
-      
+
       p1.pubSub.publish(PLAY, p1);
-      
+
       expect(animateStartSpy).toHaveBeenCalledTimes(0);
       expect(sendSpy).toHaveBeenCalledTimes(2);
     });

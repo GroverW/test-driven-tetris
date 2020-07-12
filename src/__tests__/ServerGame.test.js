@@ -4,7 +4,7 @@ const {
   GAME_TYPES,
   PIECE_TYPES,
   POWER_UP_TYPES,
-  MAX_POWER_UPS
+  MAX_POWER_UPS,
 } = require('backend/helpers/serverConstants');
 const {
   UPDATE_PLAYER,
@@ -22,7 +22,8 @@ const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
   let game;
-  let p1, p2, p3;
+  let p1; let p2; let
+    p3;
   let pubSubTest;
   let pubSubSpy;
 
@@ -34,7 +35,7 @@ describe('game tests', () => {
     p1 = new Piece(PIECE_TYPES.I);
     p2 = new Piece(PIECE_TYPES.J);
     p3 = new Piece(PIECE_TYPES.T);
-  })
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -46,7 +47,7 @@ describe('game tests', () => {
     game.board.grid = getTestBoard('empty');
     game.board.piece = new Piece(PIECE_TYPES.I);
     const gameOverSpy = jest.spyOn(game, 'unsubscribe');
-    const boardMoveSpy = jest.spyOn(game.board, 'movePiece')
+    const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
     // stacking I pieces on top of each other until they reach the top
     for (let i = 0; i < 5; i++) {
@@ -82,7 +83,7 @@ describe('game tests', () => {
       'ROTATE_LEFT',
       'AUTO_DOWN',
       'HARD_DROP',
-    ]
+    ];
 
     game.executeCommandQueue(COMMANDS);
 
@@ -126,7 +127,7 @@ describe('game tests', () => {
       'HARD_DROP',
     ];
 
-    game.executeCommandQueue(COMMANDS2)
+    game.executeCommandQueue(COMMANDS2);
 
     expect(updatePlayerSpy).toHaveBeenCalledTimes(2);
     expect(clearLinesSpy).toHaveBeenCalledTimes(1);
@@ -158,7 +159,7 @@ describe('game tests', () => {
     test('randomly add power ups from clearing lines', () => {
       Math.random = jest.fn().mockReturnValue(0);
       game.start();
-      
+
       // duplicate scoring points for tetris
       game.board.grid = getTestBoard('clearLines2');
       game.board.piece = new Piece(PIECE_TYPES.T);
@@ -180,7 +181,7 @@ describe('game tests', () => {
       expect(addPowerUpSpy).toHaveBeenCalledTimes(0);
       expect(game.powerUps.length).toBe(0);
 
-      Math.random = jest.fn().mockReturnValue(.9);
+      Math.random = jest.fn().mockReturnValue(0.9);
 
       game.board.grid = getTestBoard('clearLines2');
       game.board.piece = new Piece(PIECE_TYPES.T);
@@ -211,7 +212,7 @@ describe('game tests', () => {
         'ROTATE_LEFT',
         'AUTO_DOWN',
         'PLAYER1',
-      ]
+      ];
       game.executeCommandQueue(COMMANDS);
 
       expect(usePowerUpSpy).toHaveBeenCalledTimes(1);

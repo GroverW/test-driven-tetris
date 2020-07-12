@@ -13,7 +13,7 @@ describe('power ups', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-  
+
   test('get filled row', () => {
     Math.random = jest.fn().mockReturnValue(0);
 
@@ -26,8 +26,8 @@ describe('power ups', () => {
     const testRow = getBlankRow();
     const expectedRow = new Array(BOARD_WIDTH).fill(0);
 
-    expect(testRow).toEqual(expectedRow)
-  })
+    expect(testRow).toEqual(expectedRow);
+  });
 
   test('swap lines', () => {
     const board1 = getTestBoard('pattern1');
@@ -38,8 +38,8 @@ describe('power ups', () => {
     expect(result1).toEqual(getTestBoard('empty'));
     expect(result2).toEqual(getTestBoard('pattern1SwappedWith2'));
 
-    const board3 = getTestBoard('pattern5')
-    const board4 = getTestBoard('pattern4')
+    const board3 = getTestBoard('pattern5');
+    const board4 = getTestBoard('pattern4');
 
     const [result3, result4] = swapLines(board3, board4);
 
@@ -57,7 +57,7 @@ describe('power ups', () => {
   });
 
   test('scramble board', () => {
-    Math.random = jest.fn().mockReturnValue(.5)
+    Math.random = jest.fn().mockReturnValue(0.5);
 
     const board = getTestBoard('pattern2');
 
