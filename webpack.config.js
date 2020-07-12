@@ -1,10 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: "frontend/static/js/main.js",
+  entry: 'frontend/static/js/main.js',
   output: {
-    filename: "bundle.js",
-    path: `${__dirname}/frontend/static/js`
+    filename: 'bundle.js',
+    path: `${__dirname}/frontend/static/js`,
   },
   resolve: {
     alias: {
@@ -14,5 +14,5 @@ module.exports = {
     },
     extensions: ['.js', '.css', '.html'],
   },
-  watch: false
+  watch: false,
 };
