@@ -7,7 +7,7 @@ const app = require('./app');
 describe('Routes tests', () => {
   afterEach(() => {
     GAMES.clear();
-  })
+  });
 
   describe('POST game', () => {
     test('returns uniqid', async () => {
@@ -32,7 +32,7 @@ describe('Routes tests', () => {
 
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
     });
-    
+
     test('creates new game with uniqid - single player', async () => {
       expect(GAMES.size).toBe(0);
 
@@ -52,7 +52,7 @@ describe('Routes tests', () => {
   describe('GET game', () => {
     test('gets an existing multiplayer game', async () => {
       const gameId = GameServer.addGame('1', GAME_TYPES.MULTI);
-      
+
       expect(GAMES.size).toBe(1);
 
       const response = await request(app).get(`/game/multi/${gameId}`);
