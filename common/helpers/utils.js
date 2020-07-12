@@ -2,12 +2,12 @@ const { BOARD_WIDTH, BOARD_HEIGHT } = require('./constants');
 
 /**
  * Randomizes elements in an array
- * @param {array} arr 
+ * @param {array} arr
  * @returns {array} - new copy of array with elements randomized
  */
-const randomize = arr => {
+const randomize = (arr) => {
   let start = arr.length - 1;
-  let randomized = [...arr];
+  const randomized = [...arr];
 
   while (start > 0) {
     const swapWith = Math.floor(Math.random() * (start + 1));
@@ -16,7 +16,7 @@ const randomize = arr => {
   }
 
   return randomized;
-}
+};
 
 /**
  * Returns a new, empty board
@@ -37,10 +37,10 @@ const mapArrayToObj = (keysArr, callback, resObj = {}) => {
   });
 
   return resObj;
-}
+};
 
 module.exports = {
   randomize,
   getEmptyBoard,
   mapArrayToObj,
-}
+};
