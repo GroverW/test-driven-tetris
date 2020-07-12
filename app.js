@@ -1,6 +1,7 @@
 /** app for multiplayer tetris rooms  */
 require('module-alias/register');
 const express = require('express');
+
 const app = express();
 const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
@@ -13,15 +14,14 @@ const wsExpress = require('express-ws')(app);
 // serve stuff in static/ folder
 app.use(express.static('frontend/static/'));
 
-
 app.get('/game/multi/:gameId', (req, res, next) => {
-  const gameId = req.params.gameId;
+  const { gameId } = req.params;
   const game = GameServer.getGame(gameId);
 
-  if(game && game.gameType === GAME_TYPES.MULTI) {
+  if (game && game.gameType === GAME_TYPES.MULTI) {
     return res.json({ gameId });
   }
-  
+
   return res.status(404).json({ error: 'Game not found' });
 });
 
@@ -40,16 +40,16 @@ app.post('/game/single', (req, res, next) => {
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.SINGLE);
 
   return res.status(201).json({ gameId });
-})
+});
 
-/**Handle websocket messages */
+/** Handle websocket messages */
 
 wsExpress.getWss().on('connection', (ws) => console.log('conenction open'));
 
-//allow for app.ws routes for websocket routes
+// allow for app.ws routes for websocket routes
 app.ws('/game/:gameId', (ws, req, next) => {
   try {
-    let gameServer = GameServer.getGame(req.params.gameId);
+    const gameServer = GameServer.getGame(req.params.gameId);
     let player;
 
     if (!gameServer) {
@@ -64,7 +64,7 @@ app.ws('/game/:gameId', (ws, req, next) => {
       throw new Error('Unable to Join Game');
     }
 
-    ws.on('message', msg => {
+    ws.on('message', (msg) => {
       const { type, data } = JSON.parse(msg);
       if (type === PLAY) player.startGame();
       if (type === EXECUTE_COMMANDS) player.game.executeCommandQueue(data);
@@ -73,8 +73,7 @@ app.ws('/game/:gameId', (ws, req, next) => {
     ws.on('close', () => {
       if (player) player.leave();
     });
-  }
-  catch (err) {
+  } catch (err) {
     console.error(err);
   }
 });
