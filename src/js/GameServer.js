@@ -26,7 +26,6 @@ const {
 const { randomize } = require('common/helpers/utils');
 const powerUps = require('backend/helpers/powerUps');
 
-
 /**
  * Represents a game server
  */
@@ -64,7 +63,7 @@ class GameServer {
    * @returns {string} - id of new game
    */
   static addGame(id, gameType) {
-    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType))
+    if (!GAMES.has(id)) GAMES.set(id, new GameServer(id, gameType));
 
     return id;
   }
@@ -101,14 +100,14 @@ class GameServer {
     player.setGameType(this.gameType);
 
     this.players.push(player);
-    this.addSubscriptions(player)
+    this.addSubscriptions(player);
 
     // send new player to existing players
     this.sendAll({ type: ADD_PLAYER, data: player.id });
 
     // send existing players to new player
     this.players.forEach((p) => {
-      if (p !== player) this.sendTo(player, { type: ADD_PLAYER, data: p.id, })
+      if (p !== player) this.sendTo(player, { type: ADD_PLAYER, data: p.id });
     });
 
     this.setHost();
@@ -129,7 +128,7 @@ class GameServer {
       player.pubSub.subscribe(UPDATE_PLAYER, this.updatePlayer.bind(this)),
       player.pubSub.subscribe(ADD_POWER_UP, this.addPowerUp.bind(this)),
       player.pubSub.subscribe(USE_POWER_UP, this.executePowerUp.bind(this)),
-    ]
+    ];
   }
 
   /**
@@ -204,9 +203,8 @@ class GameServer {
    */
   sendAllExcept(exceptPlayer, data) {
     this.players.forEach((player) => {
-      if (player !== exceptPlayer) this.sendTo(player, data)
-    }
-    );
+      if (player !== exceptPlayer) this.sendTo(player, data);
+    });
   }
 
   /**
@@ -243,12 +241,12 @@ class GameServer {
       data: {
         id: data.id,
         board: data.board,
-      }
-    }
+      },
+    };
 
     includePlayer
       ? this.sendAll(sendData)
-      : this.sendAllExcept(this.getPlayerById(data.id), sendData)
+      : this.sendAllExcept(this.getPlayerById(data.id), sendData);
   }
 
   /**
@@ -259,10 +257,12 @@ class GameServer {
    */
   addPowerUp(data) {
     const player = this.getPlayerById(data.id);
-    if (player) this.sendTo(player, {
-      type: ADD_POWER_UP,
-      data: data.powerUp
-    })
+    if (player) {
+      this.sendTo(player, {
+        type: ADD_POWER_UP,
+        data: data.powerUp,
+      });
+    }
   }
 
   /**
@@ -279,7 +279,8 @@ class GameServer {
     if (player1 && player2) {
       const board1 = player1.game.board.grid;
       const board2 = player2.game.board.grid;
-      let result1, result2;
+      let result1; let
+        result2;
 
       switch (data.powerUp) {
         case POWER_UP_TYPES.SWAP_LINES:
@@ -316,7 +317,7 @@ class GameServer {
     player.readyToPlay = true;
     const totalReady = this.players.reduce((total, p) => total + p.readyToPlay, 0);
 
-    if(this.checkStartConditions(totalReady)) {
+    if (this.checkStartConditions(totalReady)) {
       this.animateStart();
     } else {
       this.sendGameMessage(
@@ -324,7 +325,8 @@ class GameServer {
         [
           `${totalReady} out of ${this.players.length} players ready`,
           `Game ID: ${this.id}`,
-      ]);
+        ],
+      );
     }
   }
 
@@ -337,10 +339,10 @@ class GameServer {
     const animate = () => setTimeout(() => {
       currInterval -= 1;
 
-      if(currInterval > 0) {
+      if (currInterval > 0) {
         this.sendGameMessage(currInterval);
         animate();
-      } else if(currInterval === 0) {
+      } else if (currInterval === 0) {
         this.sendGameMessage('Good Luck!');
         animate();
       } else {
@@ -373,11 +375,11 @@ class GameServer {
    */
   checkStartConditions(totalReady) {
     if (
-      this.gameType === GAME_TYPES.MULTI && 
-      this.players.length === 1 &&
-      totalReady === 1
-      ) {
-      this.sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.')
+      this.gameType === GAME_TYPES.MULTI
+      && this.players.length === 1
+      && totalReady === 1
+    ) {
+      this.sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.');
       return false;
     }
 
@@ -396,7 +398,7 @@ class GameServer {
 
     this.players.forEach((player) => player.pubSub.publish(ADD_PIECES, pieces));
 
-    this.sendAll({ type: ADD_PIECES, data: pieces })
+    this.sendAll({ type: ADD_PIECES, data: pieces });
   }
 
   /**
@@ -412,7 +414,7 @@ class GameServer {
         id: data.id,
         board: data.board,
         message: this.gameOverMessage(data.id),
-      }
+      },
     });
 
     this.nextRanking--;
@@ -439,28 +441,28 @@ class GameServer {
         board: winner.game.board.grid,
       });
       this.endGame();
-    } else if(this.gameType === GAME_TYPES.SINGLE) this.endGame();
+    } else if (this.gameType === GAME_TYPES.SINGLE) this.endGame();
   }
 
   endGame() {
     this.sendAll({ type: END_GAME, data: {} });
   }
+
   /**
    * Generates a Game Over message for a specified player
    * @param {number} id - player id
    * @returns {object} - message header and body
    */
   gameOverMessage(id) {
-    let message = {};
+    const message = {};
 
     if (this.gameType === GAME_TYPES.MULTI) {
       message.header = `${RANKINGS[this.nextRanking]} Place!`;
       message.body = [];
-
     } else if (this.gameType === GAME_TYPES.SINGLE) {
       const player = this.getPlayerById(id);
 
-      message.header = 'Game Over!'
+      message.header = 'Game Over!';
       message.body = [
         `Final Score: ${player.game.score}`,
         `Level: ${player.game.level}`,
@@ -474,7 +476,7 @@ class GameServer {
   sendGameMessage(header, body = []) {
     this.sendAll({
       type: GAME_MESSAGE,
-      data: { header, body }
+      data: { header, body },
     });
   }
 

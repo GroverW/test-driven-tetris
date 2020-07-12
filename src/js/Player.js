@@ -1,5 +1,5 @@
-const ServerGame = require('./ServerGame');
 const { REMOVE_PLAYER, PLAY } = require('backend/helpers/serverTopics');
+const ServerGame = require('./ServerGame');
 
 /**
  * Represents a player on the back-end
@@ -48,4 +48,4 @@ class Player {
   }
 }
 
-module.exports = Player
+module.exports = Player;

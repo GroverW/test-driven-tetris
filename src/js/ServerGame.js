@@ -1,11 +1,10 @@
 const Game = require('common/js/Game');
-const ServerBoard = require('./ServerBoard');
 const {
   GAME_TYPES,
   PLAYERS,
   POWER_UPS,
   MAX_POWER_UPS,
-  POWER_UP_LIST
+  POWER_UP_LIST,
 } = require('backend/helpers/serverConstants');
 const {
   UPDATE_PLAYER,
@@ -14,7 +13,7 @@ const {
   USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 const { mapArrayToObj } = require('common/helpers/utils');
-
+const ServerBoard = require('./ServerBoard');
 
 /**
  * Represents a server-side Tetris game
@@ -46,8 +45,8 @@ class ServerGame extends Game {
       ROTATE_LEFT: () => this.board.rotatePiece(-1),
       ROTATE_RIGHT: () => this.board.rotatePiece(1),
       HARD_DROP: () => this.board.hardDrop(),
-      ...mapArrayToObj(PLAYERS, (p, i) => () => this.usePowerUp(i + 1))
-    }
+      ...mapArrayToObj(PLAYERS, (p, i) => () => this.usePowerUp(i + 1)),
+    };
 
     if ((action in commands) && this.gameStatus) commands[action]();
   }
@@ -71,12 +70,12 @@ class ServerGame extends Game {
    */
   addPowerUp(powerUp) {
     if (
-      this.gameType === GAME_TYPES.MULTI &&
-      POWER_UPS.has(powerUp) &&
-      this.powerUps.length < MAX_POWER_UPS
+      this.gameType === GAME_TYPES.MULTI
+      && POWER_UPS.has(powerUp)
+      && this.powerUps.length < MAX_POWER_UPS
     ) {
       this.powerUps.push(powerUp);
-      this.pubSub.publish(ADD_POWER_UP, { powerUp, id: this.playerId, });
+      this.pubSub.publish(ADD_POWER_UP, { powerUp, id: this.playerId });
     }
   }
 
