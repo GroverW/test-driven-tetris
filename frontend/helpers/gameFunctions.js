@@ -4,6 +4,12 @@ const ClientGame = require('frontend/static/js/ClientGame');
 const GameLoop = require('frontend/static/js/GameLoop');
 const GameDOM = require('frontend/static/js/GameDOM');
 
+const {
+  PLAY,
+  TOGGLE_MENU,
+  ADD_PLAYER,
+} = require('frontend/helpers/clientTopics');
+const { publishError } = require('frontend/helpers/clientUtils');
 const Api = require('./Api');
 const { publish } = require('./pubSub');
 const { addText, addPowerUpTargetId } = require('./DOMUtils');
@@ -12,25 +18,19 @@ const {
   startButton,
   gameIdSelector,
   powerUpContainer,
-} = require('./DOMSelectors')
-const {
-  PLAY,
-  TOGGLE_MENU,
-  ADD_PLAYER,
-} = require('frontend/helpers/clientTopics');
-const { publishError } = require('frontend/helpers/clientUtils');
+} = require('./DOMSelectors');
 
 /**
- * Gets the base url of the current environment and converts it to 
+ * Gets the base url of the current environment and converts it to
  * a web socket url
  * @returns {string} - base url (e.g. wss://www.example.com/)
  */
 const getBaseURL = () => {
-  const [httpProtocol,,hostname] = document.URL.split('/');
+  const [httpProtocol,, hostname] = document.URL.split('/');
   const wsProtocol = httpProtocol === 'https:' ? 'wss:' : 'ws:';
-  
-  return `${wsProtocol}//${hostname}`
-}
+
+  return `${wsProtocol}//${hostname}`;
+};
 
 /**
  * Creates a new single, or multiplayer game
@@ -40,13 +40,13 @@ const createGame = async (type) => {
   try {
     const response = await axios.post(`/game/${type}`);
 
-    const gameId = response.data.gameId;
+    const { gameId } = response.data;
 
     connectToGame(gameId, type);
   } catch (err) {
-    publishError('Oops... could not connect')
+    publishError('Oops... could not connect');
   }
-}
+};
 
 /**
  * Joins an existing multiplayer game
@@ -56,14 +56,14 @@ const joinGame = async (id) => {
   try {
     const response = await axios.get(`/game/multi/${id}`);
 
-    const gameId = response.data.gameId;
+    const { gameId } = response.data;
 
     connectToGame(gameId, 'multi');
   } catch (err) {
     const message = err.response.data.error || 'Could not join game';
-    publishError(message)
+    publishError(message);
   }
-}
+};
 
 /**
  * Connects to an already created game
@@ -79,7 +79,8 @@ const connectToGame = (gameId, type) => {
   const baseURL = getBaseURL();
   const ws = new WebSocket(`${baseURL}/game/${gameId}`);
 
-  let game, gameLoop, gameDOM, api;
+  let game; let gameLoop; let gameDOM; let
+    api;
 
   /**
    * What to do when the websocket is closed
@@ -87,7 +88,7 @@ const connectToGame = (gameId, type) => {
   ws.onclose = (evt) => {
     const data = evt.reason || 'Something went wrong, please try again.';
     publishError(data);
-  }
+  };
 
   /**
    * What to do when receiving a message over the websocket
@@ -107,8 +108,8 @@ const connectToGame = (gameId, type) => {
     }
 
     publish(type, data);
-  }
-}
+  };
+};
 
 /**
  * Creates event listeners for starting game, and keyboard controls
@@ -119,7 +120,7 @@ const createEventListeners = (game, api) => {
   startButton.addEventListener('click', (evt) => {
     evt.target.blur();
     publish(PLAY);
-    api.sendMessage({ type: PLAY, data: '' })
+    api.sendMessage({ type: PLAY, data: '' });
   });
 
   document.addEventListener('keydown', (evt) => {
@@ -129,7 +130,7 @@ const createEventListeners = (game, api) => {
   document.addEventListener('keyup', (evt) => {
     game.command(evt.which, 'up');
   });
-}
+};
 
 module.exports = {
   createGame,

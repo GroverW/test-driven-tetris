@@ -35,7 +35,7 @@ const gameSelectors = {
   message: messageContainer,
   powerUps: [
     document.getElementById('p-up1'),
-    document.getElementById('p-up2')
+    document.getElementById('p-up2'),
   ],
   music: menuSelectors.music,
 };

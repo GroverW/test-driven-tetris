@@ -17,7 +17,9 @@ const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
  * @param {object} powerUpId - selector for div used to display key to press to use power up
  * @param {object} message - selector for div used to display messages
  */
-const getNewPlayerDOM = (id, node, powerUpId, message) => ({ id, node, powerUpId, message });
+const getNewPlayerDOM = (id, node, powerUpId, message) => ({
+  id, node, powerUpId, message,
+});
 
 /**
  * Publishes an error

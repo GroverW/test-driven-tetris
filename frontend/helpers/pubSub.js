@@ -1,4 +1,4 @@
-let subscribers = {};
+const subscribers = {};
 
 /**
  * Publishes data to a specified topic
@@ -9,7 +9,7 @@ const publish = (topic, data) => {
   if (subscribers[topic] !== undefined) {
     subscribers[topic].forEach((obj) => obj.callback(data));
   }
-}
+};
 
 /**
  * Adds subscriber to a specified topic
@@ -25,7 +25,7 @@ const subscribe = (topic, callback) => {
   const unsubscribe = () => removeSubscriber(topic, id);
 
   return unsubscribe;
-}
+};
 
 /**
  * Adds topic and initial subscriber to topic
@@ -47,7 +47,7 @@ const addTopic = (topic, callback) => {
  * @returns {number} - id of subscriber
  */
 const addSubscriber = (topic, callback) => {
-  const id = subscribers[topic].reduce((max,sub) => Math.max(max, sub.id), 0) + 1;
+  const id = subscribers[topic].reduce((max, sub) => Math.max(max, sub.id), 0) + 1;
   subscribers[topic].push({ id, callback });
 
   return id;
@@ -60,9 +60,9 @@ const addSubscriber = (topic, callback) => {
  */
 const removeSubscriber = (topic, id) => {
   subscribers[topic] = subscribers[topic].filter((s) => s.id !== id);
-}
+};
 
 module.exports = {
   publish,
-  subscribe
-}
+  subscribe,
+};

@@ -17,7 +17,7 @@ const CONTROLS = {
   LEFT: 37,
   RIGHT: 39,
   DOWN: 40,
-  AUTO_DOWN: "AUTO",
+  AUTO_DOWN: 'AUTO',
   ROTATE_LEFT: 65,
   ROTATE_RIGHT: 83,
   HARD_DROP: 32,
@@ -25,18 +25,18 @@ const CONTROLS = {
 };
 
 const COMMAND_QUEUE_MAP = {
-  [CONTROLS.LEFT]: "LEFT",
-  [CONTROLS.RIGHT]: "RIGHT",
-  [CONTROLS.DOWN]: "DOWN",
-  [CONTROLS.AUTO_DOWN]: "AUTO_DOWN",
-  [CONTROLS.ROTATE_LEFT]: "ROTATE_LEFT",
-  [CONTROLS.ROTATE_RIGHT]: "ROTATE_RIGHT",
-  [CONTROLS.HARD_DROP]: "HARD_DROP",
+  [CONTROLS.LEFT]: 'LEFT',
+  [CONTROLS.RIGHT]: 'RIGHT',
+  [CONTROLS.DOWN]: 'DOWN',
+  [CONTROLS.AUTO_DOWN]: 'AUTO_DOWN',
+  [CONTROLS.ROTATE_LEFT]: 'ROTATE_LEFT',
+  [CONTROLS.ROTATE_RIGHT]: 'ROTATE_RIGHT',
+  [CONTROLS.HARD_DROP]: 'HARD_DROP',
   ...PLAYER_CONTROLS_COMMAND_QUEUE,
 };
 
 const POWER_UP_KEY_CODES = new Set([
-  ...Object.values(PLAYER_CONTROLS)
+  ...Object.values(PLAYER_CONTROLS),
 ]);
 
 const MOVE_SPEED = [0, 90, 50]; // time in ms
@@ -70,7 +70,7 @@ const CELL_COLORS = {
     border: '#001d3e',
     highlight: '#060606',
     lowlight: '#060606',
-    foreground: '#060606'
+    foreground: '#060606',
   },
   1: {
     border: '#11658C',
@@ -134,4 +134,4 @@ module.exports = {
   ANIMATION_SPEED,
   MAX_SPEED,
   CELL_COLORS,
-}
+};
