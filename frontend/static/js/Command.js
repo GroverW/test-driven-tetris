@@ -1,7 +1,6 @@
 const { publish } = require('frontend/helpers/pubSub');
 const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
 
-
 /**
  * Represents a game command
  */
@@ -13,7 +12,7 @@ class Command {
    * @param {function} callback - executes the command
    * @param {number[]} [delay] - list of delay timings in ms
    */
-  constructor(key, callback, delay=[0]) {
+  constructor(key, callback, delay = [0]) {
     this.key = key;
     this.type = (delay.length > 1) ? 'toggleCommand' : 'command';
     this.callback = callback;
@@ -35,9 +34,9 @@ class Command {
    * @param {number} currTime - current game time in ms
    */
   execute(currTime) {
-    if(this.startTime === undefined) this.startTime = currTime;
+    if (this.startTime === undefined) this.startTime = currTime;
 
-    if(currTime >= this.startTime + this.delay) {
+    if (currTime >= this.startTime + this.delay) {
       publish(ADD_TO_QUEUE, this.key);
       this.callback();
       this.startTime = currTime;
@@ -50,7 +49,7 @@ class Command {
    * Iterates through delay list
    */
   updateDelay() {
-    if(this.type === 'toggleCommand') {
+    if (this.type === 'toggleCommand') {
       this._delayIdx = Math.min(this._delay.length - 1, this._delayIdx + 1);
     } else {
       this._delay[this._delayIdx] = Infinity;

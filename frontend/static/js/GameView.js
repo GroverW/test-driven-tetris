@@ -5,14 +5,13 @@ const {
   CELL_COLORS,
   BOARD_WIDTH,
   BOARD_HEIGHT,
-  CELL_SIZE
+  CELL_SIZE,
 } = require('frontend/helpers/clientConstants');
 const {
   DRAW,
   REMOVE_PLAYER,
   UPDATE_PLAYER,
 } = require('frontend/helpers/clientTopics');
-
 
 /**
  * Represents a client-side HTML canvas manager
@@ -34,13 +33,13 @@ class GameView extends SubscriberBase {
   /**
    * Initializes an HTML canvas
    * @param {object} ctx - context of canvas to initialize
-   * @param {number} cellSize - size, in pixels, of one cell on canvas 
+   * @param {number} cellSize - size, in pixels, of one cell on canvas
    * @param {number} width - width of canvas, in cells
    * @param {number} height - height of canvas, in cells
    */
   initCtx(ctx, cellSize, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
     this.scaleBoardSize(ctx, cellSize, width, height);
-    ctx.strokeStyle = "#000000";
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 3 / cellSize;
 
     return ctx;
@@ -61,7 +60,7 @@ class GameView extends SubscriberBase {
     if (piece) this.drawGrid(this.ctx, piece.grid, piece.x, piece.y, false);
     if (nextPiece) this.drawNext(this.ctxNext, nextPiece.grid);
   }
- 
+
   /**
    * Draws a specified grid on a specified canvas
    * @param {object} ctx - canvas to draw grid on
@@ -70,18 +69,16 @@ class GameView extends SubscriberBase {
    * @param {number} yStart - y-coordinate to being drawing grid
    * @param {boolean} isBoard - whether or not drawing board
    */
-  drawGrid(ctx, grid, xStart=0, yStart=0, isBoard=true) {
-    grid.forEach((row, rowIdx) =>
-      row.forEach((cell, colIdx) => {
-        if (isBoard || cell > 0) {
-          this.drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell])
-        }
-      })
-    );
+  drawGrid(ctx, grid, xStart = 0, yStart = 0, isBoard = true) {
+    grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
+      if (isBoard || cell > 0) {
+        this.drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell]);
+      }
+    }));
   }
 
   /**
-   * 
+   *
    * @param {object} ctx - canvas to draw cell on
    * @param {number} xStart - x-coordinate to begin drawing cell
    * @param {number} yStart - y-coordinate to begin drawing cell
@@ -99,26 +96,26 @@ class GameView extends SubscriberBase {
 
     ctx.fillStyle = color.highlight;
     ctx.beginPath();
-    ctx.moveTo(xStart, yStart)
-    ctx.lineTo(xStart, yStart + height)
-    ctx.lineTo(xStart + width, yStart + height)
-    ctx.lineTo(xStart + width, yStart)
+    ctx.moveTo(xStart, yStart);
+    ctx.lineTo(xStart, yStart + height);
+    ctx.lineTo(xStart + width, yStart + height);
+    ctx.lineTo(xStart + width, yStart);
     ctx.fill();
     ctx.clip();
 
     ctx.fillStyle = color.lowlight;
     ctx.beginPath();
-    ctx.moveTo(xStart, yStart + height)
-    ctx.lineTo(xStart + width, yStart + height)
-    ctx.lineTo(xStart + width, yStart)
+    ctx.moveTo(xStart, yStart + height);
+    ctx.lineTo(xStart + width, yStart + height);
+    ctx.lineTo(xStart + width, yStart);
     ctx.fill();
 
     ctx.strokeStyle = color.border;
     ctx.strokeRect(xStart, yStart, width, height);
 
     ctx.fillStyle = color.foreground;
-    const inc = .1;
-    ctx.fillRect(xStart + inc, yStart + inc, .8, .8);
+    const inc = 0.1;
+    ctx.fillRect(xStart + inc, yStart + inc, 0.8, 0.8);
 
     ctx.restore();
   }
@@ -132,7 +129,7 @@ class GameView extends SubscriberBase {
     ctx.clearRect(0, 0, 4, 4);
 
     const xStart = 2 - grid.length / 2;
-    const yStart = grid.length < 4 ? 1 : .5;
+    const yStart = grid.length < 4 ? 1 : 0.5;
 
     this.drawGrid(ctx, grid, xStart, yStart, false);
   }
@@ -148,7 +145,7 @@ class GameView extends SubscriberBase {
     ctx.canvas.width = width * cellSize;
     ctx.canvas.height = height * cellSize;
     ctx.lineWidth = 3 / cellSize;
-    ctx.scale(cellSize, cellSize)
+    ctx.scale(cellSize, cellSize);
   }
 
   /**
@@ -167,7 +164,7 @@ class GameView extends SubscriberBase {
       this.drawGrid(this.players[0].ctx, this.players[0].board);
     }
 
-    this.players.push(player)
+    this.players.push(player);
 
     this.initCtx(player.ctx, cellSize);
     this.drawGrid(player.ctx, player.board);

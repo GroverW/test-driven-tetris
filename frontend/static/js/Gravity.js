@@ -5,7 +5,6 @@ const pubSub = require('frontend/helpers/pubSub');
 const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/helpers/clientConstants');
 const { UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
 
-
 /**
  * Represents in-game gravity. Automatically moves the current piece downwards.
  */
@@ -44,7 +43,7 @@ class Gravity extends SubscriberBase {
    * @param {number} level - current game level
    */
   [UPDATE_SCORE]({ level }) {
-    if(level !== undefined) this.level = level;
+    if (level !== undefined) this.level = level;
   }
 
   /**
@@ -95,13 +94,13 @@ class Gravity extends SubscriberBase {
    */
   execute(currTime) {
     this.isValidNextMove = this.checkValidNextMove();
-    
-    if(this.isValidNextMove && this.interrupt) {
+
+    if (this.isValidNextMove && this.interrupt) {
       this.start = currTime;
       this.interrupt = false;
     }
 
-    if(currTime >= this.start + this.delay) {
+    if (currTime >= this.start + this.delay) {
       this.start = currTime;
       this.lowerPiece();
       this.resetLockDelay();

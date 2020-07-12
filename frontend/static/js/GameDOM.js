@@ -1,6 +1,4 @@
-
 const SubscriberBase = require('common/js/SubscriberBase');
-const GameView = require('./GameView');
 
 const pubSub = require('frontend/helpers/pubSub');
 const {
@@ -28,6 +26,7 @@ const {
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('frontend/helpers/clientTopics');
+const GameView = require('./GameView');
 
 /**
  * Represents a client-side DOM manager
@@ -78,7 +77,7 @@ class GameDOM extends SubscriberBase {
   [PLAY]() {
     this.addSubscription(GAME_MESSAGE);
   }
-  
+
   /**
    * Clears any game messages and starts music on game start
    */
@@ -86,6 +85,7 @@ class GameDOM extends SubscriberBase {
     this.music.play();
     this.clearMessage(this.message);
   }
+
   /**
    * Adds additional player to the game container
    * @param {number} id - id of additional player
@@ -107,14 +107,14 @@ class GameDOM extends SubscriberBase {
   }
 
   /**
-   * Resizes player 2 to have a large container if they're the only 
+   * Resizes player 2 to have a large container if they're the only
    * other player, or small if there are more than 2 players
    */
   resizePlayer2() {
     const numPlayers = this.players.length;
     const large = 'item-large';
     const small = 'item-small';
-    let p = this.players[0];
+    const p = this.players[0];
 
     if (numPlayers > 1) p.node.classList.replace(large, small);
     else if (numPlayers === 1) p.node.classList.replace(small, large);
@@ -127,15 +127,15 @@ class GameDOM extends SubscriberBase {
    */
   getNewPlayerContainer(playerId) {
     let classList = this.players.length > 0 ? 'item-small' : 'item-large';
-    let id = `p${playerId}`;
+    const id = `p${playerId}`;
     let container = this.opponents;
-    const playerContainer = createElement('div', { id, container, classList })
+    const playerContainer = createElement('div', { id, container, classList });
 
     classList = 'game-message hide';
     container = playerContainer;
-    
+
     const message = createElement('div', { container, classList });
-    
+
     const powerUpTargetId = this.players.length + 2;
     const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId);
 
@@ -153,7 +153,7 @@ class GameDOM extends SubscriberBase {
    * @returns {object[]} - canvad DOM node and ctx
    */
   getNewPlayerCanvas(id) {
-    let canvas = createElement('canvas', { id: `p${id}-board`, classList: 'game-board' });
+    const canvas = createElement('canvas', { id: `p${id}-board`, classList: 'game-board' });
     const ctx = canvas.getContext('2d');
 
     return [canvas, ctx];
@@ -214,8 +214,8 @@ class GameDOM extends SubscriberBase {
    */
   [ADD_POWER_UP](powerUp) {
     if (POWER_UPS.has(powerUp)) {
-      let nextPowerUp = this.powerUps.find((p) => p.type === null);
-      
+      const nextPowerUp = this.powerUps.find((p) => p.type === null);
+
       if (nextPowerUp) {
         nextPowerUp.type = powerUp;
         nextPowerUp.node.classList.add(`power-up${powerUp}`);
@@ -287,7 +287,7 @@ class GameDOM extends SubscriberBase {
     container.innerText = '';
     container.classList.remove('hide');
 
-    let messageElementText = createElement('div', { container, classList: 'game-message-text' });
+    const messageElementText = createElement('div', { container, classList: 'game-message-text' });
     createElement('h1', { container: messageElementText, text: message.header });
 
     message.body.forEach((line) => (

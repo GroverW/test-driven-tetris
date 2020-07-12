@@ -8,7 +8,6 @@ const {
   CLEAR_COMMAND,
 } = require('frontend/helpers/clientTopics');
 
-
 /**
  * Represents a Game Loop
  */
@@ -33,11 +32,11 @@ class GameLoop extends SubscriberBase {
    */
   [SET_COMMAND](command) {
     if (command.type === 'command') {
-      if(this.command === undefined || this.command.key !== command.key) {
+      if (this.command === undefined || this.command.key !== command.key) {
         this.command = command;
       }
     } else if (command.type === 'toggleCommand') {
-      if(this.toggleCommand === undefined || this.toggleCommand.key !== command.key) {
+      if (this.toggleCommand === undefined || this.toggleCommand.key !== command.key) {
         this.toggleCommand = command;
       }
     }
@@ -53,7 +52,7 @@ class GameLoop extends SubscriberBase {
 
   /**
    * Clears the current command or toggleCommand
-   * @param {number|string} key 
+   * @param {number|string} key
    */
   [CLEAR_COMMAND](key) {
     if (this.command !== undefined && key === this.command.key) {
@@ -67,12 +66,12 @@ class GameLoop extends SubscriberBase {
    * Starts game loop and executes commands
    * @param {number} currTime - current time in ms
    */
- [START_GAME](currTime = 0) {
+  [START_GAME](currTime = 0) {
     if (this.command !== undefined) this.command.execute(currTime);
     if (this.toggleCommand !== undefined) this.toggleCommand.execute(currTime);
     if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
 
-    this.animationId = requestAnimationFrame(this[START_GAME].bind(this))
+    this.animationId = requestAnimationFrame(this[START_GAME].bind(this));
   }
 
   /**

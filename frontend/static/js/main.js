@@ -8,7 +8,7 @@ const { publishError } = require('frontend/helpers/clientUtils');
 const clientMessage = new ClientMessage(messageSelector);
 const unsubToggleMenu = subscribe(TOGGLE_MENU, () => {
   menuSelectors.menuContainer.classList.toggle('hide');
-})
+});
 
 // start a new single player game
 menuSelectors.newSinglePlayer.addEventListener('click', (evt) => {
@@ -26,10 +26,10 @@ menuSelectors.newMultiplayer.addEventListener('click', (evt) => {
 menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
   evt.preventDefault();
   evt.target.blur();
-  
+
   const gameId = menuSelectors.multiplayerGameId.value;
 
-  if(gameId) {
+  if (gameId) {
     joinGame(gameId);
   } else {
     publishError('Game ID cannot be blank.');
@@ -37,10 +37,10 @@ menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
 });
 
 menuSelectors.mute.addEventListener('click', (evt) => {
-  const muteBtn =  evt.target;
+  const muteBtn = evt.target;
   evt.preventDefault();
   muteBtn.blur();
 
   muteBtn.classList.toggle('muted');
   menuSelectors.music.muted = !menuSelectors.music.muted;
-})
+});

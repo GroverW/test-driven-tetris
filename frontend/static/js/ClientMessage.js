@@ -13,7 +13,7 @@ class ClientMessage {
 
   addMessage(type, message) {
     this.message.innerText = message;
-    
+
     this.message.classList = '';
     this.message.classList.add(type);
   }
@@ -29,7 +29,7 @@ class ClientMessage {
   }
 
   unsubscribe() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
   }
 }
 

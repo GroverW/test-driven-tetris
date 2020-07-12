@@ -1,7 +1,8 @@
 const Game = require('common/js/Game');
-const ClientBoard = require('./ClientBoard');
-const Gravity = require('./Gravity');
-const Command = require('./Command');
+
+const pubSub = require('frontend/helpers/pubSub');
+const { mapArrayToObj } = require('common/helpers/utils');
+
 const {
   PLAYER_KEYS,
   CONTROLS,
@@ -27,9 +28,10 @@ const {
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
-const pubSub = require('frontend/helpers/pubSub');
-const { mapArrayToObj } = require('common/helpers/utils');
 
+const ClientBoard = require('./ClientBoard');
+const Gravity = require('./Gravity');
+const Command = require('./Command');
 
 /**
  * Represents a client-side Tetris game
@@ -47,7 +49,7 @@ class ClientGame extends Game {
     this.playerTargets = {};
     this.commandQueue = [];
     this.mapSubscriptions([
-      START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE
+      START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE,
     ]);
     this.mapCommands();
   }
@@ -66,7 +68,7 @@ class ClientGame extends Game {
       this.pubSub.publish(UPDATE_SCORE, {
         score: this.score,
         level: this.level,
-        lines: this.linesRemaining
+        lines: this.linesRemaining,
       });
 
       this.pubSub.publish(
@@ -109,10 +111,8 @@ class ClientGame extends Game {
    * Maps keyboard controls to actual player ids
    */
   mapPlayerTargets() {
-    this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => {
-      return this.players[i-1] ? `PLAYER${this.players[i-1]}` : false;
-    });
-    
+    this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => (this.players[i - 1] ? `PLAYER${this.players[i - 1]}` : false));
+
     this.playerTargets[PLAYER_KEYS[0]] = `PLAYER${this.playerId}`;
   }
 
@@ -120,7 +120,9 @@ class ClientGame extends Game {
    * Maps keyboard commands to ClientGame commands
    */
   mapCommands() {
-    const { LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
+    const {
+      LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP,
+    } = CONTROLS;
 
     this.commands = {
       [LEFT]: () => new Command(LEFT, this.handleMovement.bind(this, 0, -1, 0), MOVE_SPEED),
@@ -129,18 +131,24 @@ class ClientGame extends Game {
       [ROTATE_LEFT]: () => new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
       [ROTATE_RIGHT]: () => new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
       [HARD_DROP]: () => new Command(HARD_DROP, this.hardDrop.bind(this)),
-      ...mapArrayToObj(PLAYER_KEYS, (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY))),
+      ...mapArrayToObj(
+        PLAYER_KEYS,
+        (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY)),
+      ),
     };
   }
+
   /**
    * Executes movement command.
    * @param {number} key - Keypress identifier
    */
   command(key, upDown) {
-    if ((key in this.commands) && this.gameStatus) {      
-      (upDown === 'down')
-        ? this.pubSub.publish(SET_COMMAND, this.commands[key]())
-        : this.pubSub.publish(CLEAR_COMMAND, key);
+    if ((key in this.commands) && this.gameStatus) {
+      if (upDown === 'down') {
+        this.pubSub.publish(SET_COMMAND, this.commands[key]());
+      } else {
+        this.pubSub.publish(CLEAR_COMMAND, key);
+      }
     } else if (!this.gameStatus) this.sendCommandQueue();
   }
 
@@ -148,8 +156,8 @@ class ClientGame extends Game {
    * Command to hard drop current piece
    */
   hardDrop() {
-    if(!this.gameStatus) return;
-    
+    if (!this.gameStatus) return;
+
     this.board.hardDrop();
   }
 
@@ -161,14 +169,16 @@ class ClientGame extends Game {
    * @param {number} multiplier - points multiplier to distinguish commanded vs auto movement
    */
   handleMovement(rotation, xChange, yChange, multiplier = undefined) {
-    if(!this.gameStatus) return;
-    
+    if (!this.gameStatus) return;
+
     const topic = yChange === 1 ? INTERRUPT_DELAY : ADD_LOCK_DELAY;
     this.pubSub.publish(topic);
 
-    (rotation === 0)
-      ? this.board.movePiece(xChange, yChange, multiplier)
-      : this.board.rotatePiece(rotation);
+    if (rotation === 0) {
+      this.board.movePiece(xChange, yChange, multiplier);
+    } else {
+      this.board.rotatePiece(rotation);
+    }
   }
 
   /**
@@ -196,11 +206,11 @@ class ClientGame extends Game {
    * @param {number} key - Keypress identifier
    */
   [ADD_TO_QUEUE](key) {
-      if(key in this.playerTargets) {
-        this.commandQueue.push(this.playerTargets[key]);
-      } else if (key in COMMAND_QUEUE_MAP) {
-        this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
-      }
+    if (key in this.playerTargets) {
+      this.commandQueue.push(this.playerTargets[key]);
+    } else if (key in COMMAND_QUEUE_MAP) {
+      this.commandQueue.push(COMMAND_QUEUE_MAP[key]);
+    }
   }
 
   /**
@@ -209,8 +219,9 @@ class ClientGame extends Game {
   sendCommandQueue() {
     this.pubSub.publish(SEND_MESSAGE, {
       type: EXECUTE_COMMANDS,
-      data: this.commandQueue
+      data: this.commandQueue,
     });
+
     this.commandQueue = [];
   }
 
@@ -234,7 +245,7 @@ class ClientGame extends Game {
 
     this.pubSub.publish(UPDATE_SCORE, {
       score: this.score,
-    })
+    });
   }
 
   /**
@@ -247,7 +258,7 @@ class ClientGame extends Game {
     this.pubSub.publish(UPDATE_SCORE, {
       level: this.level,
       lines: this.linesRemaining,
-    })
+    });
   }
 
   /**
