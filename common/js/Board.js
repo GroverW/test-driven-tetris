@@ -3,12 +3,12 @@ const {
   BOARD_HEIGHT,
   POINTS,
   WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I
+  WALL_KICK_TESTS_I,
 } = require('common/helpers/constants');
 const {
   GAME_OVER,
   LOWER_PIECE,
-  CLEAR_LINES
+  CLEAR_LINES,
 } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
 const { PieceList, Piece } = require('./Piece');
@@ -43,7 +43,7 @@ class Board {
     if (!this.validMove(0, 0)) {
       this.pubSub.publish(GAME_OVER, {
         id: this.playerId,
-        board: this.grid
+        board: this.grid,
       });
     }
 
@@ -63,7 +63,7 @@ class Board {
     if (validMove) {
       this.piece.move(x, y);
 
-      if (y > 0) this.pubSub.publish(LOWER_PIECE, y * multiplier)
+      if (y > 0) this.pubSub.publish(LOWER_PIECE, y * multiplier);
     } else if (y > 0 && multiplier !== POINTS.DOWN) {
       this.drop();
     }
@@ -112,7 +112,7 @@ class Board {
           && this.isEmpty(xStart + xDiff, yStart + yDiff)
         )
       ))
-    ))
+    ));
   }
 
   /**
@@ -149,7 +149,7 @@ class Board {
     this.piece.update(direction);
 
     // runs tests for current piece to determine if a valid rotation can be made
-    for (let [xChange, yChange] of tests) {
+    for (const [xChange, yChange] of tests) {
       if (this.validMove(xChange, yChange)) {
         const diff = (xChange !== 0 || yChange !== 0);
         // moves piece if a valid location could be found for it
@@ -171,7 +171,7 @@ class Board {
     this.piece.grid.forEach((row, yDiff) => {
       row.forEach((cell, xDiff) => {
         if (cell > 0) this.grid[yStart + yDiff][xStart + xDiff] = cell;
-      })
+      });
     });
   }
 
@@ -188,7 +188,7 @@ class Board {
         this.grid.unshift(Array(BOARD_WIDTH).fill(0));
         numCleared += 1;
       }
-    })
+    });
 
     if (numCleared > 0) this.pubSub.publish(CLEAR_LINES, numCleared);
 
@@ -218,7 +218,7 @@ class Board {
     // try to move piece at max 5 spaces from maxHeight if not already
     if (heightDiff < 5) {
       const yMove = Math.max(heightDiff - 5, -yStart);
-      this.movePiece(0, yMove, 0)
+      this.movePiece(0, yMove, 0);
     }
 
     this.grid = newGrid;

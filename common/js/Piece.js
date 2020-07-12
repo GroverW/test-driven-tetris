@@ -28,12 +28,12 @@ class PieceList {
   getNextPiece() {
     const currentPiece = this.pieces[this.currSet][this.currIdx];
     this.currIdx += 1;
-    
-    if(this.currIdx >= this.pieces[this.currSet].length) {
+
+    if (this.currIdx >= this.pieces[this.currSet].length) {
       this.currIdx = 0;
       this.currSet += 1;
     }
-    
+
     return currentPiece;
   }
 
@@ -43,12 +43,11 @@ class PieceList {
    */
   almostEmpty() {
     return (
-      this.currSet === this.pieces.length - 1 && 
-      this.pieces[0].length - this.currIdx <= 15
+      this.currSet === this.pieces.length - 1
+      && this.pieces[0].length - this.currIdx <= 15
     );
   }
 }
-
 
 /**
  * Represents a game piece.
@@ -72,7 +71,7 @@ class Piece {
    * @param {number} x - change in x-coordinate
    * @param {number} y - change in y-coordinate
    */
-  move(x,y) {
+  move(x, y) {
     this.x += x;
     this.y += y;
   }
@@ -83,7 +82,7 @@ class Piece {
    */
   update(rotation) {
     const rotAmt = this.rotation + rotation;
-    
+
     this.rotation = rotAmt < 0 ? 3 : rotAmt % 4;
 
     this.grid = this.piece[this.rotation];
@@ -92,5 +91,5 @@ class Piece {
 
 module.exports = {
   PieceList,
-  Piece
+  Piece,
 };

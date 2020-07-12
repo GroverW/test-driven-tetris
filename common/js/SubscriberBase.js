@@ -14,7 +14,7 @@ class SubscriberBase {
     this.playerId = playerId;
     this.pubSub = pubSub;
     this.subscriptions = [];
-    this.mapSubscriptions([GAME_OVER, END_GAME])
+    this.mapSubscriptions([GAME_OVER, END_GAME]);
   }
 
   /**
@@ -22,7 +22,7 @@ class SubscriberBase {
    * @param {string[]} topics - list of topics to subscribe to
    */
   mapSubscriptions(topics) {
-    topics.forEach((topic) => this.addSubscription(topic))
+    topics.forEach((topic) => this.addSubscription(topic));
   }
 
   /**
@@ -38,7 +38,7 @@ class SubscriberBase {
    * @param {number} id - id of player whose game is over
    */
   [GAME_OVER]({ id }) {
-    if(this.playerId === id) {
+    if (this.playerId === id) {
       this.gameOverAction();
     }
   }
@@ -63,7 +63,7 @@ class SubscriberBase {
   endGameAction() {
 
   }
-  
+
   /**
    * Unsubscribes from all topics
    */

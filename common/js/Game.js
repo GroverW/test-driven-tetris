@@ -29,14 +29,14 @@ class Game extends SubscriberBase {
    * Starts the game
    */
   start() {
-    if(this.gameStatus || this.gameStatus === null) return false;
-    
+    if (this.gameStatus || this.gameStatus === null) return false;
+
     this.board.getPieces();
     this.gameStatus = true;
     return true;
   }
 
-    /**
+  /**
    * Adds new list of pieces to current set
    * @param {number[]} pieces - list of piece ids
    */
@@ -66,7 +66,7 @@ class Game extends SubscriberBase {
   updateLinesRemaining(lines) {
     this.lines += lines;
 
-    if(this.linesRemaining <= lines) this.level += 1;
+    if (this.linesRemaining <= lines) this.level += 1;
 
     this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
   }
@@ -76,7 +76,7 @@ class Game extends SubscriberBase {
    * @param {number} lines - number of lines cleared
    */
   [CLEAR_LINES](lines) {
-    if(POINTS.LINES_CLEARED[lines]) {
+    if (POINTS.LINES_CLEARED[lines]) {
       this[LOWER_PIECE](POINTS.LINES_CLEARED[lines] * this.level);
       this.updateLinesRemaining(lines);
     }
