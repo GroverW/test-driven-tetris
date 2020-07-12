@@ -14,7 +14,7 @@ describe('client message tests', () => {
   const noticeData = {
     type: MSG_TYPE.NOTICE,
     message: messageText,
-  }
+  };
 
   beforeAll(() => {
     const messageSelector = getMockDOMSelector();
@@ -65,7 +65,7 @@ describe('client message tests', () => {
     expect(clientMessage.message.classList.contains('hide')).toBe(false);
 
     jest.advanceTimersByTime(MESSAGE_TIMEOUT);
-    
+
     expect(clientMessage.message.classList.contains('hide')).toBe(true);
   });
 });

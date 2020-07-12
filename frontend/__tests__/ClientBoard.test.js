@@ -16,31 +16,31 @@ describe('client - game board tests', () => {
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
     gameBoard.piece = p1;
-  })
+  });
 
   beforeEach(() => {
     pubSubSpy = pubSubMock();
-  })
+  });
 
   afterEach(() => {
     pubSubSpy.unsubscribeAll();
-  })
+  });
 
   test('publishes on points from movement', () => {
     const drawSpy = pubSubSpy.add(DRAW);
 
-    gameBoard.movePiece(1,0);
+    gameBoard.movePiece(1, 0);
 
     expect(drawSpy).toHaveBeenCalledTimes(1);
 
-    gameBoard.movePiece(0,1);
-    
+    gameBoard.movePiece(0, 1);
+
     expect(drawSpy).toHaveBeenCalledTimes(2);
   });
 
   test('publish board updates on line clear', () => {
-    gameBoard.movePiece(-1,0)
-    
+    gameBoard.movePiece(-1, 0);
+
     const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
     const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
 
@@ -57,13 +57,13 @@ describe('client - game board tests', () => {
     expect(boardChangeSpy).toHaveBeenCalledTimes(1);
   });
 
-test('publish boards updates when board gets replaced', () => {
-  const newBoard = getTestBoard('pattern3');
-  
-  const drawSpy = pubSubSpy.add(DRAW);
-  
-  gameBoard.replaceBoard(newBoard);
+  test('publish boards updates when board gets replaced', () => {
+    const newBoard = getTestBoard('pattern3');
 
-  expect(drawSpy).toHaveBeenCalledTimes(1);
-})
+    const drawSpy = pubSubSpy.add(DRAW);
+
+    gameBoard.replaceBoard(newBoard);
+
+    expect(drawSpy).toHaveBeenCalledTimes(1);
+  });
 });

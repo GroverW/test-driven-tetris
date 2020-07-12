@@ -1,45 +1,46 @@
 const { publish, subscribe } = require('frontend/helpers/pubSub');
 
 describe('publish / subscribe', () => {
-  let sub1, sub2, sub3;
+  let sub1; let sub2; let
+    sub3;
   const topicMath = 'math';
   const topicMessage = 'message';
-  
+
   beforeEach(() => {
     const adder = () => {
       let sum = 0;
 
-      const unsubscribe = subscribe(topicMath, amt => { sum += amt });
+      const unsubscribe = subscribe(topicMath, (amt) => { sum += amt; });
 
       const getSum = () => sum;
-      
-      return {getSum, unsubscribe};
-    }
+
+      return { getSum, unsubscribe };
+    };
 
     const multiplier = () => {
       let product = 1;
 
-      const unsubscribe = subscribe(topicMath, amt => { product *= amt });
+      const unsubscribe = subscribe(topicMath, (amt) => { product *= amt; });
 
       const getProduct = () => product;
 
       return { getProduct, unsubscribe };
-    }
+    };
 
     const messages = () => {
-      let messages = [];
+      const messages = [];
 
-      const unsubscribe = subscribe(topicMessage, msg => { messages.push(msg) })
+      const unsubscribe = subscribe(topicMessage, (msg) => { messages.push(msg); });
 
       const getMessages = () => messages;
 
-      return {getMessages, unsubscribe};
-    }
+      return { getMessages, unsubscribe };
+    };
 
     sub1 = adder();
     sub2 = multiplier();
     sub3 = messages();
-  })
+  });
 
   test('publish / subscribe', () => {
     expect(sub1.getSum()).toBe(0);
@@ -92,5 +93,5 @@ describe('publish / subscribe', () => {
 
     expect(sub1.getSum()).toBe(5);
     expect(sub2.getProduct()).toBe(2);
-  })
+  });
 });

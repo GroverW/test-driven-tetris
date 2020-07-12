@@ -1,4 +1,4 @@
-const { 
+const {
   randomize,
   getEmptyBoard,
   getNewPlayer,
@@ -9,12 +9,12 @@ const { getTestBoard, pubSubMock } = require('frontend/mockData/mocks');
 const { ADD_MESSAGE } = require('frontend/helpers/clientTopics');
 
 describe('utils', () => {
-  let pieces = [1,2,3,4,5,6,7];
+  const pieces = [1, 2, 3, 4, 5, 6, 7];
   let pubSubSpy;
 
   beforeAll(() => {
     pubSubSpy = pubSubMock();
-    Math.random = jest.fn().mockReturnValue(.5)
+    Math.random = jest.fn().mockReturnValue(0.5);
   });
 
   afterAll(() => {
@@ -22,17 +22,17 @@ describe('utils', () => {
   });
 
   test('randomize pieces', () => {
-    expect(randomize(pieces)).toEqual([1,6,2,5,3,7,4]);
+    expect(randomize(pieces)).toEqual([1, 6, 2, 5, 3, 7, 4]);
   });
 
   test('get new player', () => {
     const testPlayer = {
       ctx: 'test',
       board: [],
-      id: 1
-    }
+      id: 1,
+    };
 
-    expect(getNewPlayer('test', [], 1)).toEqual(testPlayer)
+    expect(getNewPlayer('test', [], 1)).toEqual(testPlayer);
   });
 
   test('get new player DOM', () => {
@@ -41,7 +41,7 @@ describe('utils', () => {
       node: 'test',
       powerUpId: 1,
       message: 1,
-    }
+    };
 
     expect(getNewPlayerDOM(1, 'test', 1, 1)).toEqual(testPlayerDOM);
   });

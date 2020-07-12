@@ -12,8 +12,10 @@ const {
 
 describe('Game Loop tests', () => {
   let gameLoop;
-  let testCommand, testAutoCommand;
-  let testCallback, testAutoCallback;
+  let testCommand; let
+    testAutoCommand;
+  let testCallback; let
+    testAutoCallback;
 
   beforeAll(() => {
     gameLoop = new GameLoop(1);
@@ -50,13 +52,13 @@ describe('Game Loop tests', () => {
     });
 
     test('should not overwrite existing command with same key', () => {
-      let newCallback = jest.fn();
-      let newCommand = new Command(1, newCallback, [400]);
+      const newCallback = jest.fn();
+      const newCommand = new Command(1, newCallback, [400]);
 
       gameLoop[SET_COMMAND](newCommand);
       expect(testCommand).not.toBe(newCommand);
       expect(gameLoop.command).toBe(testCommand);
-    })
+    });
 
     test('should clear commands if key matches', () => {
       gameLoop[CLEAR_COMMAND](3);
@@ -131,8 +133,8 @@ describe('Game Loop tests', () => {
     });
 
     test('SET_COMMAND should set command', () => {
-      const newCommand = new Command(0, testCallback)
-      expect(gameLoop.command).toBe(testCommand)
+      const newCommand = new Command(0, testCallback);
+      expect(gameLoop.command).toBe(testCommand);
 
       publish(SET_COMMAND, newCommand);
 

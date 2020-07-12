@@ -12,13 +12,12 @@ const {
 const { publish } = require('frontend/helpers/pubSub');
 const { pubSubMock } = require('frontend/mockData/mocks');
 
-
 describe('gravity tests', () => {
   let gravity;
   let validMove = false;
-  let fakeMoveCheck = () => validMove;
-  let fakeCallback = jest.fn();
-  let playerId = 1;
+  const fakeMoveCheck = () => validMove;
+  const fakeCallback = jest.fn();
+  const playerId = 1;
   let pubSubSpy;
 
   beforeAll(() => {
@@ -47,7 +46,7 @@ describe('gravity tests', () => {
 
     test('does not go over max delay', () => {
       gravity.level = 100;
-      expect(gravity.delay).toBe(ANIMATION_SPEED[MAX_SPEED])
+      expect(gravity.delay).toBe(ANIMATION_SPEED[MAX_SPEED]);
     });
 
     test('sets flag to interrupt delay', () => {
@@ -57,16 +56,16 @@ describe('gravity tests', () => {
     });
 
     test('increments lock delay', () => {
-      const lockDelay = gravity.lockDelay;
+      const { lockDelay } = gravity;
       gravity[ADD_LOCK_DELAY]();
       expect(gravity.lockDelay).toBeGreaterThan(lockDelay);
     });
-    
+
     test('lock delay added when invalid next move', () => {
       const currDelay = gravity.delay;
-      
+
       expect(gravity.delay).toBe(currDelay);
-      
+
       gravity.isValidNextMove = false;
 
       expect(gravity.delay).toBeGreaterThan(currDelay);
@@ -77,7 +76,7 @@ describe('gravity tests', () => {
     test('does not call callback when delay threshhold not met', () => {
       const currStart = gravity.start;
       const currDelay = gravity.delay;
-      
+
       gravity.execute(currStart + currDelay - 1);
 
       expect(fakeCallback).toHaveBeenCalledTimes(0);
@@ -87,7 +86,7 @@ describe('gravity tests', () => {
       const currStart = gravity.start;
       const currDelay = gravity.delay;
       const currLockDelay = gravity.lockDelay;
-      
+
       gravity.execute(currStart + currDelay);
 
       expect(fakeCallback).toHaveBeenCalledTimes(1);
@@ -97,17 +96,17 @@ describe('gravity tests', () => {
 
     test('interrupt delay resets start time if valid next move', () => {
       let { start, delay } = gravity;
-      
+
       gravity.interruptDelay();
 
       gravity.execute(start + delay);
 
       expect(fakeCallback).toHaveBeenCalledTimes(2);
 
-      ({start, delay} = gravity);
+      ({ start, delay } = gravity);
 
       validMove = true;
-      
+
       gravity.execute(start + delay);
 
       expect(fakeCallback).toHaveBeenCalledTimes(2);
@@ -147,7 +146,7 @@ describe('gravity tests', () => {
     test('GAME_OVER should unsubscribe if correct playerId', () => {
       gravity.level = 1;
       gravity.interrupt = false;
-      let currDelay = gravity.lockDelay;
+      const currDelay = gravity.lockDelay;
 
       publish(GAME_OVER, { id: Infinity });
 
