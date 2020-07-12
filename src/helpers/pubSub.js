@@ -12,7 +12,7 @@ const pubSub = () => ({
   publish(topic, data) {
     if (this.subscribers[topic] !== undefined) {
       this.subscribers[topic].forEach((obj) => obj.callback(data));
-    };
+    }
   },
 
   /**
@@ -66,8 +66,7 @@ const pubSub = () => ({
    */
   removeSubscriber(topic, id) {
     this.subscribers[topic] = this.subscribers[topic].filter((s) => s.id !== id);
-  }
-})
-
+  },
+});
 
 module.exports = pubSub;

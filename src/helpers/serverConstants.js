@@ -14,21 +14,21 @@ const CONTROLS = new Set([
 ]);
 
 const POWER_UP_LIST = [
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  1,1,1,1,1,1,1,1,1,2,2,2,3,3,3,4,4,4,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4,
 ];
 
 const RANKINGS = {
-  1: "1st",
-  2: "2nd",
-  3: "3rd",
-  4: "4th"
+  1: '1st',
+  2: '2nd',
+  3: '3rd',
+  4: '4th',
 };
 
 const COUNTDOWN = {
   INTERVAL_LENGTH: 800,
   NUM_INTERVALS: 4,
-}
+};
 
 module.exports = {
   ...COMMON_CONSTANTS,
