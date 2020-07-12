@@ -357,6 +357,6 @@ const TEST_BOARDS = {
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ],
-}
+};
 
 module.exports = TEST_BOARDS;

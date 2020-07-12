@@ -21,7 +21,6 @@ const {
   ADD_POWER_UP,
 } = require('frontend/helpers/clientTopics');
 
-
 /**
  * Represents the Server side of the mock websocket
  */
@@ -46,8 +45,8 @@ class MockServerListener {
   }
 
   getNewUrl(url = 1) {
-    while(GameServer.getGame(url)) url += 1;
-    
+    while (GameServer.getGame(url)) url += 1;
+
     return url;
   }
 
@@ -55,8 +54,7 @@ class MockServerListener {
    * Creates a new gameServer and Player. Adds the Player to the gameServer
    */
   open() {
-
-    GameServer.addGame(this.url, GAME_TYPES.MULTI)
+    GameServer.addGame(this.url, GAME_TYPES.MULTI);
     this.gameServer = GameServer.getGame(this.url);
     this.player = new Player(this.ws.send.bind(this.ws), serverPubSub());
     this.gameServer.join(this.player);
@@ -74,7 +72,7 @@ class MockServerListener {
    * @param {array} commands - list of commands
    */
   execCommands(commands) {
-    this.player.game.executeCommandQueue(commands)
+    this.player.game.executeCommandQueue(commands);
   }
 
   /**
@@ -100,7 +98,7 @@ class MockClientListener {
   /**
    * Creates a MockClientListener
    * @constructor
-   * @param {object} ws - mock websocket 
+   * @param {object} ws - mock websocket
    * @param {Object[]} selectors - mock DOM selectors to be used by the gameDOM
    */
   constructor(ws, selectors) {
@@ -134,6 +132,7 @@ class MockClientListener {
       publish(ADD_PLAYER, id);
     }
   }
+
   /**
    * Removes player from client game
    * @param {number} id - player id
@@ -161,7 +160,7 @@ class MockClientListener {
 
   /**
    * Adds a new power up
-   * @param {*} data 
+   * @param {*} data
    */
   addPowerUp(data) {
     publish(ADD_POWER_UP, data);
@@ -187,7 +186,7 @@ class MockClientListener {
    * Unsubscribes from ws messages, as well as any pubSub topics
    */
   unsubAll() {
-    this.subscriptions.forEach(unsub => unsub());
+    this.subscriptions.forEach((unsub) => unsub());
     if (this.gameDOM !== undefined) this.gameDOM.unsubscribe();
     if (this.game !== undefined) this.game.unsubscribe();
     if (this.gameLoop !== undefined) this.gameLoop.gameOver({ id: this.gameLoop.playerId });
@@ -206,5 +205,5 @@ class MockClientListener {
 
 module.exports = {
   MockServerListener,
-  MockClientListener
+  MockClientListener,
 };

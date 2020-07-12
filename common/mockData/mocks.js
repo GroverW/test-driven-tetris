@@ -1,7 +1,7 @@
-const TEST_BOARDS = require('./sampleBoards');
 const { SEED_PIECES } = require('common/helpers/constants');
 const { randomize } = require('common/helpers/utils');
 const { subscribe } = require('frontend/helpers/pubSub');
+const TEST_BOARDS = require('./sampleBoards');
 
 /**
  * Used for adding fake websocket .send
@@ -13,8 +13,7 @@ const mockSend = () => { };
  * @param {string} board - name of test board
  * @returns {array} - test board
  */
-const getTestBoard = (board) =>
-  JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+const getTestBoard = (board) => JSON.parse(JSON.stringify(TEST_BOARDS[board]));
 
 /**
  * Creates list of piece ids
@@ -30,8 +29,8 @@ const webSocketMock = {
   send(data) {
     const parsed = JSON.parse(data);
     if (this.topics[parsed.type] !== undefined) {
-      this.topics[parsed.type].forEach((sub) => sub.callback(parsed.data))
-    };
+      this.topics[parsed.type].forEach((sub) => sub.callback(parsed.data));
+    }
   },
   on(type, callback) {
     const id = this.topics[type]
@@ -64,31 +63,31 @@ const webSocketMock = {
  * Observe when a topic is being published to
  * @param {object} pubSub - publish / subscribe object
  */
-const pubSubMock = pubSub => {
+const pubSubMock = (pubSub) => {
   // use frontend pubSub if not specified
   if (!pubSub) pubSub = { subscribe };
-  let subscriptions = [];
+  const subscriptions = [];
 
   /**
    * Adds topic to be tracked
    * @param {string} topic - topic to follow
    */
-  const add = topic => {
+  const add = (topic) => {
     const newSub = jest.fn();
-    subscriptions.push(pubSub.subscribe(topic, newSub))
+    subscriptions.push(pubSub.subscribe(topic, newSub));
     return newSub;
-  }
+  };
 
   /**
    * Removes all subscriptions
    */
-  const unsubscribeAll = () => subscriptions.forEach(unsub => unsub());
+  const unsubscribeAll = () => subscriptions.forEach((unsub) => unsub());
 
   return {
     add,
     unsubscribeAll,
-  }
-}
+  };
+};
 
 module.exports = {
   TEST_BOARDS,
@@ -97,4 +96,4 @@ module.exports = {
   getTestPieces,
   webSocketMock,
   pubSubMock,
-}
+};
