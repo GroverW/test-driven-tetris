@@ -1,6 +1,6 @@
 const COMMON_CONSTANTS = require('common/helpers/constants');
 
-MESSAGE_TIMEOUT = 3000;
+const MESSAGE_TIMEOUT = 3000;
 
 const CELL_SIZE = 30;
 
@@ -8,10 +8,10 @@ const CELL_SIZE = 30;
 const PLAYER_KEYS = COMMON_CONSTANTS.PLAYERS.map((p, i) => 49 + i);
 // map players to object of [PLAYER]: [keypress]
 const PLAYER_CONTROLS = COMMON_CONSTANTS.PLAYERS
-  .reduce((a, p, i) => a = { ...a, [p]: 49 + i }, {});
+  .reduce((a, p, i) => ({ ...a, [p]: 49 + i }), {});
 // map player_keys to object of [keypress]: [PLAYER]
 const PLAYER_CONTROLS_COMMAND_QUEUE = PLAYER_KEYS
-  .reduce((a, p, i) => a = { ...a, [p]: `PLAYER${i + 1}` }, {});
+  .reduce((a, p, i) => ({ ...a, [p]: `PLAYER${i + 1}` }), {});
 
 const CONTROLS = {
   LEFT: 37,

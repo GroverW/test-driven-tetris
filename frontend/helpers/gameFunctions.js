@@ -4,15 +4,11 @@ const ClientGame = require('frontend/static/js/ClientGame');
 const GameLoop = require('frontend/static/js/GameLoop');
 const GameDOM = require('frontend/static/js/GameDOM');
 
-const {
-  PLAY,
-  TOGGLE_MENU,
-  ADD_PLAYER,
-} = require('frontend/helpers/clientTopics');
+const { PLAY, TOGGLE_MENU, ADD_PLAYER } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
+const { addPowerUpTargetId } = require('frontend/static/js/GameDOM/DOMHelpers');
 const Api = require('./Api');
 const { publish } = require('./pubSub');
-const { addText, addPowerUpTargetId } = require('./DOMUtils');
 const {
   gameSelectors,
   startButton,
@@ -33,45 +29,34 @@ const getBaseURL = () => {
 };
 
 /**
- * Creates a new single, or multiplayer game
- * @param {string} type - 'single' or 'multi'
+ * Creates event listeners for starting game, and keyboard controls
+ * @param {object} game - instance of ClientGame class
+ * @param {object} api - instance of Api class
  */
-const createGame = async (type) => {
-  try {
-    const response = await axios.post(`/game/${type}`);
+const createEventListeners = (game, api) => {
+  startButton.addEventListener('click', (evt) => {
+    evt.target.blur();
+    publish(PLAY);
+    api.sendMessage({ type: PLAY, data: '' });
+  });
 
-    const { gameId } = response.data;
+  document.addEventListener('keydown', (evt) => {
+    game.command(evt.which, 'down');
+  });
 
-    connectToGame(gameId, type);
-  } catch (err) {
-    publishError('Oops... could not connect');
-  }
-};
-
-/**
- * Joins an existing multiplayer game
- * @param {string} id - game id
- */
-const joinGame = async (id) => {
-  try {
-    const response = await axios.get(`/game/multi/${id}`);
-
-    const { gameId } = response.data;
-
-    connectToGame(gameId, 'multi');
-  } catch (err) {
-    const message = err.response.data.error || 'Could not join game';
-    publishError(message);
-  }
+  document.addEventListener('keyup', (evt) => {
+    game.command(evt.which, 'up');
+  });
 };
 
 /**
  * Connects to an already created game
  * @param {string} gameId - game id
+ * @param {string} gameType - game type
  */
-const connectToGame = (gameId, type) => {
-  if (type === 'multi') {
-    addText(gameIdSelector, `Game ID: ${gameId}`);
+const connectToGame = (gameId, gameType) => {
+  if (gameType === 'multi') {
+    gameIdSelector.innerText = `Game ID: ${gameId}`;
     addPowerUpTargetId(gameSelectors.player, 1);
     powerUpContainer.classList.remove('hide');
   }
@@ -112,24 +97,36 @@ const connectToGame = (gameId, type) => {
 };
 
 /**
- * Creates event listeners for starting game, and keyboard controls
- * @param {object} game - instance of ClientGame class
- * @param {object} api - instance of Api class
+ * Creates a new single, or multiplayer game
+ * @param {string} type - 'single' or 'multi'
  */
-const createEventListeners = (game, api) => {
-  startButton.addEventListener('click', (evt) => {
-    evt.target.blur();
-    publish(PLAY);
-    api.sendMessage({ type: PLAY, data: '' });
-  });
+const createGame = async (type) => {
+  try {
+    const response = await axios.post(`/game/${type}`);
 
-  document.addEventListener('keydown', (evt) => {
-    game.command(evt.which, 'down');
-  });
+    const { gameId } = response.data;
 
-  document.addEventListener('keyup', (evt) => {
-    game.command(evt.which, 'up');
-  });
+    connectToGame(gameId, type);
+  } catch (err) {
+    publishError('Oops... could not connect');
+  }
+};
+
+/**
+ * Joins an existing multiplayer game
+ * @param {string} id - game id
+ */
+const joinGame = async (id) => {
+  try {
+    const response = await axios.get(`/game/multi/${id}`);
+
+    const { gameId } = response.data;
+
+    connectToGame(gameId, 'multi');
+  } catch (err) {
+    const message = err.response.data.error || 'Could not join game';
+    publishError(message);
+  }
 };
 
 module.exports = {

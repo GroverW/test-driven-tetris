@@ -1,33 +1,6 @@
 const subscribers = {};
 
 /**
- * Publishes data to a specified topic
- * @param {string} topic - topic to publish to
- * @param {*} data - data to publish to topic
- */
-const publish = (topic, data) => {
-  if (subscribers[topic] !== undefined) {
-    subscribers[topic].forEach((obj) => obj.callback(data));
-  }
-};
-
-/**
- * Adds subscriber to a specified topic
- * @param {string} topic - topic to subscribe to
- * @param {function} callback - function to call when data is published to topic
- * @returns {function} - function to call to unsubscribe from topic
- */
-const subscribe = (topic, callback) => {
-  const id = subscribers[topic]
-    ? addSubscriber(topic, callback)
-    : addTopic(topic, callback);
-
-  const unsubscribe = () => removeSubscriber(topic, id);
-
-  return unsubscribe;
-};
-
-/**
  * Adds topic and initial subscriber to topic
  * @param {string} topic - topic to add
  * @param {callback} callback - initial callback to add to topic in subscribers
@@ -60,6 +33,33 @@ const addSubscriber = (topic, callback) => {
  */
 const removeSubscriber = (topic, id) => {
   subscribers[topic] = subscribers[topic].filter((s) => s.id !== id);
+};
+
+/**
+ * Publishes data to a specified topic
+ * @param {string} topic - topic to publish to
+ * @param {*} data - data to publish to topic
+ */
+const publish = (topic, data) => {
+  if (subscribers[topic] !== undefined) {
+    subscribers[topic].forEach((obj) => obj.callback(data));
+  }
+};
+
+/**
+ * Adds subscriber to a specified topic
+ * @param {string} topic - topic to subscribe to
+ * @param {function} callback - function to call when data is published to topic
+ * @returns {function} - function to call to unsubscribe from topic
+ */
+const subscribe = (topic, callback) => {
+  const id = subscribers[topic]
+    ? addSubscriber(topic, callback)
+    : addTopic(topic, callback);
+
+  const unsubscribe = () => removeSubscriber(topic, id);
+
+  return unsubscribe;
 };
 
 module.exports = {
