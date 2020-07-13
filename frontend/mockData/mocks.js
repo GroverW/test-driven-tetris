@@ -48,12 +48,12 @@ const getMockDOMSelector = () => ({
     removeChild: jest.fn(),
   },
   get classList() {
-    return this._classList;
+    return this.classesObj;
   },
   set classList(list) {
-    this._classList.classes = list.split(' ');
+    this.classesObj.classes = list.split(' ');
   },
-  _classList: {
+  classesObj: {
     classes: [],
     add(className) {
       const idx = this.classes.indexOf(className);
@@ -69,7 +69,8 @@ const getMockDOMSelector = () => ({
     },
     toggle(className) {
       const idx = this.classes.indexOf(className);
-      idx > -1 ? this.remove(className) : this.add(className);
+      if (idx > -1) this.remove(className);
+      else this.add(className);
     },
     contains(className) {
       return this.classes.indexOf(className) > -1;
@@ -110,16 +111,16 @@ const mockAnimation = () => {
 
 const getNewTestGame = (game, testPiece = false, ...players) => {
   if (game) game.unsubscribe();
-  game = new ClientGame(1);
+  const newGame = new ClientGame(1);
 
-  game.board.grid = commonMocks.getTestBoard('empty');
+  newGame.board.grid = commonMocks.getTestBoard('empty');
 
-  if (testPiece) game.board.piece = new Piece(PIECE_TYPES.I);
+  if (testPiece) newGame.board.piece = new Piece(PIECE_TYPES.I);
 
-  game.addPieces(commonMocks.getTestPieces());
-  players.forEach((player) => game.addPlayer(player));
+  newGame.addPieces(commonMocks.getTestPieces());
+  players.forEach((player) => newGame.addPlayer(player));
 
-  return game;
+  return newGame;
 };
 
 const runCommand = (game, command) => {
