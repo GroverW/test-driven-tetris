@@ -1,8 +1,7 @@
 const pubSub = require('backend/helpers/pubSub');
 
 describe('publish / subscribe', () => {
-  let sub1; let sub2; let
-    sub3;
+  let sub1; let sub2; let sub3;
   let pubSubTest;
 
   beforeEach(() => {
@@ -29,11 +28,11 @@ describe('publish / subscribe', () => {
     };
 
     const messages = () => {
-      const messages = [];
+      const messageList = [];
 
-      const unsubscribe = pubSubTest.subscribe('message', (msg) => { messages.push(msg); });
+      const unsubscribe = pubSubTest.subscribe('message', (msg) => { messageList.push(msg); });
 
-      const getMessages = () => messages;
+      const getMessages = () => messageList;
 
       return { getMessages, unsubscribe };
     };
