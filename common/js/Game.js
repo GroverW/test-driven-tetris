@@ -15,7 +15,8 @@ class Game extends SubscriberBase {
    * @param {class} Board -  Board class to be instantiated
    */
   constructor(playerId, pubSub, Board) {
-    super(playerId, pubSub);
+    super(pubSub);
+    super.initialize(playerId);
     this.gameStatus = false;
     this.score = 0;
     this.level = 1;
