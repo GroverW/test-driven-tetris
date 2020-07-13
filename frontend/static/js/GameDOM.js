@@ -40,22 +40,29 @@ class GameDOM extends SubscriberBase {
    * @param {object} level - game level selector
    * @param {object} lines - game lines cleared selector
    * @param {object} player - player game container selector
+   * @param {object} message - game message selector
    * @param {object[]} powerUps - list of power up selectors
    * @param {object} music - game music selector
    * @param {number} playerId - Id of player on backend
    */
-  constructor(selectors, playerId) {
-    super(playerId, pubSub);
-    this.gameView = new GameView(selectors.playerCtx, getEmptyBoard(), selectors.nextCtx, getNextPieceBoard());
-    this.opponents = selectors.opponents;
-    this.score = selectors.score;
-    this.level = selectors.level;
-    this.lines = selectors.lines;
-    this.player = selectors.player;
-    this.message = selectors.message;
-    this.powerUps = mapPowerUps(selectors.powerUps);
+  constructor() {
+    super(pubSub);
+  }
+
+  initialize({
+    playerCtx, nextCtx, opponents, score, level, lines, player, message, powerUps, music,
+  }, playerId) {
+    super.initialize(playerId);
+    this.gameView = new GameView(playerCtx, getEmptyBoard(), nextCtx, getNextPieceBoard());
+    this.opponents = opponents;
+    this.score = score;
+    this.level = level;
+    this.lines = lines;
+    this.player = player;
+    this.message = message;
+    this.powerUps = mapPowerUps(powerUps);
     this.players = [];
-    this.music = selectors.music;
+    this.music = music;
     this.mapSubscriptions([
       PLAY,
       START_GAME,
@@ -223,7 +230,7 @@ class GameDOM extends SubscriberBase {
   /**
    * Adds game over message and updates board for player whose game is over
    * @param {number} id - player id whose game is over
-   * @param {array} board - player's ending game board
+   * @param {number[][]} board - player's ending game board
    * @param {object} message - game over message
    * @param {string} message.header - game over message header
    * @param {string[]} message.body - list of messages in body
@@ -264,4 +271,6 @@ class GameDOM extends SubscriberBase {
   }
 }
 
-module.exports = GameDOM;
+const gameDOM = new GameDOM();
+
+module.exports = gameDOM;

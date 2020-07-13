@@ -17,8 +17,12 @@ class GameLoop extends SubscriberBase {
    * @contructor
    * @param {number} playerId - Links client to backend Game
    */
-  constructor(playerId) {
-    super(playerId, pubSub);
+  constructor() {
+    super(pubSub);
+  }
+
+  initialize(playerId) {
+    super.initialize(playerId);
     this.mapSubscriptions([START_GAME, SET_COMMAND, SET_AUTO_COMMAND, CLEAR_COMMAND]);
   }
 
@@ -87,4 +91,6 @@ class GameLoop extends SubscriberBase {
   }
 }
 
-module.exports = GameLoop;
+const gameLoop = new GameLoop();
+
+module.exports = gameLoop;

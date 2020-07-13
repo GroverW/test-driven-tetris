@@ -17,7 +17,8 @@ class Gravity extends SubscriberBase {
    * @param {callback} validNextMove - checks whether the next move is valid
    */
   constructor(playerId, lowerPiece, validNextMove) {
-    super(playerId, pubSub);
+    super(pubSub);
+    super.initialize(playerId);
     this.level = 1;
     this.start = 0;
     this.interrupt = false;

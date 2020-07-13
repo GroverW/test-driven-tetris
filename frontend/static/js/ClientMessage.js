@@ -3,7 +3,7 @@ const { MESSAGE_TIMEOUT } = require('frontend/helpers/clientConstants');
 const { ADD_MESSAGE, CLEAR_MESSAGE } = require('frontend/helpers/clientTopics');
 
 class ClientMessage {
-  constructor(messageSelector) {
+  initialize(messageSelector) {
     this.message = messageSelector;
     this.subscriptions = [
       subscribe(ADD_MESSAGE, this.handleMessage.bind(this)),
@@ -33,4 +33,6 @@ class ClientMessage {
   }
 }
 
-module.exports = ClientMessage;
+const clientMessage = new ClientMessage();
+
+module.exports = clientMessage;

@@ -1,12 +1,12 @@
-const ClientMessage = require('frontend/static/js/ClientMessage');
+const clientMessage = require('frontend/static/js/ClientMessage');
 const { messageSelector, menuSelectors } = require('frontend/helpers/DOMSelectors');
 const { createGame, joinGame } = require('frontend/helpers/gameFunctions');
 const { subscribe } = require('frontend/helpers/pubSub');
 const { TOGGLE_MENU } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
 
-const clientMessage = new ClientMessage(messageSelector);
-const unsubToggleMenu = subscribe(TOGGLE_MENU, () => {
+clientMessage.initialize(messageSelector);
+subscribe(TOGGLE_MENU, () => {
   menuSelectors.menuContainer.classList.toggle('hide');
 });
 
