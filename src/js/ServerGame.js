@@ -4,7 +4,6 @@ const {
   PLAYERS,
   POWER_UPS,
   MAX_POWER_UPS,
-  POWER_UP_LIST,
 } = require('backend/helpers/serverConstants');
 const {
   UPDATE_PLAYER,
@@ -13,6 +12,7 @@ const {
   USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 const { mapArrayToObj } = require('common/helpers/utils');
+const { getRandomPowerUp } = require('backend/helpers/powerUps');
 const ServerBoard = require('./ServerBoard');
 
 /**
@@ -96,22 +96,13 @@ class ServerGame extends Game {
   }
 
   /**
-   * Adds random power up from power up list
-   * @returns {number} - power up id
-   */
-  getRandomPowerUp() {
-    const idx = Math.floor(Math.random() * POWER_UP_LIST.length);
-    return POWER_UP_LIST[idx];
-  }
-
-  /**
    * Updates score and lines remaining based on number of lines cleared
    * Has chance to add random power up
    * @param {number} lines - number of lines cleared
    */
   [CLEAR_LINES](lines) {
     super[CLEAR_LINES](lines);
-    if (lines > 0) this.addPowerUp(this.getRandomPowerUp());
+    if (lines > 0) this.addPowerUp(getRandomPowerUp());
   }
 
   /**
