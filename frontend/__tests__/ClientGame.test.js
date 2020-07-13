@@ -1,5 +1,5 @@
-const GameLoop = require('frontend/static/js/GameLoop');
-const { Piece } = require('common/js/Piece');
+const gameLoop = require('frontend/static/js/GameLoop');
+const Piece = require('common/js/Piece');
 const { PIECE_TYPES, CONTROLS } = require('frontend/helpers/clientConstants');
 const {
   DRAW,
@@ -20,7 +20,6 @@ const { pubSubMock } = require('common/mockData/mocks');
 
 describe('game tests', () => {
   let game;
-  let gameLoop;
   let pubSubSpy;
   const p2 = 2; const p3 = 3; const
     p4 = 4;
@@ -28,7 +27,7 @@ describe('game tests', () => {
   beforeAll(() => {
     game = getNewTestGame(game);
     // setting id to 2 so that it never receives GAME_OVER
-    gameLoop = new GameLoop(2);
+    gameLoop.initialize(2);
   });
 
   afterAll(() => {

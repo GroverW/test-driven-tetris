@@ -1,4 +1,4 @@
-const GameLoop = require('frontend/static/js/GameLoop');
+const gameLoop = require('frontend/static/js/GameLoop');
 const Command = require('frontend/static/js/Command');
 const { publish } = require('frontend/helpers/pubSub');
 const { mockAnimation } = require('frontend/mockData/mocks');
@@ -11,12 +11,11 @@ const {
 } = require('frontend/helpers/clientTopics');
 
 describe('Game Loop tests', () => {
-  let gameLoop;
   let testCommand; let testToggleCommand; let testAutoCommand;
   let testCallback; let testToggleCallback; let testAutoCallback;
 
   beforeAll(() => {
-    gameLoop = new GameLoop(1);
+    gameLoop.initialize(1);
     testCallback = jest.fn();
     testToggleCallback = jest.fn();
     testAutoCallback = jest.fn();

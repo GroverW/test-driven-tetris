@@ -2,7 +2,7 @@ const ClientBoard = require('frontend/static/js/ClientBoard');
 const { PIECE_TYPES, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
 const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
 const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
-const { Piece } = require('common/js/Piece');
+const Piece = require('common/js/Piece');
 const pubSub = require('frontend/helpers/pubSub');
 const { TEST_BOARDS } = require('frontend/mockData/mocks');
 

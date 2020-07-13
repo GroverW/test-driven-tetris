@@ -1,5 +1,5 @@
-const GameDOM = require('frontend/static/js/GameDOM');
-const GameLoop = require('frontend/static/js/GameLoop');
+const gameDOM = require('frontend/static/js/GameDOM');
+const gameLoop = require('frontend/static/js/GameLoop');
 
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/clientUtils');
@@ -27,9 +27,7 @@ const {
 } = require('frontend/mockData/mocks');
 
 describe('game DOM tests', () => {
-  let gameDOM;
   let game;
-  let gameLoop;
   let newCtx1; let newBoard1; let newId1; let newPlayer1;
   let newCtx2; let newBoard2; let newId2; let newPlayer2;
   let addPlayerSpy;
@@ -42,9 +40,9 @@ describe('game DOM tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    gameDOM = new GameDOM(getMockGameDOMSelectors());
+    gameDOM.initialize(getMockGameDOMSelectors());
     game = getNewTestGame(game);
-    gameLoop = new GameLoop(2);
+    gameLoop.initialize(2);
   });
 
   afterAll(() => {

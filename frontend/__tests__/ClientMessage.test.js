@@ -1,11 +1,10 @@
-const ClientMessage = require('frontend/static/js/ClientMessage');
+const clientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 const { MESSAGE_TIMEOUT } = require('frontend/helpers/clientConstants');
 const { ADD_MESSAGE, CLEAR_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
 
 describe('client message tests', () => {
-  let clientMessage;
   const messageText = 'some message';
   const errorData = {
     type: MSG_TYPE.ERROR,
@@ -19,7 +18,7 @@ describe('client message tests', () => {
   beforeAll(() => {
     const messageSelector = getMockDOMSelector();
     messageSelector.classList.add('hide');
-    clientMessage = new ClientMessage(messageSelector);
+    clientMessage.initialize(messageSelector);
   });
 
   afterAll(() => {

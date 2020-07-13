@@ -1,5 +1,5 @@
 const GameView = require('frontend/static/js/GameView');
-const GameLoop = require('frontend/static/js/GameLoop');
+const gameLoop = require('frontend/static/js/GameLoop');
 const {
   CONTROLS,
   BOARD_HEIGHT,
@@ -22,7 +22,6 @@ const { getNewPlayer, getNextPieceBoard } = require('frontend/helpers/clientUtil
 describe('game view tests', () => {
   let gameView;
   let game;
-  let gameLoop;
   let mockCtx; let mockCtxNext;
   let newCtx1; let newBoard1; let newId1;
   let newCtx2; let newBoard2; let newId2;
@@ -43,7 +42,7 @@ describe('game view tests', () => {
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
     game = getNewTestGame(game);
-    gameLoop = new GameLoop(2);
+    gameLoop.initialize(2);
     gameView = new GameView(mockCtx, getTestBoard('empty'), mockCtxNext, getNextPieceBoard());
   });
 
@@ -130,7 +129,7 @@ describe('game view tests', () => {
       const halfCell = CELL_SIZE / 2;
 
       expect(gameView.players.length).toBe(1);
-      
+
       const scaleBoardSpy = jest.spyOn(gameView.players[0], 'scaleBoardSize');
       expect(scaleBoardSpy).toHaveBeenCalledTimes(0);
 
