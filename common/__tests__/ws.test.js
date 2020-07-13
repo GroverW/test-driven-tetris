@@ -12,15 +12,17 @@ const { MSG_TYPE } = require('common/helpers/commonTopics');
 const {
   getMockDOMSelector, getMockGameDOMSelectors, runCommand, mockAnimation,
 } = require('frontend/mockData/mocks');
-const { MockServerListener, MockClientListener } = require('common/mockData/mockWSListeners');
+const MockClientListener = require('common/mockData/mockClientListener');
+const MockServerListener = require('common/mockData/mockServerListener');
 const {
   mockSend, getTestBoard, webSocketMock, pubSubMock,
 } = require('common/mockData/mocks');
+const { sendMessage } = require('backend/helpers/serverUtils');
 
-const startGame = (clientToServer, ...additionalPlayers) => {
-  additionalPlayers.forEach((player) => clientToServer.gameServer.join(player));
+const startGame = (serverListener, ...additionalPlayers) => {
+  additionalPlayers.forEach((player) => serverListener.gameServer.join(player));
 
-  clientToServer.startGame();
+  serverListener.startGame();
   jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
 };
 
@@ -37,30 +39,30 @@ const getNewListeners = (clientListener, serverListener) => {
 const getNewPlayer = () => new Player(mockSend, serverPubSub());
 
 const resetAll = (clientListener, serverListener, ...players) => {
-  ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
+  const [newClient, newServer] = getNewListeners(clientListener, serverListener);
 
-  serverListener.open();
+  newServer.open();
 
   players.map(() => getNewPlayer());
 
-  startGame(serverListener, ...players);
+  startGame(newServer, ...players);
 
-  return [clientListener, serverListener, ...players];
+  return [newClient, newServer, ...players];
 };
 
 describe('websocket tests', () => {
-  let player2;
-  let serverToClient;
-  let clientToServer;
+  let p2;
+  let clientListener;
+  let serverListener;
   let pubSubSpy;
   let api;
 
   beforeAll(() => {
     api = new Api(webSocketMock, 1);
 
-    ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
+    ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
 
-    player2 = getNewPlayer();
+    p2 = getNewPlayer();
   });
 
   beforeEach(() => {
@@ -82,50 +84,50 @@ describe('websocket tests', () => {
   });
 
   afterAll(() => {
-    serverToClient.unsubAll();
-    clientToServer.unsubAll();
+    clientListener.unsubAll();
+    serverListener.unsubAll();
     api.unsubscribe();
     GAMES.clear();
   });
 
   describe('joining / leaving game', () => {
     test('player opens WS connection', () => {
-      clientToServer.open();
-      expect(clientToServer.player).toEqual(expect.any(Player));
+      serverListener.open();
+      expect(serverListener.player).toEqual(expect.any(Player));
     });
 
     test('second player is added to room', () => {
-      const sendAllSpy = jest.spyOn(clientToServer.gameServer, 'sendAll');
-      const sendToSpy = jest.spyOn(clientToServer.gameServer, 'sendTo');
+      const sendAllSpy = jest.spyOn(serverListener.gameServer, 'sendAll');
+      const sendSpy = jest.spyOn(p2, 'send');
 
       // no additional players
-      expect(serverToClient.gameDOM.players.length).toBe(0);
-      expect(serverToClient.game.players.length).toBe(0);
+      expect(clientListener.gameDOM.players.length).toBe(0);
+      expect(clientListener.game.players.length).toBe(0);
       expect(sendAllSpy).toHaveBeenCalledTimes(0);
-      expect(sendToSpy).toHaveBeenCalledTimes(0);
+      expect(sendSpy).toHaveBeenCalledTimes(0);
 
-      clientToServer.gameServer.join(player2);
+      serverListener.gameServer.join(p2);
 
       // one additional player
-      expect(serverToClient.gameDOM.players.length).toBe(1);
-      expect(serverToClient.game.players.length).toBe(1);
+      expect(clientListener.gameDOM.players.length).toBe(1);
+      expect(clientListener.game.players.length).toBe(1);
 
       expect(sendAllSpy).toHaveBeenCalledTimes(1);
       // player joining should receive all other players in game
-      // 2 calls for sendAll, 1 to send p1 info to p2
-      expect(sendToSpy).toHaveBeenCalledTimes(3);
+      // 1 call for sendAll, 1 to send p1 info to p2
+      expect(sendSpy).toHaveBeenCalledTimes(2);
     });
 
     test('second player is removed from room', () => {
-      expect(serverToClient.gameDOM.players.length).toBe(1);
-      expect(serverToClient.gameDOM.gameView.players.length).toBe(1);
-      expect(serverToClient.game.players.length).toBe(1);
+      expect(clientListener.gameDOM.players.length).toBe(1);
+      expect(clientListener.gameDOM.gameView.players.length).toBe(1);
+      expect(clientListener.game.players.length).toBe(1);
 
-      player2.leave();
+      p2.leave();
 
-      expect(serverToClient.gameDOM.players.length).toBe(0);
-      expect(serverToClient.gameDOM.gameView.players.length).toBe(0);
-      expect(serverToClient.game.players.length).toBe(0);
+      expect(clientListener.gameDOM.players.length).toBe(0);
+      expect(clientListener.gameDOM.gameView.players.length).toBe(0);
+      expect(clientListener.game.players.length).toBe(0);
     });
   });
 
@@ -134,122 +136,122 @@ describe('websocket tests', () => {
       const drawSpy = pubSubSpy.add('draw');
 
       // user will click button which will send newGame to server
-      expect(serverToClient.game.gameStatus).toBe(false);
+      expect(clientListener.game.gameStatus).toBe(false);
 
-      startGame(clientToServer, player2);
+      startGame(serverListener, p2);
 
-      const serverPieces = clientToServer.player.game.board.pieceList.pieces;
-      const clientPieces = serverToClient.game.board.pieceList.pieces;
+      const serverPieces = serverListener.player.game.board.pieceList.pieces;
+      const clientPieces = clientListener.game.board.pieceList.pieces;
 
       expect(clientPieces).not.toEqual([]);
       expect(serverPieces).toEqual(clientPieces);
 
-      expect(clientToServer.gameServer.gameStarted).toBe(true);
-      expect(serverToClient.game.gameStatus).toBe(true);
+      expect(serverListener.gameServer.gameStarted).toBe(true);
+      expect(clientListener.game.gameStatus).toBe(true);
       expect(drawSpy).toHaveBeenCalledTimes(1);
     });
 
     test('subsequent game starts should fail', () => {
-      const getPiecesSpy = jest.spyOn(serverToClient.game.board, 'getPieces');
+      const getPiecesSpy = jest.spyOn(clientListener.game.board, 'getPieces');
 
       expect(getPiecesSpy).toHaveBeenCalledTimes(0);
 
-      startGame(clientToServer, player2);
+      startGame(serverListener, p2);
 
       expect(getPiecesSpy).toHaveBeenCalledTimes(0);
     });
 
     test('game over', () => {
-      expect(serverToClient.gameDOM.message.children.length).toBe(0);
-      expect(serverToClient.game.gameStatus).toBe(true);
-      expect(serverToClient.gameLoop.animationId).toEqual(expect.any(Number));
+      expect(clientListener.gameDOM.message.children.length).toBe(0);
+      expect(clientListener.game.gameStatus).toBe(true);
+      expect(clientListener.gameLoop.animationId).toEqual(expect.any(Number));
 
       const gameOverData = {
-        id: clientToServer.player.id,
-        board: clientToServer.player.game.board.grid,
+        id: serverListener.player.id,
+        board: serverListener.player.game.board.grid,
       };
 
-      clientToServer.gameServer.gameOver(gameOverData);
+      serverListener.gameServer.gameOver(gameOverData);
 
-      expect(serverToClient.gameDOM.message.children.length).toBeGreaterThan(0);
-      expect(serverToClient.game.gameStatus).toBe(null);
-      expect(serverToClient.gameLoop.animationId).toBe(undefined);
+      expect(clientListener.gameDOM.message.children.length).toBeGreaterThan(0);
+      expect(clientListener.game.gameStatus).toBe(null);
+      expect(clientListener.gameLoop.animationId).toBe(undefined);
     });
 
     test('game started - remove game after last player leaves', () => {
       // this would be caused by player closing their browser or leaving the page
-      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2));
+      ([clientListener, serverListener, p2] = resetAll(clientListener, serverListener, p2));
 
-      const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
+      const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      runCommand(serverToClient.game, CONTROLS.DOWN);
-      runCommand(serverToClient.game, CONTROLS.LEFT);
-      runCommand(serverToClient.game, CONTROLS.ROTATE_RIGHT);
-      runCommand(serverToClient.game, CONTROLS.AUTO_DOWN);
-      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+      runCommand(clientListener.game, CONTROLS.DOWN);
+      runCommand(clientListener.game, CONTROLS.LEFT);
+      runCommand(clientListener.game, CONTROLS.ROTATE_RIGHT);
+      runCommand(clientListener.game, CONTROLS.AUTO_DOWN);
+      runCommand(clientListener.game, CONTROLS.HARD_DROP);
 
-      const serverBoard = clientToServer.player.game.board.grid;
-      const clientBoard = serverToClient.game.board.grid;
+      const serverBoard = serverListener.player.game.board.grid;
+      const clientBoard = clientListener.game.board.grid;
 
       expect(startingClientBoard).not.toEqual(clientBoard);
       expect(serverBoard).toEqual(clientBoard);
 
-      clientToServer.player.leave();
-      player2.leave();
+      serverListener.player.leave();
+      p2.leave();
 
-      expect(GAMES.has(clientToServer.gameServer.id)).toBe(false);
+      expect(GAMES.has(serverListener.gameServer.id)).toBe(false);
     });
   });
 
   describe('gameplay', () => {
     test('execute commands', () => {
-      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2));
+      ([clientListener, serverListener, p2] = resetAll(clientListener, serverListener, p2));
 
-      const startingClientBoard = JSON.parse(JSON.stringify(serverToClient.game.board.grid));
+      const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      runCommand(serverToClient.game, CONTROLS.DOWN);
+      runCommand(clientListener.game, CONTROLS.DOWN);
 
-      runCommand(serverToClient.game, CONTROLS.LEFT);
-      runCommand(serverToClient.game, CONTROLS.ROTATE_RIGHT);
-      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+      runCommand(clientListener.game, CONTROLS.LEFT);
+      runCommand(clientListener.game, CONTROLS.ROTATE_RIGHT);
+      runCommand(clientListener.game, CONTROLS.HARD_DROP);
 
-      const serverBoard = clientToServer.player.game.board.grid;
-      const clientBoard = serverToClient.game.board.grid;
+      const serverBoard = serverListener.player.game.board.grid;
+      const clientBoard = clientListener.game.board.grid;
 
       expect(startingClientBoard).not.toEqual(clientBoard);
       expect(serverBoard).toEqual(clientBoard);
 
-      runCommand(serverToClient.game, CONTROLS.LEFT);
-      runCommand(serverToClient.game, CONTROLS.ROTATE_LEFT);
-      runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+      runCommand(clientListener.game, CONTROLS.LEFT);
+      runCommand(clientListener.game, CONTROLS.ROTATE_LEFT);
+      runCommand(clientListener.game, CONTROLS.HARD_DROP);
 
       expect(serverBoard).toEqual(clientBoard);
-      expect(clientToServer.player.game.score).toEqual(serverToClient.game.score);
+      expect(serverListener.player.game.score).toEqual(clientListener.game.score);
     });
 
     test('execute commands - player 2 board updates on player 1 DOM', () => {
-      const drawGridSpy = jest.spyOn(serverToClient.gameDOM.gameView, 'drawGrid');
+      const drawGridSpy = jest.spyOn(clientListener.gameDOM.gameView.players[0], 'drawGrid');
 
       expect(drawGridSpy).toHaveBeenCalledTimes(0);
 
-      player2.game.board.grid = getTestBoard('pattern1');
-      player2.game.executeCommandQueue([]);
+      p2.game.board.grid = getTestBoard('pattern1');
+      p2.game.executeCommandQueue([]);
 
       expect(drawGridSpy).toHaveBeenCalledTimes(1);
     });
 
     test('game over from play', () => {
-      for (let i = 0; i < 25; i++) {
-        runCommand(serverToClient.game, CONTROLS.HARD_DROP);
+      for (let i = 0; i < 25; i += 1) {
+        runCommand(clientListener.game, CONTROLS.HARD_DROP);
       }
 
-      const serverBoard = clientToServer.player.game.board.grid;
-      const clientBoard = serverToClient.game.board.grid;
+      const serverBoard = serverListener.player.game.board.grid;
+      const clientBoard = clientListener.game.board.grid;
 
       expect(serverBoard).toEqual(clientBoard);
 
-      expect(serverToClient.game.gameStatus).toBe(null);
-      expect(clientToServer.player.game.gameStatus).toBe(null);
+      expect(clientListener.game.gameStatus).toBe(null);
+      expect(serverListener.player.game.gameStatus).toBe(null);
     });
   });
 
@@ -257,59 +259,63 @@ describe('websocket tests', () => {
     test('power up is added to client when rewarded to server', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
-      const player3 = getNewPlayer();
-      ([serverToClient, clientToServer, player2] = resetAll(serverToClient, clientToServer, player2, player3));
+      const p3 = getNewPlayer();
+      ([
+        clientListener,
+        serverListener,
+        p2,
+      ] = resetAll(clientListener, serverListener, p2, p3));
 
-      expect(clientToServer.player.game.powerUps.length).toBe(0);
-      expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
+      expect(serverListener.player.game.powerUps.length).toBe(0);
+      expect(clientListener.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
 
-      clientToServer.player.game.clearLines(1);
+      serverListener.player.game.clearLines(1);
 
-      expect(clientToServer.player.game.powerUps.length).toBe(1);
-      expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(1);
+      expect(serverListener.player.game.powerUps.length).toBe(1);
+      expect(clientListener.gameDOM.powerUps.filter((p) => p.type).length).toBe(1);
     });
 
     test('server side updates client side board', () => {
       Math.random = jest.fn().mockReturnValue(0);
 
-      clientToServer.player.game.powerUps[0] = POWER_UP_TYPES.SWAP_LINES;
+      serverListener.player.game.powerUps[0] = POWER_UP_TYPES.SWAP_LINES;
 
-      clientToServer.player.game.board.grid = getTestBoard('pattern1');
-      serverToClient.game.board.grid = getTestBoard('pattern1');
-      player2.game.board.grid = getTestBoard('pattern2');
+      serverListener.player.game.board.grid = getTestBoard('pattern1');
+      clientListener.game.board.grid = getTestBoard('pattern1');
+      p2.game.board.grid = getTestBoard('pattern2');
 
-      const serverBoardBefore = clientToServer.player.game.board.grid;
-      const clientBoardBefore = serverToClient.game.board.grid;
+      const serverBoardBefore = serverListener.player.game.board.grid;
+      const clientBoardBefore = clientListener.game.board.grid;
 
       expect(serverBoardBefore).toEqual(getTestBoard('pattern1'));
       expect(clientBoardBefore).toEqual(getTestBoard('pattern1'));
 
-      clientToServer.player.game.usePowerUp(player2.id);
+      serverListener.player.game.usePowerUp(p2.id);
 
-      const serverBoardAfter = clientToServer.player.game.board.grid;
-      const clientBoardAfter = serverToClient.game.board.grid;
+      const serverBoardAfter = serverListener.player.game.board.grid;
+      const clientBoardAfter = clientListener.game.board.grid;
 
       expect(serverBoardAfter).toEqual(getTestBoard('empty'));
       expect(clientBoardAfter).toEqual(getTestBoard('empty'));
-      expect(player2.game.board.grid).toEqual(getTestBoard('pattern1SwappedWith2'));
+      expect(p2.game.board.grid).toEqual(getTestBoard('pattern1SwappedWith2'));
     });
 
     test('should not add if single player', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
-      clientToServer.gameServer.gameType = GAME_TYPES.SINGLE;
-      clientToServer.player.setGameType(GAME_TYPES.SINGLE);
+      serverListener.gameServer.gameType = GAME_TYPES.SINGLE;
+      serverListener.player.setGameType(GAME_TYPES.SINGLE);
 
-      serverToClient.gameDOM.usePowerUp();
-      serverToClient.gameDOM.usePowerUp();
+      clientListener.gameDOM.usePowerUp();
+      clientListener.gameDOM.usePowerUp();
 
-      expect(clientToServer.player.game.powerUps.length).toBe(0);
-      expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
+      expect(serverListener.player.game.powerUps.length).toBe(0);
+      expect(clientListener.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
 
-      clientToServer.player.game.clearLines(1);
+      serverListener.player.game.clearLines(1);
 
-      expect(clientToServer.player.game.powerUps.length).toBe(0);
-      expect(serverToClient.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
+      expect(serverListener.player.game.powerUps.length).toBe(0);
+      expect(clientListener.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
     });
   });
 
@@ -319,31 +325,31 @@ describe('websocket tests', () => {
       const errorText = 'test';
 
       expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientMessage.message.innerText).toBe('');
+      expect(clientListener.clientMessage.message.innerText).toBe('');
 
-      clientToServer.gameServer.sendMessage(clientToServer.player, MSG_TYPE.ERROR, errorText);
+      sendMessage(serverListener.player, MSG_TYPE.ERROR, errorText);
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientMessage.message.innerText).toBe(errorText);
+      expect(clientListener.clientMessage.message.innerText).toBe(errorText);
     });
 
     test('start game - not enough players', () => {
       const errorSpy = pubSubSpy.add('addMessage');
 
-      ([serverToClient, clientToServer] = getNewListeners(serverToClient, clientToServer));
-      clientToServer.open();
+      ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
+      serverListener.open();
 
       expect(errorSpy).not.toHaveBeenCalled();
-      expect(serverToClient.clientMessage.message.innerText).toBe('');
+      expect(clientListener.clientMessage.message.innerText).toBe('');
 
-      clientToServer.startGame();
+      serverListener.startGame();
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(serverToClient.clientMessage.message.innerText).not.toBe('');
+      expect(clientListener.clientMessage.message.innerText).not.toBe('');
 
-      clientToServer.gameServer.join(player2);
+      serverListener.gameServer.join(p2);
 
-      clientToServer.startGame();
+      serverListener.startGame();
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
     });
