@@ -34,16 +34,16 @@ const addPowerUpTargetId = (container, id) => createElement('div', {
  * @param {string} message.header - message header
  * @param {string[]} message.body - list of messages in body
  */
-const addMessage = (container, message) => {
-  const updatedContainer = container;
-  updatedContainer.innerText = '';
-  updatedContainer.classList.remove('hide');
+const addMessage = (selector, message) => {
+  const container = selector;
+  container.innerText = '';
+  container.classList.remove('hide');
 
-  const messageElementText = createElement('div', { updatedContainer, classList: 'game-message-text' });
-  createElement('h1', { updatedContainer: messageElementText, text: message.header });
+  const messageElementText = createElement('div', { container, classList: 'game-message-text' });
+  createElement('h1', { container: messageElementText, text: message.header });
 
   message.body.forEach((line) => (
-    createElement('p', { updatedContainer: messageElementText, text: line })
+    createElement('p', { container: messageElementText, text: line })
   ));
 };
 
