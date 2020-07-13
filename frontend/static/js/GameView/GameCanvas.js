@@ -1,4 +1,6 @@
-const { BOARD_WIDTH, BOARD_HEIGHT, CELL_COLORS, CELL_SIZE } = require('frontend/helpers/clientConstants');
+const {
+  BOARD_WIDTH, BOARD_HEIGHT, CELL_COLORS, CELL_SIZE,
+} = require('frontend/helpers/clientConstants');
 
 /**
  *
@@ -100,7 +102,7 @@ class GameCanvas {
 
   /**
    * Clears board and centers grid to be drawn
-   * @param {array} grid - next piece grid
+   * @param {number[][]} grid - next piece grid
   */
   clearAndDrawCentered(grid) {
     this.ctx.clearRect(0, 0, 4, 4);
