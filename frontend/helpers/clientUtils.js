@@ -7,7 +7,7 @@ const getNextPieceBoard = () => new Array(4).fill(null).map(() => new Array(4).f
 /**
  * Creates an object containing new player information
  * @param {object} ctx - player canvas context
- * @param {array} board - player board
+ * @param {number[][]} board - player board
  * @param {number} id - player id
  */
 const getNewPlayer = (ctx, board, id) => ({ ctx, board, id });
