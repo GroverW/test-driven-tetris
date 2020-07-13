@@ -8,15 +8,6 @@ const { DRAW, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
  */
 class ClientBoard extends Board {
   /**
-   * @constructor
-   * @param {object} pubSub - Publish / Subscribe object
-   * @param {number} playerId - Id of player on backend
-   */
-  constructor(pubSub, playerId) {
-    super(pubSub, playerId);
-  }
-
-  /**
    * Moves the current piece to a new place on the board
    * @param {number} x - The number of spaces to move in the x-direction
    * @param {number} y - The number of spaces to move in the y-direection
@@ -29,6 +20,11 @@ class ClientBoard extends Board {
         this.publishDraw(this.grid, this.piece);
       }
     }
+  }
+
+  drop() {
+    super.drop();
+    this.publishBoardUpdate();
   }
 
   /**
