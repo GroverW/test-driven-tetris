@@ -28,11 +28,11 @@ describe('publish / subscribe', () => {
     };
 
     const messages = () => {
-      const messages = [];
+      const messageList = [];
 
-      const unsubscribe = subscribe(topicMessage, (msg) => { messages.push(msg); });
+      const unsubscribe = subscribe(topicMessage, (msg) => { messageList.push(msg); });
 
-      const getMessages = () => messages;
+      const getMessages = () => messageList;
 
       return { getMessages, unsubscribe };
     };

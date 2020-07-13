@@ -3,10 +3,8 @@ const { pubSubMock } = require('frontend/mockData/mocks');
 const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
 
 describe('Command Tests', () => {
-  let command; let
-    commandToggle;
-  let callback; let
-    callbackToggle;
+  let command; let commandToggle;
+  let callback; let callbackToggle;
   let pubSubSpy;
 
   beforeAll(() => {
@@ -70,11 +68,11 @@ describe('Command Tests', () => {
 
   describe('update delay', () => {
     test('iterates through delay', () => {
-      expect(commandToggle.delay).toBe(commandToggle._delay[0]);
+      expect(commandToggle.delay).toBe(commandToggle.delayList[0]);
 
       commandToggle.updateDelay();
 
-      expect(commandToggle.delay).toBe(commandToggle._delay[1]);
+      expect(commandToggle.delay).toBe(commandToggle.delayList[1]);
     });
 
     test('handles toggling on successful execute', () => {
@@ -92,11 +90,11 @@ describe('Command Tests', () => {
     });
 
     test('does not go over max delay', () => {
-      expect(commandToggle._delayIdx).toBe(2);
+      expect(commandToggle.delayIdx).toBe(2);
 
       commandToggle.updateDelay();
 
-      expect(commandToggle._delayIdx).toBe(2);
+      expect(commandToggle.delayIdx).toBe(2);
     });
   });
 });

@@ -12,10 +12,8 @@ const {
 
 describe('Game Loop tests', () => {
   let gameLoop;
-  let testCommand; let
-    testAutoCommand;
-  let testCallback; let
-    testAutoCallback;
+  let testCommand; let testToggleCommand; let testAutoCommand;
+  let testCallback; let testToggleCallback; let testAutoCallback;
 
   beforeAll(() => {
     gameLoop = new GameLoop(1);
