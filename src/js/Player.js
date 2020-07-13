@@ -11,12 +11,19 @@ class Player {
    * @param {object} pubSub - the player's publish/subscribe object
    */
   constructor(send, pubSub) {
-    this.id;
     this.isHost = false;
     this.readyToPlay = false;
     this.send = send;
     this.pubSub = pubSub;
     this.game = new ServerGame(this.pubSub);
+  }
+
+  /**
+   * Updates player readyToPlay state
+   * @param {boolean} readyToPlay - whether the player is ready to play
+   */
+  updateReadyState(readyToPlay) {
+    this.readyToPlay = readyToPlay;
   }
 
   /**
