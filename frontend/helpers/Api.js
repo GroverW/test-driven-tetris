@@ -1,4 +1,4 @@
-const { publishError } = require('frontend/helpers/clientUtils');
+const { publishError, formatMessage } = require('frontend/helpers/clientUtils');
 const { subscribe } = require('./pubSub');
 const { SEND_MESSAGE } = require('./clientTopics');
 
@@ -8,16 +8,9 @@ class Api {
     this.unsubSend = subscribe(SEND_MESSAGE, this.sendMessage.bind(this));
   }
 
-  formatMessage(message) {
-    return JSON.stringify({
-      type: message.type,
-      data: message.data,
-    });
-  }
-
   sendMessage(message) {
     try {
-      this.ws.send(this.formatMessage(message));
+      this.ws.send(formatMessage(message));
     } catch (err) {
       publishError('Could not send message to backend.');
     }
