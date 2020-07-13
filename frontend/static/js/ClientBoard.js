@@ -39,7 +39,7 @@ class ClientBoard extends Board {
 
   /**
    * Replaces current grid with new one. Moves current piece if too close to new grid.
-   * @param {array} newGrid - new board grid
+   * @param {number[][]} newGrid - new board grid
    */
   replaceBoard(newGrid) {
     super.replaceBoard(newGrid);

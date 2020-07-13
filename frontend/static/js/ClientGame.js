@@ -101,7 +101,7 @@ class ClientGame extends Game {
   /**
    * Replaces the current board with a new one
    * @param {number} id - id of player
-   * @param {array} board - board to update
+   * @param {number[][]} board - board to update
    */
   [UPDATE_PLAYER]({ id, board }) {
     if (id === this.playerId) this.board.replaceBoard(board);
