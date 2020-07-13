@@ -2,6 +2,8 @@
 
 # Test Driven Tetris
 
+[Try it Out! (Heroku)](https://test-driven-tetris.herokuapp.com)
+
 ## Project Overview
 
 ### Project Structure - Classes, Helpers, Components, Routes, etc.
