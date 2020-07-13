@@ -209,7 +209,7 @@ class GameServer {
    * Sends message to all players to update the board for the specified player
    * @param {object} data - data to send
    * @param {number} data.id - id of player to update
-   * @param {array} data.board - player board to update
+   * @param {number[][]} data.board - player board to update
    */
   updatePlayer(data, includePlayer = false) {
     const sendData = {
@@ -383,7 +383,7 @@ class GameServer {
    * Sends Game Over message to all players when a player's game has ended
    * @param {object} data - data to send
    * @param {number} data.id - id of player
-   * @param {array} data.board - player's board
+   * @param {number[][]} data.board - player's board
    */
   gameOver(data) {
     this.sendAll({
