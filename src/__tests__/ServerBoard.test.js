@@ -1,5 +1,5 @@
 const ServerBoard = require('backend/js/ServerBoard');
-const { Piece } = require('common/js/Piece');
+const Piece = require('common/js/Piece');
 const { PIECE_TYPES, SEED_PIECES } = require('backend/helpers/serverConstants');
 const { GET_PIECES, CLEAR_LINES } = require('backend/helpers/serverTopics');
 const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
