@@ -54,7 +54,7 @@ class MockServerListener {
 
   /**
    * Executes a list of commands
-   * @param {array} commands - list of commands
+   * @param {string[]} commands - list of commands
    */
   execCommands(commands) {
     this.player.game.executeCommandQueue(commands);

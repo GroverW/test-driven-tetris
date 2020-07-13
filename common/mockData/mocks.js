@@ -11,13 +11,13 @@ const mockSend = () => { };
 /**
  * Creates new test board from sampleBoards
  * @param {string} board - name of test board
- * @returns {array} - test board
+ * @returns {number[][]} - test board
  */
 const getTestBoard = (board) => JSON.parse(JSON.stringify(TEST_BOARDS[board]));
 
 /**
  * Creates list of piece ids
- * @returns {array} - new array of piece ids
+ * @returns {number[]} - new list of piece ids
  */
 const getTestPieces = () => randomize(SEED_PIECES);
 
