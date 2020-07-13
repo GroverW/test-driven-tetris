@@ -1,4 +1,4 @@
-const { Piece } = require('common/js/Piece');
+const Piece = require('common/js/Piece');
 const Board = require('common/js/Board');
 const {
   PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT,
@@ -6,8 +6,7 @@ const {
 const { getTestPieces } = require('common/mockData/mocks');
 
 describe('game pieces', () => {
-  let p1; let p2; let p3; let p4; let p5; let p6; let
-    p7;
+  let p1; let p2; let p3; let p4; let p5; let p6; let p7;
   let board;
 
   beforeEach(() => {
@@ -23,10 +22,10 @@ describe('game pieces', () => {
   });
 
   test('creates a new piece', () => {
-    const p1 = new Piece(board.pieceList.getNextPiece());
-    const p2 = new Piece(board.pieceList.getNextPiece());
-    const p3 = new Piece(board.pieceList.getNextPiece());
-    const p4 = new Piece(board.pieceList.getNextPiece());
+    p1 = new Piece(board.pieceList.getNextPiece());
+    p2 = new Piece(board.pieceList.getNextPiece());
+    p3 = new Piece(board.pieceList.getNextPiece());
+    p4 = new Piece(board.pieceList.getNextPiece());
 
     expect(PIECES[p1.type]).toContainEqual(p1.grid);
     expect(PIECES[p2.type]).toContainEqual(p2.grid);
