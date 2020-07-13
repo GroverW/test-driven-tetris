@@ -4,7 +4,7 @@ const { POWER_UP_LIST } = require('backend/helpers/serverConstants');
 
 /**
  * Returns a board row with all neutral cells except one blank cell
- * @returns {array}
+ * @returns {number[][]}
  */
 const getFilledRow = () => {
   const filledRow = new Array(BOARD_WIDTH).fill(PIECE_TYPES.N);
@@ -18,15 +18,15 @@ const getFilledRow = () => {
 
 /**
  * Returns a blank board row
- * @returns {array}
+ * @returns {number[]}
  */
 const getBlankRow = () => Array(BOARD_WIDTH).fill(0);
 
 /**
  * Moves the last (up to) 4 lines from one board to another
- * @param {array} board1 - board to remove lines from
- * @param {array} board2 - board to add lines to
- * @returns {array[]} - new boards
+ * @param {number[][]} board1 - board to remove lines from
+ * @param {number[][]} board2 - board to add lines to
+ * @returns {number[][][]} - new boards
  */
 const swapLines = (board1, board2) => {
   const newBoard1 = [...board1];
@@ -46,9 +46,9 @@ const swapLines = (board1, board2) => {
 
 /**
  * Swaps two boards with each other
- * @param {array} board1
- * @param {array} board2
- * @returns {array[]} - new boards
+ * @param {number[][]} board1
+ * @param {number[][]} board2
+ * @returns {number[][][]} - new boards
  */
 const swapBoards = (board1, board2) => {
   const newBoard1 = JSON.parse(JSON.stringify(board2));
@@ -58,14 +58,14 @@ const swapBoards = (board1, board2) => {
 
 /**
  * Scrambles the cells of every row on a board.
- * @param {array} board - board to scramble
- * @returns {array} - scrambled board
+ * @param {number[][]} board - board to scramble
+ * @returns {number[][]} - scrambled board
  */
 const scrambleBoard = (board) => board.map((row) => randomize(row));
 
 /**
  * Clears board.
- * @returns {array} - empty board
+ * @returns {number[][]} - empty board
  */
 const clearBoard = () => getEmptyBoard();
 
