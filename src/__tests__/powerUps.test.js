@@ -41,7 +41,7 @@ describe('power ups', () => {
     const board3 = getTestBoard('pattern5');
     const board4 = getTestBoard('pattern4');
 
-    const [result3, result4] = swapLines(board3, board4);
+    const [, result4] = swapLines(board3, board4);
 
     expect(result4).toEqual(getTestBoard('pattern5SwappedWith4'));
   });
