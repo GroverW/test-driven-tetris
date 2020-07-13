@@ -14,7 +14,7 @@ const wsExpress = require('express-ws')(app);
 // serve stuff in static/ folder
 app.use(express.static('frontend/static/'));
 
-app.get('/game/multi/:gameId', (req, res, next) => {
+app.get('/game/multi/:gameId', (req, res) => {
   const { gameId } = req.params;
   const game = GameServer.getGame(gameId);
 
@@ -26,7 +26,7 @@ app.get('/game/multi/:gameId', (req, res, next) => {
 });
 
 // Create new multiplayer game
-app.post('/game/multi', (req, res, next) => {
+app.post('/game/multi', (req, res) => {
   const newGameId = uniqid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.MULTI);
@@ -34,7 +34,7 @@ app.post('/game/multi', (req, res, next) => {
   return res.status(201).json({ gameId });
 });
 
-app.post('/game/single', (req, res, next) => {
+app.post('/game/single', (req, res) => {
   const newGameId = uniqid();
 
   const gameId = GameServer.addGame(newGameId, GAME_TYPES.SINGLE);
@@ -44,20 +44,19 @@ app.post('/game/single', (req, res, next) => {
 
 /** Handle websocket messages */
 
-wsExpress.getWss().on('connection', (ws) => console.log('conenction open'));
+wsExpress.getWss().on('connection', () => console.log('connection open'));
 
 // allow for app.ws routes for websocket routes
-app.ws('/game/:gameId', (ws, req, next) => {
+app.ws('/game/:gameId', (ws, req) => {
   try {
     const gameServer = GameServer.getGame(req.params.gameId);
-    let player;
 
     if (!gameServer) {
       ws.close(1008, 'Game not found');
       throw new Error('Invalid GameId');
     }
 
-    player = new Player(ws.send.bind(ws), pubSub());
+    const player = new Player(ws.send.bind(ws), pubSub());
 
     if (!gameServer.join(player)) {
       ws.close(1008, 'Could not join game');
