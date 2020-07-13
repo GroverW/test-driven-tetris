@@ -1,15 +1,7 @@
 const {
-  BOARD_WIDTH,
-  BOARD_HEIGHT,
-  POINTS,
-  WALL_KICK_TESTS,
-  WALL_KICK_TESTS_I,
+  BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
 } = require('common/helpers/constants');
-const {
-  GAME_OVER,
-  LOWER_PIECE,
-  CLEAR_LINES,
-} = require('common/helpers/commonTopics');
+const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
 const { PieceList, Piece } = require('./Piece');
 
@@ -25,8 +17,6 @@ class Board {
   constructor(pubSub, playerId) {
     this.playerId = playerId;
     this.grid = getEmptyBoard();
-    this.piece;
-    this.nextPiece;
     this.pubSub = pubSub;
     this.pieceList = new PieceList();
   }
@@ -79,7 +69,6 @@ class Board {
     this.addPieceToBoard();
     this.clearLines();
     this.getPieces();
-    this.publishBoardUpdate();
   }
 
   /**
@@ -132,7 +121,7 @@ class Board {
    * @returns {boolean} - whether the requested board coordinates are in-bounds
    */
   isInBounds(x, y) {
-    return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT;
+    return x >= 0 && x < this.grid[0].length && y >= 0 && y < this.grid.length;
   }
 
   /**
@@ -149,13 +138,14 @@ class Board {
     this.piece.update(direction);
 
     // runs tests for current piece to determine if a valid rotation can be made
-    for (const [xChange, yChange] of tests) {
-      if (this.validMove(xChange, yChange)) {
-        const diff = (xChange !== 0 || yChange !== 0);
-        // moves piece if a valid location could be found for it
-        if (diff) this.movePiece(xChange, yChange, 0);
-        return;
-      }
+    const validTest = tests.find(([xChange, yChange]) => this.validMove(xChange, yChange));
+
+    if (validTest) {
+      const [xChange, yChange] = validTest;
+      const diff = (xChange !== 0 || yChange !== 0);
+
+      if (diff) this.movePiece(xChange, yChange, 0);
+      return;
     }
 
     // undoes rotation if no valid position could be found
@@ -205,8 +195,8 @@ class Board {
     let maxHeight = BOARD_HEIGHT;
 
     // check for first space below piece that is not empty
-    for (let row = 0; row < BOARD_HEIGHT; row++) {
-      for (let col = xStart; col <= xEnd; col++) {
+    for (let row = 0; row < BOARD_HEIGHT; row += 1) {
+      for (let col = xStart; col <= xEnd; col += 1) {
         if (newGrid[row][col] > 0) {
           maxHeight = Math.min(maxHeight, row);
         }
@@ -234,8 +224,8 @@ class Board {
     let xMin = BOARD_WIDTH;
     let xMax = 0;
 
-    for (let row = 0; row < this.piece.grid.length; row++) {
-      for (let col = 0; col < this.piece.grid[0].length; col++) {
+    for (let row = 0; row < this.piece.grid.length; row += 1) {
+      for (let col = 0; col < this.piece.grid[0].length; col += 1) {
         const yPosition = this.piece.y + row;
         const xPosition = this.piece.x + col;
 
@@ -249,13 +239,6 @@ class Board {
     }
 
     return [yMin, yMax, xMin, xMax];
-  }
-
-  /**
-   * Publishes any board updates
-   */
-  publishBoardUpdate() {
-    // to be implemented by server and client
   }
 }
 
