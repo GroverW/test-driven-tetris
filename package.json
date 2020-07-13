@@ -14,7 +14,7 @@
   },
   "pre-commit": [
     "test",
-    "lint_fix"
+    "lint:fix"
   ],
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "axios": "^0.19.2",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
+    "module-alias": "^2.2.2",
     "nodemon": "^2.0.3",
     "socket.io": "^2.3.0",
     "supertest": "^4.0.2",
@@ -34,7 +35,6 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-import-resolver-webpack": "^0.12.2",
     "eslint-plugin-import": "^2.22.0",
-    "module-alias": "^2.2.2",
     "pre-commit": "^1.2.2",
     "webpack-cli": "^3.3.11"
   },
