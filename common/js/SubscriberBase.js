@@ -7,13 +7,16 @@ class SubscriberBase {
   /**
    * Creates a new base subscriber
    * @constructor
-   * @param {number} playerId - Id of player linking backend to frontend
-   * @param {object} pubSub - Publish / Subscribe object
+   * @param {number} playerId - id of player linking backend to frontend
+   * @param {object} pubSub - publish / subscribe object
    */
-  constructor(playerId, pubSub) {
-    this.playerId = playerId;
+  constructor(pubSub) {
     this.pubSub = pubSub;
     this.subscriptions = [];
+  }
+
+  initialize(playerId) {
+    this.playerId = playerId;
     this.mapSubscriptions([GAME_OVER, END_GAME]);
   }
 
