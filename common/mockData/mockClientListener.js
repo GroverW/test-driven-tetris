@@ -1,7 +1,7 @@
 const ClientGame = require('frontend/static/js/ClientGame');
-const GameLoop = require('frontend/static/js/GameLoop');
-const GameDOM = require('frontend/static/js/GameDOM');
-const ClientMessage = require('frontend/static/js/ClientMessage');
+const gameLoop = require('frontend/static/js/GameLoop');
+const gameDOM = require('frontend/static/js/GameDOM');
+const clientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
 const {
@@ -44,7 +44,8 @@ class MockClientListener {
    * @param {Object[]} selectors - mock DOM selectors to be used by the gameDOM
    */
   constructor(ws, selectors) {
-    this.clientMessage = new ClientMessage(getMockDOMSelector());
+    this.clientMessage = clientMessage;
+    this.clientMessage.initialize(getMockDOMSelector());
     this.selectors = selectors;
     this.subscriptions = [
       ws.on(ADD_PLAYER, this.addPlayer.bind(this)),
@@ -64,9 +65,11 @@ class MockClientListener {
    */
   addPlayer(id) {
     if (!this.game) {
-      this.gameDOM = new GameDOM(this.selectors, id);
+      this.gameDOM = gameDOM;
+      this.gameDOM.initialize(this.selectors, id);
       this.game = new ClientGame(id);
-      this.gameLoop = new GameLoop(id);
+      this.gameLoop = gameLoop;
+      this.gameLoop.initialize(id);
     } else {
       publish(ADD_PLAYER, id);
     }
