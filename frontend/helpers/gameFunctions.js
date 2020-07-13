@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 const ClientGame = require('frontend/static/js/ClientGame');
-const GameLoop = require('frontend/static/js/GameLoop');
-const GameDOM = require('frontend/static/js/GameDOM');
+const gameLoop = require('frontend/static/js/GameLoop');
+const gameDOM = require('frontend/static/js/GameDOM');
 
 const { PLAY, TOGGLE_MENU, ADD_PLAYER } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
@@ -64,8 +64,7 @@ const connectToGame = (gameId, gameType) => {
   const baseURL = getBaseURL();
   const ws = new WebSocket(`${baseURL}/game/${gameId}`);
 
-  let game; let gameLoop; let gameDOM; let
-    api;
+  let game; let api;
 
   /**
    * What to do when the websocket is closed
@@ -82,9 +81,9 @@ const connectToGame = (gameId, gameType) => {
     const { type, data } = JSON.parse(evt.data);
 
     if (type === ADD_PLAYER && !game) {
-      gameDOM = new GameDOM(gameSelectors, data);
+      gameDOM.initialize(gameSelectors, data);
       game = new ClientGame(data);
-      gameLoop = new GameLoop(data);
+      gameLoop.initialize(data);
       api = new Api(ws);
       createEventListeners(game, api);
       gameSelectors.message.classList.remove('hide');
