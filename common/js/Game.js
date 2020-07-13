@@ -45,13 +45,6 @@ class Game extends SubscriberBase {
   }
 
   /**
-   * Executes commands.
-   */
-  command() {
-    // implemented individually
-  }
-
-  /**
    * Updates game score.
    * @param {number} points - number of points to add to game score
    */
@@ -68,7 +61,7 @@ class Game extends SubscriberBase {
 
     if (this.linesRemaining <= lines) this.level += 1;
 
-    this.linesRemaining = LINES_PER_LEVEL - this.lines % LINES_PER_LEVEL;
+    this.linesRemaining = LINES_PER_LEVEL - (this.lines % LINES_PER_LEVEL);
   }
 
   /**
