@@ -10,7 +10,8 @@ describe('SubscriberBase tests', () => {
   const topics = [TOPIC1, TOPIC2];
 
   beforeAll(() => {
-    subscriberBase = new SubscriberBase(1, pubSub);
+    subscriberBase = new SubscriberBase(pubSub);
+    subscriberBase.initialize(1);
     subscriberBase.val1 = 0;
     subscriberBase.val2 = 0;
     subscriberBase[TOPIC1] = () => { subscriberBase.val1 += 1; };
