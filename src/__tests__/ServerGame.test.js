@@ -22,8 +22,8 @@ const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
   let game;
-  let p1; let p2; let
-    p3;
+  let p1;
+  let p2;
   let pubSubTest;
   let pubSubSpy;
 
@@ -33,8 +33,7 @@ describe('game tests', () => {
     game = new ServerGame(pubSubTest, 1, GAME_TYPES.MULTI);
     game.board.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
-    p2 = new Piece(PIECE_TYPES.J);
-    p3 = new Piece(PIECE_TYPES.T);
+    p2 = new Piece(PIECE_TYPES.T);
   });
 
   afterEach(() => {
@@ -50,7 +49,7 @@ describe('game tests', () => {
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
     // stacking I pieces on top of each other until they reach the top
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i += 1) {
       game.board.nextPiece = new Piece(PIECE_TYPES.I);
       game.command('ROTATE_LEFT');
       game.command('HARD_DROP');
@@ -68,7 +67,7 @@ describe('game tests', () => {
     game.start();
     // duplicate scoring points for tetris
     game.board.grid = getTestBoard('clearLines2');
-    game.board.piece = p3;
+    game.board.piece = p2;
     game.board.nextPiece = p1;
 
     expect(game.score).toBe(0);
@@ -102,7 +101,7 @@ describe('game tests', () => {
 
     // duplicate scoring points for tetris
     game.board.grid = getTestBoard('clearLines2');
-    game.board.piece = p3;
+    game.board.piece = p2;
     game.board.nextPiece = p1;
 
     expect(game.score).toBe(0);
@@ -149,7 +148,7 @@ describe('game tests', () => {
 
       expect(game.powerUps.length).toBe(1);
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 20; i += 1) {
         game.addPowerUp(POWER_UP_TYPES.SCRAMBLE_BOARD);
       }
 
