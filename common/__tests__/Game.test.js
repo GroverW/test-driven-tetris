@@ -1,6 +1,6 @@
 const Game = require('common/js/Game');
 const Board = require('common/js/Board');
-const { Piece } = require('common/js/Piece');
+const Piece = require('common/js/Piece');
 const {
   LINES_PER_LEVEL,
   PIECE_TYPES,
