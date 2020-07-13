@@ -78,7 +78,7 @@ class Gravity extends SubscriberBase {
     const currentDelay = this.delay;
 
     // max is baseDelay / 4, min is baseDelay / 8
-    return ((baseDelay / currentDelay - 1) / 2 + 1) * currentDelay / 4;
+    return ((baseDelay / currentDelay - 1) / 2 + 1) * (currentDelay / 4);
   }
 
   /**

@@ -19,10 +19,6 @@ class GameLoop extends SubscriberBase {
    */
   constructor(playerId) {
     super(playerId, pubSub);
-    this.command;
-    this.toggleCommand;
-    this.autoCommand;
-    this.animationId;
     this.mapSubscriptions([START_GAME, SET_COMMAND, SET_AUTO_COMMAND, CLEAR_COMMAND]);
   }
 

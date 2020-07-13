@@ -16,9 +16,8 @@ class Command {
     this.key = key;
     this.type = (delay.length > 1) ? 'toggleCommand' : 'command';
     this.callback = callback;
-    this.startTime;
-    this._delayIdx = 0;
-    this._delay = delay;
+    this.delayIdx = 0;
+    this.delayList = delay;
   }
 
   /**
@@ -26,7 +25,7 @@ class Command {
    * @returns {number}
    */
   get delay() {
-    return this._delay[this._delayIdx];
+    return this.delayList[this.delayIdx];
   }
 
   /**
@@ -50,9 +49,9 @@ class Command {
    */
   updateDelay() {
     if (this.type === 'toggleCommand') {
-      this._delayIdx = Math.min(this._delay.length - 1, this._delayIdx + 1);
+      this.delayIdx = Math.min(this.delayList.length - 1, this.delayIdx + 1);
     } else {
-      this._delay[this._delayIdx] = Infinity;
+      this.delayList[this.delayIdx] = Infinity;
     }
   }
 }
