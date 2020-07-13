@@ -3,7 +3,8 @@ const {
 } = require('common/helpers/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
-const { PieceList, Piece } = require('./Piece');
+const Piece = require('./Piece');
+const PieceList = require('./PieceList');
 
 /**
  * Represents a game board
@@ -187,7 +188,7 @@ class Board {
 
   /**
    * Replaces current grid with new one. Moves current piece if too close to new grid.
-   * @param {array} newGrid - new grid to replace current grid
+   * @param {number[][]} newGrid - new grid to replace current grid
    */
   replaceBoard(newGrid) {
     const [yStart, yEnd, xStart, xEnd] = this.getPieceBounds();
@@ -216,7 +217,7 @@ class Board {
 
   /**
    * Gets the minimum and maximum x and y bounds of the current piece
-   * @returns {array} - [yStart, yEnd, xStart, xEnd]
+   * @returns {number[]} - [yStart, yEnd, xStart, xEnd]
    */
   getPieceBounds() {
     let yMin = BOARD_HEIGHT;
