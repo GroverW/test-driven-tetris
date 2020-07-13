@@ -65,7 +65,7 @@ const webSocketMock = {
  */
 const pubSubMock = (pubSub) => {
   // use frontend pubSub if not specified
-  if (!pubSub) pubSub = { subscribe };
+  const pubSubSpy = pubSub || { subscribe };
   const subscriptions = [];
 
   /**
@@ -74,7 +74,7 @@ const pubSubMock = (pubSub) => {
    */
   const add = (topic) => {
     const newSub = jest.fn();
-    subscriptions.push(pubSub.subscribe(topic, newSub));
+    subscriptions.push(pubSubSpy.subscribe(topic, newSub));
     return newSub;
   };
 
