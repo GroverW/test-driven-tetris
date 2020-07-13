@@ -12,7 +12,7 @@ const randomize = (arr) => {
   while (start > 0) {
     const swapWith = Math.floor(Math.random() * (start + 1));
     [randomized[swapWith], randomized[start]] = [randomized[start], randomized[swapWith]];
-    start--;
+    start -= 1;
   }
 
   return randomized;
@@ -21,7 +21,9 @@ const randomize = (arr) => {
 /**
  * Returns a new, empty board
  */
-const getEmptyBoard = () => new Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(0));
+const getEmptyBoard = () => (
+  new Array(BOARD_HEIGHT).fill(null).map(() => new Array(BOARD_WIDTH).fill(0))
+);
 
 /**
  * Maps keys in an array to values in an object. O(n) vs O(n^2) for Array.reduce
@@ -31,16 +33,26 @@ const getEmptyBoard = () => new Array(BOARD_HEIGHT).fill(null).map(() => Array(B
  * @returns {object} - object with keys mapped to values
  */
 const mapArrayToObj = (keysArr, callback, resObj = {}) => {
-  keysArr.forEach((key, idx, keysArr) => {
-    const result = callback(key, idx, keysArr);
-    if (result) resObj[key] = result;
+  const newObj = { ...resObj };
+  keysArr.forEach((key, idx, arr) => {
+    const result = callback(key, idx, arr);
+    if (result) newObj[key] = result;
   });
 
-  return resObj;
+  return newObj;
 };
+
+/**
+ * Formats message to be sent over web socket
+ * @param {string} type - type of message to send
+ * @param {*} data - data to send
+ * @returns {string} - JSON stringified message
+ */
+const formatMessage = ({ type, data }) => JSON.stringify({ type, data });
 
 module.exports = {
   randomize,
   getEmptyBoard,
   mapArrayToObj,
+  formatMessage,
 };
