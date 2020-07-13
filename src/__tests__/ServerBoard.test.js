@@ -25,7 +25,7 @@ describe('server - board tests', () => {
 
     // can't go the entire length of the list or the index will get reset
     // and almostEmpty() will return false
-    for (let i = 0; i < SEED_PIECES.length - 2; i++) gameBoard.getPieces();
+    for (let i = 0; i < SEED_PIECES.length - 2; i += 1) gameBoard.getPieces();
 
     expect(getPiecesSpy).toHaveBeenCalled();
     expect(gameBoard.pieceList.almostEmpty()).toBe(true);
