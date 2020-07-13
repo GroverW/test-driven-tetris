@@ -8,7 +8,6 @@ const {
   COUNTDOWN,
 } = require('backend/helpers/serverConstants');
 const {
-  ADD_MESSAGE,
   MSG_TYPE,
   ADD_PLAYER,
   REMOVE_PLAYER,
@@ -23,7 +22,7 @@ const {
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
-const { randomize } = require('common/helpers/utils');
+const { randomize, formatMessage, sendMessage } = require('backend/helpers/serverUtils');
 const powerUps = require('backend/helpers/powerUps');
 
 /**
@@ -41,7 +40,6 @@ class GameServer {
     this.players = [];
     this.nextPlayerId = 0;
     this.gameStarted = false;
-    this.nextRanking;
     this.subscriptions = {};
   }
 
@@ -76,11 +74,11 @@ class GameServer {
     const full = this.players.length >= MAX_PLAYERS[this.gameType];
 
     if (full) {
-      this.sendMessage(player, MSG_TYPE.ERROR, 'That game is full.');
+      sendMessage(player, MSG_TYPE.ERROR, 'That game is full.');
     }
 
     if (this.gameStarted) {
-      this.sendMessage(player, MSG_TYPE.ERROR, 'That game has already started.');
+      sendMessage(player, MSG_TYPE.ERROR, 'That game has already started.');
     }
 
     return !full && !this.gameStarted;
@@ -107,7 +105,7 @@ class GameServer {
 
     // send existing players to new player
     this.players.forEach((p) => {
-      if (p !== player) this.sendTo(player, { type: ADD_PLAYER, data: p.id });
+      if (p !== player) player.send(formatMessage({ type: ADD_PLAYER, data: p.id }));
     });
 
     this.setHost();
@@ -150,7 +148,7 @@ class GameServer {
 
     if (!this.players.length) GAMES.delete(this.id);
 
-    this.nextRanking--;
+    this.nextRanking -= 1;
     this.checkIfWinner();
     this.setHost(true);
 
@@ -182,7 +180,7 @@ class GameServer {
         newHost.isHost = true;
 
         if (onLeave) {
-          this.sendMessage(newHost, MSG_TYPE.NOTICE, 'You are now the host');
+          sendMessage(newHost, MSG_TYPE.NOTICE, 'You are now the host');
         }
       }
     }
@@ -193,7 +191,7 @@ class GameServer {
    * @param {object} data - type of message and data to send
    */
   sendAll(data) {
-    this.players.forEach((player) => this.sendTo(player, data));
+    this.players.forEach((player) => player.send(formatMessage(data)));
   }
 
   /**
@@ -203,29 +201,7 @@ class GameServer {
    */
   sendAllExcept(exceptPlayer, data) {
     this.players.forEach((player) => {
-      if (player !== exceptPlayer) this.sendTo(player, data);
-    });
-  }
-
-  /**
-   * Sends message to specified player
-   * @param {object} player - player to send message to
-   * @param {object} data - type of message and data to send
-   */
-  sendTo(player, data) {
-    player.send(JSON.stringify(data));
-  }
-
-  /**
-   * Sends message to specified player to be displayed on screen
-   * @param {object} player - player to send message to
-   * @param {string} type - message type
-   * @param {string} message - message text
-   */
-  sendMessage(player, type, message) {
-    this.sendTo(player, {
-      type: ADD_MESSAGE,
-      data: { type, message },
+      if (player !== exceptPlayer) player.send(formatMessage(data));
     });
   }
 
@@ -244,9 +220,11 @@ class GameServer {
       },
     };
 
-    includePlayer
-      ? this.sendAll(sendData)
-      : this.sendAllExcept(this.getPlayerById(data.id), sendData);
+    if (includePlayer) {
+      this.sendAll(sendData);
+    } else {
+      this.sendAllExcept(this.getPlayerById(data.id), sendData);
+    }
   }
 
   /**
@@ -258,10 +236,10 @@ class GameServer {
   addPowerUp(data) {
     const player = this.getPlayerById(data.id);
     if (player) {
-      this.sendTo(player, {
+      player.send(formatMessage({
         type: ADD_POWER_UP,
         data: data.powerUp,
-      });
+      }));
     }
   }
 
@@ -314,7 +292,7 @@ class GameServer {
    * @param {object} player - player who is ready
    */
   playerReady(player) {
-    player.readyToPlay = true;
+    player.updateReadyState(true);
     const totalReady = this.players.reduce((total, p) => total + p.readyToPlay, 0);
 
     if (this.checkStartConditions(totalReady)) {
@@ -379,7 +357,7 @@ class GameServer {
       && this.players.length === 1
       && totalReady === 1
     ) {
-      this.sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.');
+      sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.');
       return false;
     }
 
@@ -417,7 +395,7 @@ class GameServer {
       },
     });
 
-    this.nextRanking--;
+    this.nextRanking -= 1;
     this.checkIfWinner();
   }
 
@@ -432,7 +410,7 @@ class GameServer {
 
     this.players.forEach((p) => {
       if (p.game.gameStatus) winner = p;
-      else count--;
+      else count -= 1;
     });
 
     if (count === 1) {
