@@ -30,15 +30,11 @@ describe('game DOM tests', () => {
   let gameDOM;
   let game;
   let gameLoop;
-  let newCtx1; let newBoard1; let
-    newId1;
-  let newCtx2; let newBoard2; let
-    newId2;
+  let newCtx1; let newBoard1; let newId1; let newPlayer1;
+  let newCtx2; let newBoard2; let newId2; let newPlayer2;
   let addPlayerSpy;
 
   beforeAll(() => {
-    mockCtx = getMockCtx();
-    mockCtxNext = getMockCtx();
     newCtx1 = getMockCtx();
     newId1 = 1;
     newId2 = 2;
@@ -130,15 +126,13 @@ describe('game DOM tests', () => {
 
   describe('start game', () => {
     test('clear message and start music on game start', () => {
-      const clearMessageSpy = jest.spyOn(gameDOM, 'clearMessage');
-
       expect(gameDOM.music.play).toHaveBeenCalledTimes(0);
-      expect(clearMessageSpy).toHaveBeenCalledTimes(0);
+      expect(gameDOM.message.classList.contains('hide')).toBe(false);
 
       gameDOM.startGame();
 
-      expect(clearMessageSpy).toHaveBeenCalledTimes(1);
       expect(gameDOM.music.play).toHaveBeenCalledTimes(1);
+      expect(gameDOM.message.classList.contains('hide')).toBe(true);
     });
 
     test('gameDOM should subscribe to GAME_MESSAGE topic when player ready', () => {
