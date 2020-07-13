@@ -2,18 +2,16 @@ const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
 const {
+  createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
+} = require('frontend/static/js/GameDOM/DOMHelpers');
+
+const {
   getEmptyBoard,
+  getNextPieceBoard,
   getNewPlayer,
   getNewPlayerDOM,
 } = require('frontend/helpers/clientUtils');
-const {
-  createElement,
-  addPowerUpTargetId,
-} = require('frontend/helpers/DOMUtils');
-const {
-  MAX_POWER_UPS,
-  POWER_UPS,
-} = require('frontend/helpers/clientConstants');
+const { POWER_UPS } = require('frontend/helpers/clientConstants');
 const {
   PLAY,
   START_GAME,
@@ -23,6 +21,7 @@ const {
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_SCORE,
+  UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('frontend/helpers/clientTopics');
@@ -34,28 +33,27 @@ const GameView = require('./GameView');
 class GameDOM extends SubscriberBase {
   /**
    * @constructor
-   * @param {object} selectors - object of DOM selectors
-   * @param {object} selectors.playerCtx - player canvas context
-   * @param {object} selectors.nexCtx - player next piece canvas context
-   * @param {object} selectors.opponents - game container selector
-   * @param {object} selectors.score - game score selector
-   * @param {object} selectors.level - game level selector
-   * @param {object} selectors.lines - game lines cleared selector
-   * @param {object} selectors.player - player game container selector
-   * @param {object[]} selectors.powerUps - list of power up selectors
-   * @param {object} selectors.music - game music selector
+   * @param {object} playerCtx - player canvas context
+   * @param {object} nexCtx - player next piece canvas context
+   * @param {object} opponents - game container selector
+   * @param {object} score - game score selector
+   * @param {object} level - game level selector
+   * @param {object} lines - game lines cleared selector
+   * @param {object} player - player game container selector
+   * @param {object[]} powerUps - list of power up selectors
+   * @param {object} music - game music selector
    * @param {number} playerId - Id of player on backend
    */
   constructor(selectors, playerId) {
     super(playerId, pubSub);
-    this.gameView = new GameView(selectors.playerCtx, selectors.nextCtx);
+    this.gameView = new GameView(selectors.playerCtx, getEmptyBoard(), selectors.nextCtx, getNextPieceBoard());
     this.opponents = selectors.opponents;
     this.score = selectors.score;
     this.level = selectors.level;
     this.lines = selectors.lines;
     this.player = selectors.player;
     this.message = selectors.message;
-    this.powerUps = this.mapPowerUps(selectors.powerUps);
+    this.powerUps = mapPowerUps(selectors.powerUps);
     this.players = [];
     this.music = selectors.music;
     this.mapSubscriptions([
@@ -68,6 +66,7 @@ class GameDOM extends SubscriberBase {
       UPDATE_SCORE,
       ADD_POWER_UP,
       USE_POWER_UP,
+      GAME_MESSAGE,
     ]);
   }
 
@@ -83,7 +82,7 @@ class GameDOM extends SubscriberBase {
    */
   [START_GAME]() {
     this.music.play();
-    this.clearMessage(this.message);
+    hideElement(this.message);
   }
 
   /**
@@ -140,23 +139,11 @@ class GameDOM extends SubscriberBase {
     const powerUpTargetSelector = addPowerUpTargetId(playerContainer, powerUpTargetId);
 
     // creates new html canvas
-    const [canvas, ctx] = this.getNewPlayerCanvas(id);
+    const [canvas, ctx] = getNewPlayerCanvas(id);
 
     playerContainer.appendChild(canvas);
 
     return [ctx, playerContainer, powerUpTargetSelector, message];
-  }
-
-  /**
-   * Creates a new html canvas for an additional player
-   * @param {number} id - player id
-   * @returns {object[]} - canvad DOM node and ctx
-   */
-  getNewPlayerCanvas(id) {
-    const canvas = createElement('canvas', { id: `p${id}-board`, classList: 'game-board' });
-    const ctx = canvas.getContext('2d');
-
-    return [canvas, ctx];
   }
 
   /**
@@ -182,7 +169,10 @@ class GameDOM extends SubscriberBase {
    * key to use to target them with a power up
    */
   updatePowerUpTargetIds() {
-    this.players.forEach((p, i) => p.powerUpId.innerText = i + 2);
+    this.players.forEach((player, i) => {
+      const updatedPlayer = player;
+      updatedPlayer.powerUpId.innerText = i + 2;
+    });
   }
 
   /**
@@ -195,17 +185,6 @@ class GameDOM extends SubscriberBase {
     if (score !== undefined) this.score.innerText = score;
     if (level !== undefined) this.level.innerText = level;
     if (lines !== undefined) this.lines.innerText = lines;
-  }
-
-  /**
-   * Maps a list of DOM selectors to an array of objects
-   * @param {object[]} selectors - list of DOM selectors
-   * @returns {object[]|boolean} - list of objects containing DOM selector and type, otherwise false if empty
-   */
-  mapPowerUps(selectors) {
-    return selectors
-      ? selectors.map((node) => ({ node, type: null })).slice(0, MAX_POWER_UPS)
-      : false;
   }
 
   /**
@@ -228,14 +207,15 @@ class GameDOM extends SubscriberBase {
    */
   [USE_POWER_UP]() {
     this.powerUps.forEach((p, i, a) => {
+      const updated = p;
       const next = a[i + 1];
 
       if (next !== undefined && next.type !== null) {
-        p.node.classList.replace(`power-up${p.type}`, `power-up${next.type}`);
-        p.type = next.type;
+        updated.node.classList.replace(`power-up${updated.type}`, `power-up${next.type}`);
+        updated.type = next.type;
       } else {
-        p.node.classList.remove(`power-up${p.type}`);
-        p.type = null;
+        updated.node.classList.remove(`power-up${updated.type}`);
+        updated.type = null;
       }
     });
   }
@@ -252,8 +232,8 @@ class GameDOM extends SubscriberBase {
     if (!message) return;
 
     if (id === this.playerId) {
-      this.gameView.drawGrid(this.gameView.ctx, board);
-      this.addMessage(this.message, message);
+      this.gameView[UPDATE_PLAYER]({ id, board });
+      addMessage(this.message, message);
       this.music.pause();
       return;
     }
@@ -262,7 +242,7 @@ class GameDOM extends SubscriberBase {
 
     if (player) {
       this.gameView.updatePlayer({ id, board });
-      this.addMessage(player.message, message);
+      addMessage(player.message, message);
     }
   }
 
@@ -273,34 +253,7 @@ class GameDOM extends SubscriberBase {
    * @param {string[]} message.body - list of messages in body
    */
   [GAME_MESSAGE](message) {
-    this.addMessage(this.message, message);
-  }
-
-  /**
-   * Adds game over message for a specified player
-   * @param {object} container - DOM selector for player container
-   * @param {object} message - message to include
-   * @param {string} message.header - message header
-   * @param {string[]} message.body - list of messages in body
-   */
-  addMessage(container, message) {
-    container.innerText = '';
-    container.classList.remove('hide');
-
-    const messageElementText = createElement('div', { container, classList: 'game-message-text' });
-    createElement('h1', { container: messageElementText, text: message.header });
-
-    message.body.forEach((line) => (
-      createElement('p', { container: messageElementText, text: line })
-    ));
-  }
-
-  /**
-   * Hides any visible game messages on specified container
-   * @param {object} container - DOM selector
-   */
-  clearMessage(container) {
-    container.classList.add('hide');
+    addMessage(this.message, message);
   }
 
   /**
