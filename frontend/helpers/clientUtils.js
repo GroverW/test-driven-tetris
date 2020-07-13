@@ -2,6 +2,8 @@ const commonUtils = require('common/helpers/utils');
 const { publish } = require('frontend/helpers/pubSub');
 const { ADD_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
 
+const getNextPieceBoard = () => new Array(4).fill(null).map(() => new Array(4).fill(0));
+
 /**
  * Creates an object containing new player information
  * @param {object} ctx - player canvas context
@@ -31,6 +33,7 @@ const publishError = (message) => (
 
 module.exports = {
   ...commonUtils,
+  getNextPieceBoard,
   getNewPlayer,
   getNewPlayerDOM,
   publishError,
