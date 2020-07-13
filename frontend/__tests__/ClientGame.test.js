@@ -128,7 +128,7 @@ describe('game tests', () => {
       const gameOverSpy = pubSubSpy.add(GAME_OVER);
       const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 15; i += 1) {
         game.board.nextPiece = new Piece(PIECE_TYPES.O);
         runCommand(game, CONTROLS.HARD_DROP);
       }
