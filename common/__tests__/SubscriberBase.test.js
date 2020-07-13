@@ -13,8 +13,8 @@ describe('SubscriberBase tests', () => {
     subscriberBase = new SubscriberBase(1, pubSub);
     subscriberBase.val1 = 0;
     subscriberBase.val2 = 0;
-    subscriberBase[TOPIC1] = function () { this.val1 += 1; };
-    subscriberBase[TOPIC2] = function () { this.val2 += 2; };
+    subscriberBase[TOPIC1] = () => { subscriberBase.val1 += 1; };
+    subscriberBase[TOPIC2] = () => { subscriberBase.val2 += 2; };
   });
 
   afterAll(() => {

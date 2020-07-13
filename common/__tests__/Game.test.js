@@ -123,7 +123,7 @@ describe('game tests', () => {
     test('clearing lines updates level', () => {
       const currLevel = game.level;
 
-      for (let i = 0; i < 3; i++) game.clearLines(4);
+      for (let i = 0; i < 3; i += 1) game.clearLines(4);
 
       expect(game.level).toBe(currLevel + 1);
     });
