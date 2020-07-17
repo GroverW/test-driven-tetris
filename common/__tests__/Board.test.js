@@ -8,11 +8,11 @@ const pubSub = require('frontend/helpers/pubSub');
 
 const movePieceTo = (gameBoard, location) => {
   const movementTowards = {
-    left: [-1,0],
-    right: [1,0],
-    top: [0,-1],
-    bottom: [0,1],
-  }
+    left: [-1, 0],
+    right: [1, 0],
+    top: [0, -1],
+    bottom: [0, 1],
+  };
   const direction = movementTowards[location];
 
   while (gameBoard.validMove(...direction)) gameBoard.movePiece(...direction, 0);
@@ -119,7 +119,7 @@ describe('game board tests', () => {
         expect([gameBoard.piece.x, gameBoard.piece.y]).toEqual([3, 0]);
 
         gameBoard.rotatePiece(ROTATE_LEFT);
-        movePieceTo(gameBoard, 'right')
+        movePieceTo(gameBoard, 'right');
 
         let pieceEdge = gameBoard.piece.x + gameBoard.piece.grid[0].length;
         const boardEdge = gameBoard.grid[0].length;
@@ -197,7 +197,6 @@ describe('game board tests', () => {
   });
 
   describe('add piece to board', () => {
-
     test('drop piece if invalid move down', () => {
       gameBoard.piece = p1;
       gameBoard.movePiece(0, 18);
