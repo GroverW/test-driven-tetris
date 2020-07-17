@@ -181,9 +181,29 @@ describe('game tests', () => {
     });
   });
 
+  describe('board / piece validations', () => {
+    test('validates whether piece can move down', () => {
+      expect(game.isValidDrop()).toBe(true);
+
+      while (game.board.validMove(0, 1)) {
+        game.board.movePiece(0, 1, 0);
+      }
+
+      expect(game.isValidDrop()).toBe(false);
+    });
+
+    test('validates whether piece has reached lowest point', () => {
+      expect(game.isPieceAtLowestPoint()).toBe(true);
+
+      game.board.movePiece(0, -1, 0);
+
+      expect(game.isPieceAtLowestPoint()).toBe(false);
+    });
+  });
+
   describe('power ups', () => {
     test('adds to command queue', () => {
-      game.sendCommandQueue = jest.fn().mockImplementation(() => {});
+      game.sendCommandQueue = jest.fn().mockImplementation(() => { });
 
       runCommand(game, CONTROLS.PLAYER3);
 
