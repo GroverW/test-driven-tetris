@@ -73,7 +73,12 @@ class ClientGame extends Game {
 
       this.pubSub.publish(
         SET_AUTO_COMMAND,
-        new Gravity(this.playerId, this.autoDrop.bind(this), this.isValidDrop.bind(this)),
+        new Gravity(
+          this.playerId,
+          this.autoDrop.bind(this),
+          this.isValidDrop.bind(this),
+          this.isPieceAtLowestPoint.bind(this),
+        ),
       );
     }
   }
@@ -195,6 +200,10 @@ class ClientGame extends Game {
    */
   isValidDrop() {
     return this.board.validMove(0, 1);
+  }
+
+  isPieceAtLowestPoint() {
+    return this.board.piece.y >= this.board.piece.maxY;
   }
 
   [BOARD_CHANGE]() {
