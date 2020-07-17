@@ -18,8 +18,7 @@ class GameView extends SubscriberBase {
    * @param {number[][]} nextPieceBoard - initial next piece board
    */
   constructor(ctx, board, ctxNext, nextPieceBoard) {
-    super(pubSub);
-    super.initialize(null);
+    super(pubSub, null);
     this.player = new GameCanvas(ctx, board, null);
     this.nextPiece = new GameCanvas(ctxNext, nextPieceBoard, null);
     this.mapSubscriptions([DRAW, REMOVE_PLAYER, UPDATE_PLAYER]);
