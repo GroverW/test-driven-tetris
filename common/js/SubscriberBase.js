@@ -7,12 +7,13 @@ class SubscriberBase {
   /**
    * Creates a new base subscriber
    * @constructor
-   * @param {number} playerId - id of player linking backend to frontend
    * @param {object} pubSub - publish / subscribe object
+   * @param {number} [playerId] - id of player linking backend to frontend
    */
-  constructor(pubSub) {
+  constructor(pubSub, playerId = false) {
     this.pubSub = pubSub;
     this.subscriptions = [];
+    if (playerId !== false) this.initialize(playerId);
   }
 
   initialize(playerId) {
