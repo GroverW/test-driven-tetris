@@ -88,11 +88,13 @@ class GameCanvas {
   /**
    * Draws a specified grid on a specified canvas
    * @param {number[][]} [grid] - grid to draw
+   * @param {object} [ctx] - canvas of specified grid
    * @param {number} xStart - x-coordinate to begin drawing grid
    * @param {number} yStart - y-coordinate to being drawing grid
-   * @param {boolean} isBoard - whether or not drawing board
    */
-  drawGrid(grid = this.board, ctx = this.ctx, xStart = 0, yStart = 0, isBoard = true) {
+  drawGrid(grid = this.board, ctx = this.ctx, xStart = 0, yStart = 0) {
+    const isBoard = (grid.length === BOARD_HEIGHT);
+
     grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
       if (isBoard || cell > 0) {
         drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell]);
@@ -110,7 +112,7 @@ class GameCanvas {
     const xStart = 2 - grid.length / 2;
     const yStart = grid.length < 4 ? 1 : 0.5;
 
-    this.drawGrid(grid, this.ctx, xStart, yStart, false);
+    this.drawGrid(grid, this.ctx, xStart, yStart);
   }
 }
 
