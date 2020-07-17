@@ -15,13 +15,15 @@ const { pubSubMock } = require('frontend/mockData/mocks');
 describe('gravity tests', () => {
   let gravity;
   let validMove = false;
+  let lowestPoint = true;
   const fakeMoveCheck = () => validMove;
+  const fakeLowestPointCheck = () => lowestPoint;
   const fakeCallback = jest.fn();
   const playerId = 1;
   let pubSubSpy;
 
   beforeAll(() => {
-    gravity = new Gravity(playerId, fakeCallback, fakeMoveCheck);
+    gravity = new Gravity(playerId, fakeCallback, fakeMoveCheck, fakeLowestPointCheck);
     jest.useFakeTimers();
     pubSubSpy = pubSubMock();
   });
@@ -111,6 +113,16 @@ describe('gravity tests', () => {
 
       expect(fakeCallback).toHaveBeenCalledTimes(2);
       expect(gravity.interrupt).toBe(false);
+    });
+
+    test('start time does not reset if piece not at lowest point', () => {
+      const { start, delay } = gravity;
+
+      lowestPoint = false;
+
+      gravity.execute(start + delay);
+
+      expect(gravity.start).toBe(start);
     });
   });
 
