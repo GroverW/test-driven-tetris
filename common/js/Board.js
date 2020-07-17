@@ -1,5 +1,6 @@
 const {
-  BOARD_WIDTH, BOARD_HEIGHT, POINTS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
+  BOARD_WIDTH, BOARD_HEIGHT, POINTS, PIECE_TYPES,
+  MAX_WALL_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
 } = require('common/helpers/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
@@ -20,6 +21,7 @@ class Board {
     this.grid = getEmptyBoard();
     this.pubSub = pubSub;
     this.pieceList = new PieceList();
+    this.resetRemainingWallKicks();
   }
 
   /**
@@ -39,6 +41,7 @@ class Board {
     }
 
     this.nextPiece = new Piece(this.pieceList.getNextPiece());
+    this.resetRemainingWallKicks();
   }
 
   /**
@@ -131,13 +134,29 @@ class Board {
    */
   rotatePiece(direction) {
     // determines which set of tests to use based on type of piece
-    const lookup = this.piece.type === 1
+    const lookup = this.piece.type === PIECE_TYPES.I
       ? WALL_KICK_TESTS_I
       : WALL_KICK_TESTS;
 
-    const tests = lookup[direction][this.piece.rotation];
+    const currentDirection = this.piece.rotation;
+    const tests = lookup[direction][currentDirection];
     this.piece.update(direction);
 
+    if (this.wallKicksRemaining > 0 && this.wallKick(tests)) {
+      this.wallKicksRemaining -= 1;
+      return;
+    }
+
+    // undoes rotation if can't wall kick
+    this.piece.update(-direction);
+  }
+
+  /**
+   * Tests for valid positioning for piece based on current rotation and desired rotation
+   * @param {number[][]} tests - lists of tests in format [xChange, yChange] to attempt wall kick
+   * @returns {boolean} - whether or not wallKick was successful
+   */
+  wallKick(tests) {
     // runs tests for current piece to determine if a valid rotation can be made
     const validTest = tests.find(([xChange, yChange]) => this.validMove(xChange, yChange));
 
@@ -146,11 +165,14 @@ class Board {
       const diff = (xChange !== 0 || yChange !== 0);
 
       if (diff) this.movePiece(xChange, yChange, 0);
-      return;
+      return true;
     }
 
-    // undoes rotation if no valid position could be found
-    this.piece.update(-direction);
+    return false;
+  }
+
+  resetRemainingWallKicks() {
+    this.wallKicksRemaining = MAX_WALL_KICKS;
   }
 
   /**
