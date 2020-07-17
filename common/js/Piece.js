@@ -15,6 +15,7 @@ class Piece {
     this.grid = this.piece[this.rotation];
     this.x = Math.floor(BOARD_WIDTH / 2) - Math.ceil(this.grid[0].length / 2);
     this.y = 0;
+    this.maxY = 0;
   }
 
   /**
@@ -25,6 +26,7 @@ class Piece {
   move(x, y) {
     this.x += x;
     this.y += y;
+    this.maxY = Math.max(this.maxY, this.y);
   }
 
   /**
