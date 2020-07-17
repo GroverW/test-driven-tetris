@@ -15,15 +15,16 @@ class Gravity extends SubscriberBase {
    * @param {number} playerId - Links client to backend Game
    * @param {callback} lowerPiece - executes lowering the piece
    * @param {callback} validNextMove - checks whether the next move is valid
+   * @param {callback} pieceAtLowestPoint - checks whether the current piece is at its lowest point
    */
-  constructor(playerId, lowerPiece, validNextMove) {
-    super(pubSub);
-    super.initialize(playerId);
+  constructor(playerId, lowerPiece, validNextMove, pieceAtLowestPoint) {
+    super(pubSub, playerId);
     this.level = 1;
     this.start = 0;
     this.interrupt = false;
     this.lowerPiece = lowerPiece;
     this.isValidNextMove = true;
+    this.pieceAtLowestPoint = pieceAtLowestPoint;
     this.checkValidNextMove = validNextMove;
     this.resetLockDelay();
     this.mapSubscriptions([UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY]);
@@ -102,9 +103,12 @@ class Gravity extends SubscriberBase {
     }
 
     if (currTime >= this.start + this.delay) {
-      this.start = currTime;
       this.lowerPiece();
-      this.resetLockDelay();
+
+      if (this.pieceAtLowestPoint()) {
+        this.start = currTime;
+        this.resetLockDelay();
+      }
     }
   }
 
