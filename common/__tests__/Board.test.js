@@ -152,7 +152,7 @@ describe('game board tests', () => {
         gameBoard.piece = p4;
 
         movePieceTo(gameBoard, 'bottom');
-        for(let i = 0; i < 4; i += 1) gameBoard.rotatePiece(ROTATE_LEFT);
+        for (let i = 0; i < 4; i += 1) gameBoard.rotatePiece(ROTATE_LEFT);
 
         expect(gameBoard.floorKicksRemaining).toBe(MAX_FLOOR_KICKS - 1);
 
