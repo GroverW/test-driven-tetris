@@ -1,7 +1,7 @@
 const Board = require('common/js/Board');
 const Piece = require('common/js/Piece');
 const {
-  PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT, MAX_WALL_KICKS,
+  PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS,
 } = require('common/helpers/constants');
 const { TEST_BOARDS, getTestBoard, getTestPieces } = require('common/mockData/mocks');
 const pubSub = require('frontend/helpers/pubSub');
@@ -133,29 +133,32 @@ describe('game board tests', () => {
         expect(pieceEdge).toBe(boardEdge);
       });
 
-      test('MAX_WALL_KICKS - stops wall kicking after limit reached', () => {
+      test('MAX_FLOOR_KICKS - stops floor kicking after limit reached', () => {
         const wallKickSpy = jest.spyOn(gameBoard, 'wallKick');
+        const totalTests = MAX_FLOOR_KICKS * 5;
 
         gameBoard.piece = p4;
 
-        for (let i = 0; i < MAX_WALL_KICKS + 5; i += 1) {
+        for (let i = 0; i < totalTests; i += 1) {
           movePieceTo(gameBoard, 'bottom');
           gameBoard.rotatePiece(ROTATE_LEFT);
         }
-        expect(wallKickSpy).toHaveBeenCalledTimes(MAX_WALL_KICKS);
+
+        expect(wallKickSpy.mock.results.reduce((tot, res) => tot + (res.value === true), 0))
+          .toBeLessThan(totalTests);
       });
 
       test('resets remaining wall kicks on getting new piece', () => {
         gameBoard.piece = p4;
 
         movePieceTo(gameBoard, 'bottom');
-        gameBoard.rotatePiece(ROTATE_LEFT);
+        for(let i = 0; i < 4; i += 1) gameBoard.rotatePiece(ROTATE_LEFT);
 
-        expect(gameBoard.wallKicksRemaining).toBe(MAX_WALL_KICKS - 1);
+        expect(gameBoard.floorKicksRemaining).toBe(MAX_FLOOR_KICKS - 1);
 
         gameBoard.getPieces();
 
-        expect(gameBoard.wallKicksRemaining).toBe(MAX_WALL_KICKS);
+        expect(gameBoard.floorKicksRemaining).toBe(MAX_FLOOR_KICKS);
       });
     });
 
