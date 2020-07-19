@@ -184,7 +184,7 @@ const SEED_PIECES = [
   6, 6, 6, 6, 6, 6, 6,
   7, 7, 7, 7, 7, 7, 7,
 ];
-const MAX_WALL_KICKS = 10;
+const MAX_FLOOR_KICKS = 2;
 const WALL_KICK_TESTS = {
   [ROTATE_RIGHT]: {
     0: [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
@@ -230,7 +230,7 @@ module.exports = {
   PIECE_TYPES,
   PIECES,
   SEED_PIECES,
-  MAX_WALL_KICKS,
+  MAX_FLOOR_KICKS,
   WALL_KICK_TESTS,
   WALL_KICK_TESTS_I,
 };
