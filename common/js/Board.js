@@ -1,6 +1,6 @@
 const {
   BOARD_WIDTH, BOARD_HEIGHT, POINTS, PIECE_TYPES,
-  MAX_WALL_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
+  MAX_FLOOR_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
 } = require('common/helpers/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
@@ -21,7 +21,7 @@ class Board {
     this.grid = getEmptyBoard();
     this.pubSub = pubSub;
     this.pieceList = new PieceList();
-    this.resetRemainingWallKicks();
+    this.resetRemainingFloorKicks();
   }
 
   /**
@@ -41,7 +41,7 @@ class Board {
     }
 
     this.nextPiece = new Piece(this.pieceList.getNextPiece());
-    this.resetRemainingWallKicks();
+    this.resetRemainingFloorKicks();
   }
 
   /**
@@ -142,10 +142,7 @@ class Board {
     const tests = lookup[direction][currentDirection];
     this.piece.update(direction);
 
-    if (this.wallKicksRemaining > 0 && this.wallKick(tests)) {
-      this.wallKicksRemaining -= 1;
-      return;
-    }
+    if (this.wallKick(tests)) return;
 
     // undoes rotation if can't wall kick
     this.piece.update(-direction);
@@ -162,17 +159,29 @@ class Board {
 
     if (validTest) {
       const [xChange, yChange] = validTest;
-      const diff = (xChange !== 0 || yChange !== 0);
+      const isWallKick = (xChange !== 0 || yChange !== 0);
+      const isFloorKick = yChange < 0;
 
-      if (diff) this.movePiece(xChange, yChange, 0);
+      if (isFloorKick) {
+        if (this.floorKicksRemaining <= 0) {
+          return false;
+        }
+
+        this.floorKicksRemaining -= 1;
+      }
+
+      if (isWallKick) {
+        this.movePiece(xChange, yChange, 0);
+      }
+
       return true;
     }
 
     return false;
   }
 
-  resetRemainingWallKicks() {
-    this.wallKicksRemaining = MAX_WALL_KICKS;
+  resetRemainingFloorKicks() {
+    this.floorKicksRemaining = MAX_FLOOR_KICKS;
   }
 
   /**
