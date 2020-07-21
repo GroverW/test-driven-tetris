@@ -1,9 +1,6 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
-const {
-  createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
-} = require('frontend/static/js/GameDOM/DOMHelpers');
 
 const {
   getEmptyBoard,
@@ -25,7 +22,10 @@ const {
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('frontend/helpers/clientTopics');
-const GameView = require('./GameView');
+const {
+  createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
+} = require('./DOMHelpers');
+const GameView = require('../GameView');
 
 /**
  * Represents a client-side DOM manager

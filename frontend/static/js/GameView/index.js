@@ -1,11 +1,11 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
-const GameCanvas = require('frontend/static/js/GameView/GameCanvas');
 
 const { CELL_SIZE } = require('frontend/helpers/clientConstants');
 const { DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
 
+const GameCanvas = require('./GameCanvas');
 /**
  * Represents a client-side HTML canvas manager
  */

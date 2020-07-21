@@ -29,9 +29,9 @@ const {
   INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
 
-const ClientBoard = require('./ClientBoard');
+const ClientBoard = require('../ClientBoard');
 const Gravity = require('./Gravity');
-const Command = require('./Command');
+const Command = require('../Command');
 
 /**
  * Represents a client-side Tetris game
