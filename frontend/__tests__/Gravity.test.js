@@ -1,4 +1,4 @@
-const Gravity = require('frontend/static/js/Gravity');
+const Gravity = require('frontend/static/js/ClientGame/Gravity');
 const {
   ANIMATION_SPEED,
   MAX_SPEED,
