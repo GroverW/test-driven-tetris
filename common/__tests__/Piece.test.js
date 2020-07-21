@@ -46,20 +46,28 @@ describe('game pieces', () => {
   });
 
   describe('movement', () => {
-    test('moves piece', () => {
-      expect([p1.x, p1.y]).toEqual([3, 0]);
-
-      p1.move(0, 1);
-      expect([p1.x, p1.y]).toEqual([3, 1]);
+    test('moves left and right', () => {
+      const { x, y } = p1;
 
       p1.move(-1, 0);
-      expect([p1.x, p1.y]).toEqual([2, 1]);
 
-      p1.move(1, 0);
-      expect([p1.x, p1.y]).toEqual([3, 1]);
+      expect([p1.x, p1.y]).toEqual([x - 1, y]);
 
-      p1.move(0, 1);
-      expect([p1.x, p1.y]).toEqual([3, 2]);
+      p1.move(3, 0);
+
+      expect([p1.x, p1.y]).toEqual([x + 2, y]);
+    });
+
+    test('moves up and down', () => {
+      const { x, y } = p1;
+
+      p1.move(0, -1);
+
+      expect([p1.x, p1.y]).toEqual([x, y - 1]);
+
+      p1.move(0, 3);
+
+      expect([p1.x, p1.y]).toEqual([x, y + 2]);
     });
 
     test('updates max y', () => {
@@ -74,7 +82,10 @@ describe('game pieces', () => {
       expect(p1.y).toBe(0);
     });
 
-    test('rotates piece', () => {
+  });
+
+  describe('rotation', () => {
+    test('rotates left', () => {
       expect(p1.grid).toEqual([
         [0, 0, 0, 0],
         [1, 1, 1, 1],
@@ -90,8 +101,9 @@ describe('game pieces', () => {
         [0, 1, 0, 0],
         [0, 1, 0, 0],
       ]);
+    });
 
-      p1.update(ROTATE_RIGHT);
+    test('rotates right', () => {
       p1.update(ROTATE_RIGHT);
 
       expect(p1.grid).toEqual([
@@ -100,13 +112,67 @@ describe('game pieces', () => {
         [0, 0, 1, 0],
         [0, 0, 1, 0],
       ]);
+    });
 
-      p6.update(ROTATE_LEFT);
+    test('rotates left back to starting position', () => {
+      for (let i = 0; i < 3; i += 1) p1.update(ROTATE_LEFT);
 
-      expect(p6.grid).toEqual([
-        [6, 6, 0],
-        [0, 6, 0],
-        [0, 6, 0],
+      expect(p1.grid).toEqual([
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+      ]);
+
+      p1.update(ROTATE_LEFT);
+
+      expect(p1.grid).toEqual([
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ]);
+    });
+
+    test('rotates right back to starting position', () => {
+      for (let i = 0; i < 3; i += 1) p1.update(ROTATE_RIGHT);
+
+      expect(p1.grid).toEqual([
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+      ]);
+
+      p1.update(ROTATE_RIGHT);
+
+      expect(p1.grid).toEqual([
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ]);
+    });
+
+    test('rotates left no more than 1 step at a time', () => {
+      p1.update(ROTATE_LEFT * 2);
+
+      expect(p1.grid).toEqual([
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+      ]);
+    });
+
+    test('rotates right no more than 1 step at a time', () => {
+      p1.update(ROTATE_RIGHT * 2);
+
+      expect(p1.grid).toEqual([
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
       ]);
     });
   });
