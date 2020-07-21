@@ -2,7 +2,14 @@ const { subscribe } = require('frontend/helpers/pubSub');
 const { MESSAGE_TIMEOUT } = require('frontend/helpers/clientConstants');
 const { ADD_MESSAGE, CLEAR_MESSAGE } = require('frontend/helpers/clientTopics');
 
+/**
+ * Represents the flash messages displayed on screen
+ */
 class ClientMessage {
+  /**
+   * Sets the message selector and subscribes to pubSub topics
+   * @param {object} messageSelector - DOM selector for message element
+   */
   initialize(messageSelector) {
     this.message = messageSelector;
     this.subscriptions = [
@@ -11,6 +18,11 @@ class ClientMessage {
     ];
   }
 
+  /**
+   * Adds message to message container
+   * @param {string} type - type of message (error / notice)
+   * @param {string} message - message text
+   */
   addMessage(type, message) {
     this.message.innerText = message;
 
@@ -18,16 +30,27 @@ class ClientMessage {
     this.message.classList.add(type);
   }
 
+  /**
+   * Hides msesage container
+   */
   clearMessage() {
     this.message.classList.add('hide');
   }
 
+  /**
+   * Adds message and then sets timeout to clear message
+   * @param {string} type - type of message (error / notice)
+   * @param {string} message - message text
+   */
   handleMessage({ type, message }) {
     this.addMessage(type, message);
 
     setTimeout(this.clearMessage.bind(this), MESSAGE_TIMEOUT);
   }
 
+  /**
+   * Unsubscribes from all topics
+   */
   unsubscribe() {
     this.subscriptions.forEach((unsub) => unsub());
   }
