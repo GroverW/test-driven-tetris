@@ -81,7 +81,6 @@ describe('game pieces', () => {
       expect(p1.maxY).toBe(2);
       expect(p1.y).toBe(0);
     });
-
   });
 
   describe('rotation', () => {

@@ -34,9 +34,12 @@ class Piece {
    * @param {number} rotation - (-1) for counter-clockwise, (1) for clockwise
    */
   update(rotation) {
-    const rotAmt = this.rotation + rotation;
-
-    this.rotation = rotAmt < 0 ? 3 : rotAmt % 4;
+    if (rotation < 0) {
+      const newRotation = this.rotation - 1;
+      this.rotation = newRotation < 0 ? this.piece.length - 1 : newRotation;
+    } else if (rotation > 0) {
+      this.rotation = (this.rotation + 1) % 4;
+    }
 
     this.grid = this.piece[this.rotation];
   }
