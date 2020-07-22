@@ -16,17 +16,19 @@ describe('piece list tests', () => {
   });
 
   describe('add new pieces', () => {
-    test('adds new pieces', () => {
-      const newPieces = [1, 2, 3, 4, 5];
+    let newPieces;
 
+    beforeEach(() => {
+      newPieces = [1,2,3,4,5];
+    });
+
+    test('adds new pieces', () => {
       pieceList.addSet(newPieces);
 
       expect(pieceList.pieces).toEqual([newPieces]);
     });
 
     test('adds multiple new sets', () => {
-      const newPieces = [1, 2, 3, 4, 5];
-
       pieceList.addSet(newPieces);
       pieceList.addSet(newPieces);
 
@@ -35,9 +37,13 @@ describe('piece list tests', () => {
   });
 
   describe('almost empty', () => {
-    test('true when nearing end of current sets', () => {
-      const newPieces = new Array(20).fill(0);
+    let newPieces;
 
+    beforeEach(() => {
+      newPieces = new Array(20).fill(0);
+    });
+
+    test('true when nearing end of current sets', () => {
       pieceList.addSet(newPieces);
 
       expect(pieceList.almostEmpty()).toBe(false);
@@ -48,8 +54,6 @@ describe('piece list tests', () => {
     });
 
     test('only true if the current set is the last set', () => {
-      const newPieces = new Array(20).fill(0);
-
       pieceList.addSet(newPieces);
       pieceList.addSet(newPieces);
 
