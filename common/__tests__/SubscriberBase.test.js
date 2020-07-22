@@ -9,7 +9,7 @@ describe('SubscriberBase tests', () => {
   const TOPIC2 = 'topic2';
   const topics = [TOPIC1, TOPIC2];
 
-  beforeAll(() => {
+  beforeEach(() => {
     subscriberBase = new SubscriberBase(pubSub, 1);
     subscriberBase.val1 = 0;
     subscriberBase.val2 = 0;
@@ -17,7 +17,8 @@ describe('SubscriberBase tests', () => {
     subscriberBase[TOPIC2] = () => { subscriberBase.val2 += 2; };
   });
 
-  afterAll(() => {
+  afterEach(() => {
+    subscriberBase.unsubscribe();
     jest.clearAllMocks();
   });
 
@@ -74,8 +75,8 @@ describe('SubscriberBase tests', () => {
       pubSub.publish(TOPIC1);
       pubSub.publish(TOPIC2);
 
-      expect(subscriberBase.val1).toBe(1);
-      expect(subscriberBase.val2).toBe(2);
+      expect(subscriberBase.val1).toBe(0);
+      expect(subscriberBase.val2).toBe(0);
     });
   });
 });
