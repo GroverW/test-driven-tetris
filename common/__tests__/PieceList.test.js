@@ -19,7 +19,7 @@ describe('piece list tests', () => {
     let newPieces;
 
     beforeEach(() => {
-      newPieces = [1,2,3,4,5];
+      newPieces = [1, 2, 3, 4, 5];
     });
 
     test('adds new pieces', () => {

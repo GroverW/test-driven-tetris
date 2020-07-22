@@ -6,7 +6,9 @@ const {
   PIECE_TYPES,
   POINTS,
 } = require('common/helpers/constants');
-const { ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME } = require('common/helpers/commonTopics');
+const {
+  ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME,
+} = require('common/helpers/commonTopics');
 const {
   getTestBoard,
   getTestPieces,
@@ -142,7 +144,7 @@ describe('game tests', () => {
       const numSets = game.board.pieceList.pieces.length;
       const addSetSpy = jest.spyOn(game.board.pieceList, 'addSet');
 
-      pubSubTest.publish(ADD_PIECES, [1,2,3]);
+      pubSubTest.publish(ADD_PIECES, [1, 2, 3]);
 
       expect(game.board.pieceList.pieces.length).toBe(numSets + 1);
       expect(addSetSpy).toHaveBeenCalledTimes(1);
