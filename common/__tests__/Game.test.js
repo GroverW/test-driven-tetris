@@ -6,7 +6,7 @@ const {
   PIECE_TYPES,
   POINTS,
 } = require('common/helpers/constants');
-const { LOWER_PIECE, CLEAR_LINES, END_GAME } = require('common/helpers/commonTopics');
+const { ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME } = require('common/helpers/commonTopics');
 const {
   getTestBoard,
   getTestPieces,
@@ -18,26 +18,21 @@ describe('game tests', () => {
   let p1;
   let pubSubTest;
 
-  beforeAll(() => {
+  beforeEach(() => {
     pubSubTest = pubSub();
     game = new Game(1, pubSubTest, Board);
     game.addPieces(getTestPieces());
-  });
-
-  afterAll(() => {
-    game.unsubscribe();
-  });
-
-  beforeEach(() => {
     p1 = new Piece(PIECE_TYPES.I);
   });
 
   afterEach(() => {
+    game.unsubscribe();
     jest.clearAllMocks();
   });
 
   describe('start game', () => {
     test('start game', () => {
+      const getPiecesSpy = jest.spyOn(game.board, 'getPieces');
       expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
       expect(game.board.grid).toEqual(getTestBoard('empty'));
 
@@ -46,6 +41,7 @@ describe('game tests', () => {
 
       game.start();
 
+      expect(getPiecesSpy).toHaveBeenCalledTimes(1);
       expect(game.board.piece).toEqual(expect.any(Piece));
       expect(game.board.nextPiece).toEqual(expect.any(Piece));
     });
@@ -66,48 +62,60 @@ describe('game tests', () => {
     });
 
     test('score points for single line', () => {
-      const currScore = game.score;
-
       game.clearLines(1);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[1]);
+      expect(game.score).toBe(POINTS.LINES_CLEARED[1]);
     });
 
     test('score points for double line', () => {
-      const currScore = game.score;
-
       game.clearLines(2);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[2]);
+      expect(game.score).toBe(POINTS.LINES_CLEARED[2]);
     });
 
     test('score points for triple line', () => {
-      const currScore = game.score;
-
       game.clearLines(3);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[3]);
+      expect(game.score).toBe(POINTS.LINES_CLEARED[3]);
     });
 
     test('score points for tetris', () => {
-      const currScore = game.score;
-
       game.clearLines(4);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[4]);
+      expect(game.score).toBe(POINTS.LINES_CLEARED[4]);
     });
 
     test('score points with level modifier', () => {
-      const currScore = game.score;
-
       game.level = 2;
       game.clearLines(2);
 
-      expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[2] * game.level);
+      expect(game.score).toBe(POINTS.LINES_CLEARED[2] * game.level);
     });
   });
 
   describe('clear lines', () => {
+    test('updates lines and lines remaining', () => {
+      game.start();
+      const currLinesRemaining = game.linesRemaining;
+      const currLines = game.lines;
+
+      game.updateLinesRemaining(1);
+
+      expect(game.linesRemaining).toBe(currLinesRemaining - 1);
+      expect(game.lines).toBe(currLines + 1);
+    });
+
+    test('updating lines remaining updates level', () => {
+      game.start();
+      const currLinesRemaining = game.linesRemaining;
+      const currLevel = game.level;
+
+      game.updateLinesRemaining(LINES_PER_LEVEL);
+
+      expect(game.level).toBe(currLevel + 1);
+      expect(game.linesRemaining).toBe(currLinesRemaining);
+    });
+
     test('clearing lines updates lines cleared and lines remaining', () => {
       const currLines = game.lines;
       const currRemain = game.linesRemaining;
@@ -130,6 +138,16 @@ describe('game tests', () => {
   });
 
   describe('publish / subscribe', () => {
+    test('ADD_PIECES gets new pieces', () => {
+      const numSets = game.board.pieceList.pieces.length;
+      const addSetSpy = jest.spyOn(game.board.pieceList, 'addSet');
+
+      pubSubTest.publish(ADD_PIECES, [1,2,3]);
+
+      expect(game.board.pieceList.pieces.length).toBe(numSets + 1);
+      expect(addSetSpy).toHaveBeenCalledTimes(1);
+    });
+
     test('LOWER_PIECE updates score', () => {
       const currScore = game.score;
 
