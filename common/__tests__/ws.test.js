@@ -38,34 +38,27 @@ const getNewListeners = (clientListener, serverListener) => {
 
 const getNewPlayer = () => new Player(mockSend, serverPubSub());
 
-const resetAll = (clientListener, serverListener, ...players) => {
-  const [newClient, newServer] = getNewListeners(clientListener, serverListener);
+const initialize = (serverListener, ...players) => {
+  serverListener.open();
 
-  newServer.open();
-
-  players.map(() => getNewPlayer());
-
-  startGame(newServer, ...players);
-
-  return [newClient, newServer, ...players];
+  startGame(serverListener, ...players);
 };
 
 describe('websocket tests', () => {
-  let p2;
+  let p2; let p3;
   let clientListener;
   let serverListener;
   let pubSubSpy;
   let api;
 
-  beforeAll(() => {
+  beforeEach(() => {
     api = new Api(webSocketMock, 1);
 
     ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
 
     p2 = getNewPlayer();
-  });
+    p3 = getNewPlayer();
 
-  beforeEach(() => {
     WebSocket = jest.fn().mockImplementation(webSocketMock);
     api.sendMessage = jest.fn().mockImplementation(webSocketMock.send);
 
@@ -81,9 +74,6 @@ describe('websocket tests', () => {
   afterEach(() => {
     jest.clearAllMocks();
     pubSubSpy.unsubscribeAll();
-  });
-
-  afterAll(() => {
     clientListener.unsubAll();
     serverListener.unsubAll();
     api.unsubscribe();
@@ -91,8 +81,11 @@ describe('websocket tests', () => {
   });
 
   describe('joining / leaving game', () => {
-    test('player opens WS connection', () => {
+    beforeEach(() => {
       serverListener.open();
+    });
+
+    test('player opens WS connection', () => {
       expect(serverListener.player).toEqual(expect.any(Player));
     });
 
@@ -119,6 +112,8 @@ describe('websocket tests', () => {
     });
 
     test('second player is removed from room', () => {
+      serverListener.gameServer.join(p2);
+
       expect(clientListener.gameDOM.players.length).toBe(1);
       expect(clientListener.gameDOM.gameView.players.length).toBe(1);
       expect(clientListener.game.players.length).toBe(1);
@@ -133,6 +128,7 @@ describe('websocket tests', () => {
 
   describe('game start / game over', () => {
     test('should start game when initiated by client and add pieces to client and server', () => {
+      serverListener.open();
       const drawSpy = pubSubSpy.add('draw');
 
       // user will click button which will send newGame to server
@@ -152,6 +148,8 @@ describe('websocket tests', () => {
     });
 
     test('subsequent game starts should fail', () => {
+      initialize(serverListener, p2);
+
       const getPiecesSpy = jest.spyOn(clientListener.game.board, 'getPieces');
 
       expect(getPiecesSpy).toHaveBeenCalledTimes(0);
@@ -162,6 +160,7 @@ describe('websocket tests', () => {
     });
 
     test('game over', () => {
+      initialize(serverListener, p2);
       expect(clientListener.gameDOM.message.children.length).toBe(0);
       expect(clientListener.game.gameStatus).toBe(true);
       expect(clientListener.gameLoop.animationId).toEqual(expect.any(Number));
@@ -179,9 +178,7 @@ describe('websocket tests', () => {
     });
 
     test('game started - remove game after last player leaves', () => {
-      // this would be caused by player closing their browser or leaving the page
-      ([clientListener, serverListener, p2] = resetAll(clientListener, serverListener, p2));
-
+      initialize(serverListener, p2);
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
       runCommand(clientListener.game, CONTROLS.DOWN);
@@ -204,9 +201,11 @@ describe('websocket tests', () => {
   });
 
   describe('gameplay', () => {
-    test('execute commands', () => {
-      ([clientListener, serverListener, p2] = resetAll(clientListener, serverListener, p2));
+    beforeEach(() => {
+      initialize(serverListener, p2);
+    });
 
+    test('execute commands', () => {
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
       runCommand(clientListener.game, CONTROLS.DOWN);
@@ -259,12 +258,7 @@ describe('websocket tests', () => {
     test('power up is added to client when rewarded to server', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
-      const p3 = getNewPlayer();
-      ([
-        clientListener,
-        serverListener,
-        p2,
-      ] = resetAll(clientListener, serverListener, p2, p3));
+      initialize(serverListener, p2, p3);
 
       expect(serverListener.player.game.powerUps.length).toBe(0);
       expect(clientListener.gameDOM.powerUps.filter((p) => p.type).length).toBe(0);
@@ -276,6 +270,8 @@ describe('websocket tests', () => {
     });
 
     test('server side updates client side board', () => {
+      initialize(serverListener, p2);
+
       Math.random = jest.fn().mockReturnValue(0);
 
       serverListener.player.game.powerUps[0] = POWER_UP_TYPES.SWAP_LINES;
@@ -303,6 +299,7 @@ describe('websocket tests', () => {
     test('should not add if single player', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
+      serverListener.open();
       serverListener.gameServer.gameType = GAME_TYPES.SINGLE;
       serverListener.player.setGameType(GAME_TYPES.SINGLE);
 
@@ -324,6 +321,8 @@ describe('websocket tests', () => {
       const errorSpy = pubSubSpy.add('addMessage');
       const errorText = 'test';
 
+      serverListener.open();
+
       expect(errorSpy).not.toHaveBeenCalled();
       expect(clientListener.clientMessage.message.innerText).toBe('');
 
@@ -336,15 +335,16 @@ describe('websocket tests', () => {
     test('start game - not enough players', () => {
       const errorSpy = pubSubSpy.add('addMessage');
 
-      ([clientListener, serverListener] = getNewListeners(clientListener, serverListener));
-      serverListener.open();
-
       expect(errorSpy).not.toHaveBeenCalled();
       expect(clientListener.clientMessage.message.innerText).toBe('');
 
-      serverListener.startGame();
+      initialize(serverListener);
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledWith({
+        type: 'error',
+        message: expect.any(String),
+      });
       expect(clientListener.clientMessage.message.innerText).not.toBe('');
 
       serverListener.gameServer.join(p2);
