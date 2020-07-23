@@ -7,6 +7,7 @@ const {
   START_GAME,
   GAME_OVER,
   ADD_PLAYER,
+  REMOVE_PLAYER,
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
@@ -366,12 +367,28 @@ describe('client game tests', () => {
     });
 
     describe('REMOVE_PLAYER', () => {
-      test('should remove player and call mapPlayerTargets', () => {
+      beforeEach(() => {
+        game.addPlayer(p2);
+      });
 
+      test('should remove player and call mapPlayerTargets', () => {
+        const mapTargetsSpy = jest.spyOn(game, 'mapPlayerTargets');
+
+        expect(game.players.length).toBe(1);
+        expect(mapTargetsSpy).toHaveBeenCalledTimes(0);
+
+        publish(REMOVE_PLAYER, p2);
+
+        expect(game.players.length).toBe(0);
+        expect(mapTargetsSpy).toHaveBeenCalledTimes(1);
       });
 
       test('should not remove player if no id match', () => {
+        expect(game.players.length).toBe(1);
 
+        publish(REMOVE_PLAYER, p3);
+
+        expect(game.players.length).toBe(1);
       });
     });
 
