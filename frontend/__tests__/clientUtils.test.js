@@ -1,5 +1,6 @@
 const {
   randomize,
+  getNextPieceBoard,
   getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM,
@@ -12,53 +13,74 @@ describe('utils', () => {
   const pieces = [1, 2, 3, 4, 5, 6, 7];
   let pubSubSpy;
 
-  beforeAll(() => {
+  beforeEach(() => {
     pubSubSpy = pubSubMock();
     Math.random = jest.fn().mockReturnValue(0.5);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test('randomize pieces', () => {
-    expect(randomize(pieces)).toEqual([1, 6, 2, 5, 3, 7, 4]);
+  describe('getNextPieceBoard', () => {
+    test('gets empty board', () => {
+      expect(getNextPieceBoard()).toEqual([
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ]);
+    });
   });
 
-  test('get new player', () => {
-    const testPlayer = {
-      ctx: 'test',
-      board: [],
-      id: 1,
-    };
-
-    expect(getNewPlayer('test', [], 1)).toEqual(testPlayer);
+  describe('randomize', () => {
+    test('randomizes pieces', () => {
+      expect(randomize(pieces)).toEqual([1, 6, 2, 5, 3, 7, 4]);
+    });
   });
 
-  test('get new player DOM', () => {
-    const testPlayerDOM = {
-      id: 1,
-      node: 'test',
-      powerUpId: 1,
-      message: 1,
-    };
+  describe('getNewPlayer', () => {
+    test('gets new player object', () => {
+      const testPlayer = {
+        ctx: 'test',
+        board: [],
+        id: 1,
+      };
 
-    expect(getNewPlayerDOM(1, 'test', 1, 1)).toEqual(testPlayerDOM);
+      expect(getNewPlayer('test', [], 1)).toEqual(testPlayer);
+    });
   });
 
-  test('get empty board', () => {
-    const testBoard = getTestBoard('empty');
+  describe('getNewPlayerDOM', () => {
+    test('gets new player DOM object', () => {
+      const testPlayerDOM = {
+        id: 1,
+        node: 'test',
+        powerUpId: 1,
+        message: 1,
+      };
 
-    expect(getEmptyBoard()).toEqual(testBoard);
+      expect(getNewPlayerDOM(1, 'test', 1, 1)).toEqual(testPlayerDOM);
+    });
   });
 
-  test('publish error', () => {
-    const errorSpy = pubSubSpy.add(ADD_MESSAGE);
+  describe('getEmptyBoard', () => {
+    test('gets empty board', () => {
+      const testBoard = getTestBoard('empty');
 
-    expect(errorSpy).toHaveBeenCalledTimes(0);
+      expect(getEmptyBoard()).toEqual(testBoard);
+    });
+  });
 
-    publishError('test');
+  describe('publishError', () => {
+    test('publishes error', () => {
+      const errorSpy = pubSubSpy.add(ADD_MESSAGE);
 
-    expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledTimes(0);
+
+      publishError('test');
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });
