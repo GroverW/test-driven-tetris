@@ -11,14 +11,11 @@ describe('client - game board tests', () => {
   let p1;
   let pubSubSpy;
 
-  beforeAll(() => {
+  beforeEach(() => {
     gameBoard = new ClientBoard(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
     p1 = new Piece(PIECE_TYPES.I);
     gameBoard.piece = p1;
-  });
-
-  beforeEach(() => {
     pubSubSpy = pubSubMock();
   });
 
@@ -39,8 +36,6 @@ describe('client - game board tests', () => {
   });
 
   test('publish board updates on line clear', () => {
-    gameBoard.movePiece(-1, 0);
-
     const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
     const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
 
