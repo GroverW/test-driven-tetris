@@ -9,6 +9,8 @@ const {
   ADD_PLAYER,
   REMOVE_PLAYER,
   UPDATE_PLAYER,
+  BOARD_CHANGE,
+  LOWER_PIECE,
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
@@ -424,11 +426,22 @@ describe('client game tests', () => {
     });
 
     test('BOARD_CHANGE should send command queue', () => {
+      const sendQueueSpy = jest.spyOn(game, 'sendCommandQueue');
 
+      expect(sendQueueSpy).toHaveBeenCalledTimes(0);
+
+      publish(BOARD_CHANGE);
+
+      expect(sendQueueSpy).toHaveBeenCalledTimes(1);
     });
 
     test('LOWER_PIECE should publish score update', () => {
+      const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
 
+      publish(LOWER_PIECE);
+
+      expect(updateScoreSpy).toHaveBeenCalledTimes(1);
+      expect(updateScoreSpy).toHaveBeenLastCalledWith({ score: game.score });
     });
   });
 });
