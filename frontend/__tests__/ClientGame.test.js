@@ -11,12 +11,12 @@ const {
   CLEAR_COMMAND,
 } = require('frontend/helpers/clientTopics');
 const {
-  TEST_BOARDS,
   mockAnimation,
   getNewTestGame,
   runCommand,
 } = require('frontend/mockData/mocks');
 const { pubSubMock } = require('common/mockData/mocks');
+const { publish } = require('frontend/helpers/pubSub');
 
 describe('client game tests', () => {
   let game;
@@ -82,8 +82,6 @@ describe('client game tests', () => {
       test('starts game', () => {
         const drawSpy = pubSubSpy.add(DRAW);
         const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
-        expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
-        expect(game.board.grid).toEqual(TEST_BOARDS.empty);
 
         expect(game.board.piece).not.toEqual(expect.any(Piece));
         expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
@@ -289,15 +287,43 @@ describe('client game tests', () => {
   describe('publish / subscribe', () => {
     describe('START_GAME / GAME_OVER', () => {
       test('START_GAME should start game', () => {
+        const drawSpy = pubSubSpy.add(DRAW);
+        const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
 
+        expect(game.board.piece).not.toEqual(expect.any(Piece));
+        expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
+
+        expect(drawSpy).not.toHaveBeenCalled();
+        expect(updateScoreSpy).not.toHaveBeenCalled();
+
+        publish(START_GAME);
+
+        expect(game.board.piece).toEqual(expect.any(Piece));
+        expect(game.board.nextPiece).toEqual(expect.any(Piece));
+
+        expect(drawSpy).toHaveBeenCalledTimes(1);
+        expect(updateScoreSpy).toHaveBeenCalledTimes(1);
+        expect(drawSpy).toHaveBeenCalledTimes(1);
       });
 
       test('GAME_OVER should set game status to null', () => {
+        game[START_GAME]();
 
+        expect(game.gameStatus).toBe(true);
+
+        publish(GAME_OVER, { id: 1 });
+
+        expect(game.gameStatus).toBe(null);
       });
 
       test('GAME_OVER should not set game status if player id does not match', () => {
+        game[START_GAME]();
 
+        expect(game.gameStatus).toBe(true);
+
+        publish(GAME_OVER, { id: 2 });
+
+        expect(game.gameStatus).toBe(true);
       });
     });
 
