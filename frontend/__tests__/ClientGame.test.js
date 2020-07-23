@@ -6,6 +6,7 @@ const {
   UPDATE_SCORE,
   START_GAME,
   GAME_OVER,
+  ADD_PLAYER,
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
@@ -71,7 +72,6 @@ describe('client game tests', () => {
         expect(game.players).toEqual([p2, p4]);
       });
     });
-
 
     describe('start game / game over', () => {
       beforeEach(() => {
@@ -329,15 +329,39 @@ describe('client game tests', () => {
 
     describe('ADD_PLAYER', () => {
       test('should add player and call mapPlayerTargets', () => {
+        const mapTargetsSpy = jest.spyOn(game, 'mapPlayerTargets');
 
+        expect(game.players.length).toBe(0);
+        expect(mapTargetsSpy).toHaveBeenCalledTimes(0);
+
+        publish(ADD_PLAYER, p2);
+
+        expect(game.players.length).toBe(1);
+        expect(mapTargetsSpy).toHaveBeenCalledTimes(1);
       });
 
-      test('should not add player if gameStatus falsey', () => {
+      test('should not add player if game started', () => {
+        game[START_GAME]();
 
+        expect(game.players.length).toBe(0);
+
+        publish(ADD_PLAYER, p2);
+
+        expect(game.players.length).toBe(0);
       });
 
       test('should not add player if player already added', () => {
+        publish(ADD_PLAYER, p2);
 
+        expect(game.players.length).toBe(1);
+
+        publish(ADD_PLAYER, p3);
+
+        expect(game.players.length).toBe(2);
+
+        publish(ADD_PLAYER, p2);
+
+        expect(game.players.length).toBe(2);
       });
     });
 
