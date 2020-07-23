@@ -7,7 +7,7 @@ describe('Command Tests', () => {
   let callback; let callbackToggle;
   let pubSubSpy;
 
-  beforeAll(() => {
+  beforeEach(() => {
     callback = jest.fn();
     callbackToggle = jest.fn();
     command = new Command(1, callback, [1]);
@@ -15,7 +15,7 @@ describe('Command Tests', () => {
     pubSubSpy = pubSubMock();
   });
 
-  afterAll(() => {
+  afterEach(() => {
     jest.clearAllMocks();
     pubSubSpy.unsubscribeAll();
   });
@@ -44,6 +44,7 @@ describe('Command Tests', () => {
     test('delay time met', () => {
       expect(callback).toHaveBeenCalledTimes(0);
 
+      command.execute(0);
       command.execute(1);
 
       expect(callback).toHaveBeenCalledTimes(1);
@@ -52,7 +53,8 @@ describe('Command Tests', () => {
     test('publishes to command queue', () => {
       const addToQueueSpy = pubSubSpy.add(ADD_TO_QUEUE);
 
-      command.execute(Infinity);
+      command.execute(0);
+      command.execute(1);
 
       expect(addToQueueSpy).toHaveBeenCalledTimes(1);
     });
@@ -61,6 +63,7 @@ describe('Command Tests', () => {
       expect(callbackToggle).toHaveBeenCalledTimes(0);
 
       commandToggle.execute(0);
+      commandToggle.execute(1);
 
       expect(callbackToggle).toHaveBeenCalledTimes(0);
     });
@@ -76,20 +79,25 @@ describe('Command Tests', () => {
     });
 
     test('handles toggling on successful execute', () => {
+      commandToggle.execute(0);
+
       const updateDelaySpy = jest.spyOn(commandToggle, 'updateDelay');
 
-      commandToggle.execute(50);
+      commandToggle.execute(5);
 
       expect(updateDelaySpy).toHaveBeenCalledTimes(0);
 
-      commandToggle.execute(150);
+      commandToggle.execute(10);
 
       expect(updateDelaySpy).toHaveBeenCalledTimes(1);
 
-      expect(commandToggle.delay).toBe(200);
+      expect(commandToggle.delay).toBe(100);
     });
 
     test('does not go over max delay', () => {
+      commandToggle.updateDelay();
+      commandToggle.updateDelay();
+
       expect(commandToggle.delayIdx).toBe(2);
 
       commandToggle.updateDelay();
