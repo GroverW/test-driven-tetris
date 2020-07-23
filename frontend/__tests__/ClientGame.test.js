@@ -8,6 +8,7 @@ const {
   GAME_OVER,
   ADD_PLAYER,
   REMOVE_PLAYER,
+  UPDATE_PLAYER,
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
@@ -17,7 +18,7 @@ const {
   getNewTestGame,
   runCommand,
 } = require('frontend/mockData/mocks');
-const { pubSubMock } = require('common/mockData/mocks');
+const { pubSubMock, getTestBoard } = require('common/mockData/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 
 describe('client game tests', () => {
@@ -393,12 +394,32 @@ describe('client game tests', () => {
     });
 
     describe('UPDATE_PLAYER', () => {
-      test('should replace board if player id matches', () => {
+      beforeEach(() => {
+        game[START_GAME]();
+      });
 
+      test('should replace board if player id matches', () => {
+        const newBoard = getTestBoard('pattern1');
+        const emptyBoard = getTestBoard('empty');
+
+        expect(game.board.grid).toEqual(emptyBoard);
+
+        publish(UPDATE_PLAYER, { id: 1, board: newBoard });
+
+        expect(game.board.grid).toEqual(newBoard);
+        expect(game.board.grid).not.toEqual(emptyBoard);
       });
 
       test('should not replace board if player id does not match', () => {
+        const newBoard = getTestBoard('pattern1');
+        const emptyBoard = getTestBoard('empty');
 
+        expect(game.board.grid).toEqual(emptyBoard);
+
+        publish(UPDATE_PLAYER, { id: p2, board: newBoard });
+
+        expect(game.board.grid).not.toEqual(newBoard);
+        expect(game.board.grid).toEqual(emptyBoard);
       });
     });
 
