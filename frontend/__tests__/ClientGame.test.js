@@ -18,24 +18,16 @@ const {
 } = require('frontend/mockData/mocks');
 const { pubSubMock } = require('common/mockData/mocks');
 
-describe('game tests', () => {
+describe('client game tests', () => {
   let game;
   let pubSubSpy;
   const p2 = 2; const p3 = 3; const
     p4 = 4;
 
-  beforeAll(() => {
+  beforeEach(() => {
     game = getNewTestGame(game);
     // setting id to 2 so that it never receives GAME_OVER
     gameLoop.initialize(2);
-  });
-
-  afterAll(() => {
-    game.unsubscribe();
-    gameLoop.unsubscribe();
-  });
-
-  beforeEach(() => {
     pubSubSpy = pubSubMock();
     jest.useFakeTimers();
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
@@ -44,106 +36,163 @@ describe('game tests', () => {
   afterEach(() => {
     jest.clearAllMocks();
     pubSubSpy.unsubscribeAll();
+    game.unsubscribe();
+    gameLoop.unsubscribe();
   });
 
   describe('basic tests', () => {
-    test('add player', () => {
-      game.addPlayer(p2);
-      expect(game.players.length).toBe(1);
+    describe('add / remove player', () => {
+      test('adds players', () => {
+        game.addPlayer(p2);
+        expect(game.players.length).toBe(1);
 
-      // can't re-add same player
-      game.addPlayer(p2);
-      expect(game.players.length).toBe(1);
+        // can't re-add same player
+        game.addPlayer(p2);
+        expect(game.players.length).toBe(1);
 
-      game.addPlayer(p3);
-      expect(game.players.length).toBe(2);
+        game.addPlayer(p3);
+        expect(game.players.length).toBe(2);
 
-      game.addPlayer(p4);
-      expect(game.players.length).toBe(3);
+        game.addPlayer(p4);
+        expect(game.players.length).toBe(3);
 
-      expect(game.players).toEqual([p2, p3, p4]);
+        expect(game.players).toEqual([p2, p3, p4]);
+      });
+
+      test('removes player', () => {
+        game.addPlayer(p2);
+        game.addPlayer(p3);
+        game.addPlayer(p4);
+        expect(game.players.length).toBe(3);
+
+        game.removePlayer(p3);
+
+        expect(game.players.length).toBe(2);
+        expect(game.players).toEqual([p2, p4]);
+      });
     });
 
-    test('remove player', () => {
-      expect(game.players.length).toBe(3);
 
-      game.removePlayer(p3);
+    describe('start game / game over', () => {
+      beforeEach(() => {
+        game.addPlayer(p2);
+        game.addPlayer(p4);
+      });
 
-      expect(game.players.length).toBe(2);
-      expect(game.players).toEqual([p2, p4]);
+      test('starts game', () => {
+        const drawSpy = pubSubSpy.add(DRAW);
+        const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
+        expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
+        expect(game.board.grid).toEqual(TEST_BOARDS.empty);
+
+        expect(game.board.piece).not.toEqual(expect.any(Piece));
+        expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
+
+        expect(drawSpy).not.toHaveBeenCalled();
+        expect(updateScoreSpy).not.toHaveBeenCalled();
+
+        game[START_GAME]();
+        gameLoop[START_GAME]();
+
+        expect(game.board.piece).toEqual(expect.any(Piece));
+        expect(game.board.nextPiece).toEqual(expect.any(Piece));
+
+        expect(drawSpy).toHaveBeenCalledTimes(1);
+        expect(updateScoreSpy).toHaveBeenCalledTimes(1);
+        expect(drawSpy).toHaveBeenCalledTimes(1);
+      });
+
+      test('does not add player if game started', () => {
+        game[START_GAME]();
+        expect(game.gameStatus).toBe(true);
+        expect(game.players.length).toBe(2);
+
+        game.addPlayer(p3);
+
+        expect(game.players.length).toBe(2);
+      });
+
+      test('does not run commands after game over', () => {
+        game[START_GAME]();
+        game.board.piece = new Piece(PIECE_TYPES.O);
+        const gameOverSpy = pubSubSpy.add(GAME_OVER);
+        const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
+
+        for (let i = 0; i < 15; i += 1) {
+          game.board.nextPiece = new Piece(PIECE_TYPES.O);
+          runCommand(game, CONTROLS.HARD_DROP);
+        }
+
+        // only 10 O pieces can fit on the board
+        expect(boardMoveSpy).toHaveBeenCalledTimes(10);
+        expect(gameOverSpy).toHaveBeenCalled();
+
+        runCommand(game, CONTROLS.LEFT);
+
+        // should not get called again
+        expect(boardMoveSpy).toHaveBeenCalledTimes(10);
+      });
     });
 
-    test('start game', () => {
-      const drawSpy = pubSubSpy.add(DRAW);
-      const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
-      expect([game.score, game.level, game.lines]).toEqual([0, 1, 0]);
-      expect(game.board.grid).toEqual(TEST_BOARDS.empty);
+    describe('keyboard controls', () => {
+      test('publishes commands on keyboard controls', () => {
+        game[START_GAME]();
+        const setCommandSpy = pubSubSpy.add(SET_COMMAND);
+        const clearCommandSpy = pubSubSpy.add(CLEAR_COMMAND);
 
-      expect(game.board.piece).not.toEqual(expect.any(Piece));
-      expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
+        game.command(CONTROLS.DOWN, 'down');
 
-      expect(drawSpy).not.toHaveBeenCalled();
-      expect(updateScoreSpy).not.toHaveBeenCalled();
+        expect(setCommandSpy).toHaveBeenCalledTimes(1);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
 
-      game[START_GAME]();
-      gameLoop[START_GAME]();
+        game.command(CONTROLS.DOWN, 'up');
 
-      expect(game.board.piece).toEqual(expect.any(Piece));
-      expect(game.board.nextPiece).toEqual(expect.any(Piece));
+        expect(setCommandSpy).toHaveBeenCalledTimes(1);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(1);
+      });
 
-      expect(drawSpy).toHaveBeenCalledTimes(1);
-      expect(updateScoreSpy).toHaveBeenCalledTimes(1);
-      expect(drawSpy).toHaveBeenCalledTimes(1);
-    });
+      test('does not run commands for invalid keys', () => {
+        game[START_GAME]();
+        const setCommandSpy = pubSubSpy.add(SET_COMMAND);
+        const clearCommandSpy = pubSubSpy.add(CLEAR_COMMAND);
 
-    test('add player - game started', () => {
-      expect(game.gameStatus).toBe(true);
-      expect(game.players.length).toBe(2);
+        game.command(CONTROLS.DOWN, 'down');
+        game.command(CONTROLS.DOWN, 'down');
 
-      game.addPlayer(p3);
+        expect(setCommandSpy).toHaveBeenCalledTimes(2);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
 
-      expect(game.players.length).toBe(2);
-    });
+        game.command(null, 'down');
 
-    test('keyboard controls', () => {
-      const setCommandSpy = pubSubSpy.add(SET_COMMAND);
-      const clearCommandSpy = pubSubSpy.add(CLEAR_COMMAND);
+        expect(setCommandSpy).toHaveBeenCalledTimes(2);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
 
-      game.command(CONTROLS.DOWN, 'down');
+        game.command(CONTROLS.DOWN, 'up');
 
-      expect(setCommandSpy).toHaveBeenCalledTimes(1);
-      expect(clearCommandSpy).toHaveBeenCalledTimes(0);
+        expect(setCommandSpy).toHaveBeenCalledTimes(2);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(1);
 
-      game.command(CONTROLS.DOWN, 'up');
+        game.command(null, 'up');
 
-      expect(setCommandSpy).toHaveBeenCalledTimes(1);
-      expect(clearCommandSpy).toHaveBeenCalledTimes(1);
-    });
+        expect(setCommandSpy).toHaveBeenCalledTimes(2);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(1);
+      });
 
-    test('game over', () => {
-      game = getNewTestGame(game, true);
-      game.start();
-      game.board.piece = new Piece(PIECE_TYPES.O);
-      const gameOverSpy = pubSubSpy.add(GAME_OVER);
-      const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
+      test('sends command queue if game status is falsey', () => {
+        const sendQueueSpy = jest.spyOn(game, 'sendCommandQueue');
 
-      for (let i = 0; i < 15; i += 1) {
-        game.board.nextPiece = new Piece(PIECE_TYPES.O);
-        runCommand(game, CONTROLS.HARD_DROP);
-      }
+        game.command(CONTROLS.DOWN, 'down');
 
-      // only 10 O pieces can fit on the board
-      expect(boardMoveSpy).toHaveBeenCalledTimes(10);
-      expect(gameOverSpy).toHaveBeenCalled();
-
-      runCommand(game, CONTROLS.LEFT);
-
-      // should not get called again
-      expect(boardMoveSpy).toHaveBeenCalledTimes(10);
+        expect(sendQueueSpy).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
   describe('command queue', () => {
+    beforeEach(() => {
+      game[START_GAME]();
+    });
+
     test('add commands', () => {
       game = getNewTestGame(game, true, p2, p4);
       game.start();
@@ -163,7 +212,7 @@ describe('game tests', () => {
     test('send commands', () => {
       const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
 
-      expect(game.commandQueue.length).toBe(5);
+      expect(game.commandQueue.length).toBe(0);
 
       runCommand(game, CONTROLS.HARD_DROP);
 
@@ -182,6 +231,10 @@ describe('game tests', () => {
   });
 
   describe('board / piece validations', () => {
+    beforeEach(() => {
+      game[START_GAME]();
+    });
+
     test('validates whether piece can move down', () => {
       expect(game.isValidDrop()).toBe(true);
 
@@ -193,6 +246,8 @@ describe('game tests', () => {
     });
 
     test('validates whether piece has reached lowest point', () => {
+      game.board.movePiece(0, 1, 0);
+
       expect(game.isPieceAtLowestPoint()).toBe(true);
 
       game.board.movePiece(0, -1, 0);
@@ -202,6 +257,12 @@ describe('game tests', () => {
   });
 
   describe('power ups', () => {
+    beforeEach(() => {
+      game.addPlayer(p2);
+      game.addPlayer(p4);
+      game[START_GAME]();
+    });
+
     test('adds to command queue', () => {
       game.sendCommandQueue = jest.fn().mockImplementation(() => { });
 
@@ -222,6 +283,64 @@ describe('game tests', () => {
       runCommand(game, CONTROLS.PLAYER4);
       // should not send if player not found
       expect(game.sendCommandQueue).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('publish / subscribe', () => {
+    describe('START_GAME / GAME_OVER', () => {
+      test('START_GAME should start game', () => {
+
+      });
+
+      test('GAME_OVER should set game status to null', () => {
+
+      });
+
+      test('GAME_OVER should not set game status if player id does not match', () => {
+
+      });
+    });
+
+    describe('ADD_PLAYER', () => {
+      test('should add player and call mapPlayerTargets', () => {
+
+      });
+
+      test('should not add player if gameStatus falsey', () => {
+
+      });
+
+      test('should not add player if player already added', () => {
+
+      });
+    });
+
+    describe('REMOVE_PLAYER', () => {
+      test('should remove player and call mapPlayerTargets', () => {
+
+      });
+
+      test('should not remove player if no id match', () => {
+
+      });
+    });
+
+    describe('UPDATE_PLAYER', () => {
+      test('should replace board if player id matches', () => {
+
+      });
+
+      test('should not replace board if player id does not match', () => {
+
+      });
+    });
+
+    test('BOARD_CHANGE should send command queue', () => {
+
+    });
+
+    test('LOWER_PIECE should publish score update', () => {
+
     });
   });
 });
