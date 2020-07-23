@@ -15,25 +15,19 @@ describe('client message tests', () => {
     message: messageText,
   };
 
-  beforeAll(() => {
+  beforeEach(() => {
     const messageSelector = getMockDOMSelector();
     messageSelector.classList.add('hide');
     clientMessage.initialize(messageSelector);
-  });
-
-  afterAll(() => {
-    clientMessage.unsubscribe();
-  });
-
-  beforeEach(() => {
     jest.useFakeTimers();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    clientMessage.unsubscribe();
   });
 
-  test('add error message', () => {
+  test('adds error message', () => {
     expect(clientMessage.message.classList.contains('hide')).toBe(true);
 
     publish(ADD_MESSAGE, errorData);
@@ -43,7 +37,7 @@ describe('client message tests', () => {
     expect(clientMessage.message.classList.contains('hide')).toBe(false);
   });
 
-  test('add notice message', () => {
+  test('adds notice message', () => {
     publish(ADD_MESSAGE, noticeData);
 
     expect(clientMessage.message.innerText).toBe(messageText);
@@ -51,13 +45,13 @@ describe('client message tests', () => {
     expect(clientMessage.message.classList.contains('hide')).toBe(false);
   });
 
-  test('clear error message', () => {
+  test('clears error message', () => {
     publish(CLEAR_MESSAGE);
 
     expect(clientMessage.message.classList.contains('hide')).toBe(true);
   });
 
-  test('handle error', () => {
+  test('handles error', () => {
     publish(ADD_MESSAGE, errorData);
 
     expect(clientMessage.message.innerText).toBe(messageText);
