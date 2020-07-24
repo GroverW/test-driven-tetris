@@ -73,6 +73,7 @@ class SubscriberBase {
    */
   unsubscribe() {
     this.subscriptions.forEach((unsub) => unsub());
+    this.subscriptions = [];
   }
 }
 
