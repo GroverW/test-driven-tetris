@@ -80,6 +80,9 @@ class GameLoop extends SubscriberBase {
   stop() {
     cancelAnimationFrame(this.animationId);
     this.animationId = undefined;
+    this.command = undefined;
+    this.toggleCommand = undefined;
+    this.autoCommand = undefined;
   }
 
   /**
