@@ -32,7 +32,7 @@ describe('game DOM tests', () => {
   let newCtx2; let newBoard2; let newId2; let newPlayer2;
   let addPlayerSpy;
 
-  beforeAll(() => {
+  beforeEach(() => {
     newCtx1 = getMockCtx();
     newId1 = 1;
     newId2 = 2;
@@ -43,15 +43,6 @@ describe('game DOM tests', () => {
     gameDOM.initialize(getMockGameDOMSelectors());
     game = getNewTestGame(game);
     gameLoop.initialize(2);
-  });
-
-  afterAll(() => {
-    gameDOM.unsubscribe();
-    game.unsubscribe();
-    gameLoop.unsubscribe();
-  });
-
-  beforeEach(() => {
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
     document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);
@@ -62,63 +53,81 @@ describe('game DOM tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    gameDOM.unsubscribe();
+    game.unsubscribe();
+    gameLoop.unsubscribe();
   });
 
   describe('add / remove players', () => {
-    test('add player', () => {
-      publish(ADD_PLAYER, newPlayer1.id);
+    describe('add player', () => {
+      test('adds new player successfully', () => {
+        publish(ADD_PLAYER, newPlayer1.id);
 
-      expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-      expect(gameDOM.players.length).toBe(1);
-      expect(gameDOM.gameView.players.length).toBe(1);
-      expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
-      expect(gameDOM.players[0].powerUpId.classList.contains('power-up-target')).toBe(true);
-      expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+        expect(addPlayerSpy).toHaveBeenCalledTimes(1);
+        expect(gameDOM.players.length).toBe(1);
+        expect(gameDOM.gameView.players.length).toBe(1);
+        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+        expect(gameDOM.players[0].powerUpId.classList.contains('power-up-target')).toBe(true);
+        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+      });
+
+      test('adding 3rd player resizes 2nd player', () => {
+        publish(ADD_PLAYER, newPlayer1.id);
+        publish(ADD_PLAYER, newPlayer2.id);
+
+        expect(addPlayerSpy).toHaveBeenCalledTimes(2);
+        expect(gameDOM.players.length).toBe(2);
+        expect(gameDOM.gameView.players.length).toBe(2);
+        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+      });
+
+      test('does not add player if id matches Game DOM player id', () => {
+
+      });
     });
 
-    test('add 3rd player resizes 2nd player', () => {
-      publish(ADD_PLAYER, newPlayer2.id);
+    describe('remove player', () => {
+      beforeEach(() => {
+        publish(ADD_PLAYER, newPlayer1.id);
+        publish(ADD_PLAYER, newPlayer2.id);
+      });
 
-      expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-      expect(gameDOM.players.length).toBe(2);
-      expect(gameDOM.gameView.players.length).toBe(2);
-      expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
-      expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
-    });
+      test('removes player successfully', () => {
+        publish(REMOVE_PLAYER, newPlayer2.id);
 
-    test('remove player', () => {
-      publish(REMOVE_PLAYER, newPlayer2.id);
+        expect(gameDOM.players.length).toBe(1);
+        expect(gameDOM.gameView.players.length).toBe(1);
+      });
 
-      expect(gameDOM.players.length).toBe(1);
-      expect(gameDOM.gameView.players.length).toBe(1);
-    });
+      test('removing player updates power up targets', () => {
+        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+        expect(gameDOM.players[1].powerUpId.innerText).toBe(3);
 
-    test('remove player - update power up targets', () => {
-      publish(ADD_PLAYER, newPlayer2.id);
+        publish(REMOVE_PLAYER, newPlayer1.id);
 
-      expect(gameDOM.players.length).toBe(2);
-      expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
-      expect(gameDOM.players[1].powerUpId.innerText).toBe(3);
+        expect(gameDOM.players.length).toBe(1);
+        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+      });
 
-      publish(REMOVE_PLAYER, newPlayer1.id);
+      test('removing 3rd player resizes 2nd player', () => {
+        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
 
-      expect(gameDOM.players.length).toBe(1);
-      expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
-    });
+        publish(REMOVE_PLAYER, newPlayer1.id);
 
-    test('remove 3rd player resizes 2nd player', () => {
-      publish(ADD_PLAYER, newPlayer1.id);
+        expect(gameDOM.players.length).toBe(1);
+        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(false);
+      });
 
-      expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-      expect(gameDOM.players.length).toBe(2);
-      expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
-      expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+      test('does not remove player if id matches game DOM player id', () => {
 
-      publish(REMOVE_PLAYER, newPlayer1.id);
+      });
 
-      expect(gameDOM.players.length).toBe(1);
-      expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
-      expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(false);
+      test('does not update power up ids, remove or resize player if id does not match', () => {
+
+      });
     });
   });
 
@@ -168,32 +177,40 @@ describe('game DOM tests', () => {
       expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL);
     });
 
-    test('updates points when piece moves down', () => {
-      runCommand(game, CONTROLS.DOWN);
+    describe('scoreboard updates', () => {
+      beforeEach(() => {
+        game[START_GAME]();
+        gameLoop[START_GAME]();
+      });
 
-      expect(gameDOM.score.innerText).toBe(1);
-    });
+      test('updates points when piece moves down', () => {
+        runCommand(game, CONTROLS.DOWN);
 
-    test('updates on line clear (tetris)', () => {
-      expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL);
+        expect(gameDOM.score.innerText).toBe(1);
+      });
 
-      publish(CLEAR_LINES, 4);
+      test('updates on line clear (tetris)', () => {
+        expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL);
 
-      expect(gameDOM.score.innerText).toBe(801);
-      expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 4);
-    });
+        publish(CLEAR_LINES, 4);
 
-    test('updates on level increase', () => {
-      expect(gameDOM.level.innerText).toBe(1);
+        expect(gameDOM.score.innerText).toBe(800);
+        expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 4);
+      });
 
-      publish(CLEAR_LINES, 4);
+      test('updates on level increase', () => {
+        expect(gameDOM.level.innerText).toBe(1);
 
-      expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 8);
-      expect(gameDOM.level.innerText).toBe(1);
+        publish(CLEAR_LINES, 4);
 
-      publish(CLEAR_LINES, 4);
+        expect(gameDOM.lines.innerText).toBe(LINES_PER_LEVEL - 4);
+        expect(gameDOM.level.innerText).toBe(1);
 
-      expect(gameDOM.level.innerText).toBe(2);
+        publish(CLEAR_LINES, 4);
+        publish(CLEAR_LINES, 4);
+
+        expect(gameDOM.level.innerText).toBe(2);
+      });
     });
   });
 
@@ -213,6 +230,9 @@ describe('game DOM tests', () => {
     });
 
     test('uses power up', () => {
+      publish(ADD_POWER_UP, POWER_UP_TYPES.SWAP_LINES);
+      publish(ADD_POWER_UP, POWER_UP_TYPES.SCRAMBLE_BOARD);
+
       const id1 = POWER_UP_TYPES.SWAP_LINES;
       const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
       expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id1}`)).toBe(true);
