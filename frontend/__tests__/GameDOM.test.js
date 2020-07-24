@@ -122,11 +122,26 @@ describe('game DOM tests', () => {
       });
 
       test('does not remove player if id matches game DOM player id', () => {
+        const resizeSpy = jest.spyOn(gameDOM, 'resizePlayer2');
+        const updatePowerUpTargetIdsSpy = jest.spyOn(gameDOM, 'updatePowerUpTargetIds');
 
+        expect(gameDOM.players.length).toBe(2);
+
+        publish(REMOVE_PLAYER, gameDOM.playerId);
+
+        expect(gameDOM.players.length).toBe(2);
+        expect(resizeSpy).toHaveBeenCalledTimes(0);
+        expect(updatePowerUpTargetIdsSpy).toHaveBeenCalledTimes(0);
       });
 
-      test('does not update power up ids, remove or resize player if id does not match', () => {
+      test('does not remove or resize player if id does not match', () => {
+        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+        expect(gameDOM.players.length).toBe(2);
 
+        publish(REMOVE_PLAYER, 'fake id');
+
+        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+        expect(gameDOM.players.length).toBe(2);
       });
     });
   });
