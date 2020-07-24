@@ -109,6 +109,10 @@ const mockAnimation = () => {
   }, GAME_TIME_INTERVAL);
 };
 
+const mockCancelAnimation = (animationId) => {
+  clearTimeout(animationId);
+};
+
 const getNewTestGame = (game, testPiece = false, ...players) => {
   if (game) game.unsubscribe();
   const newGame = new ClientGame(1);
@@ -135,6 +139,7 @@ module.exports = {
   getMockDOMSelector,
   getMockGameDOMSelectors,
   mockAnimation,
+  mockCancelAnimation,
   getNewTestGame,
   runCommand,
 };
