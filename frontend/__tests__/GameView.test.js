@@ -1,5 +1,6 @@
 const GameView = require('frontend/static/js/GameView');
 const gameLoop = require('frontend/static/js/GameLoop');
+
 const {
   CONTROLS,
   BOARD_HEIGHT,
@@ -7,11 +8,12 @@ const {
   CELL_SIZE,
 } = require('frontend/helpers/clientConstants');
 const {
-  START_GAME, DRAW, REMOVE_PLAYER, UPDATE_PLAYER,
+  START_GAME, DRAW, REMOVE_PLAYER, UPDATE_PLAYER, END_GAME,
 } = require('frontend/helpers/clientTopics');
 const {
   getMockCtx,
   getTestBoard,
+  getTestPiece,
   getNewTestGame,
   runCommand,
   mockAnimation,
@@ -215,15 +217,44 @@ describe('game view tests', () => {
       });
 
       test('draws board if board included', () => {
+        const drawGridSpy = jest.spyOn(gameView.player, 'drawGrid');
+        const drawNextPieceSpy = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
 
+        const testBoard = getTestBoard('pattern1');
+
+        publish(DRAW, { board: testBoard });
+
+        expect(drawGridSpy).toHaveBeenCalledTimes(1);
+        expect(drawGridSpy).toHaveBeenLastCalledWith(testBoard);
+        expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
       test('draws piece if piece included', () => {
+        const drawGridSpy = jest.spyOn(gameView.player, 'drawGrid');
+        const drawNextPieceSpy = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
 
+        const testPiece = getTestPiece('I');
+        const { grid, x, y } = testPiece;
+
+        publish(DRAW, { piece: testPiece });
+
+        expect(drawGridSpy).toHaveBeenCalledTimes(1);
+        expect(drawGridSpy).toHaveBeenLastCalledWith(grid, undefined, x, y);
+        expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
       test('draws nextPiece if nextPiece included', () => {
+        const drawGridSpy = jest.spyOn(gameView.player, 'drawGrid');
+        const drawNextPieceSpy = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
 
+        const testPiece = getTestPiece('I');
+        const { grid } = testPiece;
+
+        publish(DRAW, { nextPiece: testPiece });
+
+        expect(drawNextPieceSpy).toHaveBeenCalledTimes(1);
+        expect(drawNextPieceSpy).toHaveBeenLastCalledWith(grid);
+        expect(drawGridSpy).toHaveBeenCalledTimes(0);
       });
     });
 
@@ -248,7 +279,7 @@ describe('game view tests', () => {
     describe('UPDATE_PLAYER', () => {
       beforeEach(() => {
         gameView.addPlayer(newPlayer1);
-      })
+      });
 
       test('updates player board on publish', () => {
         const testBoard = getTestBoard('pattern1');
@@ -269,18 +300,20 @@ describe('game view tests', () => {
       });
     });
 
-    test('unsubscribe - publishing should stop updating game view', () => {
-      const testBoard = getTestBoard('pattern1');
-      gameView.addPlayer(newPlayer1);
+    describe('END_GAME', () => {
+      test('publishing should stop updating game view on game end', () => {
+        const testBoard = getTestBoard('pattern1');
+        gameView.addPlayer(newPlayer1);
 
-      gameView.unsubscribe();
+        publish(END_GAME);
 
-      publish(DRAW, { board: testBoard });
-      publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
-      publish(REMOVE_PLAYER, newId1);
+        publish(DRAW, { board: testBoard });
+        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        publish(REMOVE_PLAYER, newId1);
 
-      expect(gameView.players.length).toBe(1);
-      expect(drawGrid).toHaveBeenCalledTimes(0);
+        expect(gameView.players.length).toBe(1);
+        expect(drawGrid).toHaveBeenCalledTimes(0);
+      });
     });
   });
 });
