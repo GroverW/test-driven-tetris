@@ -77,7 +77,7 @@ class Gravity extends SubscriberBase {
    */
   getLockDelayIncrement() {
     const baseDelay = ANIMATION_SPEED[1];
-    const currentDelay = this.delay;
+    const currentDelay = this.getAnimationDelay();
 
     // max is baseDelay / 4, min is baseDelay / 8
     return ((baseDelay / currentDelay - 1) / 2 + 1) * (currentDelay / 4);
@@ -90,12 +90,16 @@ class Gravity extends SubscriberBase {
     this.lockDelay = this.getLockDelayIncrement();
   }
 
+  updateValidNextMove() {
+    this.isValidNextMove = this.checkValidNextMove();
+  }
+
   /**
    * Handles execution of lowering piece and resetting timers
    * @param {number} currTime - current game time in ms
    */
   execute(currTime) {
-    this.isValidNextMove = this.checkValidNextMove();
+    this.updateValidNextMove();
 
     if (this.isValidNextMove && this.interrupt) {
       this.start = currTime;
@@ -104,7 +108,6 @@ class Gravity extends SubscriberBase {
 
     if (currTime >= this.start + this.delay) {
       this.lowerPiece();
-
       if (this.pieceAtLowestPoint()) {
         this.start = currTime;
         this.resetLockDelay();
