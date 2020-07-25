@@ -15,6 +15,7 @@ const {
   getNewTestGame,
   runCommand,
   mockAnimation,
+  mockCancelAnimation,
 } = require('frontend/mockData/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer, getNextPieceBoard } = require('frontend/helpers/clientUtils');
@@ -29,6 +30,14 @@ describe('game view tests', () => {
   let drawGrid; let drawNext;
 
   beforeAll(() => {
+
+  });
+
+  afterAll(() => {
+
+  });
+
+  beforeEach(() => {
     mockCtx = getMockCtx();
     mockCtxNext = getMockCtx();
     newCtx1 = getMockCtx();
@@ -44,23 +53,18 @@ describe('game view tests', () => {
     game = getNewTestGame(game);
     gameLoop.initialize(2);
     gameView = new GameView(mockCtx, getTestBoard('empty'), mockCtxNext, getNextPieceBoard());
-  });
-
-  afterAll(() => {
-    game.unsubscribe();
-    gameView.unsubscribe();
-    gameLoop.unsubscribe();
-  });
-
-  beforeEach(() => {
     drawGrid = jest.spyOn(gameView.player, 'drawGrid');
     drawNext = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
     jest.useFakeTimers();
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
+    cancelAnimationFrame = jest.fn().mockImplementation(mockCancelAnimation);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    game.unsubscribe();
+    gameView.unsubscribe();
+    gameLoop.gameOverAction();
   });
 
   describe('draw elements', () => {
@@ -81,28 +85,32 @@ describe('game view tests', () => {
     });
 
     test('draw elements on piece rotate', () => {
-      expect(drawGrid).toHaveBeenCalledTimes(0);
+      game[START_GAME]();
+      gameLoop[START_GAME]();
+
+      expect(drawGrid).toHaveBeenCalledTimes(2);
+      expect(drawNext).toHaveBeenCalledTimes(1);
 
       runCommand(game, CONTROLS.ROTATE_LEFT);
 
       // board and piece updated on rotate
-      expect(drawGrid).toHaveBeenCalledTimes(2);
-      expect(drawNext).toHaveBeenCalledTimes(0);
+      expect(drawGrid).toHaveBeenCalledTimes(4);
+      expect(drawNext).toHaveBeenCalledTimes(1);
     });
 
     test('only draw nextPiece when piece dropped', () => {
-      runCommand(game, CONTROLS.DOWN);
+      game[START_GAME]();
+      gameLoop[START_GAME]();
 
-      // redraw board and piece once per command
       expect(drawGrid).toHaveBeenCalledTimes(2);
-      expect(drawNext).toHaveBeenCalledTimes(0);
+      expect(drawNext).toHaveBeenCalledTimes(1);
 
       runCommand(game, CONTROLS.HARD_DROP);
 
       // when a new piece is grabbed, board, piece and nextPiece
       // should be drawn
       expect(drawGrid).toHaveBeenCalledTimes(4);
-      expect(drawNext).toHaveBeenCalledTimes(1);
+      expect(drawNext).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -128,6 +136,7 @@ describe('game view tests', () => {
       const fullCell = CELL_SIZE;
       const halfCell = CELL_SIZE / 2;
 
+      gameView.addPlayer(newPlayer1);
       expect(gameView.players.length).toBe(1);
 
       const scaleBoardSpy = jest.spyOn(gameView.players[0], 'scaleBoardSize');
@@ -155,6 +164,11 @@ describe('game view tests', () => {
     });
 
     test('remove player', () => {
+      gameView.addPlayer(newPlayer1);
+      gameView.addPlayer(newPlayer2);
+
+      expect(gameView.players.length).toBe(2);
+
       gameView.removePlayer(newId1);
 
       expect(gameView.players.length).toBe(1);
@@ -167,9 +181,11 @@ describe('game view tests', () => {
       const halfWidth = (BOARD_WIDTH * CELL_SIZE) / 2;
       const halfHeight = (BOARD_HEIGHT * CELL_SIZE) / 2;
 
+      gameView.addPlayer(newPlayer1);
+
       expect(gameView.players.length).toBe(1);
 
-      gameView.addPlayer(newPlayer1);
+      gameView.addPlayer(newPlayer2);
 
       expect(gameView.players.length).toBe(2);
 
@@ -198,9 +214,11 @@ describe('game view tests', () => {
     });
 
     test('REMOVE_PLAYER - removes player', () => {
+      gameView.addPlayer(newPlayer1);
+
       expect(gameView.players.length).toBe(1);
 
-      publish(REMOVE_PLAYER, newId2);
+      publish(REMOVE_PLAYER, newId1);
 
       expect(gameView.players.length).toBe(0);
     });
@@ -224,6 +242,7 @@ describe('game view tests', () => {
 
     test('unsubscribe - publishing should stop updating game view', () => {
       const testBoard = getTestBoard('pattern1');
+      gameView.addPlayer(newPlayer1);
 
       gameView.unsubscribe();
 
