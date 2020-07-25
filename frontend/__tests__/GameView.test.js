@@ -205,39 +205,68 @@ describe('game view tests', () => {
   });
 
   describe('publish / subscribe', () => {
-    test('DRAW - calls draw', () => {
-      const testBoard = getTestBoard('pattern1');
+    describe('DRAW', () => {
+      test('calls draw on publish', () => {
+        const testBoard = getTestBoard('pattern1');
 
-      publish(DRAW, { board: testBoard });
+        publish(DRAW, { board: testBoard });
 
-      expect(drawGrid).toHaveBeenCalledTimes(1);
+        expect(drawGrid).toHaveBeenCalledTimes(1);
+      });
+
+      test('draws board if board included', () => {
+
+      });
+
+      test('draws piece if piece included', () => {
+
+      });
+
+      test('draws nextPiece if nextPiece included', () => {
+
+      });
     });
 
-    test('REMOVE_PLAYER - removes player', () => {
-      gameView.addPlayer(newPlayer1);
+    describe('REMOVE_PLAYER', () => {
+      beforeEach(() => {
+        gameView.addPlayer(newPlayer1);
+      });
 
-      expect(gameView.players.length).toBe(1);
+      test('removes player on publish', () => {
+        expect(gameView.players.length).toBe(1);
 
-      publish(REMOVE_PLAYER, newId1);
+        publish(REMOVE_PLAYER, newId1);
 
-      expect(gameView.players.length).toBe(0);
+        expect(gameView.players.length).toBe(0);
+      });
+
+      test('does not remove player if id does not match', () => {
+
+      });
     });
 
-    test('UPDATE_PLAYER - updates player board', () => {
-      const testBoard = getTestBoard('pattern1');
+    describe('UPDATE_PLAYER', () => {
+      beforeEach(() => {
+        gameView.addPlayer(newPlayer1);
+      })
 
-      gameView.addPlayer(newPlayer1);
+      test('updates player board on publish', () => {
+        const testBoard = getTestBoard('pattern1');
+        const drawGridSpy = jest.spyOn(gameView.players[0], 'drawGrid');
 
-      const drawGridSpy = jest.spyOn(gameView.players[0], 'drawGrid');
+        expect(gameView.players.length).toBe(1);
+        expect(drawGridSpy).toHaveBeenCalledTimes(0);
+        expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
 
-      expect(gameView.players.length).toBe(1);
-      expect(drawGridSpy).toHaveBeenCalledTimes(0);
-      expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
+        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
 
-      publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        expect(gameView.players[0].board).toEqual(testBoard);
+        expect(drawGridSpy).toHaveBeenCalledTimes(1);
+      });
 
-      expect(gameView.players[0].board).toEqual(testBoard);
-      expect(drawGridSpy).toHaveBeenCalledTimes(1);
+      test('does not update player if id does not match', () => {
+
+      });
     });
 
     test('unsubscribe - publishing should stop updating game view', () => {
