@@ -22,16 +22,15 @@ describe('gravity tests', () => {
   const playerId = 1;
   let pubSubSpy;
 
-  beforeAll(() => {
+  beforeEach(() => {
     gravity = new Gravity(playerId, fakeCallback, fakeMoveCheck, fakeLowestPointCheck);
-    jest.useFakeTimers();
     pubSubSpy = pubSubMock();
   });
 
-  afterAll(() => {
+  afterEach(() => {
     jest.clearAllMocks();
-    jest.clearFakeTimers();
     pubSubSpy.unsubscribeAll();
+    gravity.gameOverAction();
   });
 
   describe('calculate delay', () => {
@@ -75,6 +74,10 @@ describe('gravity tests', () => {
   });
 
   describe('execute callback', () => {
+    beforeEach(() => {
+      gravity.updateValidNextMove();
+    });
+
     test('does not call callback when delay threshhold not met', () => {
       const currStart = gravity.start;
       const currDelay = gravity.delay;
@@ -85,33 +88,35 @@ describe('gravity tests', () => {
     });
 
     test('calls callback when delay threshhold met, resets start time and lock delay', () => {
+      gravity[ADD_LOCK_DELAY]();
+
       const currStart = gravity.start;
       const currDelay = gravity.delay;
       const currLockDelay = gravity.lockDelay;
 
-      gravity.execute(currStart + currDelay);
+      gravity.execute(currStart + currDelay + currLockDelay);
 
       expect(fakeCallback).toHaveBeenCalledTimes(1);
-      expect(gravity.start).toBe(currStart + currDelay);
+      expect(gravity.start).toBe(currStart + currDelay + currLockDelay);
       expect(gravity.lockDelay).toBeLessThan(currLockDelay);
     });
 
     test('interrupt delay resets start time if valid next move', () => {
-      let { start, delay } = gravity;
+      let { start, delay, lockDelay } = gravity;
 
       gravity.interruptDelay();
 
-      gravity.execute(start + delay);
+      gravity.execute(start + delay + lockDelay);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(2);
+      expect(fakeCallback).toHaveBeenCalledTimes(1);
 
-      ({ start, delay } = gravity);
+      ({ start, delay, lockDelay } = gravity);
 
       validMove = true;
 
-      gravity.execute(start + delay);
+      gravity.execute(start + delay + lockDelay);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(2);
+      expect(fakeCallback).toHaveBeenCalledTimes(1);
       expect(gravity.interrupt).toBe(false);
     });
 
