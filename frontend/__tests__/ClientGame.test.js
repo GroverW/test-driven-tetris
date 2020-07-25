@@ -17,6 +17,7 @@ const {
 } = require('frontend/helpers/clientTopics');
 const {
   mockAnimation,
+  mockCancelAnimation,
   getNewTestGame,
   runCommand,
 } = require('frontend/mockData/mocks');
@@ -36,6 +37,7 @@ describe('client game tests', () => {
     pubSubSpy = pubSubMock();
     jest.useFakeTimers();
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
+    cancelAnimationFrame = jest.fn().mockImplementation(mockCancelAnimation);
   });
 
   afterEach(() => {
