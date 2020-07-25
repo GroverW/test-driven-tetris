@@ -1,18 +1,11 @@
 const Game = require('common/js/Game');
 const Board = require('common/js/Board');
 const Piece = require('common/js/Piece');
-const {
-  LINES_PER_LEVEL,
-  PIECE_TYPES,
-  POINTS,
-} = require('common/helpers/constants');
+const { LINES_PER_LEVEL, POINTS } = require('common/helpers/constants');
 const {
   ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME,
 } = require('common/helpers/commonTopics');
-const {
-  getTestBoard,
-  getTestPieces,
-} = require('common/mockData/mocks');
+const { getTestBoard, getTestPiece, getTestPieces } = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {
@@ -24,7 +17,7 @@ describe('game tests', () => {
     pubSubTest = pubSub();
     game = new Game(1, pubSubTest, Board);
     game.addPieces(getTestPieces());
-    p1 = new Piece(PIECE_TYPES.I);
+    p1 = getTestPiece('I');
   });
 
   afterEach(() => {

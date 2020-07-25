@@ -1,6 +1,6 @@
 const gameLoop = require('frontend/static/js/GameLoop');
 const Piece = require('common/js/Piece');
-const { PIECE_TYPES, CONTROLS } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/helpers/clientConstants');
 const {
   DRAW,
   UPDATE_SCORE,
@@ -20,7 +20,7 @@ const {
   getNewTestGame,
   runCommand,
 } = require('frontend/mockData/mocks');
-const { pubSubMock, getTestBoard } = require('common/mockData/mocks');
+const { pubSubMock, getTestBoard, getTestPiece } = require('common/mockData/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 
 describe('client game tests', () => {
@@ -116,12 +116,12 @@ describe('client game tests', () => {
 
       test('does not run commands after game over', () => {
         game[START_GAME]();
-        game.board.piece = new Piece(PIECE_TYPES.O);
+        game.board.piece = getTestPiece('O');
         const gameOverSpy = pubSubSpy.add(GAME_OVER);
         const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
         for (let i = 0; i < 15; i += 1) {
-          game.board.nextPiece = new Piece(PIECE_TYPES.O);
+          game.board.nextPiece = getTestPiece('O');
           runCommand(game, CONTROLS.HARD_DROP);
         }
 

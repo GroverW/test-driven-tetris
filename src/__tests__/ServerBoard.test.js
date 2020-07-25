@@ -1,8 +1,9 @@
 const ServerBoard = require('backend/js/ServerBoard');
-const Piece = require('common/js/Piece');
-const { PIECE_TYPES, SEED_PIECES } = require('backend/helpers/serverConstants');
+const { SEED_PIECES } = require('backend/helpers/serverConstants');
 const { GET_PIECES, CLEAR_LINES } = require('backend/helpers/serverTopics');
-const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
+const {
+  getTestBoard, getTestPiece, getTestPieces, pubSubMock,
+} = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('server - board tests', () => {
@@ -16,7 +17,7 @@ describe('server - board tests', () => {
     pubSubSpy = pubSubMock(pubSubTest);
     gameBoard = new ServerBoard(pubSubTest);
     gameBoard.pieceList.pieces.push(getTestPieces());
-    p1 = new Piece(PIECE_TYPES.I);
+    p1 = getTestPiece('I');
   });
 
   test('requests new pieces when almost out', () => {

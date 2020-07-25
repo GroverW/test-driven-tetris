@@ -1,9 +1,11 @@
 const Board = require('common/js/Board');
 const Piece = require('common/js/Piece');
 const {
-  PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS,
+  PIECES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS,
 } = require('common/helpers/constants');
-const { TEST_BOARDS, getTestBoard, getTestPieces } = require('common/mockData/mocks');
+const {
+  TEST_BOARDS, getTestBoard, getTestPiece, getTestPieces,
+} = require('common/mockData/mocks');
 const pubSub = require('frontend/helpers/pubSub');
 
 const movePieceTo = (gameBoard, location) => {
@@ -26,11 +28,11 @@ describe('game board tests', () => {
   beforeEach(() => {
     gameBoard = new Board(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
-    p1 = new Piece(PIECE_TYPES.I);
-    p2 = new Piece(PIECE_TYPES.O);
-    p3 = new Piece(PIECE_TYPES.T);
-    p4 = new Piece(PIECE_TYPES.L);
-    p5 = new Piece(PIECE_TYPES.J);
+    p1 = getTestPiece('I');
+    p2 = getTestPiece('O');
+    p3 = getTestPiece('T');
+    p4 = getTestPiece('L');
+    p5 = getTestPiece('J');
   });
 
   afterEach(() => {

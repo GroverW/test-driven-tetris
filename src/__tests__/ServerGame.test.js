@@ -1,20 +1,12 @@
 const ServerGame = require('backend/js/ServerGame');
-const Piece = require('common/js/Piece');
+const { GAME_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/helpers/serverConstants');
 const {
-  GAME_TYPES,
-  PIECE_TYPES,
-  POWER_UP_TYPES,
-  MAX_POWER_UPS,
-} = require('backend/helpers/serverConstants');
-const {
-  UPDATE_PLAYER,
-  CLEAR_LINES,
-  ADD_POWER_UP,
-  USE_POWER_UP,
+  UPDATE_PLAYER, CLEAR_LINES, ADD_POWER_UP, USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 const {
   TEST_BOARDS,
   getTestBoard,
+  getTestPiece,
   getTestPieces,
   pubSubMock,
 } = require('common/mockData/mocks');
@@ -32,8 +24,8 @@ describe('game tests', () => {
     pubSubSpy = pubSubMock(pubSubTest);
     game = new ServerGame(pubSubTest, 1, GAME_TYPES.MULTI);
     game.board.pieceList.pieces.push(getTestPieces());
-    p1 = new Piece(PIECE_TYPES.I);
-    p2 = new Piece(PIECE_TYPES.T);
+    p1 = getTestPiece('I');
+    p2 = getTestPiece('T');
   });
 
   afterEach(() => {
@@ -44,13 +36,13 @@ describe('game tests', () => {
   test('game over', () => {
     game.start();
     game.board.grid = getTestBoard('empty');
-    game.board.piece = new Piece(PIECE_TYPES.I);
+    game.board.piece = getTestPiece('I');
     const gameOverSpy = jest.spyOn(game, 'unsubscribe');
     const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
 
     // stacking I pieces on top of each other until they reach the top
     for (let i = 0; i < 5; i += 1) {
-      game.board.nextPiece = new Piece(PIECE_TYPES.I);
+      game.board.nextPiece = getTestPiece('I');
       game.command('ROTATE_LEFT');
       game.command('HARD_DROP');
     }
@@ -161,8 +153,8 @@ describe('game tests', () => {
 
       // duplicate scoring points for tetris
       game.board.grid = getTestBoard('clearLines2');
-      game.board.piece = new Piece(PIECE_TYPES.T);
-      game.board.nextPiece = new Piece(PIECE_TYPES.I);
+      game.board.piece = getTestPiece('T');
+      game.board.nextPiece = getTestPiece('I');
 
       const COMMANDS1 = [
         'ROTATE_LEFT',
@@ -183,8 +175,8 @@ describe('game tests', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
       game.board.grid = getTestBoard('clearLines2');
-      game.board.piece = new Piece(PIECE_TYPES.T);
-      game.board.nextPiece = new Piece(PIECE_TYPES.I);
+      game.board.piece = getTestPiece('T');
+      game.board.nextPiece = getTestPiece('I');
 
       const COMMANDS2 = [
         'ROTATE_LEFT',

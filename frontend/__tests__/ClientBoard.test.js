@@ -1,8 +1,9 @@
 const ClientBoard = require('frontend/static/js/ClientBoard');
-const { PIECE_TYPES, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
+const { ROTATE_LEFT } = require('frontend/helpers/clientConstants');
 const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
-const { getTestBoard, getTestPieces, pubSubMock } = require('common/mockData/mocks');
-const Piece = require('common/js/Piece');
+const {
+  getTestBoard, getTestPiece, getTestPieces, pubSubMock,
+} = require('common/mockData/mocks');
 const pubSub = require('frontend/helpers/pubSub');
 const { TEST_BOARDS } = require('frontend/mockData/mocks');
 
@@ -14,7 +15,7 @@ describe('client - game board tests', () => {
   beforeEach(() => {
     gameBoard = new ClientBoard(pubSub);
     gameBoard.pieceList.pieces.push(getTestPieces());
-    p1 = new Piece(PIECE_TYPES.I);
+    p1 = getTestPiece('I');
     gameBoard.piece = p1;
     pubSubSpy = pubSubMock();
   });
