@@ -272,7 +272,11 @@ describe('game view tests', () => {
       });
 
       test('does not remove player if id does not match', () => {
+        expect(gameView.players.length).toBe(1);
 
+        publish(REMOVE_PLAYER, newId2);
+
+        expect(gameView.players.length).toBe(1);
       });
     });
 
@@ -296,7 +300,18 @@ describe('game view tests', () => {
       });
 
       test('does not update player if id does not match', () => {
+        const testBoard = getTestBoard('pattern1');
+        const emptyBoard = getTestBoard('empty');
+        const drawGridSpy = jest.spyOn(gameView.players[0], 'drawGrid');
 
+        expect(gameView.players.length).toBe(1);
+        expect(drawGridSpy).toHaveBeenCalledTimes(0);
+        expect(gameView.players[0].board).toEqual(emptyBoard);
+
+        publish(UPDATE_PLAYER, { id: 'fake', board: testBoard });
+
+        expect(gameView.players[0].board).toEqual(emptyBoard);
+        expect(drawGridSpy).toHaveBeenCalledTimes(0);
       });
     });
 
