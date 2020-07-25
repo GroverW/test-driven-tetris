@@ -1,6 +1,7 @@
-const { SEED_PIECES } = require('common/helpers/constants');
+const { PIECE_TYPES, SEED_PIECES } = require('common/helpers/constants');
 const { randomize } = require('common/helpers/utils');
 const { subscribe } = require('frontend/helpers/pubSub');
+const Piece = require('common/js/Piece');
 const TEST_BOARDS = require('./sampleBoards');
 
 /**
@@ -14,6 +15,12 @@ const mockSend = () => { };
  * @returns {number[][]} - test board
  */
 const getTestBoard = (board) => JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+
+/**
+ * Creates new test piece grid
+ * @param {string} type - I, O, T, S, Z, L, J, N
+ */
+const getTestPiece = (type) => new Piece(PIECE_TYPES[type]);
 
 /**
  * Creates list of piece ids
@@ -93,6 +100,7 @@ module.exports = {
   TEST_BOARDS,
   mockSend,
   getTestBoard,
+  getTestPiece,
   getTestPieces,
   webSocketMock,
   pubSubMock,
