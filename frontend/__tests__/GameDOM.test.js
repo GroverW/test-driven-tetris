@@ -245,22 +245,28 @@ describe('game DOM tests', () => {
     });
 
     test('uses power up', () => {
+      const nodeClassListContains = (nodeId, powerUpId) => {
+        return gameDOM.powerUps[nodeId].node.classList.contains(`power-up${powerUpId}`)
+      };
+      const node1 = 0;
+      const node2 = 1;
+
       publish(ADD_POWER_UP, POWER_UP_TYPES.SWAP_LINES);
       publish(ADD_POWER_UP, POWER_UP_TYPES.SCRAMBLE_BOARD);
 
       const id1 = POWER_UP_TYPES.SWAP_LINES;
       const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
-      expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id1}`)).toBe(true);
-      expect(gameDOM.powerUps[1].node.classList.contains(`power-up${id2}`)).toBe(true);
+      expect(nodeClassListContains(node1, id1)).toBe(true);
+      expect(nodeClassListContains(node2, id2)).toBe(true);
 
       publish(USE_POWER_UP);
 
-      expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id2}`)).toBe(true);
-      expect(gameDOM.powerUps[1].node.classList.contains(`power-up${id2}`)).toBe(false);
+      expect(nodeClassListContains(node1, id2)).toBe(true);
+      expect(nodeClassListContains(node2, id2)).toBe(false);
 
       publish(USE_POWER_UP);
 
-      expect(gameDOM.powerUps[0].node.classList.contains(`power-up${id2}`)).toBe(false);
+      expect(nodeClassListContains(node1, id2)).toBe(false);
 
       expect(gameDOM.powerUps[0].node.classList.classes.length).toBe(0);
       expect(gameDOM.powerUps[1].node.classList.classes.length).toBe(0);
