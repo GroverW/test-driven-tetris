@@ -1,5 +1,5 @@
 const { PIECE_TYPES, SEED_PIECES } = require('common/helpers/constants');
-const { randomize } = require('common/helpers/utils');
+const { randomize, getEmptyBoard } = require('common/helpers/utils');
 const { subscribe } = require('frontend/helpers/pubSub');
 const Piece = require('common/js/Piece');
 const TEST_BOARDS = require('./sampleBoards');
@@ -14,7 +14,17 @@ const mockSend = () => { };
  * @param {string} board - name of test board
  * @returns {number[][]} - test board
  */
-const getTestBoard = (board) => JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+const getTestBoard = (board) => {
+  if(board === 'empty' || board === 'filledLine') {
+    return JSON.parse(JSON.stringify(TEST_BOARDS[board]));
+  }
+
+  const baseBoard = getEmptyBoard();
+  const updatedParts = TEST_BOARDS[board];
+  const combinedBoard = baseBoard.slice(0,baseBoard.length - updatedParts.length);
+  combinedBoard.push(...updatedParts)
+  return JSON.parse(JSON.stringify(combinedBoard));
+};
 
 /**
  * Creates new test piece grid

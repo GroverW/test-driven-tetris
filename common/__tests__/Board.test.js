@@ -4,7 +4,7 @@ const {
   PIECES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS,
 } = require('common/helpers/constants');
 const {
-  TEST_BOARDS, getTestBoard, getTestPiece, getTestPieces,
+  getTestBoard, getTestPiece, getTestPieces,
 } = require('common/mockData/mocks');
 const pubSub = require('frontend/helpers/pubSub');
 
@@ -41,7 +41,7 @@ describe('game board tests', () => {
 
   describe('setup', () => {
     test('creates a new, empty board', () => {
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.empty);
+      expect(gameBoard.grid).toEqual(getTestBoard('empty'));
     });
 
     test('gets new piece', () => {
@@ -170,7 +170,7 @@ describe('game board tests', () => {
 
         gameBoard.hardDrop();
 
-        expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern1);
+        expect(gameBoard.grid).toEqual(getTestBoard('pattern1'));
       });
 
       test('hard drop piece with obstacles', () => {
@@ -179,24 +179,24 @@ describe('game board tests', () => {
         gameBoard.rotatePiece(ROTATE_LEFT);
         gameBoard.hardDrop();
 
-        expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern2);
+        expect(gameBoard.grid).toEqual(getTestBoard('pattern2'));
 
         gameBoard.piece = p4;
         gameBoard.hardDrop();
 
-        expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern3);
+        expect(gameBoard.grid).toEqual(getTestBoard('pattern3'));
 
         gameBoard.piece = p2;
         gameBoard.hardDrop();
 
-        expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern4);
+        expect(gameBoard.grid).toEqual(getTestBoard('pattern4'));
 
         gameBoard.piece = p3;
         gameBoard.rotatePiece(ROTATE_RIGHT);
         gameBoard.movePiece(2, 0);
         gameBoard.hardDrop();
 
-        expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern5);
+        expect(gameBoard.grid).toEqual(getTestBoard('pattern5'));
       });
     });
   });
@@ -206,29 +206,29 @@ describe('game board tests', () => {
       gameBoard.piece = p1;
       gameBoard.movePiece(0, 18);
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.empty);
+      expect(gameBoard.grid).toEqual(getTestBoard('empty'));
       expect([p1.x, p1.y]).toEqual([3, 18]);
 
       // don't drop piece if down key used (only auto_down or hard_drop)
       gameBoard.movePiece(0, 1);
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.empty);
+      expect(gameBoard.grid).toEqual(getTestBoard('empty'));
 
       // if multiplier not same as down key, then drop
       gameBoard.movePiece(0, 1, 0);
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern1);
+      expect(gameBoard.grid).toEqual(getTestBoard('pattern1'));
       expect([p1.x, p1.y]).toEqual([3, 18]);
 
       // don't drop piece if invalid horizontal move
       gameBoard.piece = p2;
       gameBoard.movePiece(-4, 0);
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern1);
+      expect(gameBoard.grid).toEqual(getTestBoard('pattern1'));
       expect([p2.x, p2.y]).toEqual([0, 0]);
 
       gameBoard.movePiece(-1, 0);
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.pattern1);
+      expect(gameBoard.grid).toEqual(getTestBoard('pattern1'));
       expect([p2.x, p2.y]).toEqual([0, 0]);
     });
 
@@ -253,7 +253,7 @@ describe('game board tests', () => {
 
       gameBoard.hardDrop();
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines1Cleared);
+      expect(gameBoard.grid).toEqual(getTestBoard('clearLines1Cleared'));
     });
 
     test('clears multiple lines', () => {
@@ -263,7 +263,7 @@ describe('game board tests', () => {
       gameBoard.rotatePiece(ROTATE_LEFT);
       gameBoard.hardDrop();
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
+      expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
     });
 
     test('clears non-consecutive lines', () => {
@@ -274,7 +274,7 @@ describe('game board tests', () => {
       gameBoard.movePiece(3, 0);
       gameBoard.hardDrop();
 
-      expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines3Cleared);
+      expect(gameBoard.grid).toEqual(getTestBoard('clearLines3Cleared'));
     });
   });
 

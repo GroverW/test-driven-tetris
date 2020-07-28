@@ -4,7 +4,6 @@ const {
   UPDATE_PLAYER, CLEAR_LINES, ADD_POWER_UP, USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 const {
-  TEST_BOARDS,
   getTestBoard,
   getTestPiece,
   getTestPieces,
@@ -78,7 +77,7 @@ describe('game tests', () => {
 
     game.executeCommandQueue(COMMANDS);
 
-    expect(game.board.grid).toEqual(TEST_BOARDS.clearLines2Cleared4);
+    expect(game.board.grid).toEqual(getTestBoard('clearLines2Cleared4'));
 
     // T will hard drop 13, I will hard drop 15
     // there are two auto_downs which count for 0 points

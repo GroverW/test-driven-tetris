@@ -5,7 +5,6 @@ const {
   getTestBoard, getTestPiece, getTestPieces, pubSubMock,
 } = require('common/mockData/mocks');
 const pubSub = require('frontend/helpers/pubSub');
-const { TEST_BOARDS } = require('frontend/mockData/mocks');
 
 describe('client - game board tests', () => {
   let gameBoard;
@@ -45,7 +44,7 @@ describe('client - game board tests', () => {
     gameBoard.rotatePiece(ROTATE_LEFT);
     gameBoard.hardDrop();
 
-    expect(gameBoard.grid).toEqual(TEST_BOARDS.clearLines2Cleared3);
+    expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
 
     // 1 for adding piece to board
     // 1 for clearing lines
