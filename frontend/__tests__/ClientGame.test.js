@@ -19,7 +19,7 @@ const {
   mockAnimation,
   mockCancelAnimation,
   getNewTestGame,
-  runCommand,
+  runCommands,
   clearMocksAndUnsubscribe,
 } = require('frontend/mockData/mocks');
 const { pubSubMock, getTestBoard, getTestPiece } = require('common/mockData/mocks');
@@ -58,17 +58,13 @@ describe('client game tests', () => {
         game.addPlayer(p3);
         expect(game.players.length).toBe(2);
 
-        game.addPlayer(p4);
-        expect(game.players.length).toBe(3);
-
-        expect(game.players).toEqual([p2, p3, p4]);
+        expect(game.players).toEqual([p2, p3]);
       });
 
       test('removes player', () => {
         game.addPlayer(p2);
         game.addPlayer(p3);
         game.addPlayer(p4);
-        expect(game.players.length).toBe(3);
 
         game.removePlayer(p3);
 
@@ -122,14 +118,14 @@ describe('client game tests', () => {
 
         for (let i = 0; i < 15; i += 1) {
           game.board.nextPiece = getTestPiece('O');
-          runCommand(game, CONTROLS.HARD_DROP);
+          runCommands(game, CONTROLS.HARD_DROP);
         }
 
         // only 10 O pieces can fit on the board
         expect(boardMoveSpy).toHaveBeenCalledTimes(10);
         expect(gameOverSpy).toHaveBeenCalled();
 
-        runCommand(game, CONTROLS.LEFT);
+        runCommands(game, CONTROLS.LEFT);
 
         // should not get called again
         expect(boardMoveSpy).toHaveBeenCalledTimes(10);
@@ -158,26 +154,11 @@ describe('client game tests', () => {
         const setCommandSpy = pubSubSpy.add(SET_COMMAND);
         const clearCommandSpy = pubSubSpy.add(CLEAR_COMMAND);
 
-        game.command(CONTROLS.DOWN, 'down');
-        game.command(CONTROLS.DOWN, 'down');
-
-        expect(setCommandSpy).toHaveBeenCalledTimes(2);
-        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
-
         game.command(null, 'down');
-
-        expect(setCommandSpy).toHaveBeenCalledTimes(2);
-        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
-
-        game.command(CONTROLS.DOWN, 'up');
-
-        expect(setCommandSpy).toHaveBeenCalledTimes(2);
-        expect(clearCommandSpy).toHaveBeenCalledTimes(1);
-
         game.command(null, 'up');
 
-        expect(setCommandSpy).toHaveBeenCalledTimes(2);
-        expect(clearCommandSpy).toHaveBeenCalledTimes(1);
+        expect(setCommandSpy).toHaveBeenCalledTimes(0);
+        expect(clearCommandSpy).toHaveBeenCalledTimes(0);
       });
 
       test('sends command queue if game status is falsey', () => {
@@ -191,41 +172,23 @@ describe('client game tests', () => {
   });
 
   describe('command queue', () => {
-    beforeEach(() => {
-      game[START_GAME]();
-    });
-
     test('add commands', () => {
       game = getNewTestGame(game, true, p2, p4);
-      game.start();
+      game[START_GAME]();
       gameLoop.autoCommand = undefined;
 
-      runCommand(game, CONTROLS.LEFT);
-      runCommand(game, CONTROLS.RIGHT);
-      runCommand(game, CONTROLS.DOWN);
-      runCommand(game, CONTROLS.ROTATE_LEFT);
-      runCommand(game, CONTROLS.ROTATE_RIGHT);
+      runCommands(game, CONTROLS.LEFT, CONTROLS.RIGHT, CONTROLS.DOWN, CONTROLS.ROTATE_LEFT);
 
-      expect(game.commandQueue).toEqual([
-        'LEFT', 'RIGHT', 'DOWN', 'ROTATE_LEFT', 'ROTATE_RIGHT',
-      ]);
+      expect(game.commandQueue).toEqual(['LEFT', 'RIGHT', 'DOWN', 'ROTATE_LEFT']);
     });
 
     test('send commands', () => {
+      game[START_GAME]();
       const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
 
       expect(game.commandQueue.length).toBe(0);
 
-      runCommand(game, CONTROLS.HARD_DROP);
-
-      // updating board should send commands and clear queue
-      expect(game.commandQueue.length).toBe(0);
-      expect(sendMessageSpy).toHaveBeenCalledTimes(1);
-
-      runCommand(game, CONTROLS.ROTATE_RIGHT);
-      runCommand(game, CONTROLS.AUTO_DOWN);
-      runCommand(game, CONTROLS.LEFT);
-      runCommand(game, CONTROLS.HARD_DROP);
+      runCommands(game, CONTROLS.ROTATE_RIGHT, CONTROLS.HARD_DROP, CONTROLS.LEFT, CONTROLS.HARD_DROP);
 
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(2);
@@ -240,9 +203,7 @@ describe('client game tests', () => {
     test('validates whether piece can move down', () => {
       expect(game.isValidDrop()).toBe(true);
 
-      while (game.board.validMove(0, 1)) {
-        game.board.movePiece(0, 1, 0);
-      }
+      while (game.board.validMove(0, 1)) game.board.movePiece(0, 1, 0);
 
       expect(game.isValidDrop()).toBe(false);
     });
@@ -268,7 +229,7 @@ describe('client game tests', () => {
     test('adds to command queue', () => {
       game.sendCommandQueue = jest.fn().mockImplementation(() => { });
 
-      runCommand(game, CONTROLS.PLAYER3);
+      runCommands(game, CONTROLS.PLAYER3);
 
       // command queue should contain actual player id, whereas CONTROLS.PLAYER3
       // represents the player's board position relative to the one using the command
@@ -278,11 +239,11 @@ describe('client game tests', () => {
     test('sends command queue', () => {
       game.sendCommandQueue = jest.fn();
 
-      runCommand(game, CONTROLS.PLAYER2);
+      runCommands(game, CONTROLS.PLAYER2);
 
       expect(game.sendCommandQueue).toHaveBeenCalledTimes(1);
 
-      runCommand(game, CONTROLS.PLAYER4);
+      runCommands(game, CONTROLS.PLAYER4);
       // should not send if player not found
       expect(game.sendCommandQueue).toHaveBeenCalledTimes(1);
     });
@@ -293,12 +254,6 @@ describe('client game tests', () => {
       test('START_GAME should start game', () => {
         const drawSpy = pubSubSpy.add(DRAW);
         const updateScoreSpy = pubSubSpy.add(UPDATE_SCORE);
-
-        expect(game.board.piece).not.toEqual(expect.any(Piece));
-        expect(game.board.nextPiece).not.toEqual(expect.any(Piece));
-
-        expect(drawSpy).not.toHaveBeenCalled();
-        expect(updateScoreSpy).not.toHaveBeenCalled();
 
         publish(START_GAME);
 
@@ -335,9 +290,6 @@ describe('client game tests', () => {
       test('should add player and call mapPlayerTargets', () => {
         const mapTargetsSpy = jest.spyOn(game, 'mapPlayerTargets');
 
-        expect(game.players.length).toBe(0);
-        expect(mapTargetsSpy).toHaveBeenCalledTimes(0);
-
         publish(ADD_PLAYER, p2);
 
         expect(game.players.length).toBe(1);
@@ -347,8 +299,6 @@ describe('client game tests', () => {
       test('should not add player if game started', () => {
         game[START_GAME]();
 
-        expect(game.players.length).toBe(0);
-
         publish(ADD_PLAYER, p2);
 
         expect(game.players.length).toBe(0);
@@ -356,16 +306,9 @@ describe('client game tests', () => {
 
       test('should not add player if player already added', () => {
         publish(ADD_PLAYER, p2);
-
-        expect(game.players.length).toBe(1);
-
-        publish(ADD_PLAYER, p3);
-
-        expect(game.players.length).toBe(2);
-
         publish(ADD_PLAYER, p2);
 
-        expect(game.players.length).toBe(2);
+        expect(game.players.length).toBe(1);
       });
     });
 
@@ -377,9 +320,6 @@ describe('client game tests', () => {
       test('should remove player and call mapPlayerTargets', () => {
         const mapTargetsSpy = jest.spyOn(game, 'mapPlayerTargets');
 
-        expect(game.players.length).toBe(1);
-        expect(mapTargetsSpy).toHaveBeenCalledTimes(0);
-
         publish(REMOVE_PLAYER, p2);
 
         expect(game.players.length).toBe(0);
@@ -387,8 +327,6 @@ describe('client game tests', () => {
       });
 
       test('should not remove player if no id match', () => {
-        expect(game.players.length).toBe(1);
-
         publish(REMOVE_PLAYER, p3);
 
         expect(game.players.length).toBe(1);
@@ -409,7 +347,6 @@ describe('client game tests', () => {
         publish(UPDATE_PLAYER, { id: 1, board: newBoard });
 
         expect(game.board.grid).toEqual(newBoard);
-        expect(game.board.grid).not.toEqual(emptyBoard);
       });
 
       test('should not replace board if player id does not match', () => {
@@ -420,7 +357,6 @@ describe('client game tests', () => {
 
         publish(UPDATE_PLAYER, { id: p2, board: newBoard });
 
-        expect(game.board.grid).not.toEqual(newBoard);
         expect(game.board.grid).toEqual(emptyBoard);
       });
     });
