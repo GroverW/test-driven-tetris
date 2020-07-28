@@ -10,7 +10,7 @@ const {
 const { MSG_TYPE } = require('common/helpers/commonTopics');
 
 const {
-  getMockDOMSelector, getMockGameDOMSelectors, runCommand, mockAnimation,
+  getMockDOMSelector, getMockGameDOMSelectors, runCommands, mockAnimation,
 } = require('frontend/mockData/mocks');
 const MockClientListener = require('common/mockData/mockClientListener');
 const MockServerListener = require('common/mockData/mockServerListener');
@@ -181,11 +181,11 @@ describe('websocket tests', () => {
       initialize(serverListener, p2);
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      runCommand(clientListener.game, CONTROLS.DOWN);
-      runCommand(clientListener.game, CONTROLS.LEFT);
-      runCommand(clientListener.game, CONTROLS.ROTATE_RIGHT);
-      runCommand(clientListener.game, CONTROLS.AUTO_DOWN);
-      runCommand(clientListener.game, CONTROLS.HARD_DROP);
+      runCommands(clientListener.game, CONTROLS.DOWN);
+      runCommands(clientListener.game, CONTROLS.LEFT);
+      runCommands(clientListener.game, CONTROLS.ROTATE_RIGHT);
+      runCommands(clientListener.game, CONTROLS.AUTO_DOWN);
+      runCommands(clientListener.game, CONTROLS.HARD_DROP);
 
       const serverBoard = serverListener.player.game.board.grid;
       const clientBoard = clientListener.game.board.grid;
@@ -208,11 +208,11 @@ describe('websocket tests', () => {
     test('execute commands', () => {
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      runCommand(clientListener.game, CONTROLS.DOWN);
+      runCommands(clientListener.game, CONTROLS.DOWN);
 
-      runCommand(clientListener.game, CONTROLS.LEFT);
-      runCommand(clientListener.game, CONTROLS.ROTATE_RIGHT);
-      runCommand(clientListener.game, CONTROLS.HARD_DROP);
+      runCommands(clientListener.game, CONTROLS.LEFT);
+      runCommands(clientListener.game, CONTROLS.ROTATE_RIGHT);
+      runCommands(clientListener.game, CONTROLS.HARD_DROP);
 
       const serverBoard = serverListener.player.game.board.grid;
       const clientBoard = clientListener.game.board.grid;
@@ -220,9 +220,9 @@ describe('websocket tests', () => {
       expect(startingClientBoard).not.toEqual(clientBoard);
       expect(serverBoard).toEqual(clientBoard);
 
-      runCommand(clientListener.game, CONTROLS.LEFT);
-      runCommand(clientListener.game, CONTROLS.ROTATE_LEFT);
-      runCommand(clientListener.game, CONTROLS.HARD_DROP);
+      runCommands(clientListener.game, CONTROLS.LEFT);
+      runCommands(clientListener.game, CONTROLS.ROTATE_LEFT);
+      runCommands(clientListener.game, CONTROLS.HARD_DROP);
 
       expect(serverBoard).toEqual(clientBoard);
       expect(serverListener.player.game.score).toEqual(clientListener.game.score);
@@ -241,7 +241,7 @@ describe('websocket tests', () => {
 
     test('game over from play', () => {
       for (let i = 0; i < 25; i += 1) {
-        runCommand(clientListener.game, CONTROLS.HARD_DROP);
+        runCommands(clientListener.game, CONTROLS.HARD_DROP);
       }
 
       const serverBoard = serverListener.player.game.board.grid;

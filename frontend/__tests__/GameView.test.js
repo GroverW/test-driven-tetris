@@ -15,7 +15,7 @@ const {
   getTestBoard,
   getTestPiece,
   getNewTestGame,
-  runCommand,
+  runCommands,
   mockAnimation,
   mockCancelAnimation,
   clearMocksAndUnsubscribe,
@@ -83,7 +83,7 @@ describe('game view tests', () => {
       expect(drawGrid).toHaveBeenCalledTimes(2);
       expect(drawNext).toHaveBeenCalledTimes(1);
 
-      runCommand(game, CONTROLS.ROTATE_LEFT);
+      runCommands(game, CONTROLS.ROTATE_LEFT);
 
       // board and piece updated on rotate
       expect(drawGrid).toHaveBeenCalledTimes(4);
@@ -97,7 +97,7 @@ describe('game view tests', () => {
       expect(drawGrid).toHaveBeenCalledTimes(2);
       expect(drawNext).toHaveBeenCalledTimes(1);
 
-      runCommand(game, CONTROLS.HARD_DROP);
+      runCommands(game, CONTROLS.HARD_DROP);
 
       // when a new piece is grabbed, board, piece and nextPiece
       // should be drawn
@@ -254,16 +254,12 @@ describe('game view tests', () => {
       });
 
       test('removes player on publish', () => {
-        expect(gameView.players.length).toBe(1);
-
         publish(REMOVE_PLAYER, newId1);
 
         expect(gameView.players.length).toBe(0);
       });
 
       test('does not remove player if id does not match', () => {
-        expect(gameView.players.length).toBe(1);
-
         publish(REMOVE_PLAYER, newId2);
 
         expect(gameView.players.length).toBe(1);

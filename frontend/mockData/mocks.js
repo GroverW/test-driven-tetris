@@ -127,10 +127,12 @@ const getNewTestGame = (game, testPiece = false, ...players) => {
   return newGame;
 };
 
-const runCommand = (game, command) => {
-  game.command(command, 'down');
-  jest.advanceTimersByTime(GAME_TIME_INTERVAL);
-  game.command(command, 'up');
+const runCommands = (game, ...commands) => {
+  commands.forEach((command) => {
+    game.command(command, 'down');
+    jest.advanceTimersByTime(GAME_TIME_INTERVAL);
+    game.command(command, 'up');
+  });
 };
 
 const clearMocksAndUnsubscribe = (...subscribers) => {
@@ -146,6 +148,6 @@ module.exports = {
   mockAnimation,
   mockCancelAnimation,
   getNewTestGame,
-  runCommand,
+  runCommands,
   clearMocksAndUnsubscribe,
 };

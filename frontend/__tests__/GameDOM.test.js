@@ -22,7 +22,7 @@ const {
   getMockGameDOMSelectors,
   getMockCtx,
   getNewTestGame,
-  runCommand,
+  runCommands,
   mockAnimation,
   mockCancelAnimation,
   clearMocksAndUnsubscribe,
@@ -199,7 +199,7 @@ describe('game DOM tests', () => {
       });
 
       test('updates points when piece moves down', () => {
-        runCommand(game, CONTROLS.DOWN);
+        runCommands(game, CONTROLS.DOWN);
 
         expect(gameDOM.score.innerText).toBe(1);
       });
