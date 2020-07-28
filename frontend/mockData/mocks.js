@@ -133,6 +133,11 @@ const runCommand = (game, command) => {
   game.command(command, 'up');
 };
 
+const clearMocksAndUnsubscribe = (...subscribers) => {
+  jest.clearAllMocks();
+  subscribers.forEach((subscriber) => subscriber.unsubscribe());
+};
+
 module.exports = {
   ...commonMocks,
   getMockCtx,
@@ -142,4 +147,5 @@ module.exports = {
   mockCancelAnimation,
   getNewTestGame,
   runCommand,
+  clearMocksAndUnsubscribe,
 };

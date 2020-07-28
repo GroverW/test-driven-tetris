@@ -20,6 +20,7 @@ const {
   mockCancelAnimation,
   getNewTestGame,
   runCommand,
+  clearMocksAndUnsubscribe,
 } = require('frontend/mockData/mocks');
 const { pubSubMock, getTestBoard, getTestPiece } = require('common/mockData/mocks');
 const { publish } = require('frontend/helpers/pubSub');
@@ -41,10 +42,7 @@ describe('client game tests', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    pubSubSpy.unsubscribeAll();
-    game.unsubscribe();
-    gameLoop.unsubscribe();
+    clearMocksAndUnsubscribe(pubSubSpy, game, gameLoop);
   });
 
   describe('basic tests', () => {

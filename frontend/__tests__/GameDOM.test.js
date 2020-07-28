@@ -24,6 +24,8 @@ const {
   getNewTestGame,
   runCommand,
   mockAnimation,
+  mockCancelAnimation,
+  clearMocksAndUnsubscribe,
 } = require('frontend/mockData/mocks');
 
 describe('game DOM tests', () => {
@@ -49,13 +51,11 @@ describe('game DOM tests', () => {
     document.createElement = jest.fn().mockImplementation(getMockDOMSelector);
     jest.useFakeTimers();
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
+    cancelAnimationFrame = jest.fn().mockImplementation(mockCancelAnimation);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    gameDOM.unsubscribe();
-    game.unsubscribe();
-    gameLoop.unsubscribe();
+    clearMocksAndUnsubscribe(gameDOM, game, gameLoop);
   });
 
   describe('add / remove players', () => {

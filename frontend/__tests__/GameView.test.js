@@ -18,6 +18,7 @@ const {
   runCommand,
   mockAnimation,
   mockCancelAnimation,
+  clearMocksAndUnsubscribe,
 } = require('frontend/mockData/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer, getNextPieceBoard } = require('frontend/helpers/clientUtils');
@@ -30,14 +31,6 @@ describe('game view tests', () => {
   let newCtx2; let newBoard2; let newId2;
   let newPlayer1; let newPlayer2;
   let drawGrid; let drawNext;
-
-  beforeAll(() => {
-
-  });
-
-  afterAll(() => {
-
-  });
 
   beforeEach(() => {
     mockCtx = getMockCtx();
@@ -63,10 +56,7 @@ describe('game view tests', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    game.unsubscribe();
-    gameView.unsubscribe();
-    gameLoop.gameOverAction();
+    clearMocksAndUnsubscribe(game, gameView, gameLoop);
   });
 
   describe('draw elements', () => {
