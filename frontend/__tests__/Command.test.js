@@ -17,7 +17,7 @@ describe('Command Tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    pubSubSpy.unsubscribeAll();
+    pubSubSpy.unsubscribe();
   });
 
   describe('setup', () => {

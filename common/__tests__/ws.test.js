@@ -73,7 +73,7 @@ describe('websocket tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    pubSubSpy.unsubscribeAll();
+    pubSubSpy.unsubscribe();
     clientListener.unsubAll();
     serverListener.unsubAll();
     api.unsubscribe();

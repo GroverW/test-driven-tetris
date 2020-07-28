@@ -29,7 +29,7 @@ describe('game tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    pubSubSpy.unsubscribeAll();
+    pubSubSpy.unsubscribe();
   });
 
   test('game over', () => {

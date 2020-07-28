@@ -20,7 +20,7 @@ describe('client - game board tests', () => {
   });
 
   afterEach(() => {
-    pubSubSpy.unsubscribeAll();
+    pubSubSpy.unsubscribe();
   });
 
   test('publishes on points from movement', () => {

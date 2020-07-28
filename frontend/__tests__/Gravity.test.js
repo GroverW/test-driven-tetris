@@ -29,7 +29,7 @@ describe('gravity tests', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    pubSubSpy.unsubscribeAll();
+    pubSubSpy.unsubscribe();
     gravity.gameOverAction();
   });
 
