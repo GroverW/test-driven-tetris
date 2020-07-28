@@ -104,36 +104,20 @@ describe('game pieces', () => {
       expect(p1.grid).toEqual(getRotatedPiece('I', 1));
     });
 
-    test('rotates left back to starting position', () => {
-      rotateNumTimes(p1, 3, ROTATE_LEFT);
+    test('rotates back to starting position', () => {
+      rotateNumTimes(p1, 4, ROTATE_LEFT);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
 
-      expect(p1.grid).toEqual(getRotatedPiece('I', 1));
-
-      p1.update(ROTATE_LEFT);
-
+      rotateNumTimes(p1, 4, ROTATE_RIGHT);
       expect(p1.grid).toEqual(getRotatedPiece('I', 0));
     });
 
-    test('rotates right back to starting position', () => {
-      rotateNumTimes(p1, 3, ROTATE_RIGHT);
-
-      expect(p1.grid).toEqual(getRotatedPiece('I', 3));
-
-      p1.update(ROTATE_RIGHT);
-
-      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
-    });
-
-    test('rotates left no more than 1 step at a time', () => {
+    test('rotates no more than 1 step at a time', () => {
       p1.update(ROTATE_LEFT * 2);
-
       expect(p1.grid).toEqual(getRotatedPiece('I', 3));
-    });
 
-    test('rotates right no more than 1 step at a time', () => {
       p1.update(ROTATE_RIGHT * 2);
-
-      expect(p1.grid).toEqual(getRotatedPiece('I', 1));
+      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
     });
   });
 });
