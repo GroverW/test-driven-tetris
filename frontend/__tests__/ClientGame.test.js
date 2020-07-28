@@ -188,7 +188,8 @@ describe('client game tests', () => {
 
       expect(game.commandQueue.length).toBe(0);
 
-      runCommands(game, CONTROLS.ROTATE_RIGHT, CONTROLS.HARD_DROP, CONTROLS.LEFT, CONTROLS.HARD_DROP);
+      const { ROTATE_RIGHT, HARD_DROP, LEFT } = CONTROLS;
+      runCommands(game, ROTATE_RIGHT, HARD_DROP, LEFT, HARD_DROP);
 
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(2);
