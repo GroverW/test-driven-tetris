@@ -84,95 +84,56 @@ describe('game pieces', () => {
   });
 
   describe('rotation', () => {
+    const rotateNumTimes = (piece, numTimes, direction) => {
+      for (let i = 0; i < numTimes; i += 1) piece.update(direction);
+    };
+
+    const getRotatedPiece = (type, rotationAmount) => PIECES[PIECE_TYPES[type]][rotationAmount];
+
     test('rotates left', () => {
-      expect(p1.grid).toEqual([
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
 
       p1.update(ROTATE_LEFT);
 
-      expect(p1.grid).toEqual([
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 3));
     });
 
     test('rotates right', () => {
       p1.update(ROTATE_RIGHT);
 
-      expect(p1.grid).toEqual([
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 1));
     });
 
     test('rotates left back to starting position', () => {
-      for (let i = 0; i < 3; i += 1) p1.update(ROTATE_LEFT);
+      rotateNumTimes(p1, 3, ROTATE_LEFT);
 
-      expect(p1.grid).toEqual([
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 1));
 
       p1.update(ROTATE_LEFT);
 
-      expect(p1.grid).toEqual([
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
     });
 
     test('rotates right back to starting position', () => {
-      for (let i = 0; i < 3; i += 1) p1.update(ROTATE_RIGHT);
+      rotateNumTimes(p1, 3, ROTATE_RIGHT);
 
-      expect(p1.grid).toEqual([
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 3));
 
       p1.update(ROTATE_RIGHT);
 
-      expect(p1.grid).toEqual([
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 0));
     });
 
     test('rotates left no more than 1 step at a time', () => {
       p1.update(ROTATE_LEFT * 2);
 
-      expect(p1.grid).toEqual([
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 3));
     });
 
     test('rotates right no more than 1 step at a time', () => {
       p1.update(ROTATE_RIGHT * 2);
 
-      expect(p1.grid).toEqual([
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-      ]);
+      expect(p1.grid).toEqual(getRotatedPiece('I', 1));
     });
   });
 });
