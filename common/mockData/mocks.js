@@ -15,14 +15,14 @@ const mockSend = () => { };
  * @returns {number[][]} - test board
  */
 const getTestBoard = (board) => {
-  if(board === 'empty' || board === 'filledLine') {
+  if (board === 'empty' || board === 'filledLine') {
     return JSON.parse(JSON.stringify(TEST_BOARDS[board]));
   }
 
   const baseBoard = getEmptyBoard();
   const updatedParts = TEST_BOARDS[board];
-  const combinedBoard = baseBoard.slice(0,baseBoard.length - updatedParts.length);
-  combinedBoard.push(...updatedParts)
+  const combinedBoard = baseBoard.slice(0, baseBoard.length - updatedParts.length);
+  combinedBoard.push(...updatedParts);
   return JSON.parse(JSON.stringify(combinedBoard));
 };
 
