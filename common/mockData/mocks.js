@@ -98,11 +98,11 @@ const pubSubMock = (pubSub) => {
   /**
    * Removes all subscriptions
    */
-  const unsubscribeAll = () => subscriptions.forEach((unsub) => unsub());
+  const unsubscribe = () => subscriptions.forEach((unsub) => unsub());
 
   return {
     add,
-    unsubscribeAll,
+    unsubscribe,
   };
 };
 
