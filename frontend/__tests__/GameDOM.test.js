@@ -245,9 +245,7 @@ describe('game DOM tests', () => {
     });
 
     test('uses power up', () => {
-      const nodeClassListContains = (nodeId, powerUpId) => {
-        return gameDOM.powerUps[nodeId].node.classList.contains(`power-up${powerUpId}`)
-      };
+      const nodeClassListContains = (nodeId, powerUpId) => gameDOM.powerUps[nodeId].node.classList.contains(`power-up${powerUpId}`);
       const node1 = 0;
       const node2 = 1;
 
