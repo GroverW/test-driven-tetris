@@ -4,8 +4,9 @@ const {
 } = require('common/helpers/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
 const { getEmptyBoard } = require('common/helpers/utils');
-const Piece = require('../Piece');
-const PieceList = require('../PieceList');
+const Piece = require('common/js/Piece');
+const PieceList = require('common/js/PieceList');
+const { getMaxGridHeight } = require('./boardHelpers');
 
 /**
  * Represents a game board
@@ -224,16 +225,7 @@ class Board {
   replaceBoard(newGrid) {
     const [yStart, yEnd, xStart, xEnd] = this.getPieceBounds();
 
-    let maxHeight = BOARD_HEIGHT;
-
-    // check for first space below piece that is not empty
-    for (let row = 0; row < BOARD_HEIGHT; row += 1) {
-      for (let col = xStart; col <= xEnd; col += 1) {
-        if (newGrid[row][col] > 0) {
-          maxHeight = Math.min(maxHeight, row);
-        }
-      }
-    }
+    const maxHeight = getMaxGridHeight(xStart, xEnd, newGrid);
 
     const heightDiff = maxHeight - yEnd;
 
@@ -244,15 +236,6 @@ class Board {
     }
 
     this.grid = newGrid;
-  }
-
-  getMaxGridHeight(verticalBounds, grid) {
-    const [xStart, xEnd] = verticalBounds;
-    const maxHeight = grid.findIndex((row) => (
-      row.some((val, col) => (val > 0 && col >= xStart && col <= xEnd))
-    ));
-
-    return maxHeight >= 0 ? maxHeight : BOARD_HEIGHT;
   }
 
   /**
