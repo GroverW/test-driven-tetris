@@ -101,7 +101,7 @@ const connectToGame = (gameId, gameType) => {
  */
 const createGame = async (type) => {
   try {
-    const response = await axios.post(`/game/${type}`);
+    const response = await axios.post(`/games/${type}`);
 
     const { gameId } = response.data;
 
@@ -117,7 +117,7 @@ const createGame = async (type) => {
  */
 const joinGame = async (id) => {
   try {
-    const response = await axios.get(`/game/multi/${id}`);
+    const response = await axios.get(`/games/multi/${id}`);
 
     const { gameId } = response.data;
 
