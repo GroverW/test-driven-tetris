@@ -293,7 +293,7 @@ describe('client game tests', () => {
 
         publish(ADD_PLAYER, p2);
 
-        expect(game.players.length).toBe(1);
+        expect(game.players).toContain(p2);
         expect(mapTargetsSpy).toHaveBeenCalledTimes(1);
       });
 
