@@ -56,28 +56,14 @@ describe('game tests', () => {
       expect(game.score).toBe(15);
     });
 
-    test('score points for single line', () => {
-      game.clearLines(1);
+    test('adds points correctly', () => {
+      let currScore = game.score;
 
-      expect(game.score).toBe(POINTS.LINES_CLEARED[1]);
-    });
-
-    test('score points for double line', () => {
-      game.clearLines(2);
-
-      expect(game.score).toBe(POINTS.LINES_CLEARED[2]);
-    });
-
-    test('score points for triple line', () => {
-      game.clearLines(3);
-
-      expect(game.score).toBe(POINTS.LINES_CLEARED[3]);
-    });
-
-    test('score points for tetris', () => {
-      game.clearLines(4);
-
-      expect(game.score).toBe(POINTS.LINES_CLEARED[4]);
+      [1,2,3,4].forEach((linesCleared) => {
+        game.clearLines(linesCleared);
+        expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[linesCleared]);
+        currScore = game.score;
+      });
     });
 
     test('score points with level modifier', () => {
