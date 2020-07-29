@@ -181,8 +181,10 @@ describe('websocket tests', () => {
       initialize(serverListener, p2);
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      const { DOWN, LEFT, ROTATE_RIGHT, AUTO_DOWN, HARD_DROP } = CONTROLS;
-      runCommands(clientListener.game, DOWN, LEFT, ROTATE_RIGHT, AUTO_DOWN, HARD_DROP)
+      const {
+        DOWN, LEFT, ROTATE_RIGHT, AUTO_DOWN, HARD_DROP,
+      } = CONTROLS;
+      runCommands(clientListener.game, DOWN, LEFT, ROTATE_RIGHT, AUTO_DOWN, HARD_DROP);
 
       const serverBoard = serverListener.player.game.board.grid;
       const clientBoard = clientListener.game.board.grid;
@@ -205,7 +207,9 @@ describe('websocket tests', () => {
     test('execute commands', () => {
       const startingClientBoard = JSON.parse(JSON.stringify(clientListener.game.board.grid));
 
-      const { DOWN, LEFT, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP } = CONTROLS;
+      const {
+        DOWN, LEFT, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP,
+      } = CONTROLS;
       runCommands(clientListener.game, DOWN, LEFT, ROTATE_RIGHT, HARD_DROP);
 
       const serverBoard = serverListener.player.game.board.grid;
@@ -232,7 +236,7 @@ describe('websocket tests', () => {
     });
 
     test('game over from play', () => {
-      const commands = new Array(25).fill(CONTROLS.HARD_DROP)
+      const commands = new Array(25).fill(CONTROLS.HARD_DROP);
       runCommands(clientListener.game, ...commands);
 
       const serverBoard = serverListener.player.game.board.grid;
