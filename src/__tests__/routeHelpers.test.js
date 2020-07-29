@@ -9,7 +9,7 @@ const {
   getNewPlayer,
   closeConnection,
   handleMessage,
-  handleClose
+  handleClose,
 } = require('backend/helpers/routeHelpers');
 
 describe('route helper tests', () => {
@@ -59,7 +59,7 @@ describe('route helper tests', () => {
   describe('create game', () => {
     test('creates game of type given', () => {
       const newGameId = createGame(GAME_TYPES.SINGLE);
-      expect(getGameById(newGameId).gameType).toBe(GAME_TYPES.SINGLE)
+      expect(getGameById(newGameId).gameType).toBe(GAME_TYPES.SINGLE);
     });
   });
 
