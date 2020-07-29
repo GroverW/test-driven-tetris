@@ -41,28 +41,23 @@ describe('Command Tests', () => {
       expect(command.startTime).toBe(0);
     });
 
-    test('delay time met', () => {
-      expect(callback).toHaveBeenCalledTimes(0);
-
+    test('calls callback and adds to queue when delay time met', () => {
       command.execute(0);
+
+      expect(callback).toHaveBeenCalledTimes(0);
+      const addToQueueSpy = pubSubSpy.add(ADD_TO_QUEUE);
+
       command.execute(1);
 
       expect(callback).toHaveBeenCalledTimes(1);
-    });
-
-    test('publishes to command queue', () => {
-      const addToQueueSpy = pubSubSpy.add(ADD_TO_QUEUE);
-
-      command.execute(0);
-      command.execute(1);
-
       expect(addToQueueSpy).toHaveBeenCalledTimes(1);
     });
 
     test('delay time not met', () => {
+      commandToggle.execute(0);
+
       expect(callbackToggle).toHaveBeenCalledTimes(0);
 
-      commandToggle.execute(0);
       commandToggle.execute(1);
 
       expect(callbackToggle).toHaveBeenCalledTimes(0);
