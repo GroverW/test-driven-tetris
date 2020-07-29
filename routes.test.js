@@ -1,6 +1,6 @@
 const request = require('supertest');
-const GameServer = require('./src/js/GameServer');
-const { GAMES, GAME_TYPES } = require('./src/helpers/serverConstants');
+const GameServer = require('backend/js/GameServer');
+const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 
 const app = require('./app');
 
@@ -15,7 +15,7 @@ describe('Routes tests', () => {
 
       expect(GAMES.size).toBe(0);
 
-      const response = await request(app).post(`/game/${urlParam}`);
+      const response = await request(app).post(`/games/${urlParam}`);
 
       expect(response.statusCode).toBe(201);
       expect(response.body.gameId).toEqual(expect.any(String));
@@ -36,7 +36,7 @@ describe('Routes tests', () => {
 
       expect(GAMES.size).toBe(1);
 
-      const response = await request(app).get(`/game/multi/${gameId}`);
+      const response = await request(app).get(`/games/multi/${gameId}`);
 
       expect(response.statusCode).toBe(200);
 
@@ -48,7 +48,7 @@ describe('Routes tests', () => {
 
       expect(GAMES.size).toBe(0);
 
-      const response = await request(app).get(`/game/multi/${gameId}`);
+      const response = await request(app).get(`/games/multi/${gameId}`);
 
       expect(response.statusCode).toBe(404);
 
@@ -60,7 +60,7 @@ describe('Routes tests', () => {
 
       expect(GAMES.size).toBe(1);
 
-      const response = await request(app).get(`/game/multi/${gameId}`);
+      const response = await request(app).get(`/games/multi/${gameId}`);
 
       expect(response.statusCode).toBe(404);
 
