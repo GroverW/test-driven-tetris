@@ -31,14 +31,8 @@ class GameLoop extends SubscriberBase {
    * @param {object} command - Command class instance
    */
   [SET_COMMAND](command) {
-    if (command.type === 'command') {
-      if (this.command === undefined || this.command.key !== command.key) {
-        this.command = command;
-      }
-    } else if (command.type === 'toggleCommand') {
-      if (this.toggleCommand === undefined || this.toggleCommand.key !== command.key) {
-        this.toggleCommand = command;
-      }
+    if (this[command.type] === undefined || this[command.type].key !== command.key) {
+      this[command.type] = command;
     }
   }
 
