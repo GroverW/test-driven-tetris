@@ -156,29 +156,38 @@ class Board {
    */
   wallKick(tests) {
     // runs tests for current piece to determine if a valid rotation can be made
-    const validTest = tests.find(([xChange, yChange]) => this.validMove(xChange, yChange));
+    const validTest = this.getValidTest(tests);
 
     if (validTest) {
       const [xChange, yChange] = validTest;
-      const isWallKick = (xChange !== 0 || yChange !== 0);
-      const isFloorKick = yChange < 0;
 
-      if (isFloorKick) {
-        if (this.floorKicksRemaining <= 0) {
-          return false;
-        }
+      if (!this.checkAndUpdateFloorKicks(yChange)) return false;
 
-        this.floorKicksRemaining -= 1;
-      }
-
-      if (isWallKick) {
-        this.movePiece(xChange, yChange, 0);
-      }
+      this.handleWallKick(xChange, yChange);
 
       return true;
     }
 
     return false;
+  }
+
+  getValidTest(tests) {
+    return tests.find(([xChange, yChange]) => this.validMove(xChange, yChange));
+  }
+
+  checkAndUpdateFloorKicks(yChange) {
+    if (yChange >= 0) return true;
+
+    if (this.floorKicksRemaining <= 0) return false;
+
+    this.floorKicksRemaining -= 1;
+    return true;
+  }
+
+  handleWallKick(xChange, yChange) {
+    if (xChange === 0 && yChange === 0) return;
+
+    this.movePiece(xChange, yChange, 0);
   }
 
   resetRemainingFloorKicks() {
