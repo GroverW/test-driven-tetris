@@ -10,43 +10,24 @@ describe('Routes tests', () => {
   });
 
   describe('POST game', () => {
-    test('returns uniqid', async () => {
-      const response = await request(app).post('/game/multi');
+    const createGameTest = async (type) => {
+      const urlParam = type === GAME_TYPES.MULTI ? 'multi' : 'single';
 
-      expect(response.statusCode).toBe(201);
-
-      expect(response.body.gameId).toEqual(expect.any(String));
-    });
-
-    test('creates new game with uniqid - multiplayer', async () => {
       expect(GAMES.size).toBe(0);
 
-      const response = await request(app).post('/game/multi');
+      const response = await request(app).post(`/game/${urlParam}`);
 
       expect(response.statusCode).toBe(201);
-
       expect(response.body.gameId).toEqual(expect.any(String));
 
       expect(GAMES.size).toBe(1);
-      expect(GAMES.get(response.body.gameId).gameType).toBe(GAME_TYPES.MULTI);
-
       expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
-    });
+      expect(GAMES.get(response.body.gameId).gameType).toBe(type);
+    };
 
-    test('creates new game with uniqid - single player', async () => {
-      expect(GAMES.size).toBe(0);
+    test('creates new game with uniqid - multiplayer', createGameTest.bind(null, GAME_TYPES.MULTI));
 
-      const response = await request(app).post('/game/single');
-
-      expect(response.statusCode).toBe(201);
-
-      expect(response.body.gameId).toEqual(expect.any(String));
-
-      expect(GAMES.size).toBe(1);
-      expect(GAMES.get(response.body.gameId).gameType).toBe(GAME_TYPES.SINGLE);
-
-      expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
-    });
+    test('creates new game with uniqid - single player', createGameTest.bind(null, GAME_TYPES.SINGLE));
   });
 
   describe('GET game', () => {
