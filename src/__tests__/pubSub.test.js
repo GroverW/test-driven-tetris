@@ -1,97 +1,79 @@
 const pubSub = require('backend/helpers/pubSub');
 
 describe('publish / subscribe', () => {
-  let sub1; let sub2; let sub3;
   let pubSubTest;
+  let adderSub; let multiplierSub; let messagesSub;
+  const topicMath = 'math';
+  const topicMessage = 'message';
 
   beforeEach(() => {
     pubSubTest = pubSub();
 
-    const adder = () => {
-      let sum = 0;
+    const subscription = (defaultValue, topic, callback) => {
+      let value = defaultValue;
 
-      const unsubscribe = pubSubTest.subscribe('math', (amt) => { sum += amt; });
+      const unsubscribe = pubSubTest.subscribe(topic, (arg) => { value = callback(value, arg) });
 
-      const getSum = () => sum;
+      const getValue = () => value;
 
-      return { getSum, unsubscribe };
+      return { getValue, unsubscribe };
     };
 
-    const multiplier = () => {
-      let product = 1;
-
-      const unsubscribe = pubSubTest.subscribe('math', (amt) => { product *= amt; });
-
-      const getProduct = () => product;
-
-      return { getProduct, unsubscribe };
-    };
-
-    const messages = () => {
-      const messageList = [];
-
-      const unsubscribe = pubSubTest.subscribe('message', (msg) => { messageList.push(msg); });
-
-      const getMessages = () => messageList;
-
-      return { getMessages, unsubscribe };
-    };
-
-    sub1 = adder();
-    sub2 = multiplier();
-    sub3 = messages();
+    adderSub = subscription(0, topicMath, (curr, amt) => curr + amt);
+    multiplierSub = subscription(1, topicMath, (curr, amt) => curr * amt);
+    messagesSub = subscription([], topicMessage, (curr, msg) => ([...curr, msg]));
   });
 
   test('publish / subscribe', () => {
-    expect(sub1.getSum()).toBe(0);
-    expect(sub2.getProduct()).toBe(1);
-    expect(sub3.getMessages()).toEqual([]);
+    expect(adderSub.getValue()).toBe(0);
+    expect(multiplierSub.getValue()).toBe(1);
+    expect(messagesSub.getValue()).toEqual([]);
 
-    pubSubTest.publish('math', 2);
+    pubSubTest.publish(topicMath, 2);
 
-    expect(sub1.getSum()).toBe(2);
-    expect(sub2.getProduct()).toBe(2);
-    expect(sub3.getMessages()).toEqual([]);
+    expect(adderSub.getValue()).toBe(2);
+    expect(multiplierSub.getValue()).toBe(2);
+    expect(messagesSub.getValue()).toEqual([]);
 
-    pubSubTest.publish('math', 4);
+    pubSubTest.publish(topicMath, 4);
 
-    expect(sub1.getSum()).toBe(6);
-    expect(sub2.getProduct()).toBe(8);
-    expect(sub3.getMessages()).toEqual([]);
+    expect(adderSub.getValue()).toBe(6);
+    expect(multiplierSub.getValue()).toBe(8);
+    expect(messagesSub.getValue()).toEqual([]);
 
-    pubSubTest.publish('message', 'hello');
+    pubSubTest.publish(topicMessage, 'hello');
 
-    expect(sub1.getSum()).toBe(6);
-    expect(sub2.getProduct()).toBe(8);
-    expect(sub3.getMessages()).toEqual(['hello']);
+    expect(adderSub.getValue()).toBe(6);
+    expect(multiplierSub.getValue()).toBe(8);
+    expect(messagesSub.getValue()).toEqual(['hello']);
   });
 
   test('nothing happens if no subscribers', () => {
-    expect(sub1.getSum()).toBe(0);
-    expect(sub2.getProduct()).toBe(1);
-    expect(sub3.getMessages()).toEqual([]);
+    expect(adderSub.getValue()).toBe(0);
+    expect(multiplierSub.getValue()).toBe(1);
+    expect(messagesSub.getValue()).toEqual([]);
 
     pubSubTest.publish('not a topic', 2);
 
-    expect(sub1.getSum()).toBe(0);
-    expect(sub2.getProduct()).toBe(1);
-    expect(sub3.getMessages()).toEqual([]);
+    expect(adderSub.getValue()).toBe(0);
+    expect(multiplierSub.getValue()).toBe(1);
+    expect(messagesSub.getValue()).toEqual([]);
   });
 
   test('unsubscribe', () => {
-    expect(sub1.getSum()).toBe(0);
-    expect(sub2.getProduct()).toBe(1);
+    expect(adderSub.getValue()).toBe(0);
+    expect(multiplierSub.getValue()).toBe(1);
 
-    pubSubTest.publish('math', 2);
+    pubSubTest.publish(topicMath, 2);
 
-    expect(sub1.getSum()).toBe(2);
-    expect(sub2.getProduct()).toBe(2);
+    expect(adderSub.getValue()).toBe(2);
+    expect(multiplierSub.getValue()).toBe(2);
 
-    sub2.unsubscribe();
+    multiplierSub.unsubscribe();
 
-    pubSubTest.publish('math', 3);
+    pubSubTest.publish(topicMath, 3);
 
-    expect(sub1.getSum()).toBe(5);
-    expect(sub2.getProduct()).toBe(2);
+    expect(adderSub.getValue()).toBe(5);
+    expect(multiplierSub.getValue()).toBe(2);
   });
 });
