@@ -22,6 +22,14 @@ const createGame = (type) => {
   return GameServer.addGame(newGameId, type);
 };
 
+const handleGameCreation = (type) => {
+  return (req, res) => {
+    const gameId = createGame(type);
+
+    return res.status(201).json({ gameId });
+  };
+};
+
 const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
 
 const closeConnection = (ws, message) => {
@@ -44,6 +52,7 @@ module.exports = {
   getGameById,
   getNewPlayer,
   createGame,
+  handleGameCreation,
   closeConnection,
   handleMessage,
   handleClose,
