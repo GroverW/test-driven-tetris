@@ -5,42 +5,51 @@ const { subscribe } = require('frontend/helpers/pubSub');
 const { TOGGLE_MENU } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
 
+const {
+  menuContainer,
+  newSinglePlayer,
+  newMultiplayer,
+  joinMultiplayer,
+  multiplayerGameId,
+  mute,
+  music,
+} = menuSelectors;
+
 clientMessage.initialize(messageSelector);
 subscribe(TOGGLE_MENU, () => {
-  menuSelectors.menuContainer.classList.toggle('hide');
+  menuContainer.classList.toggle('hide');
 });
 
-// start a new single player game
-menuSelectors.newSinglePlayer.addEventListener('click', (evt) => {
-  evt.target.blur();
-  createGame('single');
-});
+const handleNewGame = (type) => {
+  return (evt) => {
+    evt.target.blur();
+    createGame(type);
+  };
+};
 
-// start a new multiplayer game
-menuSelectors.newMultiplayer.addEventListener('click', (evt) => {
-  evt.target.blur();
-  createGame('multi');
-});
-
-// join a multiplayer game
-menuSelectors.joinMultiplayer.addEventListener('submit', (evt) => {
+const handleJoinMultiplayer = (evt) => {
   evt.preventDefault();
   evt.target.blur();
 
-  const gameId = menuSelectors.multiplayerGameId.value;
+  const gameId = multiplayerGameId.value;
 
   if (gameId) {
     joinGame(gameId);
   } else {
     publishError('Game ID cannot be blank.');
   }
-});
+};
 
-menuSelectors.mute.addEventListener('click', (evt) => {
+const handleMute = (evt) => {
   const muteBtn = evt.target;
   evt.preventDefault();
   muteBtn.blur();
 
   muteBtn.classList.toggle('muted');
-  menuSelectors.music.muted = !menuSelectors.music.muted;
-});
+  music.muted = !music.muted;
+};
+
+newSinglePlayer.addEventListener('click', handleNewGame('single'));
+newMultiplayer.addEventListener('click', handleNewGame('multi'));
+joinMultiplayer.addEventListener('submit', handleJoinMultiplayer);
+mute.addEventListener('click', handleMute);
