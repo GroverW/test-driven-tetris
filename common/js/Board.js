@@ -255,20 +255,20 @@ class Board {
     let yMax = 0;
     let xMin = BOARD_WIDTH;
     let xMax = 0;
+    const { x, y } = this.piece;
 
-    for (let row = 0; row < this.piece.grid.length; row += 1) {
-      for (let col = 0; col < this.piece.grid[0].length; col += 1) {
-        const yPosition = this.piece.y + row;
-        const xPosition = this.piece.x + col;
+    this.piece.grid.forEach((line, row) => (
+      line.forEach((val, col) => {
+        if (val > 0) {
+          const yPosition = y + row;
+          const xPosition = x + col;
 
-        if (this.piece.grid[row][col] !== 0) {
           yMin = Math.min(yMin, yPosition);
           yMax = Math.max(yMax, yPosition);
           xMin = Math.min(xMin, xPosition);
           xMax = Math.max(xMax, xPosition);
         }
-      }
-    }
+      })));
 
     return [yMin, yMax, xMin, xMax];
   }
