@@ -59,7 +59,7 @@ describe('game tests', () => {
     test('adds points correctly', () => {
       let currScore = game.score;
 
-      [1,2,3,4].forEach((linesCleared) => {
+      [1, 2, 3, 4].forEach((linesCleared) => {
         game.clearLines(linesCleared);
         expect(game.score).toBe(currScore + POINTS.LINES_CLEARED[linesCleared]);
         currScore = game.score;

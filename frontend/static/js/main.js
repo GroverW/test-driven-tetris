@@ -6,13 +6,7 @@ const { TOGGLE_MENU } = require('frontend/helpers/clientTopics');
 const { publishError } = require('frontend/helpers/clientUtils');
 
 const {
-  menuContainer,
-  newSinglePlayer,
-  newMultiplayer,
-  joinMultiplayer,
-  multiplayerGameId,
-  mute,
-  music,
+  menuContainer, newSinglePlayer, newMultiplayer, joinMultiplayer, multiplayerGameId, mute, music,
 } = menuSelectors;
 
 clientMessage.initialize(messageSelector);
@@ -20,11 +14,9 @@ subscribe(TOGGLE_MENU, () => {
   menuContainer.classList.toggle('hide');
 });
 
-const handleNewGame = (type) => {
-  return (evt) => {
-    evt.target.blur();
-    createGame(type);
-  };
+const handleNewGame = (type) => (evt) => {
+  evt.target.blur();
+  createGame(type);
 };
 
 const handleJoinMultiplayer = (evt) => {
