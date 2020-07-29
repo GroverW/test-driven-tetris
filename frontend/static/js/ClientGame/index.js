@@ -149,12 +149,18 @@ class ClientGame extends Game {
    */
   command(key, upDown) {
     if ((key in this.commands) && this.gameStatus) {
-      if (upDown === 'down') {
-        this.pubSub.publish(SET_COMMAND, this.commands[key]());
-      } else {
-        this.pubSub.publish(CLEAR_COMMAND, key);
-      }
-    } else if (!this.gameStatus) this.sendCommandQueue();
+      this.publishCommand(key, upDown);
+    } else if (!this.gameStatus) {
+      this.sendCommandQueue();
+    }
+  }
+
+  publishCommand(key, upDown) {
+    if (upDown === 'down') {
+      this.pubSub.publish(SET_COMMAND, this.commands[key]());
+    } else if (upDown === 'up') {
+      this.pubSub.publish(CLEAR_COMMAND, key);
+    }
   }
 
   /**
