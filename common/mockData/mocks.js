@@ -107,7 +107,6 @@ const pubSubMock = (pubSub) => {
 };
 
 module.exports = {
-  TEST_BOARDS,
   mockSend,
   getTestBoard,
   getTestPiece,
