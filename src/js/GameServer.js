@@ -108,7 +108,7 @@ class GameServer {
       if (p !== player) player.send(formatMessage({ type: ADD_PLAYER, data: p.id }));
     });
 
-    this.setHost();
+    this.setHostOnJoin();
 
     return true;
   }
@@ -150,7 +150,7 @@ class GameServer {
 
     this.nextRanking -= 1;
     this.checkIfWinner();
-    this.setHost(true);
+    this.setHostOnLeave();
 
     return true;
   }
@@ -169,20 +169,20 @@ class GameServer {
     return true;
   }
 
+  setHostOnJoin() {
+    const [player1] = this.players;
+    player1.isHost = true;
+  }
+
   /**
    * Sets the first player to be the host
    */
-  setHost(onLeave = false) {
-    if (this.players.length) {
-      const newHost = this.players[0];
+  setHostOnLeave() {
+    const [player1] = this.players;
 
-      if (!newHost.isHost) {
-        newHost.isHost = true;
-
-        if (onLeave) {
-          sendMessage(newHost, MSG_TYPE.NOTICE, 'You are now the host');
-        }
-      }
+    if (player1 && !player1.isHost) {
+      player1.isHost = true;
+      sendMessage(player1, MSG_TYPE.NOTICE, 'You are now the host');
     }
   }
 
