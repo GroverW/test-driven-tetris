@@ -12,7 +12,7 @@ describe('publish / subscribe', () => {
     const subscription = (defaultValue, topic, callback) => {
       let value = defaultValue;
 
-      const unsubscribe = pubSubTest.subscribe(topic, (arg) => { value = callback(value, arg) });
+      const unsubscribe = pubSubTest.subscribe(topic, (arg) => { value = callback(value, arg); });
 
       const getValue = () => value;
 
