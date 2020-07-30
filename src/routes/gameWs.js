@@ -1,7 +1,5 @@
 const express = require('express');
 
-const app = express();
-require('express-ws')(app);
 const {
   getGameById, getNewPlayer, closeConnection, handleMessage, handleClose,
 } = require('backend/helpers/routeHelpers');
