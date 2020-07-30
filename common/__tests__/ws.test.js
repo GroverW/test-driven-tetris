@@ -123,6 +123,12 @@ describe('websocket tests', () => {
       expect(clientListener.gameDOM.gameView.players.length).toBe(0);
       expect(clientListener.game.players.length).toBe(0);
     });
+
+    test('client closes window should remove player from server', () => {
+      clientListener.closeWindow();
+      expect(serverListener.gameServer.players.length).toBe(0);
+      expect(GAMES.has(serverListener.gameServer.id)).toBe(false);
+    });
   });
 
   describe('game start / game over', () => {

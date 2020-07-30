@@ -4,6 +4,7 @@ const gameDOM = require('frontend/static/js/GameDOM');
 const clientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
 const { getMockDOMSelector } = require('frontend/mockData/mocks');
+const { formatMessage } = require('common/helpers/utils');
 const {
   ADD_MESSAGE,
   ADD_PLAYER,
@@ -44,6 +45,7 @@ class MockClientListener {
    * @param {Object[]} selectors - mock DOM selectors to be used by the gameDOM
    */
   constructor(ws, selectors) {
+    this.ws = ws;
     this.clientMessage = clientMessage;
     this.clientMessage.initialize(getMockDOMSelector());
     this.selectors = selectors;
@@ -81,6 +83,10 @@ class MockClientListener {
   startGame() {
     this.game[START_GAME]();
     this.gameLoop[START_GAME]();
+  }
+
+  closeWindow() {
+    this.ws.send(formatMessage({ type: 'close' }));
   }
 
   /**
