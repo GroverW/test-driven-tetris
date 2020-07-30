@@ -1,4 +1,7 @@
-const { REMOVE_PLAYER, PLAY } = require('backend/helpers/serverTopics');
+const {
+  REMOVE_PLAYER, PLAY, ADD_MESSAGE,
+} = require('backend/helpers/serverTopics');
+const { formatMessage } = require('backend/helpers/serverUtils');
 const ServerGame = require('./ServerGame');
 
 /**
@@ -16,6 +19,17 @@ class Player {
     this.send = send;
     this.pubSub = pubSub;
     this.game = new ServerGame(this.pubSub);
+  }
+
+  sendMessage(data) {
+    this.send(formatMessage(data));
+  }
+
+  sendFlash(type, message) {
+    this.sendMessage({
+      type: ADD_MESSAGE,
+      data: { type, message },
+    });
   }
 
   /**
