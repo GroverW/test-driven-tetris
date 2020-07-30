@@ -5,12 +5,15 @@ const { multiGameExists, handleGameCreation } = require('backend/helpers/routeHe
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/multi/:gameId', (req, res) => {
+router.get('/multi/:gameId', (req, res, next) => {
   const { gameId } = req.params;
 
   if (multiGameExists(gameId)) return res.json({ gameId });
 
-  return res.status(404).json({ error: 'Game not found' });
+  const err = new Error('Game not found');
+  err.status = 404;
+
+  return next(err);
 });
 
 router.post('/multi', handleGameCreation(GAME_TYPES.MULTI));

@@ -22,10 +22,13 @@ const createGame = (type) => {
   return GameServer.addGame(newGameId, type);
 };
 
-const handleGameCreation = (type) => (req, res) => {
+const handleGameCreation = (type) => (req, res, next) => {
   const gameId = createGame(type);
 
-  return res.status(201).json({ gameId });
+  if (gameId) return res.status(201).json({ gameId });
+
+  const err = new Error('Could not create game.');
+  return next(err);
 };
 
 const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
