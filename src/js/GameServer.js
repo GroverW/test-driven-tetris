@@ -2,7 +2,6 @@ const {
   GAMES,
   GAME_TYPES,
   MAX_PLAYERS,
-  POWER_UP_TYPES,
   SEED_PIECES,
   COUNTDOWN,
 } = require('backend/helpers/serverConstants');
@@ -24,7 +23,7 @@ const {
 const {
   randomize, multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');
-const powerUps = require('backend/helpers/powerUps');
+const { handlePowerUp } = require('backend/helpers/powerUps');
 
 /**
  * Represents a game server
@@ -213,18 +212,16 @@ class GameServer {
    * @param {number[][]} data.board - player board to update
    */
   updatePlayer(data, includePlayer = false) {
+    const { id, board } = data;
     const sendData = {
       type: UPDATE_PLAYER,
-      data: {
-        id: data.id,
-        board: data.board,
-      },
+      data: { id, board },
     };
 
     if (includePlayer) {
       this.sendAll(sendData);
     } else {
-      this.sendAllExcept(this.getPlayerById(data.id), sendData);
+      this.sendAllExcept(this.getPlayerById(id), sendData);
     }
   }
 
@@ -258,24 +255,9 @@ class GameServer {
     if (player1 && player2) {
       const board1 = player1.game.board.grid;
       const board2 = player2.game.board.grid;
-      let result1; let result2;
 
-      switch (data.powerUp) {
-        case POWER_UP_TYPES.SWAP_LINES:
-          [result1, result2] = powerUps.swapLines(board1, board2);
-          break;
-        case POWER_UP_TYPES.SWAP_BOARDS:
-          [result1, result2] = powerUps.swapBoards(board1, board2);
-          break;
-        case POWER_UP_TYPES.SCRAMBLE_BOARD:
-          result2 = powerUps.scrambleBoard(board2);
-          break;
-        case POWER_UP_TYPES.CLEAR_BOARD:
-          result2 = powerUps.clearBoard(board2);
-          break;
-        default:
-          break;
-      }
+      const [result1, result2] = handlePowerUp(data.powerUp, board1, board2);
+
       if (result1) {
         player1.game.board.replaceBoard(result1);
         this.updatePlayer({ id: data.player1, board: result1 }, true);
