@@ -3,7 +3,6 @@ const {
   GAME_TYPES,
   MAX_PLAYERS,
   POWER_UP_TYPES,
-  RANKINGS,
   SEED_PIECES,
   COUNTDOWN,
 } = require('backend/helpers/serverConstants');
@@ -22,7 +21,9 @@ const {
   ADD_POWER_UP,
   USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
-const { randomize, formatMessage, sendMessage } = require('backend/helpers/serverUtils');
+const {
+  randomize, multiPlayerGameOverMessage, singlePlayerGameOverMessage,
+} = require('backend/helpers/serverUtils');
 const powerUps = require('backend/helpers/powerUps');
 
 /**
@@ -74,11 +75,11 @@ class GameServer {
     const full = this.players.length >= MAX_PLAYERS[this.gameType];
 
     if (full) {
-      sendMessage(player, MSG_TYPE.ERROR, 'That game is full.');
+      player.sendFlash(MSG_TYPE.ERROR, 'That game is full.');
     }
 
     if (this.gameStarted) {
-      sendMessage(player, MSG_TYPE.ERROR, 'That game has already started.');
+      player.sendFlash(MSG_TYPE.ERROR, 'That game has already started.');
     }
 
     return !full && !this.gameStarted;
@@ -105,7 +106,7 @@ class GameServer {
 
     // send existing players to new player
     this.players.forEach((p) => {
-      if (p !== player) player.send(formatMessage({ type: ADD_PLAYER, data: p.id }));
+      if (p !== player) player.sendMessage({ type: ADD_PLAYER, data: p.id });
     });
 
     this.setHostOnJoin();
@@ -170,7 +171,7 @@ class GameServer {
   }
 
   setHostOnJoin() {
-    const [player1] = this.players;
+    const player1 = this.players[0];
     player1.isHost = true;
   }
 
@@ -178,11 +179,11 @@ class GameServer {
    * Sets the first player to be the host
    */
   setHostOnLeave() {
-    const [player1] = this.players;
+    const player1 = this.players[0];
 
     if (player1 && !player1.isHost) {
       player1.isHost = true;
-      sendMessage(player1, MSG_TYPE.NOTICE, 'You are now the host');
+      player1.sendFlash(MSG_TYPE.NOTICE, 'You are now the host');
     }
   }
 
@@ -191,7 +192,7 @@ class GameServer {
    * @param {object} data - type of message and data to send
    */
   sendAll(data) {
-    this.players.forEach((player) => player.send(formatMessage(data)));
+    this.players.forEach((player) => player.sendMessage(data));
   }
 
   /**
@@ -201,7 +202,7 @@ class GameServer {
    */
   sendAllExcept(exceptPlayer, data) {
     this.players.forEach((player) => {
-      if (player !== exceptPlayer) player.send(formatMessage(data));
+      if (player !== exceptPlayer) player.sendMessage(data);
     });
   }
 
@@ -236,10 +237,10 @@ class GameServer {
   addPowerUp(data) {
     const player = this.getPlayerById(data.id);
     if (player) {
-      player.send(formatMessage({
+      player.sendMessage({
         type: ADD_POWER_UP,
         data: data.powerUp,
-      }));
+      });
     }
   }
 
@@ -292,7 +293,7 @@ class GameServer {
    */
   playerReady(player) {
     player.updateReadyState(true);
-    const totalReady = this.players.reduce((total, p) => total + p.readyToPlay, 0);
+    const totalReady = this.players.filter((p) => p.readyToPlay).length;
 
     if (this.checkStartConditions(totalReady)) {
       this.animateStart();
@@ -356,7 +357,7 @@ class GameServer {
       && this.players.length === 1
       && totalReady === 1
     ) {
-      sendMessage(this.players[0], MSG_TYPE.ERROR, 'Not enough players to start game.');
+      this.players[0].sendFlash(MSG_TYPE.ERROR, 'Not enough players to start game.');
       return false;
     }
 
@@ -404,15 +405,10 @@ class GameServer {
   checkIfWinner() {
     if (!this.gameStarted) return;
 
-    let count = this.players.length;
-    let winner = false;
+    const remaining = this.players.filter((p) => p.game.gameStatus);
 
-    this.players.forEach((p) => {
-      if (p.game.gameStatus) winner = p;
-      else count -= 1;
-    });
-
-    if (count === 1) {
+    if (remaining.length === 1) {
+      const winner = remaining[0];
       winner.pubSub.publish(GAME_OVER, {
         id: winner.id,
         board: winner.game.board.grid,
@@ -431,23 +427,12 @@ class GameServer {
    * @returns {object} - message header and body
    */
   gameOverMessage(id) {
-    const message = {};
-
     if (this.gameType === GAME_TYPES.MULTI) {
-      message.header = `${RANKINGS[this.nextRanking]} Place!`;
-      message.body = [];
-    } else if (this.gameType === GAME_TYPES.SINGLE) {
-      const player = this.getPlayerById(id);
-
-      message.header = 'Game Over!';
-      message.body = [
-        `Final Score: ${player.game.score}`,
-        `Level: ${player.game.level}`,
-        `Lines Cleared: ${player.game.lines}`,
-      ];
+      return multiPlayerGameOverMessage(this.nextRanking);
     }
 
-    return message;
+    const player = this.getPlayerById(id);
+    return singlePlayerGameOverMessage(player);
   }
 
   sendGameMessage(header, body = []) {
