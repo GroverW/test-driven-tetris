@@ -29,10 +29,10 @@ frontend                            # Wrapping folder for front-end
 │   └── clientUtils                 # Utilities (e.g. getNewPlayer, getNewBoard)
 └── static
     ├── index                       # Main html file
-    ├── css               
+    ├── css
     │   └── style                   # Main stylesheet
     └── js
-        ├── ClientGame              # Manages score, commands, etc. 
+        ├── ClientGame              # Manages score, commands, etc.
         │   ├── Command             # Object sent by ClientGame to GameLoop to be executed
         │   ├── Gravity             # Manages automatic dropping of current piece
         │   └── ClientBoard         # Manages board state and pieces
@@ -41,7 +41,7 @@ frontend                            # Wrapping folder for front-end
         ├── GameLoop                # Manages animation of client side commands
         ├── ClientMessage           # Manages the display of flash messages
         └── main                    # Placeholder for event handlers
-        
+
 
 src                                 # Wrapping folder for back-end classes
 ├── helpers
@@ -49,9 +49,9 @@ src                                 # Wrapping folder for back-end classes
 │   └── pubSub                      # Factory function for creating local pub/sub functions
 └── js
     └── GameServer                  # Manages adding / removing players, sending messages
-        └── Player                  # Associates game with gameServer        
+        └── Player                  # Associates game with gameServer
             └── ServerGame          # Manages score, executes commands, etc
-                └── ServerBoard     # Manages board state and pieces 
+                └── ServerBoard     # Manages board state and pieces
 
 app                                 # Backend-routes
 ```
@@ -62,10 +62,10 @@ SubscriberBase
 ├── Game                            # Common Game class
 │   ├── ClientGame
 │   └── ServerGame
-├── GameDOM                         
-├── GameView                        
-├── GameLoop                        
-└── Gravity                         
+├── GameDOM
+├── GameView
+├── GameLoop
+└── Gravity
 ```
 
 ### Technologies Used
@@ -84,7 +84,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them
 
-* Make that you have Node.js and npm installed. 
+* Make that you have Node.js and npm installed.
 * No database required.
 
 ### Installing
@@ -137,3 +137,6 @@ jest
 ## Authors
 
 * **Will Grover** - [GroverW](https://github.com/GroverW)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/maintainability)](https://codeclimate.com/github/GroverW/test-driven-tetris/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/test_coverage)](https://codeclimate.com/github/GroverW/test-driven-tetris/test_coverage)
