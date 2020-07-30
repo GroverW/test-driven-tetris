@@ -3,32 +3,22 @@ require('module-alias/register');
 const express = require('express');
 
 const app = express();
-const wsExpress = require('express-ws')(app);
-const {
-  getGameById, getNewPlayer, closeConnection, handleMessage, handleClose,
-} = require('backend/helpers/routeHelpers');
+
 const games = require('backend/routes/games');
+const gameWs = require('backend/routes/gameWs');
 
 app.use(express.static('frontend/static/'));
 
 app.use('/games', games);
+app.use('/game', gameWs);
 
-wsExpress.getWss().on('connection', () => console.log('connection open'));
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
 
-app.ws('/game/:gameId', (ws, req) => {
-  try {
-    const { gameId } = req.params;
-    const gameServer = getGameById(gameId);
-    const player = getNewPlayer(ws);
-
-    if (!gameServer) closeConnection(ws, 'Game not found.');
-    if (!gameServer.join(player)) closeConnection(ws, 'Could not join game.');
-
-    ws.on('message', handleMessage(player));
-    ws.on('close', handleClose(player));
-  } catch (err) {
-    console.error(err);
-  }
+  return res.json({
+    error: err.message,
+  });
 });
 
 app.get('/', (req, res) => {
