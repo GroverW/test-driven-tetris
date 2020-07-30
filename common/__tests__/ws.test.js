@@ -17,7 +17,6 @@ const MockServerListener = require('common/mockData/mockServerListener');
 const {
   mockSend, getTestBoard, webSocketMock, pubSubMock,
 } = require('common/mockData/mocks');
-const { sendMessage } = require('backend/helpers/serverUtils');
 
 const startGame = (serverListener, ...additionalPlayers) => {
   additionalPlayers.forEach((player) => serverListener.gameServer.join(player));
@@ -321,7 +320,7 @@ describe('websocket tests', () => {
       expect(errorSpy).not.toHaveBeenCalled();
       expect(clientListener.clientMessage.message.innerText).toBe('');
 
-      sendMessage(serverListener.player, MSG_TYPE.ERROR, errorText);
+      serverListener.player.sendFlash(MSG_TYPE.ERROR, errorText);
 
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(clientListener.clientMessage.message.innerText).toBe(errorText);
