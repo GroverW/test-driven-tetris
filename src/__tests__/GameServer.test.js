@@ -260,7 +260,7 @@ describe('game server tests', () => {
       mpGameServer.startGame();
 
       ({ pieces: p1Pieces } = p1.game.board.pieceList);
-      const { pieces: p2Pieces } = p2.game.board.pieceList
+      const { pieces: p2Pieces } = p2.game.board.pieceList;
       expect(p1Pieces).not.toEqual([]);
       expect(p1Pieces).toEqual(p2Pieces);
     });
