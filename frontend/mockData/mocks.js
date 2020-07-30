@@ -67,11 +67,6 @@ const getMockDOMSelector = () => ({
       const idx = this.classes.indexOf(class1);
       if (idx > -1) this.classes[idx] = class2;
     },
-    toggle(className) {
-      const idx = this.classes.indexOf(className);
-      if (idx > -1) this.remove(className);
-      else this.add(className);
-    },
     contains(className) {
       return this.classes.indexOf(className) > -1;
     },
