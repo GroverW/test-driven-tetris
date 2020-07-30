@@ -1,6 +1,6 @@
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
 const { BOARD_WIDTH, PIECE_TYPES } = require('common/helpers/constants');
-const { POWER_UP_LIST } = require('backend/helpers/serverConstants');
+const { POWER_UP_LIST, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
 
 /**
  * Returns a board row with all neutral cells except one blank cell
@@ -78,6 +78,21 @@ const getRandomPowerUp = () => {
   return POWER_UP_LIST[idx];
 };
 
+const handlePowerUp = (type, board1, board2) => {
+  switch (type) {
+    case POWER_UP_TYPES.SWAP_LINES:
+      return swapLines(board1, board2);
+    case POWER_UP_TYPES.SWAP_BOARDS:
+      return swapBoards(board1, board2);
+    case POWER_UP_TYPES.SCRAMBLE_BOARD:
+      return [null, scrambleBoard(board2)];
+    case POWER_UP_TYPES.CLEAR_BOARD:
+      return [null, clearBoard()];
+    default:
+      return [];
+  }
+};
+
 module.exports = {
   getFilledRow,
   getBlankRow,
@@ -86,4 +101,5 @@ module.exports = {
   scrambleBoard,
   clearBoard,
   getRandomPowerUp,
+  handlePowerUp,
 };
