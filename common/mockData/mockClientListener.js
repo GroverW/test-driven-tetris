@@ -98,6 +98,23 @@ class MockClientListener {
     if (this.game !== undefined) this.game.unsubscribe();
     if (this.gameLoop !== undefined) this.gameLoop.gameOver({ id: this.gameLoop.playerId });
   }
+
+  getProp(property) {
+    return {
+      numPlayers: [
+        this.gameDOM.players.length,
+        this.gameDOM.gameView.players.length,
+        this.game.players.length,
+      ],
+      pieces: JSON.parse(JSON.stringify(this.game.board.pieceList.pieces)),
+      messagePresent: this.gameDOM.message.children.length > 0,
+      board: JSON.parse(JSON.stringify(this.game.board.grid)),
+      score: this.game.score,
+      gameStatus: this.game.gameStatus,
+      numPowerUps: this.gameDOM.powerUps.filter((p) => p.type).length,
+      flashMessage: this.clientMessage.message.innerText,
+    }[property];
+  }
 }
 
 module.exports = MockClientListener;

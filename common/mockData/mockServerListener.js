@@ -66,6 +66,18 @@ class MockServerListener {
     this.subscriptions.forEach((unsub) => unsub());
     if (this.gameServer !== undefined) this.gameServer.unsubscribe();
   }
+
+  getProp(property) {
+    return {
+      numPlayers: this.gameServer.players.length,
+      gameStarted: this.gameServer.gameStarted,
+      pieces: JSON.parse(JSON.stringify(this.player.game.board.pieceList.pieces)),
+      board: JSON.parse(JSON.stringify(this.player.game.board.grid)),
+      score: this.player.game.score,
+      gameStatus: this.player.game.gameStatus,
+      numPowerUps: this.player.game.powerUps.length,
+    }[property];
+  }
 }
 
 module.exports = MockServerListener;
