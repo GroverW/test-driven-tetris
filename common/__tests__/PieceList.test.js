@@ -2,9 +2,11 @@ const PieceList = require('common/js/PieceList');
 
 describe('piece list tests', () => {
   let pieceList;
+  let newPieces;
 
   beforeEach(() => {
     pieceList = new PieceList();
+    newPieces = new Array(20).fill(0);
   });
 
   describe('new piece list', () => {
@@ -16,12 +18,6 @@ describe('piece list tests', () => {
   });
 
   describe('add new pieces', () => {
-    let newPieces;
-
-    beforeEach(() => {
-      newPieces = [1, 2, 3, 4, 5];
-    });
-
     test('adds new pieces', () => {
       pieceList.addSet(newPieces);
 
@@ -36,13 +32,25 @@ describe('piece list tests', () => {
     });
   });
 
-  describe('almost empty', () => {
-    let newPieces;
+  describe('current set iteration', () => {
+    test('increases current set after iterating through previous set', () => {
+      pieceList.addSet(newPieces);
+      pieceList.addSet(newPieces);
 
-    beforeEach(() => {
-      newPieces = new Array(20).fill(0);
+      pieceList.currIdx = newPieces.length - 2;
+      pieceList.getNextPiece();
+
+      expect(pieceList.currIdx).toBe(newPieces.length - 1);
+      expect(pieceList.currSet).toBe(0);
+
+      pieceList.getNextPiece();
+
+      expect(pieceList.currIdx).toBe(0);
+      expect(pieceList.currSet).toBe(1);
     });
+  });
 
+  describe('almost empty', () => {
     test('true when nearing end of current sets', () => {
       pieceList.addSet(newPieces);
 
