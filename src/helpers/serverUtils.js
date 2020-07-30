@@ -1,14 +1,22 @@
 const commonUtils = require('common/helpers/utils');
-const { ADD_MESSAGE } = require('./serverTopics');
+const { RANKINGS } = require('./serverConstants');
 
-const sendMessage = (player, type, message) => {
-  player.send(commonUtils.formatMessage({
-    type: ADD_MESSAGE,
-    data: { type, message },
-  }));
-};
+const multiPlayerGameOverMessage = (ranking) => ({
+  header: `${RANKINGS[ranking]} Place!`,
+  body: [],
+});
+
+const singlePlayerGameOverMessage = (player) => ({
+  header: 'Game Over!',
+  body: [
+    `Final Score: ${player.game.score}`,
+    `Level: ${player.game.level}`,
+    `Lines Cleared: ${player.game.lines}`,
+  ],
+});
 
 module.exports = {
   ...commonUtils,
-  sendMessage,
+  multiPlayerGameOverMessage,
+  singlePlayerGameOverMessage,
 };
