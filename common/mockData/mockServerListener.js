@@ -6,14 +6,6 @@ const { GAME_TYPES } = require('backend/helpers/serverConstants');
 
 const { PLAY, EXECUTE_COMMANDS } = require('common/helpers/commonTopics');
 
-const getNewUrl = (url = 1) => {
-  let newUrl = url;
-
-  while (GameServer.getGame(newUrl)) newUrl += 1;
-
-  return newUrl;
-};
-
 /**
  * Represents the Server side of the mock websocket
  */
@@ -26,7 +18,7 @@ class MockServerListener {
    */
   constructor(ws, url) {
     this.ws = ws;
-    this.url = getNewUrl(url);
+    this.url = url;
     this.subscriptions = [
       ws.on('open', this.open.bind(this)),
       ws.on(PLAY, this.startGame.bind(this)),
