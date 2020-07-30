@@ -281,8 +281,8 @@ class GameServer {
       }
       if (result2) {
         player2.game.board.replaceBoard(result2);
-        this.updatePlayer({ id: data.player2, board: result2 }, true)
-      };
+        this.updatePlayer({ id: data.player2, board: result2 }, true);
+      }
     }
   }
 
