@@ -197,7 +197,7 @@ describe('game server tests', () => {
   });
 
   describe('game start, game over', () => {
-    test('game start - single player - game starts when player ready', () => {
+    test('single player game starts when player ready', () => {
       const animateStartSpy = jest.spyOn(spGameServer, 'animateStart');
 
       spGameServer.join(p1);
@@ -209,7 +209,7 @@ describe('game server tests', () => {
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('game start - multiplayer - game starts all players ready', () => {
+    test('multiplayer game starts when all players ready', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
       mpGameServer.join(p3);
@@ -229,7 +229,7 @@ describe('game server tests', () => {
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('game start - multiplayer - game only starts if > 1 player', () => {
+    test('multiplayer game only starts if > 1 player', () => {
       mpGameServer.join(p1);
 
       const animateStartSpy = jest.spyOn(mpGameServer, 'animateStart');
@@ -250,25 +250,22 @@ describe('game server tests', () => {
       expect(animateStartSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('game start - update pieces', () => {
+    test('game start updates pieces', () => {
       mpGameServer.join(p1);
       mpGameServer.join(p2);
-      mpGameServer.join(p3);
+
+      let { pieces: p1Pieces } = p1.game.board.pieceList;
+      expect(p1Pieces).toEqual([]);
 
       mpGameServer.startGame();
 
-      expect(p1.game.board.pieceList.pieces).toEqual(p2.game.board.pieceList.pieces);
-      expect(p2.game.board.pieceList.pieces).toEqual(p3.game.board.pieceList.pieces);
-
-      p3.leave();
-
-      p1.pubSub.publish(GET_PIECES);
-
-      expect(p1.game.board.pieceList.pieces).toEqual(p2.game.board.pieceList.pieces);
-      expect(p2.game.board.pieceList.pieces).not.toEqual(p3.game.board.pieceList.pieces);
+      ({ pieces: p1Pieces } = p1.game.board.pieceList);
+      const { pieces: p2Pieces } = p2.game.board.pieceList
+      expect(p1Pieces).not.toEqual([]);
+      expect(p1Pieces).toEqual(p2Pieces);
     });
 
-    test('game start - animate start', () => {
+    test('game start animates start', () => {
       jest.useFakeTimers();
 
       mpGameServer.join(p1);
@@ -385,6 +382,33 @@ describe('game server tests', () => {
       expect(sendAllSpy).toHaveBeenCalledTimes(4);
       expect(p1.game.gameStatus).toBe(null);
       expect(p3.game.gameStatus).toBe(null);
+    });
+  });
+
+  describe('GET_PIECES', () => {
+    test('gets a new set of pieces for all players', () => {
+      mpGameServer.join(p1);
+      mpGameServer.join(p2);
+
+      mpGameServer.startGame();
+
+      const currPieces = JSON.parse(JSON.stringify(p1.game.board.pieceList.pieces));
+
+      p1.pubSub.publish(GET_PIECES);
+
+      const p1NewPieces = JSON.parse(JSON.stringify(p1.game.board.pieceList.pieces));
+      const p2NewPieces = JSON.parse(JSON.stringify(p2.game.board.pieceList.pieces));
+
+      expect(currPieces).not.toEqual(p1NewPieces);
+      expect(p1NewPieces).toEqual(p2NewPieces);
+
+      p2.pubSub.publish(GET_PIECES);
+
+      const p1LastPieces = JSON.parse(JSON.stringify(p1.game.board.pieceList.pieces));
+      const p2LastPieces = JSON.parse(JSON.stringify(p2.game.board.pieceList.pieces));
+
+      expect(p1NewPieces).not.toEqual(p1LastPieces);
+      expect(p1LastPieces).toEqual(p2LastPieces);
     });
   });
 
