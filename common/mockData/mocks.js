@@ -1,6 +1,7 @@
 const { PIECE_TYPES, SEED_PIECES } = require('common/helpers/constants');
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
 const { subscribe } = require('frontend/helpers/pubSub');
+const pubSub = require('backend/helpers/pubSub');
 const Piece = require('common/js/Piece');
 const TEST_BOARDS = require('./sampleBoards');
 
@@ -41,48 +42,25 @@ const getTestPieces = () => randomize(SEED_PIECES);
 /**
  * Simple pubSub object to mock websocket functionality
  */
-const webSocketMock = {
-  topics: {},
-  send(data) {
-    const parsed = JSON.parse(data);
-    if (this.topics[parsed.type] !== undefined) {
-      this.topics[parsed.type].forEach((sub) => sub.callback(parsed.data));
-    }
-  },
-  on(type, callback) {
-    const id = this.topics[type]
-      ? this.addSub(type, callback)
-      : this.addTopic(type, callback);
+const webSocketMock = pubSub();
 
-    const unsubscribe = () => {
-      this.removeSub(type, id);
-    };
-
-    return unsubscribe;
-  },
-  addTopic(type, callback) {
-    const id = 0;
-    this.topics[type] = [{ id, callback }];
-    return id;
-  },
-  addSub(type, callback) {
-    const id = this.topics[type].reduce((max, obj) => Math.max(max, obj.id), 0) + 1;
-    this.topics[type].push({ id, callback });
-
-    return id;
-  },
-  removeSub(type, id) {
-    this.topics[type] = this.topics[type].filter((s) => s.id !== id);
-  },
+// eslint-disable-next-line func-names
+webSocketMock.send = function (data) {
+  const parsed = JSON.parse(data);
+  if (this.subscribers[parsed.type] !== undefined) {
+    this.subscribers[parsed.type].forEach((sub) => sub.callback(parsed.data));
+  }
 };
+
+webSocketMock.on = webSocketMock.subscribe;
 
 /**
  * Observe when a topic is being published to
- * @param {object} pubSub - publish / subscribe object
+ * @param {object} pubSubObj - publish / subscribe object
  */
-const pubSubMock = (pubSub) => {
+const pubSubMock = (pubSubObj) => {
   // use frontend pubSub if not specified
-  const pubSubSpy = pubSub || { subscribe };
+  const pubSubSpy = pubSubObj || { subscribe };
   const subscriptions = [];
 
   /**
