@@ -1,27 +1,27 @@
 const GameManager = require('backend/js/GameManager');
 const MessageManager = require('backend/js/MessageManager');
 const { GAME_TYPES, COUNTDOWN } = require('backend/helpers/serverConstants');
-const { START_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
-const pubSub = require('backend/helpers/pubSub');
-const { pubSubMock } = require('common/mockData/mocks');
+const { ADD_PIECES } = require('backend/helpers/serverTopics');
 
 describe('game manager tests', () => {
   let gameManager;
   let p1; let p2;
-  let pubSubSpy;
 
   const getPlayer = (id) => ({
     id,
+    pubSub: { publish: jest.fn() },
     addPieces: jest.fn(),
-    game: { start: jest.fn(), gameStatus: true },
+    game: {
+      start: jest.fn(),
+      gameStatus: true,
+      board: {},
+    },
   });
 
   beforeEach(() => {
-    const serverPubSub = pubSub();
-    pubSubSpy = pubSubMock(serverPubSub);
     p1 = getPlayer(1);
     p2 = getPlayer(2);
-    gameManager = new GameManager(GAME_TYPES.MULTI, serverPubSub);
+    gameManager = new GameManager(GAME_TYPES.MULTI);
   });
 
   afterEach(() => {
@@ -129,14 +129,14 @@ describe('game manager tests', () => {
       });
 
       test('goes through start steps', () => {
-        const startSpy = pubSubSpy.add(START_GAME);
         const getPiecesSpy = jest.spyOn(gameManager, 'getPieces');
         const startPlayerGamesSpy = jest.spyOn(gameManager, 'startPlayerGames');
         const sendAllSpy = jest.spyOn(gameManager.msg, 'sendAll');
+        expect(gameManager.gameStarted).toBe(false);
 
         gameManager.startGame();
 
-        expect(startSpy).toHaveBeenCalledTimes(1);
+        expect(gameManager.gameStarted).toBe(true);
         expect(getPiecesSpy).toHaveBeenCalledTimes(1);
         expect(startPlayerGamesSpy).toHaveBeenCalledTimes(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(2);
@@ -177,20 +177,66 @@ describe('game manager tests', () => {
     beforeEach(() => {
       gameManager.addPlayer(p1);
       gameManager.addPlayer(p2);
+      gameManager.gameStarted = true;
     });
 
-    test('gameOver sends game over message to specified player and checks for winner', () => {
-      const sendGameOverMessageSpy = jest.spyOn(gameManager.msg, 'sendGameOverMessage');
-      const checkIfWinnerSpy = jest.spyOn(gameManager, 'checkIfWinner');
+    describe('gameOver steps', () => {
+      test('gameOver sends game over message to specified player and checks for winner', () => {
+        const sendGameOverMessageSpy = jest.spyOn(gameManager.msg, 'sendGameOverMessage');
+        const checkIfWinnerSpy = jest.spyOn(gameManager, 'checkIfWinner');
 
-      gameManager.gameOver({ id: p1.id, board: [] });
+        gameManager.gameOver({ id: p1.id, board: [] });
 
-      expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p1.id, [], 2);
-      expect(checkIfWinnerSpy).toHaveBeenCalledTimes(1);
+        expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p1.id, [], 2);
+        expect(checkIfWinnerSpy).toHaveBeenCalledTimes(1);
+      });
+
+      test('gameOver ends game if checkIfWinner returns true', () => {
+        gameManager.endGame = jest.fn();
+
+        gameManager.gameOver({ id: '', board: [] });
+
+        expect(gameManager.endGame).toHaveBeenCalledTimes(0);
+
+        gameManager.checkIfWinner = jest.fn().mockReturnValue(true);
+
+        gameManager.gameOver({ id: '', board: [] });
+
+        expect(gameManager.endGame).toHaveBeenCalledTimes(1);
+      });
     });
 
     describe('check if winner', () => {
+      test('returns true if multiplayer game and one player left', () => {
+        p1.game.gameStatus = false;
 
+        expect(gameManager.checkIfWinner()).toBe(true);
+      });
+
+      test('returns true if single player game and game over', () => {
+        gameManager.removePlayer(p2);
+        gameManager.gameType = GAME_TYPES.SINGLE;
+        p1.game.gameStatus = false;
+
+        expect(gameManager.checkIfWinner()).toBe(true);
+      });
+
+      test('returns false if more than one player remaining', () => {
+        expect(gameManager.checkIfWinner()).toBe(false);
+      });
+
+      test('returns false if single player game with player remaining', () => {
+        gameManager.removePlayer(p2);
+        gameManager.gameType = GAME_TYPES.SINGLE;
+
+        expect(gameManager.checkIfWinner()).toBe(false);
+      });
+
+      test('returns false if game has not started yet', () => {
+        gameManager.gameStarted = false;
+
+        expect(gameManager.checkIfWinner()).toBe(false);
+      });
     });
   });
 
