@@ -13,7 +13,7 @@ describe('game manager tests', () => {
   const getPlayer = (id) => ({
     id,
     addPieces: jest.fn(),
-    game: { start: jest.fn() },
+    game: { start: jest.fn(), gameStatus: true },
   });
 
   beforeEach(() => {
@@ -133,7 +133,6 @@ describe('game manager tests', () => {
         const getPiecesSpy = jest.spyOn(gameManager, 'getPieces');
         const startPlayerGamesSpy = jest.spyOn(gameManager, 'startPlayerGames');
         const sendAllSpy = jest.spyOn(gameManager.msg, 'sendAll');
-        const updateRankingsSpy = jest.spyOn(gameManager, 'updateRankings');
 
         gameManager.startGame();
 
@@ -141,7 +140,6 @@ describe('game manager tests', () => {
         expect(getPiecesSpy).toHaveBeenCalledTimes(1);
         expect(startPlayerGamesSpy).toHaveBeenCalledTimes(1);
         expect(sendAllSpy).toHaveBeenCalledTimes(2);
-        expect(updateRankingsSpy).toHaveBeenCalledTimes(1);
       });
 
       test('game start animates start', () => {
@@ -175,6 +173,27 @@ describe('game manager tests', () => {
     });
   });
 
+  describe('game over', () => {
+    beforeEach(() => {
+      gameManager.addPlayer(p1);
+      gameManager.addPlayer(p2);
+    });
+
+    test('gameOver sends game over message to specified player and checks for winner', () => {
+      const sendGameOverMessageSpy = jest.spyOn(gameManager.msg, 'sendGameOverMessage');
+      const checkIfWinnerSpy = jest.spyOn(gameManager, 'checkIfWinner');
+
+      gameManager.gameOver({ id: p1.id, board: [] });
+
+      expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p1.id, [], 2);
+      expect(checkIfWinnerSpy).toHaveBeenCalledTimes(1);
+    });
+
+    describe('check if winner', () => {
+
+    });
+  });
+
   describe('game actions', () => {
     beforeEach(() => {
       gameManager.addPlayer(p1);
@@ -201,14 +220,10 @@ describe('game manager tests', () => {
       expect(p2.game.start).toHaveBeenCalledTimes(1);
     });
 
-    describe('update rankings', () => {
-      test('sets ranking if no rankings', () => {
-
-      });
-
-      test('updates rankings if rankings exist', () => {
-
-      });
+    test('getNextRanking gets next ranking', () => {
+      expect(gameManager.getNextRanking()).toBe(2);
+      p1.game.gameStatus = false;
+      expect(gameManager.getNextRanking()).toBe(1);
     });
   });
 });
