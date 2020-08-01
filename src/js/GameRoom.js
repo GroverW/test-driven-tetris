@@ -1,7 +1,7 @@
 const PlayerManager = require('backend/js/PlayerManager');
 const GameManager = require('backend/js/GameManager');
 const { MAX_PLAYERS } = require('backend/helpers/serverConstants');
-const { MSG_TYPE, ADD_PLAYER } = require('backend/helpers/serverTopics');
+const { MSG_TYPE, ADD_PLAYER, REMOVE_PLAYER } = require('backend/helpers/serverTopics');
 
 class GameRoom {
   constructor(gameType) {
@@ -14,7 +14,7 @@ class GameRoom {
 
   roomAvailable(player) {
     if (this.roomIsFull()) {
-      player.sendFlash(MSG_TYPE.ERROR, 'That game is full.')
+      player.sendFlash(MSG_TYPE.ERROR, 'That game is full.');
       return false;
     }
 
@@ -45,6 +45,13 @@ class GameRoom {
     return true;
   }
 
+  removePlayer(player) {
+    if (!this.removeFromRoom(player)) return false;
+
+    this.removeSubscriptions(player);
+    return true;
+  }
+
   setPlayerAttributes(player) {
     player.setId(this.nextPlayerId);
     player.setGameType(this.gameType);
@@ -61,8 +68,12 @@ class GameRoom {
   }
 
   syncPlayersWith(player) {
-    this.manager.msg.sendAll({ type: ADD_PLAYER, data: player.id });
-    this.manager.msg.addOtherPlayersTo(player);
+    if (this.players.getById(player.id)) {
+      this.manager.msg.sendAll({ type: ADD_PLAYER, data: player.id });
+      this.manager.msg.addOtherPlayersTo(player);
+    } else {
+      this.manager.msg.sendAll({ type: REMOVE_PLAYER, data: player.id });
+    }
   }
 
   join(player) {
@@ -72,6 +83,15 @@ class GameRoom {
     this.setPlayerAttributes(player);
     this.addSubscriptions(player);
     this.syncPlayersWith(player);
+
+    return true;
+  }
+
+  leave(player) {
+    if (!this.removePlayer(player)) return false;
+
+    this.syncPlayersWith(player);
+    this.manager.checkIfWinnerAndEndGame();
 
     return true;
   }

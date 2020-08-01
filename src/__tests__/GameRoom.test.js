@@ -5,7 +5,7 @@ const Player = require('backend/js/Player');
 const { mockSend } = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
-const { MSG_TYPE, ADD_PLAYER } = require('backend/helpers/serverTopics');
+const { MSG_TYPE, ADD_PLAYER, REMOVE_PLAYER } = require('backend/helpers/serverTopics');
 
 describe('game room tests', () => {
   let gameRoom;
@@ -121,23 +121,77 @@ describe('game room tests', () => {
       [p1, p2, p3].forEach((p) => gameRoom.join(p));
     });
 
-    test('removes subscriptions', () => {
-      expect(gameRoom.subscriptions[p2.id]).toEqual(expect.any(Array));
+    describe('remove player', () => {
+      test('removes subscriptions', () => {
+        expect(gameRoom.subscriptions[p2.id]).toEqual(expect.any(Array));
 
-      const mockUnsub = jest.fn();
-      gameRoom.subscriptions[p2.id].push(mockUnsub);
+        const mockUnsub = jest.fn();
+        gameRoom.subscriptions[p2.id].push(mockUnsub);
 
-      gameRoom.removeSubscriptions(p2);
+        gameRoom.removeSubscriptions(p2);
 
-      expect(gameRoom.subscriptions[p2.id]).toBe(undefined);
-      expect(mockUnsub).toHaveBeenCalledTimes(1);
+        expect(gameRoom.subscriptions[p2.id]).toBe(undefined);
+        expect(mockUnsub).toHaveBeenCalledTimes(1);
+      });
+
+      test('removes player from room', () => {
+        expect(gameRoom.removeFromRoom(p2)).toBe(true);
+        expect(gameRoom.players.getById(p2.id)).toBe(undefined);
+      });
+
+      test('removes subscriptions and returns true if player removed successfully', () => {
+        const removeSubscriptionsSpy = jest.spyOn(gameRoom, 'removeSubscriptions');
+        const removeFromRoomSpy = jest.spyOn(gameRoom, 'removeFromRoom');
+
+        expect(gameRoom.removePlayer(p3)).toBe(true);
+
+        expect(removeSubscriptionsSpy).toHaveBeenCalledTimes(1);
+        expect(removeFromRoomSpy).toHaveBeenCalledTimes(1);
+      });
+
+      test('returns false if player not removed from room', () => {
+        gameRoom.removeFromRoom = jest.fn().mockReturnValue(false);
+        expect(gameRoom.removePlayer(p3)).toBe(false);
+      });
     });
 
-    test('removes player from room', () => {
-      expect(gameRoom.removeFromRoom(p2)).toBe(true);
-      expect(gameRoom.players.getById(p2.id)).toBe(undefined);
-    });
+    describe('leave room steps', () => {
+      test('syncPlayersWith removes player if player doesn\t exist', () => {
+        const sendAllSpy = jest.spyOn(gameRoom.manager.msg, 'sendAll');
 
+        gameRoom.players.remove(p2);
+        gameRoom.syncPlayersWith(p2);
+
+        expect(sendAllSpy).toHaveBeenLastCalledWith({ type: REMOVE_PLAYER, data: p2.id });
+      });
+
+      test('removes player, syncs players, checks for winner and returns true', () => {
+        const removePlayerSpy = jest.spyOn(gameRoom, 'removePlayer');
+        const syncPlayersWithSpy = jest.spyOn(gameRoom, 'syncPlayersWith');
+        const checkIfWinnerAndEndGameSpy = jest.spyOn(gameRoom.manager, 'checkIfWinnerAndEndGame');
+
+        expect(gameRoom.leave(p1)).toBe(true);
+
+        expect(removePlayerSpy).toHaveBeenCalledTimes(1);
+        expect(syncPlayersWithSpy).toHaveBeenCalledTimes(1);
+        expect(checkIfWinnerAndEndGameSpy).toHaveBeenCalledTimes(1);
+      });
+
+      test('returns false if player not removed', () => {
+        gameRoom.removePlayer = jest.fn().mockReturnValue(false);
+        expect(gameRoom.leave(p1)).toBe(false);
+      });
+
+      test('endGame called if winner', () => {
+        const endGameSpy = jest.spyOn(gameRoom.manager, 'endGame');
+
+        gameRoom.manager.checkIfWinner = jest.fn().mockReturnValue(true);
+
+        gameRoom.leave(p1);
+
+        expect(endGameSpy).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 
   describe('publish / subscribe', () => {
