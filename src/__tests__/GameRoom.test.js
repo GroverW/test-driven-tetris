@@ -5,14 +5,24 @@ const Player = require('backend/js/Player');
 const { mockSend } = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
-const { MSG_TYPE, ADD_PLAYER, REMOVE_PLAYER } = require('backend/helpers/serverTopics');
+const {
+  MSG_TYPE,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  PLAY,
+  GAME_OVER,
+  ADD_PIECES,
+  UPDATE_PLAYER,
+  ADD_POWER_UP,
+  USE_POWER_UP
+} = require('backend/helpers/serverTopics');
 
 describe('game room tests', () => {
   let gameRoom;
   let p1; let p2; let p3; let p4; let p5;
 
   beforeEach(() => {
-    gameRoom = new GameRoom(GAME_TYPES.MULTI);
+    gameRoom = new GameRoom(GAME_TYPES.MULTI, jest.fn());
     ([p1, p2, p3, p4, p5] = [p1, p2, p3, p4, p5].map(() => new Player(mockSend(), pubSub())));
   });
 
@@ -191,10 +201,61 @@ describe('game room tests', () => {
 
         expect(endGameSpy).toHaveBeenCalledTimes(1);
       });
+
+      test('calls remove game room if no players remaining', () => {
+        [p1, p2, p3].forEach((p) => gameRoom.leave(p));
+
+        expect(gameRoom.removeGameRoom).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
   describe('publish / subscribe', () => {
+    let mockFunction;
 
+    const runPubSubTestFor = (player, topic) => {
+      gameRoom.join(player);
+      player.pubSub.publish(topic, '');
+      expect(mockFunction).toHaveBeenCalledTimes(1);
+    };
+
+    beforeEach(() => {
+      mockFunction = jest.fn();
+    });
+
+    test('REMOVE_PLAYER calls leave', () => {
+      gameRoom.leave = () => mockFunction();
+      runPubSubTestFor(p1, REMOVE_PLAYER);
+    });
+
+    test('PLAY calls playerReady', () => {
+      gameRoom.manager.playerReady = () => mockFunction();
+      runPubSubTestFor(p1, PLAY);
+    });
+
+    test('GAME_OVER calls game over for player', () => {
+      gameRoom.manager.gameOver = () => mockFunction();
+      runPubSubTestFor(p1, GAME_OVER);
+    });
+
+    test('GET_PIECES calls add pieces', () => {
+      gameRoom.manager.getPieces = () => mockFunction();
+      runPubSubTestFor(p1, ADD_PIECES);
+    });
+
+    test('UPDATE_PLAYER sends player update to others', () => {
+      gameRoom.manager.msg.sendPlayerUpdateToOthers = () => mockFunction();
+      runPubSubTestFor(p1, UPDATE_PLAYER);
+    });
+
+    test('ADD_POWER_UP adds power up for player', () => {
+      gameRoom.manager.msg.sendPowerUp = () => mockFunction();
+      runPubSubTestFor(p1, ADD_POWER_UP);
+    });
+
+    test('USE_POWER_UP executes power up', () => {
+      gameRoom.manager.executePowerUp = () => mockFunction();
+      runPubSubTestFor(p1, USE_POWER_UP);
+    });
   });
 });

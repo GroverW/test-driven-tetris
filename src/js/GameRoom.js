@@ -1,11 +1,22 @@
 const PlayerManager = require('backend/js/PlayerManager');
 const GameManager = require('backend/js/GameManager');
 const { MAX_PLAYERS } = require('backend/helpers/serverConstants');
-const { MSG_TYPE, ADD_PLAYER, REMOVE_PLAYER } = require('backend/helpers/serverTopics');
+const {
+  MSG_TYPE,
+  ADD_PLAYER,
+  REMOVE_PLAYER,
+  PLAY,
+  GAME_OVER,
+  ADD_PIECES,
+  UPDATE_PLAYER,
+  ADD_POWER_UP,
+  USE_POWER_UP
+} = require('backend/helpers/serverTopics');
 
 class GameRoom {
-  constructor(gameType) {
+  constructor(gameType, removeGameRoom) {
     this.gameType = gameType;
+    this.removeGameRoom = removeGameRoom;
     this.players = new PlayerManager();
     this.manager = new GameManager(gameType, this.players);
     this.nextPlayerId = 1;
@@ -59,7 +70,18 @@ class GameRoom {
   }
 
   addSubscriptions(player) {
-    this.subscriptions[player.id] = [];
+    this.subscriptions[player.id] = [
+      player.pubSub.subscribe(REMOVE_PLAYER, this.leave.bind(this)),
+      player.pubSub.subscribe(PLAY, this.manager.playerReady.bind(this.manager)),
+      player.pubSub.subscribe(GAME_OVER, this.manager.gameOver.bind(this.manager)),
+      player.pubSub.subscribe(ADD_PIECES, this.manager.getPieces.bind(this.manager)),
+      player.pubSub.subscribe(
+        UPDATE_PLAYER, this.manager.msg.sendPlayerUpdateToOthers.bind(this.manager.msg),
+      ),
+      player.pubSub.subscribe(ADD_POWER_UP, this.manager.msg.sendPowerUp.bind(this.manager.msg)),
+      player.pubSub.subscribe(USE_POWER_UP, this.manager.executePowerUp.bind(this.manager)),
+
+    ];
   }
 
   removeSubscriptions(player) {
@@ -89,6 +111,7 @@ class GameRoom {
 
   leave(player) {
     if (!this.removePlayer(player)) return false;
+    if (this.players.count === 0) this.removeGameRoom();
 
     this.syncPlayersWith(player);
     this.manager.checkIfWinnerAndEndGame();
