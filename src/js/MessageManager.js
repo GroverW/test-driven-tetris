@@ -7,37 +7,23 @@ const {
 } = require('backend/helpers/serverUtils');
 
 class MessageManager {
-  constructor(gameType) {
+  constructor(gameType, players) {
     this.gameType = gameType;
-    this.players = [];
-  }
-
-  addPlayer(player) {
-    if (!this.players.includes(player)) {
-      this.players.push(player);
-    }
-  }
-
-  removePlayer(player) {
-    this.players = this.players.filter((p) => p !== player);
-  }
-
-  getPlayerById(id) {
-    return this.players.find((p) => p.id === id);
+    this.players = players;
   }
 
   sendAll(data) {
-    this.players.forEach((player) => player.sendMessage(data));
+    this.players.list.forEach((player) => player.sendMessage(data));
   }
 
   sendAllExcept(exceptPlayer, data) {
-    this.players.forEach((player) => {
+    this.players.list.forEach((player) => {
       if (player !== exceptPlayer) player.sendMessage(data);
     });
   }
 
   sendGameOverMessage(id, board, ranking = false) {
-    const player = this.getPlayerById(id);
+    const player = this.players.getById(id);
     const message = this.getGameOverMessage(player, ranking);
 
     this.sendAll({
@@ -60,7 +46,7 @@ class MessageManager {
   }
 
   sendPowerUp(id, data) {
-    const player = this.getPlayerById(id);
+    const player = this.players.getById(id);
     if (player) {
       player.sendMessage({
         type: ADD_POWER_UP,
