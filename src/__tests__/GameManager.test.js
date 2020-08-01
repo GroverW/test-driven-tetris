@@ -1,7 +1,9 @@
 const GameManager = require('backend/js/GameManager');
 const MessageManager = require('backend/js/MessageManager');
-const { GAME_TYPES, COUNTDOWN } = require('backend/helpers/serverConstants');
-const { ADD_PIECES } = require('backend/helpers/serverTopics');
+const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
+const { ADD_PIECES, END_GAME } = require('backend/helpers/serverTopics');
+const { getTestBoard } = require('common/mockData/mocks');
+
 
 describe('game manager tests', () => {
   let gameManager;
@@ -14,7 +16,12 @@ describe('game manager tests', () => {
     game: {
       start: jest.fn(),
       gameStatus: true,
-      board: {},
+      board: {
+        grid: [],
+        replaceBoard(board) {
+          this.grid = board;
+        },
+      },
     },
   });
 
@@ -204,6 +211,16 @@ describe('game manager tests', () => {
 
         expect(gameManager.endGame).toHaveBeenCalledTimes(1);
       });
+
+      test('endGame ends each remaining players game and sends END_GAME message to all', () => {
+        const gameOverRemainingPlayersSpy = jest.spyOn(gameManager, 'gameOverRemainingPlayers');
+        const sendAllSpy = jest.spyOn(gameManager.msg, 'sendAll');
+
+        gameManager.endGame();
+
+        expect(gameOverRemainingPlayersSpy).toHaveBeenCalledTimes(1);
+        expect(sendAllSpy).toHaveBeenLastCalledWith({ type: END_GAME, data: {} });
+      });
     });
 
     describe('check if winner', () => {
@@ -270,6 +287,29 @@ describe('game manager tests', () => {
       expect(gameManager.getNextRanking()).toBe(2);
       p1.game.gameStatus = false;
       expect(gameManager.getNextRanking()).toBe(1);
+    });
+
+    test('executePowerUp modifies specified players', () => {
+      Math.random = jest.fn().mockReturnValue(0);
+      const sendPlayerUpdateSpy = jest.spyOn(gameManager.msg, 'sendPlayerUpdate');
+      p1.game.board.grid = getTestBoard('pattern1');
+      p2.game.board.grid = getTestBoard('pattern2');
+      const player1 = p1.id;
+      const player2 = p2.id;
+      let powerUp = POWER_UP_TYPES.SWAP_LINES;
+
+      gameManager.executePowerUp({ player1, player2, powerUp });
+
+      expect(p1.game.board.grid).toEqual(getTestBoard('empty'));
+      expect(p2.game.board.grid).toEqual(getTestBoard('pattern1SwappedWith2'));
+      expect(sendPlayerUpdateSpy).toHaveBeenCalledTimes(2);
+
+      powerUp = POWER_UP_TYPES.CLEAR_BOARD;
+
+      gameManager.executePowerUp({ player1, player2, powerUp });
+
+      expect(p2.game.board.grid).toEqual(getTestBoard('empty'));
+      expect(sendPlayerUpdateSpy).toHaveBeenCalledTimes(3);
     });
   });
 });
