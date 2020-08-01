@@ -23,7 +23,10 @@ class PlayerManager {
   }
 
   remove(player) {
+    const numPlayers = this.count;
     this.playerList = this.playerList.filter((p) => p !== player);
+
+    return this.count < numPlayers;
   }
 
   getById(id) {

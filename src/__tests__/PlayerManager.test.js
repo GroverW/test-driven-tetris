@@ -36,19 +36,17 @@ describe('player manager tests', () => {
 
       expect(playerManager.playerList.length).toBe(1);
 
-      playerManager.remove(p1);
-
+      expect(playerManager.remove(p1)).toBe(true);
       expect(playerManager.playerList.length).toBe(0);
     });
 
     test('only removes player if player matches', () => {
       playerManager.add(p1);
-      playerManager.remove(p2);
 
+      expect(playerManager.remove(p2)).toBe(false);
       expect(playerManager.playerList.length).toBe(1);
 
-      playerManager.remove(p1);
-
+      expect(playerManager.remove(p1)).toBe(true);
       expect(playerManager.playerList.length).toBe(0);
     });
   });
