@@ -5,7 +5,7 @@ const Player = require('backend/js/Player');
 const { mockSend } = require('common/mockData/mocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
-const { MSG_TYPE } = require('backend/helpers/serverTopics');
+const { MSG_TYPE, ADD_PLAYER } = require('backend/helpers/serverTopics');
 
 describe('game room tests', () => {
   let gameRoom;
@@ -72,29 +72,71 @@ describe('game room tests', () => {
         expect(gameRoom.nextPlayerId).toBeGreaterThan(nextId);
       });
 
+      test('adds player subscriptions', () => {
+        expect(gameRoom.subscriptions[p2.id]).toBe(undefined);
+        gameRoom.addSubscriptions(p2);
+        expect(gameRoom.subscriptions[p2.id]).toEqual(expect.any(Array));
+      });
+
+      test('syncs players', () => {
+        const sendAllSpy = jest.spyOn(gameRoom.manager.msg, 'sendAll');
+        const addOtherPlayersToSpy = jest.spyOn(gameRoom.manager.msg, 'addOtherPlayersTo');
+
+        gameRoom.players.add(p2);
+        gameRoom.syncPlayersWith(p2);
+
+        expect(sendAllSpy).toHaveBeenLastCalledWith({ type: ADD_PLAYER, data: p2.id });
+        expect(addOtherPlayersToSpy).toHaveBeenLastCalledWith(p2);
+      });
+
       test('joining room sets attributes, adds subs, syncs players and returns true', () => {
         const setPlayerAttributesSpy = jest.spyOn(gameRoom, 'setPlayerAttributes');
         const addSubscriptionsSpy = jest.spyOn(gameRoom, 'addSubscriptions');
-        const syncPlayersWithSpy = jest.spyOn(gmeRoom, 'syncPlayersWith');
+        const syncPlayersWithSpy = jest.spyOn(gameRoom, 'syncPlayersWith');
 
         expect(gameRoom.join(p2)).toBe(true);
+        expect(gameRoom.players.list.includes(p2)).toBe(true);
 
         expect(setPlayerAttributesSpy).toHaveBeenCalledTimes(1);
         expect(addSubscriptionsSpy).toHaveBeenCalledTimes(1);
         expect(syncPlayersWithSpy).toHaveBeenCalledTimes(1);
       });
 
-      test('returns true if check room conditions met', () => {
+      test('returns false if room available conditions not met', () => {
+        gameRoom.roomAvailable = jest.fn().mockReturnValue(false);
 
+        expect(gameRoom.join(p2)).toBe(false);
       });
 
-      test('returns false if check room conditions not met', () => {
+      test('returns false if unable to add player to room', () => {
+        gameRoom.addToRoom = jest.fn().mockReturnValue(false);
 
+        expect(gameRoom.join(p2)).toBe(false);
       });
     });
   });
 
   describe('leave room', () => {
+    beforeEach(() => {
+      [p1, p2, p3].forEach((p) => gameRoom.join(p));
+    });
+
+    test('removes subscriptions', () => {
+      expect(gameRoom.subscriptions[p2.id]).toEqual(expect.any(Array));
+
+      const mockUnsub = jest.fn();
+      gameRoom.subscriptions[p2.id].push(mockUnsub);
+
+      gameRoom.removeSubscriptions(p2);
+
+      expect(gameRoom.subscriptions[p2.id]).toBe(undefined);
+      expect(mockUnsub).toHaveBeenCalledTimes(1);
+    });
+
+    test('removes player from room', () => {
+      expect(gameRoom.removeFromRoom(p2)).toBe(true);
+      expect(gameRoom.players.getById(p2.id)).toBe(undefined);
+    });
 
   });
 
