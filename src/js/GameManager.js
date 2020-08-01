@@ -1,7 +1,7 @@
 const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
 const { START_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
-const MessageManager = require('./MessageManager');
 const { randomize } = require('backend/helpers/serverUtils');
+const MessageManager = require('./MessageManager');
 
 class GameManager {
   constructor(gameType, pubSub) {
@@ -83,7 +83,6 @@ class GameManager {
     this.getPieces();
     this.startPlayerGames();
     this.msg.sendAll({ type: START_GAME });
-    this.updateRankings();
   }
 
   getPieces() {
@@ -99,7 +98,17 @@ class GameManager {
     this.players.forEach((p) => p.game.start());
   }
 
-  updateRankings() {
+  getNextRanking() {
+    return this.players.filter((p) => p.game.gameStatus).length;
+  }
+
+  gameOver({ id, board }) {
+    const ranking = this.getNextRanking();
+    this.msg.sendGameOverMessage(id, board, ranking);
+    this.checkIfWinner();
+  }
+
+  checkIfWinner() {
 
   }
 
