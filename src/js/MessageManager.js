@@ -45,7 +45,7 @@ class MessageManager {
     });
   }
 
-  sendPowerUp(id, data) {
+  sendPowerUp({ id, data }) {
     const player = this.players.getById(id);
     if (player) {
       player.sendMessage({

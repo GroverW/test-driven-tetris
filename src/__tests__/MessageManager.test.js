@@ -92,7 +92,7 @@ describe('message manager tests', () => {
     });
 
     test('sendPowerUp sends add power up message to specified player', () => {
-      messageManager.sendPowerUp(p1.id, 1);
+      messageManager.sendPowerUp({ id: p1.id, data: 1 });
 
       expect(p1.sendMessage).toHaveBeenLastCalledWith({
         type: ADD_POWER_UP,
