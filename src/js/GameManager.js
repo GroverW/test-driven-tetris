@@ -1,12 +1,12 @@
 const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
-const { START_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
+const { START_GAME, GAME_OVER, END_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
 const { randomize } = require('backend/helpers/serverUtils');
 const MessageManager = require('./MessageManager');
 
 class GameManager {
-  constructor(gameType, pubSub) {
+  constructor(gameType) {
+    this.gameStarted = false;
     this.gameType = gameType;
-    this.pubSub = pubSub;
     this.players = [];
     this.msg = new MessageManager(gameType);
   }
@@ -79,7 +79,7 @@ class GameManager {
   }
 
   startGame() {
-    this.pubSub.publish(START_GAME);
+    this.gameStarted = true;
     this.getPieces();
     this.startPlayerGames();
     this.msg.sendAll({ type: START_GAME });
@@ -104,12 +104,34 @@ class GameManager {
 
   gameOver({ id, board }) {
     const ranking = this.getNextRanking();
+
     this.msg.sendGameOverMessage(id, board, ranking);
-    this.checkIfWinner();
+
+    if (this.checkIfWinner()) this.endGame();
   }
 
   checkIfWinner() {
+    if (!this.gameStarted) return false;
 
+    const remaining = this.getNextRanking();
+
+    if (remaining <= 1 && this.gameType === GAME_TYPES.MULTI) return true;
+
+    if (remaining === 0 && this.gameType === GAME_TYPES.SINGLE) return true;
+
+    return false;
+  }
+
+  endGame() {
+    this.players.forEach((p) => {
+      if (p.game.gameStatus) {
+        const { id } = p;
+        const board = p.game.board.grid;
+        p.pubSub.publish(GAME_OVER, { id, board });
+      }
+    });
+
+    this.msg.sendAll({ type: END_GAME, data: {} });
   }
 
   sendError() {
