@@ -13,8 +13,8 @@ describe('player tests', () => {
   beforeEach(() => {
     pubSubTest1 = pubSub();
     pubSubTest2 = pubSub();
-    p1 = new Player(mockSend, pubSubTest1);
-    p2 = new Player(mockSend, pubSubTest2);
+    p1 = new Player(mockSend(), pubSubTest1);
+    p2 = new Player(mockSend(), pubSubTest2);
   });
 
   test('setup player', () => {

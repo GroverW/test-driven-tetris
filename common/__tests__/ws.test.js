@@ -35,7 +35,7 @@ const getNewListeners = (clientListener, serverListener) => {
   return [newClientListener, newServerListener];
 };
 
-const getNewPlayer = () => new Player(mockSend, serverPubSub());
+const getNewPlayer = () => new Player(mockSend(), serverPubSub());
 
 const initialize = (serverListener, ...players) => {
   serverListener.open();

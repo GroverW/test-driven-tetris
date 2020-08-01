@@ -8,7 +8,7 @@ const TEST_BOARDS = require('./sampleBoards');
 /**
  * Used for adding fake websocket .send
  */
-const mockSend = () => { };
+const mockSend = () => jest.fn();
 
 /**
  * Creates new test board from sampleBoards
