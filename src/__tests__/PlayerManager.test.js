@@ -20,15 +20,14 @@ describe('player manager tests', () => {
     test('adds player', () => {
       expect(playerManager.playerList.length).toBe(0);
 
-      playerManager.add(p1);
-
+      expect(playerManager.add(p1)).toBe(true);
       expect(playerManager.playerList.length).toBe(1);
     });
 
     test('does not add same player twice', () => {
       playerManager.add(p1);
-      playerManager.add(p1);
 
+      expect(playerManager.add(p1)).toBe(false);
       expect(playerManager.playerList.length).toBe(1);
     });
 

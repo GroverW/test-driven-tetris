@@ -16,9 +16,10 @@ class PlayerManager {
   }
 
   add(player) {
-    if (!this.playerList.includes(player)) {
-      this.playerList.push(player);
-    }
+    if (this.playerList.includes(player)) return false;
+
+    this.playerList.push(player);
+    return true;
   }
 
   remove(player) {
