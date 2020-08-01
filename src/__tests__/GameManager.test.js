@@ -1,16 +1,19 @@
 const GameManager = require('backend/js/GameManager');
 const MessageManager = require('backend/js/MessageManager');
+const PlayerManager = require('backend/js/PlayerManager');
 const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
-const { ADD_PIECES, END_GAME } = require('backend/helpers/serverTopics');
+const { ADD_PIECES, END_GAME, MSG_TYPE } = require('backend/helpers/serverTopics');
 const { getTestBoard } = require('common/mockData/mocks');
 
 
 describe('game manager tests', () => {
   let gameManager;
+  let playerManager;
   let p1; let p2;
 
-  const getPlayer = (id) => ({
+  const getTestPlayer = (id) => ({
     id,
+    sendMessage: jest.fn(),
     pubSub: { publish: jest.fn() },
     addPieces: jest.fn(),
     game: {
@@ -26,9 +29,10 @@ describe('game manager tests', () => {
   });
 
   beforeEach(() => {
-    p1 = getPlayer(1);
-    p2 = getPlayer(2);
-    gameManager = new GameManager(GAME_TYPES.MULTI);
+    p1 = getTestPlayer(1);
+    p2 = getTestPlayer(2);
+    playerManager = new PlayerManager();
+    gameManager = new GameManager(GAME_TYPES.MULTI, playerManager);
   });
 
   afterEach(() => {
@@ -39,48 +43,10 @@ describe('game manager tests', () => {
     expect(gameManager.msg).toEqual(expect.any(MessageManager));
   });
 
-  describe('add / remove players', () => {
-    test('adds player', () => {
-      expect(gameManager.players.length).toBe(0);
-
-      gameManager.addPlayer(p1);
-
-      expect(gameManager.players.length).toBe(1);
-    });
-
-    test('does not add same player twice', () => {
-      gameManager.addPlayer(p1);
-      gameManager.addPlayer(p1);
-
-      expect(gameManager.players.length).toBe(1);
-    });
-
-    test('removes player', () => {
-      gameManager.addPlayer(p1);
-
-      expect(gameManager.players.length).toBe(1);
-
-      gameManager.removePlayer(p1);
-
-      expect(gameManager.players.length).toBe(0);
-    });
-
-    test('only removes player if player matches', () => {
-      gameManager.addPlayer(p1);
-      gameManager.removePlayer(p2);
-
-      expect(gameManager.players.length).toBe(1);
-
-      gameManager.removePlayer(p1);
-
-      expect(gameManager.players.length).toBe(0);
-    });
-  });
-
   describe('start game', () => {
     describe('check start conditions', () => {
       beforeEach(() => {
-        gameManager.addPlayer(p1);
+        playerManager.add(p1);
       });
 
       test('gets total number of players ready', () => {
@@ -92,7 +58,7 @@ describe('game manager tests', () => {
       });
 
       test('returns true if players ready is == total ready', () => {
-        gameManager.addPlayer(p2);
+        playerManager.add(p2);
 
         p1.readyToPlay = true;
         p2.readyToPlay = true;
@@ -101,7 +67,7 @@ describe('game manager tests', () => {
       });
 
       test('returns false if players ready is < total ready', () => {
-        gameManager.addPlayer(p2);
+        playerManager.add(p2);
 
         p1.readyToPlay = true;
 
@@ -109,13 +75,13 @@ describe('game manager tests', () => {
       });
 
       test('sends error if only one player in multiplayer game', () => {
-        const sendErrorSpy = jest.spyOn(gameManager, 'sendError');
+        p1.sendFlash = jest.fn();
 
         p1.readyToPlay = true;
 
         expect(gameManager.checkStartConditions()).toBe(false);
-        expect(sendErrorSpy).toHaveBeenCalledTimes(1);
-        expect(sendErrorSpy).toHaveBeenLastCalledWith(expect.any(String));
+        expect(p1.sendFlash).toHaveBeenCalledTimes(1);
+        expect(p1.sendFlash).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
       });
 
       test('handles single player game', () => {
@@ -131,8 +97,8 @@ describe('game manager tests', () => {
 
     describe('player ready', () => {
       beforeEach(() => {
-        gameManager.addPlayer(p1);
-        gameManager.addPlayer(p2);
+        playerManager.add(p1);
+        playerManager.add(p2);
       });
 
       test('goes through start steps', () => {
@@ -182,8 +148,8 @@ describe('game manager tests', () => {
 
   describe('game over', () => {
     beforeEach(() => {
-      gameManager.addPlayer(p1);
-      gameManager.addPlayer(p2);
+      playerManager.add(p1);
+      playerManager.add(p2);
       gameManager.gameStarted = true;
     });
 
@@ -231,7 +197,7 @@ describe('game manager tests', () => {
       });
 
       test('returns true if single player game and game over', () => {
-        gameManager.removePlayer(p2);
+        playerManager.remove(p2);
         gameManager.gameType = GAME_TYPES.SINGLE;
         p1.game.gameStatus = false;
 
@@ -243,7 +209,7 @@ describe('game manager tests', () => {
       });
 
       test('returns false if single player game with player remaining', () => {
-        gameManager.removePlayer(p2);
+        playerManager.remove(p2);
         gameManager.gameType = GAME_TYPES.SINGLE;
 
         expect(gameManager.checkIfWinner()).toBe(false);
@@ -259,8 +225,8 @@ describe('game manager tests', () => {
 
   describe('game actions', () => {
     beforeEach(() => {
-      gameManager.addPlayer(p1);
-      gameManager.addPlayer(p2);
+      playerManager.add(p1);
+      playerManager.add(p2);
     });
 
     test('getPieces adds a new set of pieces for each player', () => {

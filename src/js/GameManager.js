@@ -1,33 +1,21 @@
 const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
-const { START_GAME, GAME_OVER, END_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
+const {
+  START_GAME, GAME_OVER, END_GAME, ADD_PIECES, MSG_TYPE,
+} = require('backend/helpers/serverTopics');
 const { randomize } = require('backend/helpers/serverUtils');
 const { handlePowerUp } = require('backend/helpers/powerUps');
 const MessageManager = require('./MessageManager');
 
 class GameManager {
-  constructor(gameType) {
+  constructor(gameType, players) {
     this.gameStarted = false;
     this.gameType = gameType;
-    this.players = [];
-    this.msg = new MessageManager(gameType);
-  }
-
-  addPlayer(player) {
-    if (!this.players.includes(player)) {
-      this.players.push(player);
-    }
-  }
-
-  removePlayer(player) {
-    this.players = this.players.filter((p) => p !== player);
-  }
-
-  getPlayerById(id) {
-    return this.players.find((p) => p.id === id);
+    this.players = players;
+    this.msg = new MessageManager(gameType, players);
   }
 
   getTotalReady() {
-    return this.players.filter((p) => p.readyToPlay).length;
+    return this.players.list.filter((p) => p.readyToPlay).length;
   }
 
   checkStartConditions() {
@@ -39,10 +27,10 @@ class GameManager {
 
   checkMultiplayerStartConditions() {
     const totalReady = this.getTotalReady();
-    const numPlayers = this.players.length;
+    const numPlayers = this.players.count;
 
     if (totalReady === numPlayers && numPlayers === 1) {
-      this.sendError('Not enough players to start game.');
+      this.players.first.sendFlash(MSG_TYPE.ERROR, 'Not enough players to start game.');
       return false;
     }
 
@@ -54,7 +42,7 @@ class GameManager {
   }
 
   checkSingleplayerStartConditions() {
-    return this.getTotalReady() === this.players.length;
+    return this.getTotalReady() === this.players.count;
   }
 
   playerReady() {
@@ -92,7 +80,7 @@ class GameManager {
 
   getPieces() {
     const pieces = randomize(SEED_PIECES);
-    this.players.forEach((p) => p.addPieces(pieces));
+    this.players.list.forEach((p) => p.addPieces(pieces));
     this.msg.sendAll({
       type: ADD_PIECES,
       data: pieces,
@@ -100,12 +88,12 @@ class GameManager {
   }
 
   startPlayerGames() {
-    this.players.forEach((p) => p.game.start());
+    this.players.list.forEach((p) => p.game.start());
   }
 
   executePowerUp({ player1, player2, powerUp }) {
-    const p1 = this.getPlayerById(player1);
-    const p2 = this.getPlayerById(player2);
+    const p1 = this.players.getById(player1);
+    const p2 = this.players.getById(player2);
 
     if (p1 && p2) {
       const board1 = p1.game.board.grid;
@@ -125,7 +113,7 @@ class GameManager {
   }
 
   getNextRanking() {
-    return this.players.filter((p) => p.game.gameStatus).length;
+    return this.players.list.filter((p) => p.game.gameStatus).length;
   }
 
   gameOver({ id, board }) {
@@ -155,17 +143,13 @@ class GameManager {
   }
 
   gameOverRemainingPlayers() {
-    this.players.forEach((p) => {
+    this.players.list.forEach((p) => {
       if (p.game.gameStatus) {
         const { id } = p;
         const board = p.game.board.grid;
         p.pubSub.publish(GAME_OVER, { id, board });
       }
     });
-  }
-
-  sendError() {
-
   }
 }
 

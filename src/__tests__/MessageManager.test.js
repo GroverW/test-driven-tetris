@@ -1,11 +1,13 @@
 const MessageManager = require('backend/js/MessageManager');
+const PlayerManager = require('backend/js/PlayerManager');
 const { GAME_TYPES } = require('common/helpers/constants');
 const { GAME_MESSAGE, ADD_POWER_UP, UPDATE_PLAYER } = require('backend/helpers/serverTopics');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');
 
-describe('message manager', () => {
+describe('message manager tests', () => {
+  let playerManager;
   let messageManager;
   let p1; let p2;
 
@@ -16,7 +18,8 @@ describe('message manager', () => {
   });
 
   beforeEach(() => {
-    messageManager = new MessageManager(GAME_TYPES.MULTI);
+    playerManager = new PlayerManager();
+    messageManager = new MessageManager(GAME_TYPES.MULTI, playerManager);
     p1 = getTestPlayer(1);
     p2 = getTestPlayer(1);
   });
@@ -25,59 +28,13 @@ describe('message manager', () => {
     jest.clearAllMocks();
   });
 
-  describe('add / remove players', () => {
-    test('adds player', () => {
-      expect(messageManager.players.length).toBe(0);
-
-      messageManager.addPlayer(p1);
-
-      expect(messageManager.players.length).toBe(1);
-    });
-
-    test('does not add same player twice', () => {
-      messageManager.addPlayer(p1);
-      messageManager.addPlayer(p1);
-
-      expect(messageManager.players.length).toBe(1);
-    });
-
-    test('removes player', () => {
-      messageManager.addPlayer(p1);
-
-      expect(messageManager.players.length).toBe(1);
-
-      messageManager.removePlayer(p1);
-
-      expect(messageManager.players.length).toBe(0);
-    });
-
-    test('only removes player if player matches', () => {
-      messageManager.addPlayer(p1);
-      messageManager.removePlayer(p2);
-
-      expect(messageManager.players.length).toBe(1);
-
-      messageManager.removePlayer(p1);
-
-      expect(messageManager.players.length).toBe(0);
-    });
-  });
-
-  describe('get player by id', () => {
-    test('gets player by id', () => {
-      messageManager.addPlayer(p1);
-      messageManager.addPlayer(p2);
-      expect(messageManager.getPlayerById(p1.id)).toBe(p1);
-    });
-  })
-
   describe('send messages', () => {
     let testMessage;
 
     beforeEach(() => {
       testMessage = 'test';
-      messageManager.addPlayer(p1);
-      messageManager.addPlayer(p2);
+      playerManager.add(p1);
+      playerManager.add(p2);
     });
 
     test('sendAll sends message to all players', () => {
