@@ -137,7 +137,7 @@ class GameManager {
   }
 
   endGame() {
-    this.gameOverRemainingPlayers()
+    this.gameOverRemainingPlayers();
 
     this.msg.sendAll({ type: END_GAME, data: {} });
   }
