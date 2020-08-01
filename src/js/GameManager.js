@@ -1,9 +1,14 @@
-const { GAME_TYPES } = require('common/helpers/constants');
+const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
+const { START_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
+const MessageManager = require('./MessageManager');
+const { randomize } = require('backend/helpers/serverUtils');
 
 class GameManager {
-  constructor(gameType) {
+  constructor(gameType, pubSub) {
     this.gameType = gameType;
+    this.pubSub = pubSub;
     this.players = [];
+    this.msg = new MessageManager(gameType);
   }
 
   addPlayer(player) {
@@ -54,6 +59,47 @@ class GameManager {
   }
 
   animateStart() {
+    let currInterval = COUNTDOWN.NUM_INTERVALS;
+
+    const animate = () => setTimeout(() => {
+      currInterval -= 1;
+
+      if (currInterval > 0) {
+        this.msg.sendGameMessage(currInterval);
+        animate();
+      } else if (currInterval === 0) {
+        this.msg.sendGameMessage('Good Luck!');
+        animate();
+      } else {
+        this.startGame();
+      }
+    }, COUNTDOWN.INTERVAL_LENGTH * (currInterval < COUNTDOWN.NUM_INTERVALS));
+
+    animate();
+  }
+
+  startGame() {
+    this.pubSub.publish(START_GAME);
+    this.getPieces();
+    this.startPlayerGames();
+    this.msg.sendAll({ type: START_GAME });
+    this.updateRankings();
+  }
+
+  getPieces() {
+    const pieces = randomize(SEED_PIECES);
+    this.players.forEach((p) => p.addPieces(pieces));
+    this.msg.sendAll({
+      type: ADD_PIECES,
+      data: pieces,
+    });
+  }
+
+  startPlayerGames() {
+    this.players.forEach((p) => p.game.start());
+  }
+
+  updateRankings() {
 
   }
 
