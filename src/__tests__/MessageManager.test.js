@@ -1,7 +1,9 @@
 const MessageManager = require('backend/js/MessageManager');
 const PlayerManager = require('backend/js/PlayerManager');
 const { GAME_TYPES } = require('common/helpers/constants');
-const { GAME_MESSAGE, ADD_POWER_UP, UPDATE_PLAYER } = require('backend/helpers/serverTopics');
+const {
+  GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER
+} = require('backend/helpers/serverTopics');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');
@@ -21,7 +23,7 @@ describe('message manager tests', () => {
     playerManager = new PlayerManager();
     messageManager = new MessageManager(GAME_TYPES.MULTI, playerManager);
     p1 = getTestPlayer(1);
-    p2 = getTestPlayer(1);
+    p2 = getTestPlayer(2);
   });
 
   afterEach(() => {
@@ -112,6 +114,18 @@ describe('message manager tests', () => {
       messageManager.sendPlayerUpdateToOthers(p1, data);
 
       expect(sendAllExceptSpy).toHaveBeenLastCalledWith(p1, { type: UPDATE_PLAYER, data });
+    });
+
+    test('addOtherPlayersTo sends all other players for specified player to adad', () => {
+      const p3 = getTestPlayer(3);
+      const sendMessageSpy = jest.spyOn(p3, 'sendMessage');
+
+      playerManager.add(p3);
+
+      messageManager.addOtherPlayersTo(p3);
+
+      expect(sendMessageSpy).toHaveBeenCalledTimes(2);
+      expect(sendMessageSpy).toHaveBeenLastCalledWith({ type: ADD_PLAYER, data: p2.id });
     });
   });
 });

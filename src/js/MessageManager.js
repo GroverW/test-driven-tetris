@@ -1,5 +1,5 @@
 const {
-  GAME_OVER, GAME_MESSAGE, ADD_POWER_UP, UPDATE_PLAYER,
+  GAME_OVER, GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER,
 } = require('backend/helpers/serverTopics');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const {
@@ -67,6 +67,12 @@ class MessageManager {
       player,
       { type: UPDATE_PLAYER, data },
     );
+  }
+
+  addOtherPlayersTo(player) {
+    this.players.list.forEach((p) => {
+      if (p !== player) player.sendMessage({ type: ADD_PLAYER, data: p.id });
+    });
   }
 }
 
