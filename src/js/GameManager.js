@@ -121,7 +121,7 @@ class GameManager {
 
     this.msg.sendGameOverMessage(id, board, ranking);
 
-    if (this.checkIfWinner()) this.endGame();
+    this.checkIfWinnerAndEndGame();
   }
 
   checkIfWinner() {
@@ -140,6 +140,10 @@ class GameManager {
     this.gameOverRemainingPlayers();
 
     this.msg.sendAll({ type: END_GAME, data: {} });
+  }
+
+  checkIfWinnerAndEndGame() {
+    if (this.checkIfWinner()) this.endGame();
   }
 
   gameOverRemainingPlayers() {
