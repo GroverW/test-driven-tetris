@@ -1,7 +1,7 @@
 const {
   GAME_OVER, GAME_MESSAGE, ADD_POWER_UP, UPDATE_PLAYER,
 } = require('backend/helpers/serverTopics');
-const { GAME_TYPES } = require('common/helpers/constants');
+const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');
@@ -36,8 +36,8 @@ class MessageManager {
     });
   }
 
-  sendGameOverMessage(player, ranking = false) {
-    const { id, board } = player;
+  sendGameOverMessage(id, board, ranking = false) {
+    const player = this.getPlayerById(id);
     const message = this.getGameOverMessage(player, ranking);
 
     this.sendAll({

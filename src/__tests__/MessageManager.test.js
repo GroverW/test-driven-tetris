@@ -112,7 +112,7 @@ describe('message manager', () => {
     test('sendGameOverMessage sends game over message to all players', () => {
       const ranking = 1;
 
-      messageManager.sendGameOverMessage(p1, ranking);
+      messageManager.sendGameOverMessage(p1.id, [], ranking);
 
       expect(p1.sendMessage).toHaveBeenCalledTimes(1);
       expect(p2.sendMessage).toHaveBeenCalledTimes(1);
