@@ -5,7 +5,6 @@ const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/helpers/serve
 const { ADD_PIECES, END_GAME, MSG_TYPE } = require('backend/helpers/serverTopics');
 const { getTestBoard } = require('common/mockData/mocks');
 
-
 describe('game manager tests', () => {
   let gameManager;
   let playerManager;
@@ -41,6 +40,7 @@ describe('game manager tests', () => {
 
   test('setup', () => {
     expect(gameManager.msg).toEqual(expect.any(MessageManager));
+    expect(gameManager.players).toEqual(expect.any(PlayerManager));
   });
 
   describe('start game', () => {
@@ -70,6 +70,16 @@ describe('game manager tests', () => {
         playerManager.add(p2);
 
         p1.readyToPlay = true;
+
+        expect(gameManager.checkStartConditions()).toBe(false);
+      });
+
+      test('returns false if invalid game type', () => {
+        playerManager.add(p2);
+
+        p1.readyToPlay = true;
+        p2.readyToPlay = true;
+        gameManager.gameType = null;
 
         expect(gameManager.checkStartConditions()).toBe(false);
       });
