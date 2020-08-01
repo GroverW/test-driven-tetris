@@ -1,6 +1,7 @@
 const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
 const { START_GAME, GAME_OVER, END_GAME, ADD_PIECES } = require('backend/helpers/serverTopics');
 const { randomize } = require('backend/helpers/serverUtils');
+const { handlePowerUp } = require('backend/helpers/powerUps');
 const MessageManager = require('./MessageManager');
 
 class GameManager {
@@ -19,6 +20,10 @@ class GameManager {
 
   removePlayer(player) {
     this.players = this.players.filter((p) => p !== player);
+  }
+
+  getPlayerById(id) {
+    return this.players.find((p) => p.id === id);
   }
 
   getTotalReady() {
@@ -98,6 +103,27 @@ class GameManager {
     this.players.forEach((p) => p.game.start());
   }
 
+  executePowerUp({ player1, player2, powerUp }) {
+    const p1 = this.getPlayerById(player1);
+    const p2 = this.getPlayerById(player2);
+
+    if (p1 && p2) {
+      const board1 = p1.game.board.grid;
+      const board2 = p2.game.board.grid;
+
+      const [result1, result2] = handlePowerUp(powerUp, board1, board2);
+
+      if (result1) this.updatePlayerBoard(p1, result1);
+      if (result2) this.updatePlayerBoard(p2, result2);
+    }
+  }
+
+  updatePlayerBoard(player, board) {
+    const { id } = player;
+    player.game.board.replaceBoard(board);
+    this.msg.sendPlayerUpdate({ id, board });
+  }
+
   getNextRanking() {
     return this.players.filter((p) => p.game.gameStatus).length;
   }
@@ -123,6 +149,12 @@ class GameManager {
   }
 
   endGame() {
+    this.gameOverRemainingPlayers()
+
+    this.msg.sendAll({ type: END_GAME, data: {} });
+  }
+
+  gameOverRemainingPlayers() {
     this.players.forEach((p) => {
       if (p.game.gameStatus) {
         const { id } = p;
@@ -130,8 +162,6 @@ class GameManager {
         p.pubSub.publish(GAME_OVER, { id, board });
       }
     });
-
-    this.msg.sendAll({ type: END_GAME, data: {} });
   }
 
   sendError() {
