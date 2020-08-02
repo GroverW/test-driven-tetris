@@ -20,12 +20,12 @@ describe('route helper tests', () => {
   describe('get game', () => {
     let gameServerSingle;
     let gameServerMulti;
-    const id1 = 1;
-    const id2 = 2;
+    let id1;
+    let id2;
 
     beforeEach(() => {
-      GameServer.addGame(id1, GAME_TYPES.SINGLE);
-      GameServer.addGame(id2, GAME_TYPES.MULTI);
+      id1 = GameServer.addGame(GAME_TYPES.SINGLE);
+      id2 = GameServer.addGame(GAME_TYPES.MULTI);
       gameServerSingle = GameServer.getGame(id1);
       gameServerMulti = GameServer.getGame(id2);
     });
