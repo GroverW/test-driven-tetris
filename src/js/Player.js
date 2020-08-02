@@ -68,7 +68,7 @@ class Player {
     if (this.game.gameStatus !== null) {
       this.updateReadyState(true);
       this.pubSub.publish(PLAY, this);
-    };
+    }
   }
 
   addPieces(pieces) {

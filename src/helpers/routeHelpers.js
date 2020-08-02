@@ -16,9 +16,7 @@ const getGameById = (gameId) => {
   return gameServer;
 };
 
-const createGame = (type) => {
-  return GameServer.addGame(type);
-};
+const createGame = (type) => GameServer.addGame(type);
 
 const handleGameCreation = (type) => (req, res, next) => {
   const gameId = createGame(type);

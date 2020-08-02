@@ -1,4 +1,4 @@
-const GameServer = require('backend/js/GameServer')
+const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const Api = require('frontend/helpers/Api');
 
