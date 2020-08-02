@@ -1,25 +1,20 @@
-const express = require('express');
-
 const {
-  getGameById, getNewPlayer, closeConnection, handleMessage, handleClose,
+  getGameById, getNewPlayer, handleMessage, handleClose, ensureGameExists,
 } = require('backend/helpers/routeHelpers');
 
-const router = express.Router({ mergeParams: true });
+module.exports = (io) => {
+  io.of('/game')
+    .use(ensureGameExists)
+    .on('connection', (socket) => {
+      const { gameId } = socket.handshake.query;
+      socket.join(gameId);
 
-router.ws('/:gameId', (ws, req, next) => { // eslint-disable-line consistent-return
-  try {
-    const { gameId } = req.params;
-    const gameServer = getGameById(gameId);
-    const player = getNewPlayer(ws);
+      const gameRoom = getGameById(gameId);
+      const player = getNewPlayer(socket);
 
-    if (!gameServer) closeConnection(ws, 'Game not found.');
-    if (!gameServer.join(player)) closeConnection(ws, 'Could not join game.');
+      if (!gameRoom.join(player)) socket.disconnect();
 
-    ws.on('message', handleMessage(player));
-    ws.on('close', handleClose(player));
-  } catch (err) {
-    return next(err);
-  }
-});
-
-module.exports = router;
+      socket.on('message', handleMessage(player));
+      socket.on('disconnect', handleClose(player));
+    });
+};
