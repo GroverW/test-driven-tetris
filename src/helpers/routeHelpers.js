@@ -3,7 +3,6 @@ const { PLAY, EXECUTE_COMMANDS } = require('backend/helpers/serverTopics');
 const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/Player');
 const pubSub = require('backend/helpers/pubSub');
-const uniqid = require('uniqid');
 
 const multiGameExists = (gameId) => {
   const gameServer = GameServer.getGame(gameId);
@@ -18,8 +17,7 @@ const getGameById = (gameId) => {
 };
 
 const createGame = (type) => {
-  const newGameId = uniqid();
-  return GameServer.addGame(newGameId, type);
+  return GameServer.addGame(type);
 };
 
 const handleGameCreation = (type) => (req, res, next) => {

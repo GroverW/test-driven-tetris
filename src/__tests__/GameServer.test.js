@@ -1,6 +1,10 @@
+const uniqid = require('uniqid');
+
 const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
+
+jest.mock('uniqid');
 
 describe('game server tests', () => {
   const testGameRoom = { id: 1 };
@@ -11,6 +15,7 @@ describe('game server tests', () => {
 
   afterEach(() => {
     GAMES.clear();
+    jest.clearAllMocks();
   });
 
   describe('get, add, remove games', () => {
@@ -20,12 +25,13 @@ describe('game server tests', () => {
     });
 
     test('creates a new GameRoom if id does not exist', () => {
-      const newId = GameServer.addGame(2, GAME_TYPES.MULTI);
+      const newId = GameServer.addGame(GAME_TYPES.MULTI);
       expect(GameServer.getGame(newId)).toEqual(expect.any(GameRoom));
     });
 
     test('does not add a new GameRoom if id in use', () => {
-      const newId = GameServer.addGame(testGameRoom.id, GAME_TYPES.MULTI);
+      uniqid.mockImplementation(() => testGameRoom.id);
+      const newId = GameServer.addGame(GAME_TYPES.MULTI);
       expect(GameServer.getGame(newId)).not.toEqual(expect.any(GameRoom));
       expect(GameServer.getGame(newId)).toBe(testGameRoom);
     });

@@ -1,5 +1,6 @@
 const { GAMES } = require('backend/helpers/serverConstants');
 const GameRoom = require('backend/js/GameRoom');
+const uniqid = require('uniqid');
 
 /**
  * Represents a game server
@@ -18,11 +19,12 @@ class GameServer {
 
   /**
    * Adds a new game if id does not already exist
-   * @param {string} id - id of game to add
    * @param {string} gameType - type of game to add (single or multiplayer)
    * @returns {string} - id of new game
    */
-  static addGame(id, gameType) {
+  static addGame(gameType) {
+    const id = uniqid();
+
     if (!GAMES.has(id)) GAMES.set(id, new GameRoom(id, gameType, this.removeGame.bind(this)));
 
     return id;
