@@ -69,8 +69,8 @@ const connectToGame = (gameId, gameType) => {
   /**
    * What to do when the websocket is closed
    */
-  socket.on('disconnect', (evt) => {
-    const data = evt.reason || 'Something went wrong, please try again.';
+  socket.on('error', (msg) => {
+    const data = msg || 'Something went wrong, please try again.';
     publishError(data);
   });
 
@@ -79,7 +79,6 @@ const connectToGame = (gameId, gameType) => {
    */
   socket.on('message', (msg) => {
     const { type, data } = msg;
-    console.log(type, data);
 
     if (type === ADD_PLAYER && !game) {
       gameDOM.initialize(gameSelectors, data);
