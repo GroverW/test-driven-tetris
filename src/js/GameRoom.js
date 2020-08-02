@@ -112,7 +112,7 @@ class GameRoom {
 
   leave(player) {
     if (!this.removePlayer(player)) return false;
-    if (this.players.count === 0) this.removeGameRoom();
+    if (this.players.count === 0) this.removeGameRoom(this.id);
 
     this.syncPlayersWith(player);
     this.manager.checkIfWinnerAndEndGame();
