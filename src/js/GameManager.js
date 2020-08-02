@@ -19,6 +19,7 @@ class GameManager {
   }
 
   checkStartConditions() {
+    console.log(this.gameType)
     if (this.gameType === GAME_TYPES.MULTI) return this.checkMultiplayerStartConditions();
     if (this.gameType === GAME_TYPES.SINGLE) return this.checkSingleplayerStartConditions();
 
@@ -46,14 +47,16 @@ class GameManager {
   }
 
   playerReady() {
+    console.log('ready to play')
     if (this.checkStartConditions()) {
+      console.log('playing')
       this.animateStart();
     }
   }
 
   animateStart() {
     let currInterval = COUNTDOWN.NUM_INTERVALS;
-
+    console.log('animating')
     const animate = () => setTimeout(() => {
       currInterval -= 1;
 

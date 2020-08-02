@@ -22,7 +22,8 @@ class Player {
   }
 
   sendMessage(data) {
-    this.send(formatMessage(data));
+    console.log('LETS DO IT!', data)
+    this.send('message', data);
   }
 
   sendFlash(type, message) {

@@ -10,7 +10,7 @@ class Api {
 
   sendMessage(message) {
     try {
-      this.ws.send(formatMessage(message));
+      this.ws.emit('message', message);
     } catch (err) {
       publishError('Could not send message to backend.');
     }

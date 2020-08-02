@@ -1,4 +1,5 @@
 const axios = require('axios');
+const io = require('socket.io-client');
 
 const ClientGame = require('frontend/static/js/ClientGame');
 const gameLoop = require('frontend/static/js/GameLoop');
@@ -22,7 +23,7 @@ const {
  * @returns {string} - base url (e.g. wss://www.example.com/)
  */
 const getBaseURL = () => {
-  const [httpProtocol,, hostname] = document.URL.split('/');
+  const [httpProtocol, , hostname] = document.URL.split('/');
   const wsProtocol = httpProtocol === 'https:' ? 'wss:' : 'ws:';
 
   return `${wsProtocol}//${hostname}`;
@@ -60,31 +61,31 @@ const connectToGame = (gameId, gameType) => {
     addPowerUpTargetId(gameSelectors.player, 1);
     powerUpContainer.classList.remove('hide');
   }
-
   const baseURL = getBaseURL();
-  const ws = new WebSocket(`${baseURL}/game/${gameId}`);
+  const socket = io(`${baseURL}/game`, { query: `gameId=${gameId}` });
 
   let game; let api;
 
   /**
    * What to do when the websocket is closed
    */
-  ws.onclose = (evt) => {
+  socket.on('disconnect', (evt) => {
     const data = evt.reason || 'Something went wrong, please try again.';
     publishError(data);
-  };
+  });
 
   /**
    * What to do when receiving a message over the websocket
    */
-  ws.onmessage = (evt) => {
-    const { type, data } = JSON.parse(evt.data);
+  socket.on('message', (msg) => {
+    const { type, data } = msg;
+    console.log(type, data);
 
     if (type === ADD_PLAYER && !game) {
       gameDOM.initialize(gameSelectors, data);
       game = new ClientGame(data);
       gameLoop.initialize(data);
-      api = new Api(ws);
+      api = new Api(socket);
       createEventListeners(game, api);
       gameSelectors.message.classList.remove('hide');
       publish(TOGGLE_MENU);
@@ -92,7 +93,7 @@ const connectToGame = (gameId, gameType) => {
     }
 
     publish(type, data);
-  };
+  });
 };
 
 /**

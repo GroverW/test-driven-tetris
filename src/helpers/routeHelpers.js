@@ -27,7 +27,7 @@ const handleGameCreation = (type) => (req, res, next) => {
   return next(err);
 };
 
-const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
+const getNewPlayer = (socket) => new Player(socket.emit.bind(socket), pubSub());
 
 const closeConnection = (ws, message) => {
   ws.close(1008, message);
@@ -35,7 +35,8 @@ const closeConnection = (ws, message) => {
 };
 
 const handleMessage = (player) => (msg) => {
-  const { type, data } = JSON.parse(msg);
+  console.log('WAO!', msg)
+  const { type, data } = msg;
   if (type === PLAY) player.startGame();
   if (type === EXECUTE_COMMANDS) player.game.executeCommandQueue(data);
 };
