@@ -36,7 +36,6 @@ const handleMessage = (player) => (msg) => {
 };
 
 const handleClose = (player) => () => {
-  console.log('leaving!!')
   if (player) player.leave();
 };
 
