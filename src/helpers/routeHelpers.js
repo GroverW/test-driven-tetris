@@ -29,20 +29,33 @@ const handleGameCreation = (type) => (req, res, next) => {
 
 const getNewPlayer = (socket) => new Player(socket.emit.bind(socket), pubSub());
 
-const closeConnection = (ws, message) => {
-  ws.close(1008, message);
-  throw new Error(message);
-};
-
 const handleMessage = (player) => (msg) => {
-  console.log('WAO!', msg)
   const { type, data } = msg;
   if (type === PLAY) player.startGame();
   if (type === EXECUTE_COMMANDS) player.game.executeCommandQueue(data);
 };
 
 const handleClose = (player) => () => {
+  console.log('leaving!!')
   if (player) player.leave();
+};
+
+const ensureGameExists = (socket, next) => {
+  const { gameId } = socket.handshake.query;
+
+  if (!gameId) {
+    const err = new Error('No Game Id provided.');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!getGameById(gameId)) {
+    const err = new Error('Game not found.');
+    err.status = 404;
+    return next(err);
+  }
+
+  return next();
 };
 
 module.exports = {
@@ -51,7 +64,7 @@ module.exports = {
   getNewPlayer,
   createGame,
   handleGameCreation,
-  closeConnection,
+  ensureGameExists,
   handleMessage,
   handleClose,
 };
