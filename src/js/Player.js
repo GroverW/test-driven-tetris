@@ -65,7 +65,10 @@ class Player {
    * Publishes a message for the current game to be started
    */
   startGame() {
-    if (this.game.gameStatus !== null) this.pubSub.publish(PLAY, this);
+    if (this.game.gameStatus !== null) {
+      this.updateReadyState(true);
+      this.pubSub.publish(PLAY, this);
+    };
   }
 }
 
