@@ -1,5 +1,5 @@
 const {
-  REMOVE_PLAYER, PLAY, ADD_MESSAGE,
+  REMOVE_PLAYER, PLAY, ADD_MESSAGE, ADD_PIECES,
 } = require('backend/helpers/serverTopics');
 const { formatMessage } = require('backend/helpers/serverUtils');
 const ServerGame = require('./ServerGame');
@@ -69,6 +69,10 @@ class Player {
       this.updateReadyState(true);
       this.pubSub.publish(PLAY, this);
     };
+  }
+
+  addPieces(pieces) {
+    this.game[ADD_PIECES](pieces);
   }
 }
 
