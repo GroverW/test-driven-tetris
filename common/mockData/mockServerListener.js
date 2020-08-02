@@ -14,11 +14,9 @@ class MockServerListener {
    * Creates a MockServerListener
    * @constructor
    * @param {object} ws - mock websocket
-   * @param {string} url - the url of the gameServer to connect to
    */
-  constructor(ws, url) {
+  constructor(ws) {
     this.ws = ws;
-    this.url = url;
     this.subscriptions = [
       ws.on('open', this.open.bind(this)),
       ws.on(PLAY, this.startGame.bind(this)),
@@ -28,20 +26,20 @@ class MockServerListener {
   }
 
   /**
-   * Creates a new gameServer and Player. Adds the Player to the gameServer
+   * Creates a new game room and Player. Adds the Player to the game room
    */
   open() {
-    GameServer.addGame(this.url, GAME_TYPES.MULTI);
-    this.gameServer = GameServer.getGame(this.url);
+    const id = GameServer.addGame(GAME_TYPES.MULTI);
+    this.gameRoom = GameServer.getGame(id);
     this.player = new Player(this.ws.send.bind(this.ws), serverPubSub());
-    this.gameServer.join(this.player);
+    this.gameRoom.join(this.player);
   }
 
   /**
    * Starts the game
    */
   startGame() {
-    this.gameServer.players.forEach((player) => player.startGame());
+    this.gameRoom.players.list.forEach((player) => player.startGame());
   }
 
   /**
@@ -64,13 +62,13 @@ class MockServerListener {
    */
   unsubAll() {
     this.subscriptions.forEach((unsub) => unsub());
-    if (this.gameServer !== undefined) this.gameServer.unsubscribe();
+    if (this.gameRoom !== undefined) this.gameRoom.unsubscribe();
   }
 
   getProp(property) {
     return {
-      numPlayers: this.gameServer.players.length,
-      gameStarted: this.gameServer.gameStarted,
+      numPlayers: this.gameRoom.players.count,
+      gameStarted: this.gameRoom.manager.gameStarted,
       pieces: JSON.parse(JSON.stringify(this.player.game.board.pieceList.pieces)),
       board: JSON.parse(JSON.stringify(this.player.game.board.grid)),
       score: this.player.game.score,

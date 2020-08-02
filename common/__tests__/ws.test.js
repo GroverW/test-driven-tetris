@@ -1,3 +1,4 @@
+const GameServer = require('backend/js/GameServer')
 const Player = require('backend/js/Player');
 const Api = require('frontend/helpers/Api');
 
@@ -19,7 +20,7 @@ const {
 } = require('common/mockData/mocks');
 
 const startGame = (serverListener, ...additionalPlayers) => {
-  additionalPlayers.forEach((player) => serverListener.gameServer.join(player));
+  additionalPlayers.forEach((player) => serverListener.gameRoom.join(player));
 
   serverListener.startGame();
   jest.advanceTimersByTime(COUNTDOWN.NUM_INTERVALS * COUNTDOWN.INTERVAL_LENGTH);
@@ -89,25 +90,25 @@ describe('websocket tests', () => {
     });
 
     test('second player is added to room', () => {
-      const sendAllSpy = jest.spyOn(server.gameServer, 'sendAll');
+      const syncPlayersSpy = jest.spyOn(server.gameRoom, 'syncPlayersWith');
       const sendSpy = jest.spyOn(p2, 'send');
 
       expect(client.getProp('numPlayers')).toEqual([0, 0, 0]);
-      expect(sendAllSpy).toHaveBeenCalledTimes(0);
+      expect(syncPlayersSpy).toHaveBeenCalledTimes(0);
       expect(sendSpy).toHaveBeenCalledTimes(0);
 
-      server.gameServer.join(p2);
+      server.gameRoom.join(p2);
 
       expect(client.getProp('numPlayers')).toEqual([1, 1, 1]);
 
-      expect(sendAllSpy).toHaveBeenCalledTimes(1);
+      expect(syncPlayersSpy).toHaveBeenCalledTimes(1);
       // player joining should receive all other players in game
       // 1 call for sendAll, 1 to send p1 info to p2
       expect(sendSpy).toHaveBeenCalledTimes(2);
     });
 
     test('second player is removed from room', () => {
-      server.gameServer.join(p2);
+      server.gameRoom.join(p2);
 
       expect(client.getProp('numPlayers')).toEqual([1, 1, 1]);
 
@@ -119,7 +120,7 @@ describe('websocket tests', () => {
     test('client closes window should remove player from server', () => {
       client.closeWindow();
       expect(server.getProp('numPlayers')).toBe(0);
-      expect(GAMES.has(server.gameServer.id)).toBe(false);
+      expect(GameServer.getGame(server.gameRoom.id)).toBe(false);
     });
   });
 
@@ -164,7 +165,7 @@ describe('websocket tests', () => {
         board: server.player.game.board.grid,
       };
 
-      server.gameServer.gameOver(gameOverData);
+      server.gameRoom.manager.gameOver(gameOverData);
 
       expect(client.getProp('messagePresent')).toBe(true);
       expect(client.getProp('gameStatus')).toBe(null);
@@ -186,7 +187,7 @@ describe('websocket tests', () => {
       server.player.leave();
       p2.leave();
 
-      expect(GAMES.has(server.gameServer.id)).toBe(false);
+      expect(GameServer.getGame(server.gameRoom.id)).toBe(false);
     });
   });
 
@@ -274,7 +275,7 @@ describe('websocket tests', () => {
       Math.random = jest.fn().mockReturnValue(0.9);
 
       server.open();
-      server.gameServer.gameType = GAME_TYPES.SINGLE;
+      server.gameRoom.gameType = GAME_TYPES.SINGLE;
       server.player.setGameType(GAME_TYPES.SINGLE);
 
       client.gameDOM.usePowerUp();
@@ -321,7 +322,7 @@ describe('websocket tests', () => {
       });
       expect(client.clientMessage.message.innerText).not.toBe('');
 
-      server.gameServer.join(p2);
+      server.gameRoom.join(p2);
 
       server.startGame();
 
