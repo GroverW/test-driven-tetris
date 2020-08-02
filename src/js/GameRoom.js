@@ -10,7 +10,7 @@ const {
   ADD_PIECES,
   UPDATE_PLAYER,
   ADD_POWER_UP,
-  USE_POWER_UP
+  USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 
 class GameRoom {
@@ -124,7 +124,6 @@ class GameRoom {
       subList.forEach((unsub) => unsub());
       delete this.subscriptions[id];
     });
-
   }
 }
 

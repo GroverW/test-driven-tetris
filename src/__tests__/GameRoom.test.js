@@ -14,7 +14,7 @@ const {
   ADD_PIECES,
   UPDATE_PLAYER,
   ADD_POWER_UP,
-  USE_POWER_UP
+  USE_POWER_UP,
 } = require('backend/helpers/serverTopics');
 
 describe('game room tests', () => {
