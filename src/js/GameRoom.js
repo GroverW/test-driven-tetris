@@ -14,7 +14,8 @@ const {
 } = require('backend/helpers/serverTopics');
 
 class GameRoom {
-  constructor(gameType, removeGameRoom) {
+  constructor(id, gameType, removeGameRoom) {
+    this.id = id;
     this.gameType = gameType;
     this.removeGameRoom = removeGameRoom;
     this.players = new PlayerManager();
@@ -23,8 +24,12 @@ class GameRoom {
     this.subscriptions = {};
   }
 
+  roomFull() {
+    return this.players.count >= MAX_PLAYERS[this.gameType];
+  }
+
   roomAvailable(player) {
-    if (this.roomIsFull()) {
+    if (this.roomFull()) {
       player.sendFlash(MSG_TYPE.ERROR, 'That game is full.');
       return false;
     }
@@ -35,10 +40,6 @@ class GameRoom {
     }
 
     return true;
-  }
-
-  roomIsFull() {
-    return this.players.count >= MAX_PLAYERS[this.gameType];
   }
 
   addToRoom(player) {
@@ -120,8 +121,8 @@ class GameRoom {
   }
 
   unsubscribe() {
-    Object.entries(this.subscriptions).forEach(([id, subList]) => {
-      subList.forEach((unsub) => unsub());
+    Object.entries(this.subscriptions).forEach(([id, subscriberList]) => {
+      subscriberList.forEach((unsub) => unsub());
       delete this.subscriptions[id];
     });
   }

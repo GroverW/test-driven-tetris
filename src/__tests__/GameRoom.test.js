@@ -22,7 +22,7 @@ describe('game room tests', () => {
   let p1; let p2; let p3; let p4; let p5;
 
   beforeEach(() => {
-    gameRoom = new GameRoom(GAME_TYPES.MULTI, jest.fn());
+    gameRoom = new GameRoom(1, GAME_TYPES.MULTI, jest.fn());
     ([p1, p2, p3, p4, p5] = [p1, p2, p3, p4, p5].map(() => new Player(mockSend(), pubSub())));
   });
 
