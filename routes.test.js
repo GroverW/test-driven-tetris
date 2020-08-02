@@ -1,5 +1,6 @@
 const request = require('supertest');
 const GameServer = require('backend/js/GameServer');
+const GameRoom = require('backend/js/GameRoom');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 
 const app = require('./app');
@@ -21,7 +22,7 @@ describe('Routes tests', () => {
       expect(response.body.gameId).toEqual(expect.any(String));
 
       expect(GAMES.size).toBe(1);
-      expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameServer));
+      expect(GAMES.get(response.body.gameId)).toEqual(expect.any(GameRoom));
       expect(GAMES.get(response.body.gameId).gameType).toBe(type);
     };
 
