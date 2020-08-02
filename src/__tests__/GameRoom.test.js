@@ -257,5 +257,15 @@ describe('game room tests', () => {
       gameRoom.manager.executePowerUp = () => mockFunction();
       runPubSubTestFor(p1, USE_POWER_UP);
     });
+
+    test('unsubscribe removes all subscriptions', () => {
+      p1.pubSub.subscribe = jest.fn().mockImplementation(() => mockFunction);
+      gameRoom.join(p1);
+
+      expect(mockFunction).toHaveBeenCalledTimes(0);
+      gameRoom.unsubscribe();
+      expect(Object.keys(gameRoom.subscriptions).length).toBe(0);
+      expect(mockFunction).toHaveBeenCalledTimes(7);
+    });
   });
 });

@@ -118,6 +118,14 @@ class GameRoom {
 
     return true;
   }
+
+  unsubscribe() {
+    Object.entries(this.subscriptions).forEach(([id, subList]) => {
+      subList.forEach((unsub) => unsub());
+      delete this.subscriptions[id];
+    });
+
+  }
 }
 
 module.exports = GameRoom;
