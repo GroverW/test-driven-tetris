@@ -92,7 +92,7 @@ describe('message manager tests', () => {
     });
 
     test('sendPowerUp sends add power up message to specified player', () => {
-      messageManager.sendPowerUp({ id: p1.id, data: 1 });
+      messageManager.sendPowerUp({ id: p1.id, powerUp: 1 });
 
       expect(p1.sendMessage).toHaveBeenLastCalledWith({
         type: ADD_POWER_UP,
@@ -111,7 +111,7 @@ describe('message manager tests', () => {
     test('sendPlayerUpdateToOthers sends message for all others to update player', () => {
       const sendAllExceptSpy = jest.spyOn(messageManager, 'sendAllExcept');
       const data = { id: p1.id, board: p1.game.board };
-      messageManager.sendPlayerUpdateToOthers(p1, data);
+      messageManager.sendPlayerUpdateToOthers(data);
 
       expect(sendAllExceptSpy).toHaveBeenLastCalledWith(p1, { type: UPDATE_PLAYER, data });
     });

@@ -45,12 +45,12 @@ class MessageManager {
     });
   }
 
-  sendPowerUp({ id, data }) {
+  sendPowerUp({ id, powerUp }) {
     const player = this.players.getById(id);
     if (player) {
       player.sendMessage({
         type: ADD_POWER_UP,
-        data,
+        data: powerUp,
       });
     }
   }
@@ -62,10 +62,11 @@ class MessageManager {
     });
   }
 
-  sendPlayerUpdateToOthers(player, data) {
+  sendPlayerUpdateToOthers({ id, board }) {
+    const player = this.players.getById(id);
     this.sendAllExcept(
       player,
-      { type: UPDATE_PLAYER, data },
+      { type: UPDATE_PLAYER, data: { id, board } },
     );
   }
 
