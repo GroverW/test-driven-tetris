@@ -13,6 +13,13 @@ describe('Routes tests', () => {
     GAMES.clear();
   });
 
+  describe('GET /', () => {
+    test('returns good response in html format', async () => {
+      const response = await request(app).get('/').expect('content-type', /html/);
+      expect(response.statusCode).toBe(200);
+    });
+  });
+
   describe('POST game', () => {
     const createGameTest = async (type) => {
       const urlParam = type === GAME_TYPES.MULTI ? 'multi' : 'single';
