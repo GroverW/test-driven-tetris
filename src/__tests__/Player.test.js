@@ -1,40 +1,106 @@
 const Player = require('backend/js/Player');
 const ServerGame = require('backend/js/ServerGame');
 const pubSub = require('backend/helpers/pubSub');
-const { mockSend } = require('common/mockData/mocks');
+const { mockSend, pubSubMock } = require('common/mockData/mocks');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const {
+  MSG_TYPE, ADD_MESSAGE, REMOVE_PLAYER, PLAY, ADD_PIECES,
+} = require('backend/helpers/serverTopics');
 
 describe('player tests', () => {
   let p1;
-  let p2;
-  let pubSubTest1;
-  let pubSubTest2;
+  let pubSubTest;
+  let pubSubSpy;
+  let testMessage;
 
   beforeEach(() => {
-    pubSubTest1 = pubSub();
-    pubSubTest2 = pubSub();
-    p1 = new Player(mockSend(), pubSubTest1);
-    p2 = new Player(mockSend(), pubSubTest2);
+    pubSubTest = pubSub();
+    p1 = new Player(mockSend(), pubSubTest);
+    pubSubSpy = pubSubMock(pubSubTest);
+    testMessage = { type: 'test', data: 'test' };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('setup player', () => {
-    expect(p1.game).toEqual(expect.any(ServerGame));
-    expect(p2.game).toEqual(expect.any(ServerGame));
+    const {
+      isHost, readyToPlay, send, pubSub: pubSubObj, game,
+    } = p1;
+    expect([isHost, readyToPlay, send, pubSubObj, game])
+      .toEqual([false, false, expect.any(Function), expect.any(Object), expect.any(ServerGame)]);
   });
 
-  test('set id', () => {
+  test('sends messages', () => {
+    const sendSpy = jest.spyOn(p1, 'send');
+
+    p1.sendMessage(testMessage);
+
+    expect(sendSpy).toHaveBeenLastCalledWith(JSON.stringify(testMessage));
+  });
+
+  test('sends flash', () => {
+    const sendMessageSpy = jest.spyOn(p1, 'sendMessage');
+
+    p1.sendFlash(MSG_TYPE.NOTICE, testMessage.data);
+
+    expect(sendMessageSpy).toHaveBeenLastCalledWith({
+      type: ADD_MESSAGE,
+      data: {
+        type: MSG_TYPE.NOTICE,
+        message: testMessage.data,
+      },
+    });
+  });
+
+  test('updates ready state', () => {
+    p1.updateReadyState(true);
+    expect(p1.readyToPlay).toBe(true);
+  });
+
+  test('sets id', () => {
     expect(p1.id).toBe(undefined);
 
     p1.setId(1);
 
-    expect(p1.id).toBe(1);
-    expect(p1.game.playerId).toBe(1);
-    expect(p1.game.board.playerId).toBe(1);
+    expect([p1.id, p1.game.playerId, p1.game.board.playerId]).toEqual([1, 1, 1]);
   });
 
-  test('set game type', () => {
+  test('sets game type', () => {
     expect(p1.game.gameType).toBe(undefined);
     p1.setGameType(GAME_TYPES.MULTI);
     expect(p1.game.gameType).toBe(GAME_TYPES.MULTI);
+  });
+
+  test('publishes REMOVE_PLAYER on leave', () => {
+    const removePlayerSpy = pubSubSpy.add(REMOVE_PLAYER);
+    p1.leave();
+    expect(removePlayerSpy).toHaveBeenLastCalledWith(p1);
+  });
+
+  test('startGame publishes PLAY if game not over', () => {
+    const playSpy = pubSubSpy.add(PLAY);
+    const updateReadyStateSpy = jest.spyOn(p1, 'updateReadyState');
+
+    p1.startGame();
+
+    expect(playSpy).toHaveBeenLastCalledWith(p1);
+    expect(updateReadyStateSpy).toHaveBeenCalledTimes(1);
+
+    p1.game.gameStatus = null;
+    p1.startGame();
+
+    expect(playSpy).toHaveBeenCalledTimes(1);
+    expect(updateReadyStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('addPieces adds pieces to game', () => {
+    const addPiecesSpy = jest.spyOn(p1.game, ADD_PIECES);
+    const testPieces = [1, 1, 1, 1];
+
+    p1.addPieces(testPieces);
+
+    expect(addPiecesSpy).toHaveBeenLastCalledWith(testPieces);
   });
 });
