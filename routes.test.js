@@ -81,7 +81,6 @@ describe('Routes tests', () => {
   });
 
   describe('websocket tests', () => {
-    let ws;
     let server;
 
     const addPlayersToRoom = (type, numPlayers) => {
@@ -106,7 +105,7 @@ describe('Routes tests', () => {
     });
 
     afterEach(() => {
-      destroySocket(ws);
+      destroySocket();
     });
 
     test('successfully connects', async () => {
