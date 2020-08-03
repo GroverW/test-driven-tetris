@@ -81,9 +81,8 @@ describe('Routes tests', () => {
       setTimeout(() => reject(new Error('failed to connect')), 5000);
     });
 
-    const destroySocket = (ws) => new Promise((resolve, reject) => {
+    const destroySocket = () => new Promise((resolve, reject) => {
       if (ws.readyState === 1) {
-        console.log('CLOSING')
         ws.close();
         resolve(true);
       }
@@ -100,7 +99,13 @@ describe('Routes tests', () => {
     });
 
     afterEach(() => {
-      destroySocket(ws);
+      destroySocket();
+    });
+
+    test('successfully connects', async () => {
+      const id = GameServer.addGame(GAME_TYPES.MULTI);
+      const socket = await initSocket(id);
+      expect(socket).toEqual(expect.any(Object));
     });
 
     test('successfully connects', async () => {
