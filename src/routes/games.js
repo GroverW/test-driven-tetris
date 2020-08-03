@@ -1,4 +1,5 @@
 const express = require('express');
+const ExpressError = require('backend/js/ExpressError');
 
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const { multiGameExists, handleGameCreation } = require('backend/helpers/routeHelpers');
@@ -10,9 +11,7 @@ router.get('/multi/:gameId', (req, res, next) => {
 
   if (multiGameExists(gameId)) return res.json({ gameId });
 
-  const err = new Error('Game not found');
-  err.status = 404;
-
+  const err = new ExpressError(404, 'Game not found');
   return next(err);
 });
 
