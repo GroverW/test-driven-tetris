@@ -22,7 +22,6 @@ class Player {
   }
 
   sendMessage(data) {
-    console.log('LETS DO IT!', data)
     this.send('message', data);
   }
 
