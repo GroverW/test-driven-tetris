@@ -1,3 +1,4 @@
+const io = require('socket.io-client');
 const request = require('supertest');
 const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
@@ -66,6 +67,53 @@ describe('Routes tests', () => {
       expect(response.statusCode).toBe(404);
 
       expect(response.body.error).toEqual(expect.any(String));
+    });
+  });
+
+  describe('WS tests', () => {
+    let socket;
+
+    const initSocket = (gameId) => new Promise((resolve, reject) => {
+      socket = io('http://localhost:3000/game', {
+        query: `gameId=${gameId || ''}`,
+        'reconnection delay': 0,
+        'reopen delay': 0,
+        'force new connection': true,
+      });
+
+      socket.on('message', () => {
+        resolve(socket);
+      });
+
+      setTimeout(() => reject(new Error('failed to connect')), 5000);
+    });
+
+    const destroySocket = (socket) => new Promise((resolve, reject) => {
+      if (socket.connected) {
+        socket.disconnect();
+        resolve(true);
+      }
+
+      resolve(false);
+    });
+
+    beforeAll(() => {
+      app.listen(3000);
+    });
+
+    afterAll(() => {
+      app.close();
+    });
+
+    afterEach(() => {
+      GAMES.clear();
+      destroySocket(socket);
+    });
+
+    test('successfully connects', async () => {
+      const id = GameServer.addGame(GAME_TYPES.MULTI);
+      const socket = await initSocket(id);
+      expect(socket).toEqual(expect.any(Object));
     });
   });
 });
