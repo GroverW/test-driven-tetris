@@ -6,6 +6,18 @@
 
 ## Project Overview
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/maintainability)](https://codeclimate.com/github/GroverW/test-driven-tetris/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/test_coverage)](https://codeclimate.com/github/GroverW/test-driven-tetris/test_coverage)
+
+### Project Summary
+
+Test-Driven, Multiplayer Tetris written in JavaScript. This project is an ongoing exploration of different concepts, technologies and design patterns:
+- websockets
+- TDD
+- mocking
+- publish / subscribe
+- other Object Oriented design patterns
+
 ### Project Structure - Classes, Helpers, Components, Routes, etc.
 
 ```
@@ -44,16 +56,23 @@ frontend                            # Wrapping folder for front-end
 
 
 src                                 # Wrapping folder for back-end classes
+├── middleware
+│   └── wsRouteValidation           # validates requests to connect to websocket
+├── routes
+│   ├── games                       # POST / GET games
+│   └── gameWs                      # server-side websocket
 ├── helpers
 │   ├── serverConstants             # Constants specific to server
-│   └── pubSub                      # Factory function for creating local pub/sub functions
+│   └── pubSub                      # Factory function for creating local pub/sub objects
 └── js
-    └── GameServer                  # Manages adding / removing players, sending messages
-        └── Player                  # Associates game with gameServer
-            └── ServerGame          # Manages score, executes commands, etc
-                └── ServerBoard     # Manages board state and pieces
-
-app                                 # Backend-routes
+    └── GameServer                  # Adds / removes and retrieves games from the server
+        └── GameRoom                # Adds / removes players from the current game
+            ├── PlayerManager       # Manages the current player list
+            ├── GameManager         # Starts / stops / syncs the current game
+            │   └── MessageManager  # Handles sending / formatting messages to clients
+            └── Player              # Associates game with game room
+                └── ServerGame      # Manages score, executes commands, etc
+                    └── ServerBoard # Manages board state and piece
 ```
 
 ### Class Inheritance Structure
@@ -108,7 +127,7 @@ And you should be good to go!
 From the root directory, run the following command
 
 ```
-npx webpack --mode="<MODE>"
+npx webpack --watach --mode="development"
 ```
 
 Where mode is your desired build process (e.g. development).
@@ -127,7 +146,7 @@ The backend will be automatically restarted on save.
 
 To run unit-tests - from the root directory, run the following command:
 ```
-jest
+npm test
 ```
 
 ## Built With
@@ -137,6 +156,3 @@ jest
 ## Authors
 
 * **Will Grover** - [GroverW](https://github.com/GroverW)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/maintainability)](https://codeclimate.com/github/GroverW/test-driven-tetris/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/873cb57f3d83094c75cd/test_coverage)](https://codeclimate.com/github/GroverW/test-driven-tetris/test_coverage)
