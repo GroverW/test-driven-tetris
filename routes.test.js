@@ -3,6 +3,7 @@ const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
 const Player = require('backend/js/Player');
 const { mockSend } = require('common/mockData/mocks');
+const { initSocket, destroySocket } = require('common/mockData/wsMocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 
@@ -83,23 +84,6 @@ describe('Routes tests', () => {
     let ws;
     let server;
 
-    const initSocket = (gameId) => new Promise((resolve, reject) => {
-      ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
-
-      ws.onmessage = () => resolve(ws);
-
-      ws.onclose = () => reject(new Error('failed to connect'));
-    });
-
-    const destroySocket = () => new Promise((resolve) => {
-      if (ws.readyState === 1) {
-        ws.close();
-        resolve(true);
-      }
-
-      resolve(false);
-    });
-
     const addPlayersToRoom = (type, numPlayers) => {
       const id = GameServer.addGame(type);
       const gameRoom = GameServer.getGame(id);
@@ -122,7 +106,7 @@ describe('Routes tests', () => {
     });
 
     afterEach(() => {
-      destroySocket();
+      if (ws) destroySocket(ws);
     });
 
     test('successfully connects', async () => {
