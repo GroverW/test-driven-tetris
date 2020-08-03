@@ -9,8 +9,6 @@ const initSocket = (gameId) => new Promise((resolve, reject) => {
 });
 
 const destroySocket = () => new Promise((resolve) => {
-  if (!ws) resolve(false);
-
   if (ws.readyState === 1) {
     ws.close();
     resolve(true);
