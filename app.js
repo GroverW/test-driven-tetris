@@ -5,11 +5,12 @@ const app = express();
 require('express-ws')(app);
 const games = require('backend/routes/games');
 const gameWs = require('backend/routes/gameWs');
+const wsRouteValidation = require('backend/middleware/wsRouteValidation');
 
 app.use(express.static('frontend/static/'));
 
 app.use('/games', games);
-app.use('/game', gameWs);
+app.use('/game/:gameId', wsRouteValidation, gameWs);
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.status(err.status || 500);
