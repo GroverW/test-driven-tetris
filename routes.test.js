@@ -68,4 +68,45 @@ describe('Routes tests', () => {
       expect(response.body.error).toEqual(expect.any(String));
     });
   });
+
+  describe('WS tests', () => {
+    let ws;
+    let server;
+
+    const initSocket = (gameId) => new Promise((resolve, reject) => {
+      ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
+
+      ws.onmessage = () => resolve(ws);
+
+      setTimeout(() => reject(new Error('failed to connect')), 5000);
+    });
+
+    const destroySocket = (ws) => new Promise((resolve, reject) => {
+      if (ws.readyState === 1) {
+        console.log('CLOSING')
+        ws.close();
+        resolve(true);
+      }
+
+      resolve(false);
+    });
+
+    beforeAll(() => {
+      server = app.listen(3000);
+    });
+
+    afterAll(() => {
+      server.close();
+    });
+
+    afterEach(() => {
+      destroySocket(ws);
+    });
+
+    test('successfully connects', async () => {
+      const id = GameServer.addGame(GAME_TYPES.MULTI);
+      const socket = await initSocket(id);
+      expect(socket).toEqual(expect.any(Object));
+    });
+  });
 });
