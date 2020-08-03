@@ -79,7 +79,7 @@ describe('Routes tests', () => {
     });
   });
 
-  describe('WS tests', () => {
+  describe('websocket tests', () => {
     let ws;
     let server;
 
