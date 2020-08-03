@@ -7,6 +7,8 @@ const initSocket = (gameId) => new Promise((resolve, reject) => {
 });
 
 const destroySocket = (ws) => new Promise((resolve) => {
+  if (!ws) resolve(false);
+
   if (ws.readyState === 1) {
     ws.close();
     resolve(true);
@@ -18,4 +20,4 @@ const destroySocket = (ws) => new Promise((resolve) => {
 module.exports = {
   initSocket,
   destroySocket,
-}
+};

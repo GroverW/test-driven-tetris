@@ -106,7 +106,7 @@ describe('Routes tests', () => {
     });
 
     afterEach(() => {
-      if (ws) destroySocket(ws);
+      destroySocket(ws);
     });
 
     test('successfully connects', async () => {
