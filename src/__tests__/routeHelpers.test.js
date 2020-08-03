@@ -77,7 +77,8 @@ describe('route helper tests', () => {
       const mockWs = { close: jest.fn() };
       const testMessage = 'message';
 
-      expect(() => closeConnection(mockWs, testMessage)).toThrow(Error);
+      closeConnection(mockWs, testMessage);
+
       expect(mockWs.close).toHaveBeenLastCalledWith(1008, testMessage);
     });
   });

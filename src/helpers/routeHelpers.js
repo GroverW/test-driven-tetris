@@ -10,28 +10,21 @@ const multiGameExists = (gameId) => {
   return (gameServer && gameServer.gameType === GAME_TYPES.MULTI);
 };
 
-const getGameById = (gameId) => {
-  const gameServer = GameServer.getGame(gameId);
-
-  return gameServer;
-};
+const getGameById = (gameId) => GameServer.getGame(gameId);
 
 const createGame = (type) => GameServer.addGame(type);
+
+const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
+
+const closeConnection = (ws, message) => ws.close(1008, message);
 
 const handleGameCreation = (type) => (req, res, next) => {
   const gameId = createGame(type);
 
   if (gameId) return res.status(201).json({ gameId });
 
-  const err = new Error('Could not create game.');
+  const err = new Error('Unable to create game.');
   return next(err);
-};
-
-const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
-
-const closeConnection = (ws, message) => {
-  ws.close(1008, message);
-  throw new Error(message);
 };
 
 const handleMessage = (player) => (msg) => {
