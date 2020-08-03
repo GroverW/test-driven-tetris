@@ -1,6 +1,9 @@
 const request = require('supertest');
 const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
+const Player = require('backend/js/Player');
+const { mockSend } = require('common/mockData/mocks');
+const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 
 const app = require('./app');
@@ -90,6 +93,19 @@ describe('Routes tests', () => {
       resolve(false);
     });
 
+    const addPlayersToRoom = (type, numPlayers) => {
+      const id = GameServer.addGame(type);
+      const gameRoom = GameServer.getGame(id);
+      let count = numPlayers;
+
+      while (count) {
+        gameRoom.join(new Player(mockSend(), pubSub()));
+        count -= 1;
+      }
+
+      return gameRoom;
+    };
+
     beforeAll(() => {
       server = app.listen(3000);
     });
@@ -111,6 +127,27 @@ describe('Routes tests', () => {
     test('closes connection if invalid id', async () => {
       try {
         await initSocket('');
+      } catch (err) {
+        expect(err).toEqual(expect.any(Error));
+      }
+    });
+
+    test('closes connection if game is full', async () => {
+      try {
+        const { id } = addPlayersToRoom(GAME_TYPES.SINGLE, 1);
+
+        await initSocket(id);
+      } catch (err) {
+        expect(err).toEqual(expect.any(Error));
+      }
+    });
+
+    test('closes connection if game is started', async () => {
+      try {
+        const { id, manager } = addPlayersToRoom(GAME_TYPES.MULTI, 2);
+        manager.startGame();
+
+        await initSocket(id);
       } catch (err) {
         expect(err).toEqual(expect.any(Error));
       }
