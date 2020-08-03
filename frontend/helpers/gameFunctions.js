@@ -62,7 +62,7 @@ const connectToGame = (gameId, gameType) => {
     powerUpContainer.classList.remove('hide');
   }
   const baseURL = getBaseURL();
-  const socket = io(`${baseURL}/game`, { query: `gameId=${gameId}` });
+  const socket = io(`${baseURL}/game`, { query: `gameId=${gameId}`, reconnection: false });
 
   let game; let api;
 
