@@ -213,9 +213,14 @@ describe('game room tests', () => {
   describe('publish / subscribe', () => {
     let mockFunction;
 
-    const runPubSubTestFor = (player, topic) => {
-      gameRoom.join(player);
-      player.pubSub.publish(topic, '');
+    const runPubSubTestFor = (object, methodToMock, topic) => {
+      const obj = object;
+      obj[methodToMock] = () => mockFunction();
+
+      gameRoom.join(p1);
+
+      p1.pubSub.publish(topic, '');
+
       expect(mockFunction).toHaveBeenCalledTimes(1);
     };
 
@@ -224,38 +229,31 @@ describe('game room tests', () => {
     });
 
     test('REMOVE_PLAYER calls leave', () => {
-      gameRoom.leave = () => mockFunction();
-      runPubSubTestFor(p1, REMOVE_PLAYER);
+      runPubSubTestFor(gameRoom, 'leave', REMOVE_PLAYER);
     });
 
     test('PLAY calls playerReady', () => {
-      gameRoom.manager.playerReady = () => mockFunction();
-      runPubSubTestFor(p1, PLAY);
+      runPubSubTestFor(gameRoom.manager, 'playerReady', PLAY);
     });
 
     test('GAME_OVER calls game over for player', () => {
-      gameRoom.manager.gameOver = () => mockFunction();
-      runPubSubTestFor(p1, GAME_OVER);
+      runPubSubTestFor(gameRoom.manager, 'gameOver', GAME_OVER);
     });
 
     test('GET_PIECES calls add pieces', () => {
-      gameRoom.manager.getPieces = () => mockFunction();
-      runPubSubTestFor(p1, ADD_PIECES);
+      runPubSubTestFor(gameRoom.manager, 'getPieces', ADD_PIECES);
     });
 
     test('UPDATE_PLAYER sends player update to others', () => {
-      gameRoom.manager.msg.sendPlayerUpdateToOthers = () => mockFunction();
-      runPubSubTestFor(p1, UPDATE_PLAYER);
+      runPubSubTestFor(gameRoom.manager.msg, 'sendPlayerUpdateToOthers', UPDATE_PLAYER);
     });
 
     test('ADD_POWER_UP adds power up for player', () => {
-      gameRoom.manager.msg.sendPowerUp = () => mockFunction();
-      runPubSubTestFor(p1, ADD_POWER_UP);
+      runPubSubTestFor(gameRoom.manager.msg, 'sendPowerUp', ADD_POWER_UP);
     });
 
     test('USE_POWER_UP executes power up', () => {
-      gameRoom.manager.executePowerUp = () => mockFunction();
-      runPubSubTestFor(p1, USE_POWER_UP);
+      runPubSubTestFor(gameRoom.manager, 'executePowerUp', USE_POWER_UP);
     });
 
     test('unsubscribe removes all subscriptions', () => {
