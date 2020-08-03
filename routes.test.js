@@ -78,10 +78,10 @@ describe('Routes tests', () => {
 
       ws.onmessage = () => resolve(ws);
 
-      setTimeout(() => reject(new Error('failed to connect')), 5000);
+      ws.onclose = () => reject(new Error('failed to connect'));
     });
 
-    const destroySocket = () => new Promise((resolve, reject) => {
+    const destroySocket = () => new Promise((resolve) => {
       if (ws.readyState === 1) {
         ws.close();
         resolve(true);
@@ -108,10 +108,12 @@ describe('Routes tests', () => {
       expect(socket).toEqual(expect.any(Object));
     });
 
-    test('successfully connects', async () => {
-      const id = GameServer.addGame(GAME_TYPES.MULTI);
-      const socket = await initSocket(id);
-      expect(socket).toEqual(expect.any(Object));
+    test('closes connection if invalid id', async () => {
+      try {
+        await initSocket('');
+      } catch (err) {
+        expect(err).toEqual(expect.any(Error));
+      }
     });
   });
 });
