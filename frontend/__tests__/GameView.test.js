@@ -45,7 +45,7 @@ describe('game view tests', () => {
     newPlayer1 = getNewPlayer(newCtx1, newBoard1, newId1);
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
-    game = getNewTestGame(game);
+    game = getNewTestGame();
     gameLoop.initialize(2);
     gameView = new GameView(mockCtx, getTestBoard('empty'), mockCtxNext, getNextPieceBoard());
     drawGrid = jest.spyOn(gameView.player, 'drawGrid');

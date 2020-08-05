@@ -28,11 +28,10 @@ const { publish } = require('frontend/helpers/pubSub');
 describe('client game tests', () => {
   let game;
   let pubSubSpy;
-  const p2 = 2; const p3 = 3; const
-    p4 = 4;
+  const p2 = 2; const p3 = 3; const p4 = 4;
 
   beforeEach(() => {
-    game = getNewTestGame(game);
+    game = getNewTestGame();
     // setting id to 2 so that it never receives GAME_OVER
     gameLoop.initialize(2);
     pubSubSpy = pubSubMock();
@@ -173,7 +172,9 @@ describe('client game tests', () => {
 
   describe('command queue', () => {
     test('add commands', () => {
-      game = getNewTestGame(game, true, p2, p4);
+      //
+      game.unsubscribe();
+      game = getNewTestGame('I', p2, p4);
       game[START_GAME]();
       gameLoop.autoCommand = undefined;
 
@@ -247,7 +248,7 @@ describe('client game tests', () => {
 
         expect(game.gameStatus).toBe(true);
 
-        publish(GAME_OVER, { id: 1 });
+        publish(GAME_OVER, { id: game.playerId });
 
         expect(game.gameStatus).toBe(null);
       });

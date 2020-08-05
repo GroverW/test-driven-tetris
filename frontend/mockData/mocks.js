@@ -108,13 +108,18 @@ const mockCancelAnimation = (animationId) => {
   clearTimeout(animationId);
 };
 
-const getNewTestGame = (game, testPiece = false, ...players) => {
-  if (game) game.unsubscribe();
+/**
+ *
+ * @param {Game|ClientGame|ServerGame|null} game - an existing game to reset
+ * @param {string|null} testPiece - I, O, T, S, Z, L, J, N or null
+ * @param  {number[]} players - ids of players to add
+ */
+const getNewTestGame = (testPiece = null, ...players) => {
   const newGame = new ClientGame(1);
 
   newGame.board.grid = commonMocks.getTestBoard('empty');
 
-  if (testPiece) newGame.board.piece = new Piece(PIECE_TYPES.I);
+  if (testPiece) newGame.board.piece = commonMocks.getTestPiece(testPiece.toUpperCase());
 
   newGame.addPieces(commonMocks.getTestPieces());
   players.forEach((player) => newGame.addPlayer(player));

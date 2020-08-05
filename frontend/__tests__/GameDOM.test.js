@@ -43,7 +43,7 @@ describe('game DOM tests', () => {
     newPlayer2 = getNewPlayer(newCtx2, newBoard2, newId2);
 
     gameDOM.initialize(getMockGameDOMSelectors());
-    game = getNewTestGame(game);
+    game = getNewTestGame();
     gameLoop.initialize(2);
     addPlayerSpy = jest.spyOn(gameDOM.gameView, 'addPlayer');
 
