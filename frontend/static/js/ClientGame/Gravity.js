@@ -22,7 +22,7 @@ class Gravity extends SubscriberBase {
     this.level = 1;
     this.start = 0;
     this.interrupt = false;
-    this.lowerPiece = game.movement.bind(game, CONTROLS.AUTO_DOWN, 0, 1, 0);
+    this.lowerPiece = game.movement.bind(game, 'movePiece', CONTROLS.AUTO_DOWN, 0, 1, 0);
     this.isValidNextMove = true;
     this.board = board;
     this.resetLockDelay();

@@ -1,16 +1,14 @@
 const Gravity = require('frontend/static/js/ClientGame/Gravity');
-const {
-  ANIMATION_SPEED,
-  MAX_SPEED,
-} = require('frontend/helpers/clientConstants');
+const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/helpers/clientConstants');
 const {
   UPDATE_SCORE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
+  START_GAME,
   GAME_OVER,
 } = require('frontend/helpers/clientTopics');
 const { publish } = require('frontend/helpers/pubSub');
-const { pubSubMock } = require('frontend/mockData/mocks');
+const { pubSubMock, getNewTestGame } = require('frontend/mockData/mocks');
 
 describe('gravity tests', () => {
   let gravity;
@@ -133,6 +131,21 @@ describe('gravity tests', () => {
       gravity.execute(start + delay);
 
       expect(gravity.start).toBe(start);
+    });
+
+    test('successfully calls movePiece', () => {
+      const game = getNewTestGame();
+
+      const movePieceSpy = jest.spyOn(game.board, 'movePiece');
+
+      gravity = new Gravity(playerId, game, game.board);
+
+      game[START_GAME]();
+
+      gravity.execute(Infinity);
+
+      expect(movePieceSpy).toHaveBeenCalledTimes(1);
+      expect(movePieceSpy).toHaveBeenLastCalledWith(0, 1, 0);
     });
   });
 
