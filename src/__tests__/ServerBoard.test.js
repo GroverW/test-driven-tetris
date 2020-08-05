@@ -1,7 +1,9 @@
 const ServerBoard = require('backend/js/ServerBoard');
-const { SEED_PIECES } = require('backend/helpers/serverConstants');
-const { GET_PIECES, CLEAR_LINES } = require('backend/helpers/serverTopics');
-const { getTestBoard, getTestPiece, getTestPieces, pubSubMock } = require('common/mocks');
+const { SEED_PIECES } = require('backend/constants');
+const { GET_PIECES, CLEAR_LINES } = require('backend/topics');
+const {
+  getTestBoard, getTestPiece, getTestPieces, pubSubMock,
+} = require('common/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('server - board tests', () => {

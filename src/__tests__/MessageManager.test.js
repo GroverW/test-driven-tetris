@@ -3,7 +3,7 @@ const PlayerManager = require('backend/js/PlayerManager');
 const { GAME_TYPES } = require('common/constants');
 const {
   GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');

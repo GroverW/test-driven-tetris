@@ -1,6 +1,6 @@
 const PlayerManager = require('backend/js/PlayerManager');
 const GameManager = require('backend/js/GameManager');
-const { MAX_PLAYERS } = require('backend/helpers/serverConstants');
+const { MAX_PLAYERS } = require('backend/constants');
 const {
   MSG_TYPE,
   ADD_PLAYER,
@@ -11,7 +11,7 @@ const {
   UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 
 class GameRoom {
   constructor(id, gameType, removeGameRoom) {

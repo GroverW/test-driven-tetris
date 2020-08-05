@@ -1,5 +1,5 @@
 const Board = require('common/js/Board');
-const { GET_PIECES } = require('backend/helpers/serverTopics');
+const { GET_PIECES } = require('backend/topics');
 
 /**
  * Represents a server-side game board

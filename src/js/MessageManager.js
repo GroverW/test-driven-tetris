@@ -1,7 +1,7 @@
 const {
   GAME_OVER, GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER,
-} = require('backend/helpers/serverTopics');
-const { GAME_TYPES } = require('backend/helpers/serverConstants');
+} = require('backend/topics');
+const { GAME_TYPES } = require('backend/constants');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/serverUtils');

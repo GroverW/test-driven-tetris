@@ -4,7 +4,7 @@ const GameManager = require('backend/js/GameManager');
 const Player = require('backend/js/Player');
 const { mockSend } = require('common/mocks');
 const pubSub = require('backend/helpers/pubSub');
-const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const { GAME_TYPES } = require('backend/constants');
 const {
   MSG_TYPE,
   ADD_PLAYER,
@@ -15,7 +15,7 @@ const {
   UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 
 describe('game room tests', () => {
   let gameRoom;

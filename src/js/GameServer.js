@@ -1,4 +1,4 @@
-const { GAMES } = require('backend/helpers/serverConstants');
+const { GAMES } = require('backend/constants');
 const GameRoom = require('backend/js/GameRoom');
 const uniqid = require('uniqid');
 

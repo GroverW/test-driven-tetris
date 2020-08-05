@@ -2,7 +2,7 @@ const uniqid = require('uniqid');
 
 const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
-const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
+const { GAMES, GAME_TYPES } = require('backend/constants');
 
 jest.mock('uniqid');
 

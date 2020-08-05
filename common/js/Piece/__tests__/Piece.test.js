@@ -1,6 +1,8 @@
 const Piece = require('common/js/Piece');
 const Board = require('common/js/Board');
-const { PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT } = require('common/constants');
+const {
+  PIECES, PIECE_TYPES, ROTATE_LEFT, ROTATE_RIGHT,
+} = require('common/constants');
 const { getTestPieces } = require('common/mocks');
 
 describe('game pieces', () => {

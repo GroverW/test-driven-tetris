@@ -1,6 +1,8 @@
 const Board = require('common/js/Board');
 const Piece = require('common/js/Piece');
-const { PIECES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS } = require('common/constants');
+const {
+  PIECES, ROTATE_LEFT, ROTATE_RIGHT, MAX_FLOOR_KICKS,
+} = require('common/constants');
 const { getTestBoard, getTestPiece, getTestPieces } = require('common/mocks');
 const pubSub = require('frontend/helpers/pubSub');
 

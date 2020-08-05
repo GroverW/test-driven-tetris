@@ -1,9 +1,11 @@
 const ServerGame = require('backend/js/ServerGame');
-const { GAME_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/helpers/serverConstants');
+const { GAME_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/constants');
 const {
   UPDATE_PLAYER, CLEAR_LINES, ADD_POWER_UP, USE_POWER_UP,
-} = require('backend/helpers/serverTopics');
-const { getTestBoard, getTestPiece, getTestPieces, pubSubMock } = require('common/mocks');
+} = require('backend/topics');
+const {
+  getTestBoard, getTestPiece, getTestPieces, pubSubMock,
+} = require('common/mocks');
 const pubSub = require('backend/helpers/pubSub');
 
 describe('game tests', () => {

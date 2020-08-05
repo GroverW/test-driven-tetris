@@ -2,10 +2,10 @@ const Player = require('backend/js/Player');
 const ServerGame = require('backend/js/ServerGame');
 const pubSub = require('backend/helpers/pubSub');
 const { mockSend, pubSubMock } = require('common/mocks');
-const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const { GAME_TYPES } = require('backend/constants');
 const {
   MSG_TYPE, ADD_MESSAGE, REMOVE_PLAYER, PLAY, ADD_PIECES,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 
 describe('player tests', () => {
   let p1;

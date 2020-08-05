@@ -5,7 +5,7 @@ const Player = require('backend/js/Player');
 const { mockSend } = require('common/mocks');
 const { initSocket, destroySocket, TEST_PORT } = require('common/mocks/wsMocks');
 const pubSub = require('backend/helpers/pubSub');
-const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
+const { GAMES, GAME_TYPES } = require('backend/constants');
 
 const app = require('./app');
 

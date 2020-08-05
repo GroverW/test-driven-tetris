@@ -1,16 +1,10 @@
 const Game = require('common/js/Game');
 const {
-  GAME_TYPES,
-  PLAYERS,
-  POWER_UPS,
-  MAX_POWER_UPS,
-} = require('backend/helpers/serverConstants');
+  GAME_TYPES, PLAYERS, POWER_UPS, MAX_POWER_UPS,
+} = require('backend/constants');
 const {
-  UPDATE_PLAYER,
-  CLEAR_LINES,
-  ADD_POWER_UP,
-  USE_POWER_UP,
-} = require('backend/helpers/serverTopics');
+  UPDATE_PLAYER, CLEAR_LINES, ADD_POWER_UP, USE_POWER_UP,
+} = require('backend/topics');
 const { mapArrayToObj } = require('common/helpers/utils');
 const { getRandomPowerUp } = require('backend/helpers/powerUps');
 const ServerBoard = require('./ServerBoard');

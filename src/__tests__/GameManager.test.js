@@ -1,8 +1,8 @@
 const GameManager = require('backend/js/GameManager');
 const MessageManager = require('backend/js/MessageManager');
 const PlayerManager = require('backend/js/PlayerManager');
-const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
-const { ADD_PIECES, END_GAME, MSG_TYPE } = require('backend/helpers/serverTopics');
+const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/constants');
+const { ADD_PIECES, END_GAME, MSG_TYPE } = require('backend/topics');
 const { getTestBoard } = require('common/mocks');
 
 describe('game manager tests', () => {

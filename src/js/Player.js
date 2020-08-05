@@ -1,6 +1,6 @@
 const {
   REMOVE_PLAYER, PLAY, ADD_MESSAGE, ADD_PIECES,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 const { formatMessage } = require('backend/helpers/serverUtils');
 const ServerGame = require('./ServerGame');
 

@@ -1,7 +1,7 @@
-const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/helpers/serverConstants');
+const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/constants');
 const {
   START_GAME, GAME_OVER, END_GAME, ADD_PIECES, MSG_TYPE,
-} = require('backend/helpers/serverTopics');
+} = require('backend/topics');
 const { randomize } = require('backend/helpers/serverUtils');
 const { handlePowerUp } = require('backend/helpers/powerUps');
 const MessageManager = require('./MessageManager');

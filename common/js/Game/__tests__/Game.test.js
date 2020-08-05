@@ -2,7 +2,9 @@ const Game = require('common/js/Game');
 const Board = require('common/js/Board');
 const Piece = require('common/js/Piece');
 const { LINES_PER_LEVEL, POINTS } = require('common/constants');
-const { ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME} = require('common/topics');
+const {
+  ADD_PIECES, LOWER_PIECE, CLEAR_LINES, END_GAME,
+} = require('common/topics');
 const { getTestBoard, getTestPiece, getTestPieces } = require('common/mocks');
 const pubSub = require('backend/helpers/pubSub');
 

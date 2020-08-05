@@ -1,7 +1,7 @@
 const express = require('express');
 const ExpressError = require('backend/js/ExpressError');
 
-const { GAME_TYPES } = require('backend/helpers/serverConstants');
+const { GAME_TYPES } = require('backend/constants');
 const { multiGameExists, handleGameCreation } = require('backend/helpers/routeHelpers');
 
 const router = express.Router({ mergeParams: true });

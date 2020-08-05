@@ -1,6 +1,7 @@
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
-const { BOARD_WIDTH, PIECE_TYPES } = require('common/constants');
-const { POWER_UP_LIST, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
+const {
+  BOARD_WIDTH, PIECE_TYPES, POWER_UP_LIST, POWER_UP_TYPES,
+} = require('backend/constants');
 
 /**
  * Returns a board row with all neutral cells except one blank cell

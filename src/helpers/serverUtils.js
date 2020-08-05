@@ -1,5 +1,5 @@
 const commonUtils = require('common/helpers/utils');
-const { RANKINGS } = require('./serverConstants');
+const { RANKINGS } = require('backend/constants');
 
 const multiPlayerGameOverMessage = (ranking) => ({
   header: `${RANKINGS[ranking]} Place!`,
