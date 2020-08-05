@@ -26,7 +26,7 @@ const handleGameValidation = (gameId, ws) => {
   if (!gameServer.join(player)) closeConnection(ws, 'Could not join game.');
 
   return player;
-}
+};
 
 const handleGameCreation = (type) => (req, res, next) => {
   const gameId = createGame(type);
