@@ -3,12 +3,7 @@ const Game = require('common/js/Game');
 const pubSub = require('frontend/helpers/pubSub');
 const { mapArrayToObj } = require('common/helpers/utils');
 
-const {
-  PLAYER_KEYS,
-  CONTROLS,
-  COMMAND_QUEUE_MAP,
-  MOVE_SPEED,
-} = require('frontend/helpers/clientConstants');
+const { PLAYER_KEYS, COMMAND_QUEUE_MAP } = require('frontend/helpers/clientConstants');
 const {
   START_GAME,
   BOARD_CHANGE,
@@ -25,13 +20,11 @@ const {
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
   ADD_TO_QUEUE,
-  ADD_LOCK_DELAY,
-  INTERRUPT_DELAY,
 } = require('frontend/helpers/clientTopics');
 
 const ClientBoard = require('../ClientBoard');
 const Gravity = require('./Gravity');
-const Command = require('../Command');
+const { getCommandList } = require('../Command/getCommandList');
 
 /**
  * Represents a client-side Tetris game
@@ -71,15 +64,7 @@ class ClientGame extends Game {
         lines: this.linesRemaining,
       });
 
-      this.pubSub.publish(
-        SET_AUTO_COMMAND,
-        new Gravity(
-          this.playerId,
-          this.autoDrop.bind(this),
-          this.isValidDrop.bind(this),
-          this.isPieceAtLowestPoint.bind(this),
-        ),
-      );
+      this.pubSub.publish(SET_AUTO_COMMAND, new Gravity(this.playerId, this, this.board));
     }
   }
 
@@ -125,22 +110,14 @@ class ClientGame extends Game {
    * Maps keyboard commands to ClientGame commands
    */
   mapCommands() {
-    const {
-      LEFT, RIGHT, DOWN, ROTATE_LEFT, ROTATE_RIGHT, HARD_DROP,
-    } = CONTROLS;
+    this.commands = getCommandList(this);
+  }
 
-    this.commands = {
-      [LEFT]: () => new Command(LEFT, this.handleMovement.bind(this, 0, -1, 0), MOVE_SPEED),
-      [RIGHT]: () => new Command(RIGHT, this.handleMovement.bind(this, 0, 1, 0), MOVE_SPEED),
-      [DOWN]: () => new Command(DOWN, this.handleMovement.bind(this, 0, 0, 1), MOVE_SPEED),
-      [ROTATE_LEFT]: () => new Command(ROTATE_LEFT, this.handleMovement.bind(this, -1, 0, 0)),
-      [ROTATE_RIGHT]: () => new Command(ROTATE_RIGHT, this.handleMovement.bind(this, 1, 0, 0)),
-      [HARD_DROP]: () => new Command(HARD_DROP, this.hardDrop.bind(this)),
-      ...mapArrayToObj(
-        PLAYER_KEYS,
-        (PKEY) => () => new Command(PKEY, this.usePowerUp.bind(this, PKEY)),
-      ),
-    };
+  movement(boardKey, controlKey, ...args) {
+    if ((boardKey in this.board) && this.gameStatus) {
+      this[ADD_TO_QUEUE](controlKey);
+      this.board[boardKey](...args);
+    }
   }
 
   /**
@@ -161,55 +138,6 @@ class ClientGame extends Game {
     } else if (upDown === 'up') {
       this.pubSub.publish(CLEAR_COMMAND, key);
     }
-  }
-
-  /**
-   * Command to hard drop current piece
-   */
-  hardDrop() {
-    if (!this.gameStatus) return;
-
-    this.board.hardDrop();
-  }
-
-  /**
-   * Handles rotation nad piece movement
-   * @param {number} rotation - clockwise or counterclockwise rotation
-   * @param {number} xChange - movement in horizontal direction
-   * @param {number} yChange  - movement in vertical direction
-   * @param {number} multiplier - points multiplier to distinguish commanded vs auto movement
-   */
-  handleMovement(rotation, xChange, yChange, multiplier = undefined) {
-    if (!this.gameStatus) return;
-
-    const topic = yChange === 1 ? INTERRUPT_DELAY : ADD_LOCK_DELAY;
-    this.pubSub.publish(topic);
-
-    if (rotation === 0) {
-      this.board.movePiece(xChange, yChange, multiplier);
-    } else {
-      this.board.rotatePiece(rotation);
-    }
-  }
-
-  /**
-   * Command to auto move piece downwards
-   */
-  autoDrop() {
-    this[ADD_TO_QUEUE](CONTROLS.AUTO_DOWN);
-    this.handleMovement(0, 0, 1, 0);
-  }
-
-  /**
-   * Checks if the next move down is valid
-   * @returns {boolean} - whether or not the next move is valid
-   */
-  isValidDrop() {
-    return this.board.validMove(0, 1);
-  }
-
-  isPieceAtLowestPoint() {
-    return this.board.piece.y >= this.board.piece.maxY;
   }
 
   [BOARD_CHANGE]() {
@@ -246,6 +174,7 @@ class ClientGame extends Game {
    */
   usePowerUp(player) {
     if (this.playerTargets[player]) {
+      this[ADD_TO_QUEUE](player);
       this.sendCommandQueue();
       this.pubSub.publish(USE_POWER_UP);
     }

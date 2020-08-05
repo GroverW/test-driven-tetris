@@ -196,30 +196,6 @@ describe('client game tests', () => {
     });
   });
 
-  describe('board / piece validations', () => {
-    beforeEach(() => {
-      game[START_GAME]();
-    });
-
-    test('validates whether piece can move down', () => {
-      expect(game.isValidDrop()).toBe(true);
-
-      while (game.board.validMove(0, 1)) game.board.movePiece(0, 1, 0);
-
-      expect(game.isValidDrop()).toBe(false);
-    });
-
-    test('validates whether piece has reached lowest point', () => {
-      game.board.movePiece(0, 1, 0);
-
-      expect(game.isPieceAtLowestPoint()).toBe(true);
-
-      game.board.movePiece(0, -1, 0);
-
-      expect(game.isPieceAtLowestPoint()).toBe(false);
-    });
-  });
-
   describe('power ups', () => {
     beforeEach(() => {
       game.addPlayer(p2);

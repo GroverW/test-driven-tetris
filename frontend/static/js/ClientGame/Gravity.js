@@ -2,7 +2,7 @@ const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
 
-const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/helpers/clientConstants');
+const { ANIMATION_SPEED, MAX_SPEED, CONTROLS } = require('frontend/helpers/clientConstants');
 const { UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
 
 /**
@@ -17,15 +17,14 @@ class Gravity extends SubscriberBase {
    * @param {callback} validNextMove - checks whether the next move is valid
    * @param {callback} pieceAtLowestPoint - checks whether the current piece is at its lowest point
    */
-  constructor(playerId, lowerPiece, validNextMove, pieceAtLowestPoint) {
+  constructor(playerId, game, board) {
     super(pubSub, playerId);
     this.level = 1;
     this.start = 0;
     this.interrupt = false;
-    this.lowerPiece = lowerPiece;
+    this.lowerPiece = game.movement.bind(game, CONTROLS.AUTO_DOWN, 0, 1, 0);
     this.isValidNextMove = true;
-    this.pieceAtLowestPoint = pieceAtLowestPoint;
-    this.checkValidNextMove = validNextMove;
+    this.board = board;
     this.resetLockDelay();
     this.mapSubscriptions([UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY]);
   }
@@ -91,7 +90,7 @@ class Gravity extends SubscriberBase {
   }
 
   updateValidNextMove() {
-    this.isValidNextMove = this.checkValidNextMove();
+    this.isValidNextMove = this.board.validMove(0, 1);
   }
 
   /**
@@ -108,7 +107,7 @@ class Gravity extends SubscriberBase {
 
     if (currTime >= this.start + this.delay) {
       this.lowerPiece();
-      if (this.pieceAtLowestPoint()) {
+      if (this.board.isPieceAtLowestPoint()) {
         this.start = currTime;
         this.resetLockDelay();
       }

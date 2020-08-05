@@ -46,6 +46,10 @@ class ClientBoard extends Board {
     this.publishDraw(this.grid, this.piece);
   }
 
+  isPieceAtLowestPoint() {
+    return this.piece.y >= this.piece.maxY;
+  }
+
   /**
    * Publishes any board updates
    */

@@ -16,14 +16,19 @@ describe('gravity tests', () => {
   let gravity;
   let validMove = false;
   let lowestPoint = true;
-  const fakeMoveCheck = () => validMove;
-  const fakeLowestPointCheck = () => lowestPoint;
-  const fakeCallback = jest.fn();
+
+  const fakeBoard = {
+    validMove: () => validMove,
+    isPieceAtLowestPoint: () => lowestPoint,
+  };
+  const fakeGame = {
+    movement: jest.fn(),
+  };
   const playerId = 1;
   let pubSubSpy;
 
   beforeEach(() => {
-    gravity = new Gravity(playerId, fakeCallback, fakeMoveCheck, fakeLowestPointCheck);
+    gravity = new Gravity(playerId, fakeGame, fakeBoard);
     pubSubSpy = pubSubMock();
   });
 
@@ -84,7 +89,7 @@ describe('gravity tests', () => {
 
       gravity.execute(currStart + currDelay - 1);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(0);
+      expect(fakeGame.movement).toHaveBeenCalledTimes(0);
     });
 
     test('calls callback when delay threshhold met, resets start time and lock delay', () => {
@@ -96,7 +101,7 @@ describe('gravity tests', () => {
 
       gravity.execute(currStart + currDelay + currLockDelay);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(1);
+      expect(fakeGame.movement).toHaveBeenCalledTimes(1);
       expect(gravity.start).toBe(currStart + currDelay + currLockDelay);
       expect(gravity.lockDelay).toBeLessThan(currLockDelay);
     });
@@ -108,7 +113,7 @@ describe('gravity tests', () => {
 
       gravity.execute(start + delay + lockDelay);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(1);
+      expect(fakeGame.movement).toHaveBeenCalledTimes(1);
 
       ({ start, delay, lockDelay } = gravity);
 
@@ -116,7 +121,7 @@ describe('gravity tests', () => {
 
       gravity.execute(start + delay + lockDelay);
 
-      expect(fakeCallback).toHaveBeenCalledTimes(1);
+      expect(fakeGame.movement).toHaveBeenCalledTimes(1);
       expect(gravity.interrupt).toBe(false);
     });
 

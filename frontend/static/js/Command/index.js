@@ -1,6 +1,3 @@
-const { publish } = require('frontend/helpers/pubSub');
-const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
-
 /**
  * Represents a game command
  */
@@ -36,12 +33,15 @@ class Command {
     if (this.startTime === undefined) this.startTime = currTime;
 
     if (currTime >= this.startTime + this.delay) {
-      publish(ADD_TO_QUEUE, this.key);
-      this.callback();
+      this.executeCallback();
       this.startTime = currTime;
 
       this.updateDelay();
     }
+  }
+
+  executeCallback() {
+    this.callback();
   }
 
   /**
