@@ -1,6 +1,3 @@
-const { publish } = require('frontend/helpers/pubSub');
-const { ADD_TO_QUEUE } = require('frontend/helpers/clientTopics');
-
 /**
  * Represents a game command
  */
