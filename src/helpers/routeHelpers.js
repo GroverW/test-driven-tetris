@@ -18,6 +18,16 @@ const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
 
 const closeConnection = (ws, message) => ws.close(1008, message);
 
+const handleGameValidation = (gameId, ws) => {
+  const gameServer = getGameById(gameId);
+  const player = getNewPlayer(ws);
+
+  if (!getGameById(gameId)) closeConnection(ws, 'Game not found');
+  if (!gameServer.join(player)) closeConnection(ws, 'Could not join game.');
+
+  return player;
+}
+
 const handleGameCreation = (type) => (req, res, next) => {
   const gameId = createGame(type);
 
@@ -43,6 +53,7 @@ module.exports = {
   getNewPlayer,
   createGame,
   handleGameCreation,
+  handleGameValidation,
   closeConnection,
   handleMessage,
   handleClose,
