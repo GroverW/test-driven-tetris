@@ -36,7 +36,6 @@ class Command {
     if (this.startTime === undefined) this.startTime = currTime;
 
     if (currTime >= this.startTime + this.delay) {
-      publish(ADD_TO_QUEUE, this.key);
       this.executeCallback();
       this.startTime = currTime;
 

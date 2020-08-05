@@ -3,9 +3,11 @@ const { INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
 const { publish } = require('frontend/helpers/pubSub');
 const Command = require('.');
 
+const { DOWN } = CONTROLS;
+
 class MoveDown extends Command {
   constructor(game) {
-    super(CONTROLS.DOWN, game.movement.bind(game, 'movePiece', 0, 1), MOVE_SPEED);
+    super(DOWN, game.movement.bind(game, 'movePiece', DOWN, 0, 1), MOVE_SPEED);
   }
 
   executeCallback() {
@@ -14,7 +16,7 @@ class MoveDown extends Command {
   }
 
   static getKey() {
-    return CONTROLS.DOWN;
+    return DOWN;
   }
 }
 

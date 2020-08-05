@@ -3,9 +3,11 @@ const { ADD_LOCK_DELAY } = require('frontend/helpers/clientTopics');
 const { publish } = require('frontend/helpers/pubSub');
 const Command = require('.');
 
+const { RIGHT } = CONTROLS;
+
 class MoveRight extends Command {
   constructor(game) {
-    super(CONTROLS.RIGHT, game.movement.bind(game, 'movePiece', 1, 0), MOVE_SPEED);
+    super(RIGHT, game.movement.bind(game, 'movePiece', RIGHT, 1, 0), MOVE_SPEED);
   }
 
   executeCallback() {
@@ -14,7 +16,7 @@ class MoveRight extends Command {
   }
 
   static getKey() {
-    return CONTROLS.RIGHT;
+    return RIGHT;
   }
 }
 

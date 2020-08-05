@@ -1,11 +1,13 @@
-const { CONTROLS, ROTATE_LEFT } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/helpers/clientConstants');
 const { ADD_LOCK_DELAY } = require('frontend/helpers/clientTopics');
 const { publish } = require('frontend/helpers/pubSub');
 const Command = require('.');
 
+const { ROTATE_LEFT } = CONTROLS;
+
 class RotateLeft extends Command {
   constructor(game) {
-    super(CONTROLS.ROTATE_LEFT, game.movement.bind(game, 'rotatePiece', ROTATE_LEFT));
+    super(ROTATE_LEFT, game.movement.bind(game, 'rotatePiece', ROTATE_LEFT, -1));
   }
 
   executeCallback() {
@@ -14,7 +16,7 @@ class RotateLeft extends Command {
   }
 
   static getKey() {
-    return CONTROLS.ROTATE_LEFT;
+    return ROTATE_LEFT;
   }
 }
 
