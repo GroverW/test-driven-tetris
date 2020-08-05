@@ -61,4 +61,14 @@ describe('client - game board tests', () => {
 
     expect(drawSpy).toHaveBeenCalledTimes(1);
   });
+
+  test('validates whether piece has reached lowest point', () => {
+    gameBoard.movePiece(0, 1, 0);
+
+    expect(gameBoard.isPieceAtLowestPoint()).toBe(true);
+
+    gameBoard.movePiece(0, -1, 0);
+
+    expect(gameBoard.isPieceAtLowestPoint()).toBe(false);
+  });
 });
