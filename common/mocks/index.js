@@ -1,4 +1,4 @@
-const { PIECE_TYPES, SEED_PIECES } = require('common/helpers/constants');
+const { PIECE_TYPES, SEED_PIECES } = require('common/constants');
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
 const { subscribe } = require('frontend/helpers/pubSub');
 const pubSub = require('backend/helpers/pubSub');

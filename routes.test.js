@@ -2,8 +2,8 @@ const request = require('supertest');
 const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
 const Player = require('backend/js/Player');
-const { mockSend } = require('common/mockData/mocks');
-const { initSocket, destroySocket, TEST_PORT } = require('common/mockData/wsMocks');
+const { mockSend } = require('common/mocks');
+const { initSocket, destroySocket, TEST_PORT } = require('common/mocks/wsMocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 

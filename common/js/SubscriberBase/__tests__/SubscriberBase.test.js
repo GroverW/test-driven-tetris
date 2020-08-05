@@ -1,7 +1,7 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 const pubSub = require('frontend/helpers/pubSub');
 
-const { GAME_OVER, END_GAME } = require('common/helpers/commonTopics');
+const { GAME_OVER, END_GAME } = require('common/topics');
 
 describe('SubscriberBase tests', () => {
   let subscriberBase;

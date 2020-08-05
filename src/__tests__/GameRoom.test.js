@@ -2,7 +2,7 @@ const GameRoom = require('backend/js/GameRoom');
 const PlayerManager = require('backend/js/PlayerManager');
 const GameManager = require('backend/js/GameManager');
 const Player = require('backend/js/Player');
-const { mockSend } = require('common/mockData/mocks');
+const { mockSend } = require('common/mocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const {

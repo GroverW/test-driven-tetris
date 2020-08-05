@@ -1,4 +1,4 @@
-const COMMON_CONSTANTS = require('common/helpers/constants');
+const COMMON_CONSTANTS = require('common/constants');
 
 const GAMES = new Map();
 

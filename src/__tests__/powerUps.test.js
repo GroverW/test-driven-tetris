@@ -1,4 +1,4 @@
-const { getTestBoard } = require('common/mockData/mocks');
+const { getTestBoard } = require('common/mocks');
 const {
   getFilledRow,
   getBlankRow,
@@ -8,7 +8,7 @@ const {
   clearBoard,
   handlePowerUp,
 } = require('backend/helpers/powerUps');
-const { BOARD_WIDTH, POWER_UP_TYPES } = require('common/helpers/constants');
+const { BOARD_WIDTH, POWER_UP_TYPES } = require('common/constants');
 
 describe('power ups', () => {
   afterEach(() => {

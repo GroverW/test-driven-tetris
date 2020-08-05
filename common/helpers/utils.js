@@ -1,4 +1,4 @@
-const { BOARD_WIDTH, BOARD_HEIGHT } = require('./constants');
+const { BOARD_WIDTH, BOARD_HEIGHT } = require('common/constants');
 
 /**
  * Randomizes elements in an array

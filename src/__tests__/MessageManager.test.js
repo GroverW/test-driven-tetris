@@ -1,6 +1,6 @@
 const MessageManager = require('backend/js/MessageManager');
 const PlayerManager = require('backend/js/PlayerManager');
-const { GAME_TYPES } = require('common/helpers/constants');
+const { GAME_TYPES } = require('common/constants');
 const {
   GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER,
 } = require('backend/helpers/serverTopics');

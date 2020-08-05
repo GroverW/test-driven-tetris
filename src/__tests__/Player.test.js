@@ -1,7 +1,7 @@
 const Player = require('backend/js/Player');
 const ServerGame = require('backend/js/ServerGame');
 const pubSub = require('backend/helpers/pubSub');
-const { mockSend, pubSubMock } = require('common/mockData/mocks');
+const { mockSend, pubSubMock } = require('common/mocks');
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 const {
   MSG_TYPE, ADD_MESSAGE, REMOVE_PLAYER, PLAY, ADD_PIECES,

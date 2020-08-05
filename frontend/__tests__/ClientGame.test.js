@@ -22,7 +22,7 @@ const {
   runCommands,
   clearMocksAndUnsubscribe,
 } = require('frontend/mockData/mocks');
-const { pubSubMock, getTestBoard, getTestPiece } = require('common/mockData/mocks');
+const { pubSubMock, getTestBoard, getTestPiece } = require('common/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 
 describe('client game tests', () => {

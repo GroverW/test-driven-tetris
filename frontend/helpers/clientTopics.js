@@ -1,4 +1,4 @@
-const COMMON_TOPICS = require('common/helpers/commonTopics');
+const COMMON_TOPICS = require('common/topics');
 
 /**
  * Client publish / subscribe topics

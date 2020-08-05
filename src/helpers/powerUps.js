@@ -1,5 +1,5 @@
 const { randomize, getEmptyBoard } = require('common/helpers/utils');
-const { BOARD_WIDTH, PIECE_TYPES } = require('common/helpers/constants');
+const { BOARD_WIDTH, PIECE_TYPES } = require('common/constants');
 const { POWER_UP_LIST, POWER_UP_TYPES } = require('backend/helpers/serverConstants');
 
 /**

@@ -4,7 +4,7 @@ const serverPubSub = require('backend/helpers/pubSub');
 
 const { GAME_TYPES } = require('backend/helpers/serverConstants');
 
-const { PLAY, EXECUTE_COMMANDS } = require('common/helpers/commonTopics');
+const { PLAY, EXECUTE_COMMANDS } = require('common/topics');
 
 /**
  * Represents the Server side of the mock websocket

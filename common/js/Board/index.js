@@ -1,8 +1,8 @@
 const {
   BOARD_WIDTH, BOARD_HEIGHT, POINTS, PIECE_TYPES,
   MAX_FLOOR_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
-} = require('common/helpers/constants');
-const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/helpers/commonTopics');
+} = require('common/constants');
+const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/topics');
 const { getEmptyBoard } = require('common/helpers/utils');
 const Piece = require('common/js/Piece');
 const PieceList = require('common/js/PieceList');

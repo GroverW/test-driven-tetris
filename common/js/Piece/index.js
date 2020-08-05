@@ -1,4 +1,4 @@
-const { PIECES, BOARD_WIDTH } = require('common/helpers/constants');
+const { PIECES, BOARD_WIDTH } = require('common/constants');
 
 /**
  * Represents a game piece.

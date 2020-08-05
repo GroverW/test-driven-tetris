@@ -1,4 +1,4 @@
-const commonMocks = require('common/mockData/mocks');
+const commonMocks = require('common/mocks');
 const ClientGame = require('frontend/static/js/ClientGame');
 
 // time in ms for one requestAnimationFrame call

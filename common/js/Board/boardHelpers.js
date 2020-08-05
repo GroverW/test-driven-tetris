@@ -1,4 +1,4 @@
-const { BOARD_HEIGHT } = require('common/helpers/constants');
+const { BOARD_HEIGHT } = require('common/constants');
 
 /**
  * Gets first non empty space on grid within specified columns
