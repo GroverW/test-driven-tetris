@@ -3,7 +3,7 @@ const GameServer = require('backend/js/GameServer');
 const GameRoom = require('backend/js/GameRoom');
 const Player = require('backend/js/Player');
 const { mockSend } = require('common/mockData/mocks');
-const { initSocket, destroySocket } = require('common/mockData/wsMocks');
+const { initSocket, destroySocket, TEST_PORT } = require('common/mockData/wsMocks');
 const pubSub = require('backend/helpers/pubSub');
 const { GAMES, GAME_TYPES } = require('backend/helpers/serverConstants');
 
@@ -97,7 +97,7 @@ describe('Routes tests', () => {
     };
 
     beforeAll(() => {
-      server = app.listen(3000);
+      server = app.listen(TEST_PORT);
     });
 
     afterAll(() => {
@@ -116,7 +116,7 @@ describe('Routes tests', () => {
 
     test('closes connection if invalid id', async () => {
       try {
-        await initSocket('');
+        await initSocket(undefined);
       } catch (err) {
         expect(err).toEqual(expect.any(Error));
       }

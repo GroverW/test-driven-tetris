@@ -1,7 +1,9 @@
 let ws;
 
+const TEST_PORT = 1234;
+
 const initSocket = (gameId) => new Promise((resolve, reject) => {
-  ws = new WebSocket(`ws://localhost:3000/game/${gameId}`);
+  ws = new WebSocket(`ws://localhost:${TEST_PORT}/game/${gameId}`);
 
   ws.onmessage = () => resolve(ws);
 
@@ -20,4 +22,5 @@ const destroySocket = () => new Promise((resolve) => {
 module.exports = {
   initSocket,
   destroySocket,
+  TEST_PORT,
 };
