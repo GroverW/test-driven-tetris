@@ -6,7 +6,7 @@ const {
 } = require('backend/topics');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
-} = require('backend/helpers/serverUtils');
+} = require('backend/helpers/utils');
 
 describe('message manager tests', () => {
   let playerManager;

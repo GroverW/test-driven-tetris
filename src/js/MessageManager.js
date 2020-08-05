@@ -4,7 +4,7 @@ const {
 const { GAME_TYPES } = require('backend/constants');
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
-} = require('backend/helpers/serverUtils');
+} = require('backend/helpers/utils');
 
 class MessageManager {
   constructor(gameType, players) {
