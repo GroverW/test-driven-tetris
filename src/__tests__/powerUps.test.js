@@ -6,8 +6,9 @@ const {
   swapBoards,
   scrambleBoard,
   clearBoard,
+  handlePowerUp,
 } = require('backend/helpers/powerUps');
-const { BOARD_WIDTH } = require('common/helpers/constants');
+const { BOARD_WIDTH, POWER_UP_TYPES } = require('common/helpers/constants');
 
 describe('power ups', () => {
   afterEach(() => {
@@ -72,5 +73,27 @@ describe('power ups', () => {
     const result = clearBoard(board);
 
     expect(result).toEqual(getTestBoard('empty'));
+  });
+
+  test('handle power up returns the same value as each individual power up', () => {
+    Math.random = jest.fn().mockReturnValue(0);
+
+    const runHandlePowerUpTest = (key, powerUp, numBoards) => {
+      const boards = new Array(numBoards).fill(null).map(() => getTestBoard('pattern5'));
+
+      if (numBoards === 1) {
+        expect([null, powerUp(boards[0])]).toEqual(handlePowerUp(key, null, boards[0]));
+      } else {
+        expect(powerUp(...boards)).toEqual(handlePowerUp(key, ...boards));
+      }
+    };
+
+    [
+      [POWER_UP_TYPES.SWAP_LINES, swapLines, 2],
+      [POWER_UP_TYPES.SWAP_BOARDS, swapBoards, 2],
+      [POWER_UP_TYPES.SCRAMBLE_BOARD, scrambleBoard, 1],
+      [POWER_UP_TYPES.CLEAR_BOARD, clearBoard, 1],
+      ['default', () => [], 0],
+    ].forEach(([key, powerUp, numBoards]) => runHandlePowerUpTest(key, powerUp, numBoards));
   });
 });
