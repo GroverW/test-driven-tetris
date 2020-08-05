@@ -1,7 +1,5 @@
 const commonMocks = require('common/mockData/mocks');
 const ClientGame = require('frontend/static/js/ClientGame');
-const Piece = require('common/js/Piece');
-const { PIECE_TYPES } = require('frontend/helpers/clientConstants');
 
 // time in ms for one requestAnimationFrame call
 const GAME_TIME_INTERVAL = 100;
