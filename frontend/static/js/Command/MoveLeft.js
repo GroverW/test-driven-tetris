@@ -4,13 +4,17 @@ const { publish } = require('frontend/helpers/pubSub');
 const Command = require('.');
 
 class MoveLeft extends Command {
-  constructor(board) {
-    super(CONTROLS.LEFT, board.movePiece.bind(board, 1, 0), MOVE_SPEED);
+  constructor(game) {
+    super(CONTROLS.LEFT, game.movement.bind(game, 'movePiece', -1, 0), MOVE_SPEED);
   }
 
-  execute() {
-    super.execute();
+  executeCallback() {
     publish(ADD_LOCK_DELAY);
+    super.executeCallback();
+  }
+
+  static getKey() {
+    return CONTROLS.LEFT;
   }
 }
 
