@@ -37,11 +37,15 @@ class Command {
 
     if (currTime >= this.startTime + this.delay) {
       publish(ADD_TO_QUEUE, this.key);
-      this.callback();
+      this.executeCallback();
       this.startTime = currTime;
 
       this.updateDelay();
     }
+  }
+
+  executeCallback() {
+    this.callback();
   }
 
   /**
