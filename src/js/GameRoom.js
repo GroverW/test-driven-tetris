@@ -7,7 +7,7 @@ const {
   REMOVE_PLAYER,
   PLAY,
   GAME_OVER,
-  ADD_PIECES,
+  GET_PIECES,
   UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
@@ -75,7 +75,7 @@ class GameRoom {
       player.pubSub.subscribe(REMOVE_PLAYER, this.leave.bind(this)),
       player.pubSub.subscribe(PLAY, this.manager.playerReady.bind(this.manager)),
       player.pubSub.subscribe(GAME_OVER, this.manager.gameOver.bind(this.manager)),
-      player.pubSub.subscribe(ADD_PIECES, this.manager.getPieces.bind(this.manager)),
+      player.pubSub.subscribe(GET_PIECES, this.manager.getPieces.bind(this.manager)),
       player.pubSub.subscribe(
         UPDATE_PLAYER, this.manager.msg.sendPlayerUpdateToOthers.bind(this.manager.msg),
       ),

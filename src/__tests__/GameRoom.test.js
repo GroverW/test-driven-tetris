@@ -11,7 +11,7 @@ const {
   REMOVE_PLAYER,
   PLAY,
   GAME_OVER,
-  ADD_PIECES,
+  GET_PIECES,
   UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
@@ -241,7 +241,7 @@ describe('game room tests', () => {
     });
 
     test('GET_PIECES calls add pieces', () => {
-      runPubSubTestFor(gameRoom.manager, 'getPieces', ADD_PIECES);
+      runPubSubTestFor(gameRoom.manager, 'getPieces', GET_PIECES);
     });
 
     test('UPDATE_PLAYER sends player update to others', () => {
