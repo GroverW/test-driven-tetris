@@ -1,4 +1,4 @@
-const GameView = require('frontend/static/js/GameView');
+const GameView = require('frontend/static/js/GameDOM/GameView');
 const gameLoop = require('frontend/static/js/GameLoop');
 
 const {

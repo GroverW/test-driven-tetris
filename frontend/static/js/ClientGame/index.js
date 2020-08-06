@@ -22,9 +22,9 @@ const {
   ADD_TO_QUEUE,
 } = require('frontend/topics');
 
-const ClientBoard = require('../ClientBoard');
+const { getCommandList } = require('frontend/static/js/Command/getCommandList');
+const ClientBoard = require('./ClientBoard');
 const Gravity = require('./Gravity');
-const { getCommandList } = require('../Command/getCommandList');
 
 /**
  * Represents a client-side Tetris game

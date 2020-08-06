@@ -25,7 +25,7 @@ const {
 const {
   createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
 } = require('./DOMHelpers');
-const GameView = require('../GameView');
+const GameView = require('./GameView');
 
 /**
  * Represents a client-side DOM manager

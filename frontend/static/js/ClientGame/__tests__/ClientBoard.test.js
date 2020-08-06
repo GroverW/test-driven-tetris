@@ -1,4 +1,4 @@
-const ClientBoard = require('frontend/static/js/ClientBoard');
+const ClientBoard = require('frontend/static/js/ClientGame/ClientBoard');
 const { ROTATE_LEFT } = require('frontend/constants');
 const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/topics');
 const {
