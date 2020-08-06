@@ -190,7 +190,6 @@ describe('game manager tests', () => {
           gameManager.gameOver({ id: p.id, board: [] });
           expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p.id, [], a.length - rank);
         });
-
       });
 
       test('gameOver ends game if checkIfWinner returns true', () => {

@@ -1,6 +1,6 @@
 const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/constants');
 const {
-  START_GAME, GAME_OVER, END_GAME, ADD_PIECES, MSG_TYPE,
+  START_GAME, END_GAME, ADD_PIECES, MSG_TYPE,
 } = require('backend/topics');
 const { randomize } = require('backend/helpers/utils');
 const { handlePowerUp } = require('backend/helpers/powerUps');
