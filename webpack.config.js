@@ -11,6 +11,7 @@ module.exports = {
       frontend: path.resolve(__dirname, 'frontend/'),
       backend: path.resolve(__dirname, 'backend/'),
       common: path.resolve(__dirname, 'common/'),
+      app: path.resolve(__dirname, './app.js'),
     },
     extensions: ['.js', '.css', '.html'],
   },
