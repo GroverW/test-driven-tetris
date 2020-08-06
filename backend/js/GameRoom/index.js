@@ -19,7 +19,7 @@ class GameRoom {
     this.gameType = gameType;
     this.removeGameRoom = removeGameRoom;
     this.players = new PlayerManager();
-    this.manager = new GameManager(gameType, this.players);
+    this.manager = new GameManager(id, gameType, this.players);
     this.nextPlayerId = 1;
     this.subscriptions = {};
   }
