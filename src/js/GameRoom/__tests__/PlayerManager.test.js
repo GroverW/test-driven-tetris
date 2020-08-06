@@ -1,4 +1,4 @@
-const PlayerManager = require('backend/js/PlayerManager');
+const PlayerManager = require('backend/js/GameRoom/PlayerManager');
 
 describe('player manager tests', () => {
   let playerManager;

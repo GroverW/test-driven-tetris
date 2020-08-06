@@ -1,5 +1,3 @@
-const MessageManager = require('backend/js/MessageManager');
-const PlayerManager = require('backend/js/PlayerManager');
 const { GAME_TYPES } = require('common/constants');
 const {
   GAME_MESSAGE, ADD_POWER_UP, ADD_PLAYER, UPDATE_PLAYER,
@@ -7,6 +5,8 @@ const {
 const {
   multiPlayerGameOverMessage, singlePlayerGameOverMessage,
 } = require('backend/helpers/utils');
+const MessageManager = require('backend/js/GameRoom/MessageManager');
+const PlayerManager = require('backend/js/GameRoom/PlayerManager');
 
 describe('message manager tests', () => {
   let playerManager;

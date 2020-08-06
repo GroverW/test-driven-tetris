@@ -1,5 +1,5 @@
 const GameServer = require('backend/js/GameServer');
-const Player = require('backend/js/Player');
+const Player = require('backend/js/GameRoom/Player');
 const { GAME_TYPES } = require('common/constants');
 const { PLAY, EXECUTE_COMMANDS } = require('backend/topics');
 const {

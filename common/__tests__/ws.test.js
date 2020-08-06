@@ -1,5 +1,5 @@
 const GameServer = require('backend/js/GameServer');
-const Player = require('backend/js/Player');
+const Player = require('backend/js/GameRoom/Player');
 const Api = require('frontend/helpers/Api');
 
 const serverPubSub = require('backend/helpers/pubSub');

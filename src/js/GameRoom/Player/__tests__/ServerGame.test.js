@@ -1,4 +1,4 @@
-const ServerGame = require('backend/js/ServerGame');
+const ServerGame = require('backend/js/GameRoom/Player/ServerGame');
 const { GAME_TYPES, POWER_UP_TYPES, MAX_POWER_UPS } = require('backend/constants');
 const {
   UPDATE_PLAYER, CLEAR_LINES, ADD_POWER_UP, USE_POWER_UP,
