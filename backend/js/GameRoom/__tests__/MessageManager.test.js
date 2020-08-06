@@ -100,6 +100,18 @@ describe('message manager tests', () => {
       });
     });
 
+    test('sendWaitingMessage sends waiting message to all players', () => {
+      const sendGameMessageSpy = jest.spyOn(messageManager, 'sendGameMessage');
+
+      messageManager.sendWaitingMessage(1, 1);
+
+      expect(sendGameMessageSpy).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.any(String),
+      );
+    });
+
     test('sendPlayerUpdate sends message for all to update player', () => {
       const sendAllSpy = jest.spyOn(messageManager, 'sendAll');
       const data = { id: p1.id, board: p1.game.board };

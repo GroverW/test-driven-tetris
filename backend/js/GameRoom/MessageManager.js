@@ -38,7 +38,9 @@ class MessageManager {
     return null;
   }
 
-  sendGameMessage(header, body = []) {
+  sendGameMessage(header, ...bodyList) {
+    const body = bodyList || [];
+
     this.sendAll({
       type: GAME_MESSAGE,
       data: { header, body },
@@ -53,6 +55,14 @@ class MessageManager {
         data: powerUp,
       });
     }
+  }
+
+  sendWaitingMessage(playersReady, gameId) {
+    this.sendGameMessage(
+      'Waiting for others',
+      `${playersReady} out of ${this.players.count} players ready`,
+      `Game ID: ${gameId}`,
+    );
   }
 
   sendPlayerUpdate(data) {
