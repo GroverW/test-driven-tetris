@@ -7,7 +7,8 @@ const { handlePowerUp } = require('backend/helpers/powerUps');
 const MessageManager = require('./MessageManager');
 
 class GameManager {
-  constructor(gameType, players) {
+  constructor(id, gameType, players) {
+    this.id = id;
     this.gameStarted = false;
     this.gameType = gameType;
     this.players = players;
@@ -15,7 +16,8 @@ class GameManager {
   }
 
   getTotalReady() {
-    return this.players.list.filter((p) => p.readyToPlay).length;
+    this.totalReady = this.players.list.filter((p) => p.readyToPlay).length;
+    return this.totalReady;
   }
 
   checkStartConditions() {
@@ -48,6 +50,8 @@ class GameManager {
   playerReady() {
     if (this.checkStartConditions()) {
       this.animateStart();
+    } else {
+      this.msg.sendWaitingMessage(this.totalReady, this.id);
     }
   }
 
@@ -112,12 +116,12 @@ class GameManager {
     this.msg.sendPlayerUpdate({ id, board });
   }
 
-  getNextRanking() {
-    return this.players.list.filter((p) => p.game.gameStatus).length;
+  getNextRanking(id = null) {
+    return this.players.list.filter((p) => (p.game.gameStatus || p.id === id)).length;
   }
 
   gameOver({ id, board }) {
-    const ranking = this.getNextRanking();
+    const ranking = this.getNextRanking(id);
 
     this.msg.sendGameOverMessage(id, board, ranking);
 
@@ -147,13 +151,7 @@ class GameManager {
   }
 
   gameOverRemainingPlayers() {
-    this.players.list.forEach((p) => {
-      if (p.game.gameStatus) {
-        const { id } = p;
-        const board = p.game.board.grid;
-        p.pubSub.publish(GAME_OVER, { id, board });
-      }
-    });
+    this.players.list.forEach((p) => p.gameOver());
   }
 }
 
