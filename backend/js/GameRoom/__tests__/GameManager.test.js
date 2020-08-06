@@ -1,37 +1,29 @@
 const { GAME_TYPES, COUNTDOWN, POWER_UP_TYPES } = require('backend/constants');
 const { ADD_PIECES, END_GAME, MSG_TYPE } = require('backend/topics');
-const { getTestBoard } = require('common/mocks');
+const { getTestBoard, mockSend } = require('common/mocks');
 const GameManager = require('backend/js/GameRoom/GameManager');
 const MessageManager = require('backend/js/GameRoom/MessageManager');
 const PlayerManager = require('backend/js/GameRoom/PlayerManager');
+const Player = require('backend/js/GameRoom/Player');
+const pubSub = require('backend/helpers/pubSub');
 
 describe('game manager tests', () => {
   let gameManager;
   let playerManager;
   let p1; let p2;
 
-  const getTestPlayer = (id) => ({
-    id,
-    sendMessage: jest.fn(),
-    pubSub: { publish: jest.fn() },
-    addPieces: jest.fn(),
-    game: {
-      start: jest.fn(),
-      gameStatus: true,
-      board: {
-        grid: [],
-        replaceBoard(board) {
-          this.grid = board;
-        },
-      },
-    },
-  });
+  const getTestPlayer = (id) => {
+    const newPlayer = new Player(mockSend(), pubSub());
+    newPlayer.setId(id);
+
+    return newPlayer;
+  };
 
   beforeEach(() => {
     p1 = getTestPlayer(1);
     p2 = getTestPlayer(2);
     playerManager = new PlayerManager();
-    gameManager = new GameManager(GAME_TYPES.MULTI, playerManager);
+    gameManager = new GameManager(1, GAME_TYPES.MULTI, playerManager);
   });
 
   afterEach(() => {
@@ -153,6 +145,16 @@ describe('game manager tests', () => {
 
         expect(animateStartSpy).toHaveBeenCalledTimes(1);
       });
+
+      test('sends waiting message if start conditions not met', () => {
+        const sendWaitingMessageSpy = jest.spyOn(gameManager.msg, 'sendWaitingMessage');
+
+        p1.readyToPlay = true;
+
+        gameManager.playerReady();
+
+        expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(1, gameManager.id);
+      });
     });
   });
 
@@ -160,7 +162,7 @@ describe('game manager tests', () => {
     beforeEach(() => {
       playerManager.add(p1);
       playerManager.add(p2);
-      gameManager.gameStarted = true;
+      gameManager.startGame();
     });
 
     describe('gameOver steps', () => {
@@ -172,6 +174,23 @@ describe('game manager tests', () => {
 
         expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p1.id, [], 2);
         expect(checkIfWinnerSpy).toHaveBeenCalledTimes(1);
+      });
+
+      test('gameOver sends the correct ranking each time', () => {
+        const sendGameOverMessageSpy = jest.spyOn(gameManager.msg, 'sendGameOverMessage');
+        gameManager.checkIfWinnerAndEndGame = jest.fn();
+
+        const p3 = getTestPlayer(3);
+        const p4 = getTestPlayer(4);
+        gameManager.players.list.push(p3, p4);
+        gameManager.startGame();
+
+        [p1, p2, p3, p4].forEach((p, rank, a) => {
+          p.gameOver();
+          gameManager.gameOver({ id: p.id, board: [] });
+          expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p.id, [], a.length - rank);
+        });
+
       });
 
       test('gameOver ends game if checkIfWinner returns true', () => {
@@ -241,6 +260,8 @@ describe('game manager tests', () => {
 
     test('getPieces adds a new set of pieces for each player', () => {
       const sendAllSpy = jest.spyOn(gameManager.msg, 'sendAll');
+      p1.addPieces = jest.fn();
+      p2.addPieces = jest.fn();
 
       gameManager.getPieces();
 
@@ -253,6 +274,8 @@ describe('game manager tests', () => {
     });
 
     test('startPlayerGames starts each players games', () => {
+      p1.game.start = jest.fn();
+      p2.game.start = jest.fn();
       gameManager.startPlayerGames();
 
       expect(p1.game.start).toHaveBeenCalledTimes(1);
@@ -260,6 +283,7 @@ describe('game manager tests', () => {
     });
 
     test('getNextRanking gets next ranking', () => {
+      gameManager.startGame();
       expect(gameManager.getNextRanking()).toBe(2);
       p1.game.gameStatus = false;
       expect(gameManager.getNextRanking()).toBe(1);
@@ -274,6 +298,7 @@ describe('game manager tests', () => {
       const player2 = p2.id;
       let powerUp = POWER_UP_TYPES.SWAP_LINES;
 
+      gameManager.startGame();
       gameManager.executePowerUp({ player1, player2, powerUp });
 
       expect(p1.game.board.grid).toEqual(getTestBoard('empty'));
