@@ -1,4 +1,4 @@
-const { GAME_OVER, END_GAME } = require('common/helpers/commonTopics');
+const { GAME_OVER, END_GAME } = require('common/topics');
 
 /**
  * Represents a subscriber to publish / subscribe messages

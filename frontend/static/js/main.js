@@ -2,8 +2,8 @@ const clientMessage = require('frontend/static/js/ClientMessage');
 const { messageSelector, menuSelectors } = require('frontend/helpers/DOMSelectors');
 const { createGame, joinGame } = require('frontend/helpers/gameFunctions');
 const { subscribe } = require('frontend/helpers/pubSub');
-const { TOGGLE_MENU } = require('frontend/helpers/clientTopics');
-const { publishError } = require('frontend/helpers/clientUtils');
+const { TOGGLE_MENU } = require('frontend/topics');
+const { publishError } = require('frontend/helpers/utils');
 
 const {
   menuContainer, newSinglePlayer, newMultiplayer, joinMultiplayer, multiplayerGameId, mute, music,

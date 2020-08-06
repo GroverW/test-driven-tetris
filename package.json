@@ -13,8 +13,8 @@
     "lint:fix": "npm run eslint:fix -- . "
   },
   "pre-commit": [
-    "test",
-    "lint:fix"
+    "lint:fix",
+    "test"
   ],
   "keywords": [],
   "author": "",
@@ -40,14 +40,15 @@
   },
   "_moduleAliases": {
     "frontend": "frontend",
-    "backend": "src",
+    "backend": "backend",
     "common": "common"
   },
   "jest": {
     "moduleNameMapper": {
       "^frontend(.*)$": "<rootDir>/frontend$1",
-      "^backend(.*)$": "<rootDir>/src$1",
-      "^common(.*)$": "<rootDir>/common$1"
+      "^backend(.*)$": "<rootDir>/backend$1",
+      "^common(.*)$": "<rootDir>/common$1",
+      "^app(.*)$": "<rootDir>./app.js$1"
     }
   }
 }

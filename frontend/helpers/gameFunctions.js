@@ -4,8 +4,8 @@ const ClientGame = require('frontend/static/js/ClientGame');
 const gameLoop = require('frontend/static/js/GameLoop');
 const gameDOM = require('frontend/static/js/GameDOM');
 
-const { PLAY, TOGGLE_MENU, ADD_PLAYER } = require('frontend/helpers/clientTopics');
-const { publishError } = require('frontend/helpers/clientUtils');
+const { PLAY, TOGGLE_MENU, ADD_PLAYER } = require('frontend/topics');
+const { publishError } = require('frontend/helpers/utils');
 const { addPowerUpTargetId } = require('frontend/static/js/GameDOM/DOMHelpers');
 const Api = require('./Api');
 const { publish } = require('./pubSub');

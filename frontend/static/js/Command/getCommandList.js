@@ -1,5 +1,5 @@
 const { mapArrayToObj } = require('common/helpers/utils');
-const { PLAYER_KEYS } = require('frontend/helpers/clientConstants');
+const { PLAYER_KEYS } = require('frontend/constants');
 
 const HardDrop = require('./HardDrop');
 const MoveDown = require('./MoveDown');

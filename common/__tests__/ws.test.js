@@ -1,23 +1,23 @@
 const GameServer = require('backend/js/GameServer');
-const Player = require('backend/js/Player');
+const Player = require('backend/js/GameRoom/Player');
 const Api = require('frontend/helpers/Api');
 
 const serverPubSub = require('backend/helpers/pubSub');
 
-const { CONTROLS } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/constants');
 const {
   GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN,
-} = require('backend/helpers/serverConstants');
-const { MSG_TYPE } = require('common/helpers/commonTopics');
+} = require('backend/constants');
+const { MSG_TYPE } = require('common/topics');
 
 const {
   getMockDOMSelector, getMockGameDOMSelectors, runCommands, mockAnimation,
-} = require('frontend/mockData/mocks');
-const MockClientListener = require('common/mockData/mockClientListener');
-const MockServerListener = require('common/mockData/mockServerListener');
+} = require('frontend/mocks');
+const MockClientListener = require('common/mocks/ClientListener');
+const MockServerListener = require('common/mocks/ServerListener');
 const {
   mockSend, getTestBoard, webSocketMock, pubSubMock,
-} = require('common/mockData/mocks');
+} = require('common/mocks');
 
 const startGame = (serverListener, ...additionalPlayers) => {
   additionalPlayers.forEach((player) => serverListener.gameRoom.join(player));

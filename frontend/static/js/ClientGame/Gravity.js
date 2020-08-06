@@ -2,8 +2,8 @@ const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
 
-const { ANIMATION_SPEED, MAX_SPEED, CONTROLS } = require('frontend/helpers/clientConstants');
-const { UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
+const { ANIMATION_SPEED, MAX_SPEED, CONTROLS } = require('frontend/constants');
+const { UPDATE_SCORE, ADD_LOCK_DELAY, INTERRUPT_DELAY } = require('frontend/topics');
 
 /**
  * Represents in-game gravity. Automatically moves the current piece downwards.

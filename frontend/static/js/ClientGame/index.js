@@ -3,7 +3,7 @@ const Game = require('common/js/Game');
 const pubSub = require('frontend/helpers/pubSub');
 const { mapArrayToObj } = require('common/helpers/utils');
 
-const { PLAYER_KEYS, COMMAND_QUEUE_MAP } = require('frontend/helpers/clientConstants');
+const { PLAYER_KEYS, COMMAND_QUEUE_MAP } = require('frontend/constants');
 const {
   START_GAME,
   BOARD_CHANGE,
@@ -20,11 +20,11 @@ const {
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
   ADD_TO_QUEUE,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 
-const ClientBoard = require('../ClientBoard');
+const { getCommandList } = require('frontend/static/js/Command/getCommandList');
+const ClientBoard = require('./ClientBoard');
 const Gravity = require('./Gravity');
-const { getCommandList } = require('../Command/getCommandList');
 
 /**
  * Represents a client-side Tetris game

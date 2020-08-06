@@ -1,6 +1,6 @@
-const { publishError, formatMessage } = require('frontend/helpers/clientUtils');
+const { publishError, formatMessage } = require('frontend/helpers/utils');
+const { SEND_MESSAGE } = require('frontend/topics');
 const { subscribe } = require('./pubSub');
-const { SEND_MESSAGE } = require('./clientTopics');
 
 class Api {
   constructor(ws) {

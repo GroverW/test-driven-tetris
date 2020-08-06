@@ -1,5 +1,5 @@
-const { CONTROLS, MOVE_SPEED } = require('frontend/helpers/clientConstants');
-const { INTERRUPT_DELAY } = require('frontend/helpers/clientTopics');
+const { CONTROLS, MOVE_SPEED } = require('frontend/constants');
+const { INTERRUPT_DELAY } = require('frontend/topics');
 const { publish } = require('frontend/helpers/pubSub');
 const Command = require('.');
 

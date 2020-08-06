@@ -1,7 +1,7 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 
-const { POINTS, LINES_PER_LEVEL } = require('common/helpers/constants');
-const { LOWER_PIECE, CLEAR_LINES, ADD_PIECES } = require('common/helpers/commonTopics');
+const { POINTS, LINES_PER_LEVEL } = require('common/constants');
+const { LOWER_PIECE, CLEAR_LINES, ADD_PIECES } = require('common/topics');
 
 /**
  * Represents a Tetris game.
