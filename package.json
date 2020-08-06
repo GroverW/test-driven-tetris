@@ -40,7 +40,7 @@
   },
   "_moduleAliases": {
     "frontend": "frontend",
-    "backend": "src",
+    "backend": "backend",
     "common": "common"
   },
   "jest": {
