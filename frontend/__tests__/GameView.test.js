@@ -2,14 +2,11 @@ const GameView = require('frontend/static/js/GameView');
 const gameLoop = require('frontend/static/js/GameLoop');
 
 const {
-  CONTROLS,
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
-  CELL_SIZE,
-} = require('frontend/helpers/clientConstants');
+  CONTROLS, BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE,
+} = require('frontend/constants');
 const {
   START_GAME, DRAW, REMOVE_PLAYER, UPDATE_PLAYER, END_GAME,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 const {
   getMockCtx,
   getTestBoard,
@@ -19,9 +16,9 @@ const {
   mockAnimation,
   mockCancelAnimation,
   clearMocksAndUnsubscribe,
-} = require('frontend/mockData/mocks');
+} = require('frontend/mocks');
 const { publish } = require('frontend/helpers/pubSub');
-const { getNewPlayer, getNextPieceBoard } = require('frontend/helpers/clientUtils');
+const { getNewPlayer, getNextPieceBoard } = require('frontend/helpers/utils');
 
 describe('game view tests', () => {
   let gameView;

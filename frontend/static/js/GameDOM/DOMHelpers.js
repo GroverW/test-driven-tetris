@@ -1,4 +1,4 @@
-const { MAX_POWER_UPS } = require('frontend/helpers/clientConstants');
+const { MAX_POWER_UPS } = require('frontend/constants');
 
 /**
  * Creates and returns a new HTML Element

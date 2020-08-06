@@ -1,6 +1,6 @@
 const { subscribe } = require('frontend/helpers/pubSub');
-const { MESSAGE_TIMEOUT } = require('frontend/helpers/clientConstants');
-const { ADD_MESSAGE, CLEAR_MESSAGE } = require('frontend/helpers/clientTopics');
+const { MESSAGE_TIMEOUT } = require('frontend/constants');
+const { ADD_MESSAGE, CLEAR_MESSAGE } = require('frontend/topics');
 
 /**
  * Represents the flash messages displayed on screen

@@ -4,7 +4,7 @@ const Api = require('frontend/helpers/Api');
 
 const serverPubSub = require('backend/helpers/pubSub');
 
-const { CONTROLS } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/constants');
 const {
   GAMES, GAME_TYPES, POWER_UP_TYPES, COUNTDOWN,
 } = require('backend/constants');
@@ -12,7 +12,7 @@ const { MSG_TYPE } = require('common/topics');
 
 const {
   getMockDOMSelector, getMockGameDOMSelectors, runCommands, mockAnimation,
-} = require('frontend/mockData/mocks');
+} = require('frontend/mocks');
 const MockClientListener = require('common/mocks/ClientListener');
 const MockServerListener = require('common/mocks/ServerListener');
 const {

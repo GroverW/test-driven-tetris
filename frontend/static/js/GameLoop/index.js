@@ -6,7 +6,7 @@ const {
   SET_COMMAND,
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 
 /**
  * Represents a Game Loop

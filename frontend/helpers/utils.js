@@ -1,6 +1,6 @@
 const commonUtils = require('common/helpers/utils');
 const { publish } = require('frontend/helpers/pubSub');
-const { ADD_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
+const { ADD_MESSAGE, MSG_TYPE } = require('frontend/topics');
 
 const getNextPieceBoard = () => new Array(4).fill(null).map(() => new Array(4).fill(0));
 

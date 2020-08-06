@@ -1,14 +1,14 @@
 const Gravity = require('frontend/static/js/ClientGame/Gravity');
-const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/helpers/clientConstants');
+const { ANIMATION_SPEED, MAX_SPEED } = require('frontend/constants');
 const {
   UPDATE_SCORE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
   START_GAME,
   GAME_OVER,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 const { publish } = require('frontend/helpers/pubSub');
-const { pubSubMock, getNewTestGame } = require('frontend/mockData/mocks');
+const { pubSubMock, getNewTestGame } = require('frontend/mocks');
 
 describe('gravity tests', () => {
   let gravity;

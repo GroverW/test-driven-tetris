@@ -1,6 +1,6 @@
 const gameLoop = require('frontend/static/js/GameLoop');
 const Piece = require('common/js/Piece');
-const { CONTROLS } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/constants');
 const {
   DRAW,
   UPDATE_SCORE,
@@ -14,15 +14,17 @@ const {
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 const {
+  pubSubMock,
+  getTestBoard,
+  getTestPiece,
   mockAnimation,
   mockCancelAnimation,
   getNewTestGame,
   runCommands,
   clearMocksAndUnsubscribe,
-} = require('frontend/mockData/mocks');
-const { pubSubMock, getTestBoard, getTestPiece } = require('common/mocks');
+} = require('frontend/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 
 describe('client game tests', () => {

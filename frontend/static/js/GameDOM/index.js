@@ -7,8 +7,8 @@ const {
   getNextPieceBoard,
   getNewPlayer,
   getNewPlayerDOM,
-} = require('frontend/helpers/clientUtils');
-const { POWER_UPS } = require('frontend/helpers/clientConstants');
+} = require('frontend/helpers/utils');
+const { POWER_UPS } = require('frontend/constants');
 const {
   PLAY,
   START_GAME,
@@ -21,7 +21,7 @@ const {
   UPDATE_PLAYER,
   ADD_POWER_UP,
   USE_POWER_UP,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 const {
   createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
 } = require('./DOMHelpers');

@@ -1,4 +1,4 @@
-const GameRoom = require('backend/js/GameRoom/index');
+const GameRoom = require('backend/js/GameRoom');
 const PlayerManager = require('backend/js/GameRoom/PlayerManager');
 const GameManager = require('backend/js/GameRoom/GameManager');
 const Player = require('backend/js/GameRoom/Player');

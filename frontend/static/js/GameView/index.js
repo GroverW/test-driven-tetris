@@ -2,8 +2,8 @@ const SubscriberBase = require('common/js/SubscriberBase');
 
 const pubSub = require('frontend/helpers/pubSub');
 
-const { CELL_SIZE } = require('frontend/helpers/clientConstants');
-const { DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/helpers/clientTopics');
+const { CELL_SIZE } = require('frontend/constants');
+const { DRAW, REMOVE_PLAYER, UPDATE_PLAYER } = require('frontend/topics');
 
 const GameCanvas = require('./GameCanvas');
 /**

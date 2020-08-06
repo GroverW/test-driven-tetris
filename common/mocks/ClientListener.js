@@ -3,7 +3,7 @@ const gameLoop = require('frontend/static/js/GameLoop');
 const gameDOM = require('frontend/static/js/GameDOM');
 const clientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
-const { getMockDOMSelector } = require('frontend/mockData/mocks');
+const { getMockDOMSelector } = require('frontend/mocks');
 const { formatMessage } = require('common/helpers/utils');
 const {
   ADD_MESSAGE,
@@ -14,7 +14,7 @@ const {
   ADD_PIECES,
   UPDATE_PLAYER,
   ADD_POWER_UP,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 
 /**
  * Removes player from client game

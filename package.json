@@ -13,8 +13,8 @@
     "lint:fix": "npm run eslint:fix -- . "
   },
   "pre-commit": [
-    "test",
-    "lint:fix"
+    "lint:fix",
+    "test"
   ],
   "keywords": [],
   "author": "",

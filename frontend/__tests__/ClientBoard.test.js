@@ -1,6 +1,6 @@
 const ClientBoard = require('frontend/static/js/ClientBoard');
-const { ROTATE_LEFT } = require('frontend/helpers/clientConstants');
-const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
+const { ROTATE_LEFT } = require('frontend/constants');
+const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/topics');
 const {
   getTestBoard, getTestPiece, getTestPieces, pubSubMock,
 } = require('common/mocks');

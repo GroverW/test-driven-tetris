@@ -1,4 +1,4 @@
-const { CONTROLS } = require('frontend/helpers/clientConstants');
+const { CONTROLS } = require('frontend/constants');
 const Command = require('.');
 
 const { HARD_DROP } = CONTROLS;

@@ -1,14 +1,14 @@
 const gameLoop = require('frontend/static/js/GameLoop');
 const Command = require('frontend/static/js/Command');
 const { publish } = require('frontend/helpers/pubSub');
-const { mockAnimation, mockCancelAnimation } = require('frontend/mockData/mocks');
+const { mockAnimation, mockCancelAnimation } = require('frontend/mocks');
 const {
   START_GAME,
   GAME_OVER,
   SET_COMMAND,
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
-} = require('frontend/helpers/clientTopics');
+} = require('frontend/topics');
 
 describe('Game Loop tests', () => {
   let testCommand; let testToggleCommand; let testAutoCommand;

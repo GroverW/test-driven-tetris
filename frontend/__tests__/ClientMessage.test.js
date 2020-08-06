@@ -1,8 +1,8 @@
 const clientMessage = require('frontend/static/js/ClientMessage');
 const { publish } = require('frontend/helpers/pubSub');
-const { getMockDOMSelector } = require('frontend/mockData/mocks');
-const { MESSAGE_TIMEOUT } = require('frontend/helpers/clientConstants');
-const { ADD_MESSAGE, CLEAR_MESSAGE, MSG_TYPE } = require('frontend/helpers/clientTopics');
+const { getMockDOMSelector } = require('frontend/mocks');
+const { MESSAGE_TIMEOUT } = require('frontend/constants');
+const { ADD_MESSAGE, CLEAR_MESSAGE, MSG_TYPE } = require('frontend/topics');
 
 describe('client message tests', () => {
   const messageText = 'some message';

@@ -1,6 +1,6 @@
 const Board = require('common/js/Board');
-const { POINTS } = require('frontend/helpers/clientConstants');
-const { DRAW, BOARD_CHANGE } = require('frontend/helpers/clientTopics');
+const { POINTS } = require('frontend/constants');
+const { DRAW, BOARD_CHANGE } = require('frontend/topics');
 
 /**
  * Represents a client-side game board

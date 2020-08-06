@@ -5,9 +5,9 @@ const {
   getNewPlayer,
   getNewPlayerDOM,
   publishError,
-} = require('frontend/helpers/clientUtils');
-const { getTestBoard, pubSubMock } = require('frontend/mockData/mocks');
-const { ADD_MESSAGE } = require('frontend/helpers/clientTopics');
+} = require('frontend/helpers/utils');
+const { getTestBoard, pubSubMock } = require('frontend/mocks');
+const { ADD_MESSAGE } = require('frontend/topics');
 
 describe('utils', () => {
   const pieces = [1, 2, 3, 4, 5, 6, 7];

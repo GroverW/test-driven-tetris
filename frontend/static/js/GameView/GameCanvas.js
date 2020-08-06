@@ -1,6 +1,6 @@
 const {
   BOARD_WIDTH, BOARD_HEIGHT, CELL_COLORS, CELL_SIZE,
-} = require('frontend/helpers/clientConstants');
+} = require('frontend/constants');
 
 /**
  *
