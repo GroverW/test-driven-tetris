@@ -4,7 +4,7 @@ const pubSub = require('backend/helpers/pubSub');
 const { mockSend, pubSubMock } = require('common/mocks');
 const { GAME_TYPES } = require('backend/constants');
 const {
-  MSG_TYPE, ADD_MESSAGE, REMOVE_PLAYER, PLAY, ADD_PIECES,
+  MSG_TYPE, ADD_MESSAGE, REMOVE_PLAYER, PLAY, ADD_PIECES, GAME_OVER,
 } = require('backend/topics');
 
 describe('player tests', () => {
@@ -93,6 +93,26 @@ describe('player tests', () => {
 
     expect(playSpy).toHaveBeenCalledTimes(1);
     expect(updateReadyStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('endGame ends the current game if not already ended', () => {
+    const gameOverSpy = pubSubSpy.add(GAME_OVER);
+    const gameOverActionSpy = jest.spyOn(p1.game, 'gameOverAction');
+
+    p1.game.gameStatus = true;
+
+    p1.gameOver();
+
+    expect(gameOverSpy).toHaveBeenLastCalledWith({
+      id: p1.id, board: expect.any(Array),
+    });
+    expect(gameOverActionSpy).toHaveBeenCalledTimes(1);
+    expect(p1.game.gameStatus).toBe(null);
+
+    p1.gameOver();
+
+    expect(gameOverActionSpy).toHaveBeenCalledTimes(1);
+    expect(gameOverSpy).toHaveBeenCalledTimes(1);
   });
 
   test('addPieces adds pieces to game', () => {

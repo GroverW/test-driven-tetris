@@ -1,5 +1,5 @@
 const {
-  REMOVE_PLAYER, PLAY, ADD_MESSAGE, ADD_PIECES,
+  REMOVE_PLAYER, PLAY, ADD_MESSAGE, ADD_PIECES, GAME_OVER,
 } = require('backend/topics');
 const { formatMessage } = require('backend/helpers/utils');
 const ServerGame = require('./ServerGame');
@@ -68,6 +68,17 @@ class Player {
     if (this.game.gameStatus !== null) {
       this.updateReadyState(true);
       this.pubSub.publish(PLAY, this);
+    }
+  }
+
+  gameOver() {
+    if (this.game.gameStatus) {
+      this.game.gameOverAction();
+
+      const { id } = this;
+      const { grid: board } = this.game.board;
+
+      this.pubSub.publish(GAME_OVER, { id, board });
     }
   }
 
