@@ -19,6 +19,27 @@ const randomize = (arr) => {
 };
 
 /**
+ *
+ * @param {array} arr
+ * @param {number} numBuckets - number of times to repeat randomizing
+ * @returns {array} - new copy of array with elements randomized
+ */
+const randomizedBuckets = (arr, numBuckets) => {
+  let currBucket = 0;
+  const result = [];
+
+  while (currBucket < numBuckets) {
+    const randomized = randomize(arr);
+    result.push(...randomized);
+    currBucket += 1;
+  }
+
+  return result;
+}
+
+
+
+/**
  * Returns a new, empty board
  */
 const getEmptyBoard = () => (
@@ -52,6 +73,7 @@ const formatMessage = ({ type, data }) => JSON.stringify({ type, data });
 
 module.exports = {
   randomize,
+  randomizedBuckets,
   getEmptyBoard,
   mapArrayToObj,
   formatMessage,

@@ -1,5 +1,6 @@
 const {
   randomize,
+  randomizedBuckets,
   getNextPieceBoard,
   getEmptyBoard,
   getNewPlayer,
@@ -34,8 +35,14 @@ describe('utils', () => {
   });
 
   describe('randomize', () => {
+    const expected = [1, 6, 2, 5, 3, 7, 4];
+
     test('randomizes pieces', () => {
-      expect(randomize(pieces)).toEqual([1, 6, 2, 5, 3, 7, 4]);
+      expect(randomize(pieces)).toEqual(expected);
+    });
+
+    test('repeatedly randomized list', () => {
+      expect(randomizedBuckets(pieces, 2)).toEqual([...expected, ...expected]);
     });
   });
 
