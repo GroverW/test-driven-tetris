@@ -73,7 +73,6 @@ class GameDOM extends SubscriberBase {
       UPDATE_SCORE,
       ADD_POWER_UP,
       USE_POWER_UP,
-      GAME_MESSAGE,
     ]);
   }
 
