@@ -39,7 +39,18 @@ const handleMute = (evt) => {
 
   muteBtn.classList.toggle('muted');
   music.muted = !music.muted;
+
+  localStorage.setItem('muted', JSON.parse(music.muted));
 };
+
+(() => {
+  const defaultMute = JSON.parse(localStorage.getItem('muted'));
+
+  if (defaultMute) {
+    music.muted = true;
+    mute.classList.add('muted');
+  }
+})();
 
 newSinglePlayer.addEventListener('click', handleNewGame('single'));
 newMultiplayer.addEventListener('click', handleNewGame('multi'));
