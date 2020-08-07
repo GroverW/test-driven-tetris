@@ -2,7 +2,7 @@ const { GAME_TYPES, COUNTDOWN, SEED_PIECES } = require('backend/constants');
 const {
   START_GAME, END_GAME, ADD_PIECES, MSG_TYPE,
 } = require('backend/topics');
-const { randomize } = require('backend/helpers/utils');
+const { randomizedBuckets } = require('backend/helpers/utils');
 const { handlePowerUp } = require('backend/helpers/powerUps');
 const MessageManager = require('./MessageManager');
 
@@ -83,7 +83,7 @@ class GameManager {
   }
 
   getPieces() {
-    const pieces = randomize(SEED_PIECES);
+    const pieces = randomizedBuckets(SEED_PIECES, 4);
     this.players.list.forEach((p) => p.addPieces(pieces));
     this.msg.sendAll({
       type: ADD_PIECES,

@@ -35,9 +35,7 @@ const randomizedBuckets = (arr, numBuckets) => {
   }
 
   return result;
-}
-
-
+};
 
 /**
  * Returns a new, empty board
