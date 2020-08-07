@@ -58,93 +58,93 @@ describe('game DOM tests', () => {
     clearMocksAndUnsubscribe(gameDOM, game, gameLoop);
   });
 
-  describe('add / remove players', () => {
-    describe('add player', () => {
-      test('adds new player successfully', () => {
-        publish(ADD_PLAYER, newPlayer1.id);
+  // describe('add / remove players', () => {
+  //   describe('add player', () => {
+  //     test('adds new player successfully', () => {
+  //       publish(ADD_PLAYER, newPlayer1.id);
 
-        expect(addPlayerSpy).toHaveBeenCalledTimes(1);
-        expect(gameDOM.players.length).toBe(1);
-        expect(gameDOM.gameView.players.length).toBe(1);
-        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
-        expect(gameDOM.players[0].powerUpId.classList.contains('power-up-target')).toBe(true);
-        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
-      });
+  //       expect(addPlayerSpy).toHaveBeenCalledTimes(1);
+  //       expect(gameDOM.players.length).toBe(1);
+  //       expect(gameDOM.gameView.players.length).toBe(1);
+  //       expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+  //       expect(gameDOM.players[0].powerUpId.classList.contains('power-up-target')).toBe(true);
+  //       expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+  //     });
 
-      test('adding 3rd player resizes 2nd player', () => {
-        publish(ADD_PLAYER, newPlayer1.id);
-        publish(ADD_PLAYER, newPlayer2.id);
+  //     test('adding 3rd player resizes 2nd player', () => {
+  //       publish(ADD_PLAYER, newPlayer1.id);
+  //       publish(ADD_PLAYER, newPlayer2.id);
 
-        expect(addPlayerSpy).toHaveBeenCalledTimes(2);
-        expect(gameDOM.players.length).toBe(2);
-        expect(gameDOM.gameView.players.length).toBe(2);
-        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
-        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
-      });
+  //       expect(addPlayerSpy).toHaveBeenCalledTimes(2);
+  //       expect(gameDOM.players.length).toBe(2);
+  //       expect(gameDOM.gameView.players.length).toBe(2);
+  //       expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+  //       expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+  //     });
 
-      test('does not add player if id matches Game DOM player id', () => {
+  //     test('does not add player if id matches Game DOM player id', () => {
 
-      });
-    });
+  //     });
+  //   });
 
-    describe('remove player', () => {
-      beforeEach(() => {
-        publish(ADD_PLAYER, newPlayer1.id);
-        publish(ADD_PLAYER, newPlayer2.id);
-      });
+  //   describe('remove player', () => {
+  //     beforeEach(() => {
+  //       publish(ADD_PLAYER, newPlayer1.id);
+  //       publish(ADD_PLAYER, newPlayer2.id);
+  //     });
 
-      test('removes player successfully', () => {
-        publish(REMOVE_PLAYER, newPlayer2.id);
+  //     test('removes player successfully', () => {
+  //       publish(REMOVE_PLAYER, newPlayer2.id);
 
-        expect(gameDOM.players.length).toBe(1);
-        expect(gameDOM.gameView.players.length).toBe(1);
-      });
+  //       expect(gameDOM.players.length).toBe(1);
+  //       expect(gameDOM.gameView.players.length).toBe(1);
+  //     });
 
-      test('removing player updates power up targets', () => {
-        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
-        expect(gameDOM.players[1].powerUpId.innerText).toBe(3);
+  //     test('removing player updates power up targets', () => {
+  //       expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+  //       expect(gameDOM.players[1].powerUpId.innerText).toBe(3);
 
-        publish(REMOVE_PLAYER, newPlayer1.id);
+  //       publish(REMOVE_PLAYER, newPlayer1.id);
 
-        expect(gameDOM.players.length).toBe(1);
-        expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
-      });
+  //       expect(gameDOM.players.length).toBe(1);
+  //       expect(gameDOM.players[0].powerUpId.innerText).toBe(2);
+  //     });
 
-      test('removing 3rd player resizes 2nd player', () => {
-        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
-        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+  //     test('removing 3rd player resizes 2nd player', () => {
+  //       expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(false);
+  //       expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
 
-        publish(REMOVE_PLAYER, newPlayer1.id);
+  //       publish(REMOVE_PLAYER, newPlayer1.id);
 
-        expect(gameDOM.players.length).toBe(1);
-        expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
-        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(false);
-      });
+  //       expect(gameDOM.players.length).toBe(1);
+  //       expect(gameDOM.players[0].node.classList.contains('item-large')).toBe(true);
+  //       expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(false);
+  //     });
 
-      test('does not remove player if id matches game DOM player id', () => {
-        const resizeSpy = jest.spyOn(gameDOM, 'resizePlayer2');
-        const updatePowerUpTargetIdsSpy = jest.spyOn(gameDOM, 'updatePowerUpTargetIds');
+  //     test('does not remove player if id matches game DOM player id', () => {
+  //       const resizeSpy = jest.spyOn(gameDOM, 'resizePlayer2');
+  //       const updatePowerUpTargetIdsSpy = jest.spyOn(gameDOM, 'updatePowerUpTargetIds');
 
-        expect(gameDOM.players.length).toBe(2);
+  //       expect(gameDOM.players.length).toBe(2);
 
-        publish(REMOVE_PLAYER, gameDOM.playerId);
+  //       publish(REMOVE_PLAYER, gameDOM.playerId);
 
-        expect(gameDOM.players.length).toBe(2);
-        expect(resizeSpy).toHaveBeenCalledTimes(0);
-        expect(updatePowerUpTargetIdsSpy).toHaveBeenCalledTimes(0);
-      });
+  //       expect(gameDOM.players.length).toBe(2);
+  //       expect(resizeSpy).toHaveBeenCalledTimes(0);
+  //       expect(updatePowerUpTargetIdsSpy).toHaveBeenCalledTimes(0);
+  //     });
 
-      test('does not remove or resize player if id does not match', () => {
-        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
-        expect(gameDOM.players.length).toBe(2);
+  //     test('does not remove or resize player if id does not match', () => {
+  //       expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+  //       expect(gameDOM.players.length).toBe(2);
 
-        publish(REMOVE_PLAYER, 'fake id');
+  //       publish(REMOVE_PLAYER, 'fake id');
 
-        expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
-        expect(gameDOM.players.length).toBe(2);
-      });
-    });
-  });
+  //       expect(gameDOM.players[0].node.classList.contains('item-small')).toBe(true);
+  //       expect(gameDOM.players.length).toBe(2);
+  //     });
+  //   });
+  // });
 
   describe('start game', () => {
     test('clear message and start music on game start', () => {
@@ -158,15 +158,28 @@ describe('game DOM tests', () => {
     });
 
     test('gameDOM should subscribe to GAME_MESSAGE topic when player ready', () => {
-      const numSubscriptions = gameDOM.subscriptions.length;
+      const testMessage = { header: 'hi', body: ['this', 'is', 'a', 'message'] };
+      const appendChildSpy = jest.spyOn(gameDOM.message, 'appendChild');
+      const addSubscriptionSpy = jest.spyOn(gameDOM, 'addSubscription');
+
+      publish(GAME_MESSAGE, {});
+
+      expect(appendChildSpy).not.toHaveBeenCalled();
 
       publish(PLAY);
 
-      expect(gameDOM.subscriptions.length).toBeGreaterThan(numSubscriptions);
+      expect(addSubscriptionSpy).toHaveBeenLastCalledWith(GAME_MESSAGE);
+
+      publish(GAME_MESSAGE, testMessage);
+      expect(appendChildSpy).toHaveBeenCalled();
     });
   });
 
   describe('game message', () => {
+    beforeEach(() => {
+      publish(PLAY);
+    });
+
     test('gameDOM should add game message when topic published', () => {
       const testMessage = { header: 'hi', body: ['this', 'is', 'a', 'message'] };
 
