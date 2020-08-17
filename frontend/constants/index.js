@@ -65,60 +65,81 @@ const ANIMATION_SPEED = {
   21: 20,
 };
 
+const COLOR_STEPS = 4;
+
+const adjustColors = (obj, adjAmt) => {
+  const adjustedColors = {};
+  Object.entries(obj).forEach(([type, rgb]) => {
+    let [r, g, b] = rgb;
+    r += Math.floor(255, Math.floor(((255 - r) / COLOR_STEPS) * adjAmt));
+    g += Math.floor(255, Math.floor(((255 - g) / COLOR_STEPS) * adjAmt));
+    b += Math.floor(255, Math.floor(((255 - b) / COLOR_STEPS) * adjAmt));
+    adjustedColors[type] = `rgb(${r}, ${g}, ${b})`;
+  });
+
+  return adjustedColors;
+};
+
+const mapColors = (colors) => (
+  new Array(COLOR_STEPS + 1)
+    .fill(null)
+    .map((_, i) => adjustColors(colors, i))
+);
+
 const CELL_COLORS = {
-  0: {
-    border: '#001d3e',
-    highlight: '#060606',
-    lowlight: '#060606',
-    foreground: '#060606',
-  },
-  1: {
-    border: '#11658C',
-    highlight: '#8AD8FC',
-    lowlight: '#2794C7',
-    foreground: '#63BCE6',
-  },
+  0: mapColors({
+    border: [0, 29, 62],
+    highlight: [6, 6, 6],
+    lowlight: [6, 6, 6],
+    foreground: [6, 6, 6],
+  }),
+  1: mapColors({
+    border: [17, 101, 140],
+    highlight: [138, 216, 252],
+    lowlight: [39, 148, 199],
+    foreground: [99, 188, 230],
+  }),
   2: {
-    border: '#806904',
-    highlight: '#F2DE83',
-    lowlight: '#C4A829',
-    foreground: '#E6CE63',
+    border: [128, 105, 4],
+    highlight: [242, 222, 131],
+    lowlight: [196, 168, 41],
+    foreground: [230, 206, 99],
   },
   3: {
-    border: '#880667',
-    highlight: '#F674D5',
-    lowlight: '#CF32A8',
-    foreground: '#E64EC0',
+    border: [136, 6, 103],
+    highlight: [246, 116, 213],
+    lowlight: [207, 50, 168],
+    foreground: [230, 78, 192],
   },
   4: {
-    border: '#058010',
-    highlight: '#6AF276',
-    lowlight: '#30CA3D',
-    foreground: '#4EE65B',
+    border: [5, 128, 16],
+    highlight: [106, 242, 118],
+    lowlight: [48, 202, 61],
+    foreground: [78, 230, 91],
   },
   5: {
-    border: '#7D0804',
-    highlight: '#F3716D',
-    lowlight: '#CB3A35',
-    foreground: '#E6534E',
+    border: [125, 8, 4],
+    highlight: [243, 113, 109],
+    lowlight: [203, 58, 53],
+    foreground: [230, 83, 78],
   },
   6: {
-    border: '#985b0c',
-    highlight: '#f5b869',
-    lowlight: '#de8f29',
-    foreground: '#f6a843',
+    border: [152, 91, 12],
+    highlight: [245, 184, 105],
+    lowlight: [222, 143, 41],
+    foreground: [246, 168, 67],
   },
   7: {
-    border: '#051D86',
-    highlight: '#6E87F6',
-    lowlight: '#2F4DD0',
-    foreground: '#4E6AE6',
+    border: [5, 29, 134],
+    highlight: [110, 135, 246],
+    lowlight: [47, 77, 208],
+    foreground: [78, 106, 230],
   },
   8: {
-    border: '#333333',
-    highlight: '#bbbbbb',
-    lowlight: '#999999',
-    foreground: '#aaaaaa',
+    border: [51, 51, 51],
+    highlight: [187, 187, 187],
+    lowlight: [153, 153, 153],
+    foreground: [170, 170, 170],
   },
 };
 
