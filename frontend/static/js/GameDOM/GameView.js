@@ -37,7 +37,7 @@ class GameView extends SubscriberBase {
    */
   [DRAW]({ board, piece, nextPiece }) {
     if (board) this.player.drawGrid(board);
-    if (piece) this.player.drawGrid(piece.grid, undefined, piece.x, piece.y);
+    if (piece) this.player.drawGrid(piece.grid, piece.x, piece.y);
     if (nextPiece) this.nextPiece.clearAndDrawCentered(nextPiece.grid);
   }
 
@@ -84,7 +84,7 @@ class GameView extends SubscriberBase {
 
     if (player) {
       player.board = board;
-      player.drawGrid();
+      player.drawGrid(board);
     }
   }
 

@@ -50,7 +50,7 @@ class GameCanvas {
   constructor(ctx, board, id, cellSize = CELL_SIZE) {
     this.id = id;
     this.board = board;
-    this.ctx = this.initCtx(ctx, cellSize, board[0].length, board.length);
+    this.initCtx(ctx, cellSize, board[0].length, board.length);
   }
 
   /**
@@ -61,43 +61,39 @@ class GameCanvas {
  * @param {number} [height] - height of canvas, in cells
  */
   initCtx(ctx, cellSize, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
-    const newCtx = ctx;
+    this.ctx = ctx;
 
-    this.scaleBoardSize(cellSize, newCtx, width, height);
-    newCtx.strokeStyle = '#000000';
-    newCtx.lineWidth = 3 / cellSize;
-
-    return newCtx;
+    this.scaleBoardSize(cellSize, width, height);
+    this.ctx.strokeStyle = '#000000';
+    this.ctx.lineWidth = 3 / cellSize;
   }
 
   /**
  * Updatese the scaling of the specified board
  * @param {number} cellSize - size, in pixels, of a single board cell
- * @param {object} [ctx] - canvas of the specified board to scale
  * @param {number} [width] - specified width of board, in cells
  * @param {number} [height] - specified height of board, in cells
 */
-  scaleBoardSize(cellSize, ctx = this.ctx, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
-    ctx.canvas.width = width * cellSize;
-    ctx.canvas.height = height * cellSize;
-    ctx.lineWidth = 3 / cellSize;
-    ctx.scale(cellSize, cellSize);
-    this.drawGrid(this.board, ctx);
+  scaleBoardSize(cellSize, width = BOARD_WIDTH, height = BOARD_HEIGHT) {
+    this.ctx.canvas.width = width * cellSize;
+    this.ctx.canvas.height = height * cellSize;
+    this.ctx.lineWidth = 3 / cellSize;
+    this.ctx.scale(cellSize, cellSize);
+    this.drawGrid(this.board);
   }
 
   /**
    * Draws a specified grid on a specified canvas
    * @param {number[][]} [grid] - grid to draw
-   * @param {object} [ctx] - canvas of specified grid
    * @param {number} xStart - x-coordinate to begin drawing grid
    * @param {number} yStart - y-coordinate to being drawing grid
    */
-  drawGrid(grid = this.board, ctx = this.ctx, xStart = 0, yStart = 0) {
+  drawGrid(grid, xStart = 0, yStart = 0) {
     const isBoard = (grid.length === BOARD_HEIGHT);
 
     grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
       if (isBoard || cell > 0) {
-        drawCell(ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell]);
+        drawCell(this.ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell]);
       }
     }));
   }
@@ -112,7 +108,7 @@ class GameCanvas {
     const xStart = 2 - grid.length / 2;
     const yStart = grid.length < 4 ? 1 : 0.5;
 
-    this.drawGrid(grid, this.ctx, xStart, yStart);
+    this.drawGrid(grid, xStart, yStart);
   }
 }
 

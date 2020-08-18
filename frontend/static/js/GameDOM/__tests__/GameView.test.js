@@ -226,7 +226,7 @@ describe('game view tests', () => {
         publish(DRAW, { piece: testPiece });
 
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
-        expect(drawGridSpy).toHaveBeenLastCalledWith(grid, undefined, x, y);
+        expect(drawGridSpy).toHaveBeenLastCalledWith(grid, x, y);
         expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
