@@ -17,31 +17,32 @@ const {
  * @param {string} color.foreground - forground hex color value
  */
 
-const drawCell = (ctx, xStart, yStart, width, height, color) => {
+const drawCell = (ctx, xStart, yStart, color) => {
   ctx.save();
+  const [left, right, top, bottom] = [xStart, xStart + 1, yStart, yStart + 1];
 
   ctx.fillStyle = color.highlight;
   ctx.beginPath();
-  ctx.moveTo(xStart, yStart);
-  ctx.lineTo(xStart, yStart + height);
-  ctx.lineTo(xStart + width, yStart + height);
-  ctx.lineTo(xStart + width, yStart);
+  ctx.moveTo(left, top);
+  ctx.lineTo(left, bottom);
+  ctx.lineTo(right, bottom);
+  ctx.lineTo(right, top);
   ctx.fill();
   ctx.clip();
 
   ctx.fillStyle = color.lowlight;
   ctx.beginPath();
-  ctx.moveTo(xStart, yStart + height);
-  ctx.lineTo(xStart + width, yStart + height);
-  ctx.lineTo(xStart + width, yStart);
+  ctx.moveTo(left, bottom);
+  ctx.lineTo(right, bottom);
+  ctx.lineTo(right, top);
   ctx.fill();
 
   ctx.strokeStyle = color.border;
-  ctx.strokeRect(xStart, yStart, width, height);
+  ctx.strokeRect(left, top, 1, 1);
 
   ctx.fillStyle = color.foreground;
   const inc = 0.1;
-  ctx.fillRect(xStart + inc, yStart + inc, 0.8, 0.8);
+  ctx.fillRect(left + inc, top + inc, 0.8, 0.8);
 
   ctx.restore();
 };
@@ -87,13 +88,14 @@ class GameCanvas {
    * @param {number[][]} [grid] - grid to draw
    * @param {number} xStart - x-coordinate to begin drawing grid
    * @param {number} yStart - y-coordinate to being drawing grid
+   * @param {number} brightness - 0 - 4 levels of brightness
    */
-  drawGrid(grid, xStart = 0, yStart = 0) {
+  drawGrid(grid, xStart = 0, yStart = 0, brightness = 0) {
     const isBoard = (grid.length === BOARD_HEIGHT);
 
     grid.forEach((row, rowIdx) => row.forEach((cell, colIdx) => {
       if (isBoard || cell > 0) {
-        drawCell(this.ctx, xStart + colIdx, yStart + rowIdx, 1, 1, CELL_COLORS[cell]);
+        drawCell(this.ctx, xStart + colIdx, yStart + rowIdx, CELL_COLORS[cell][brightness]);
       }
     }));
   }
