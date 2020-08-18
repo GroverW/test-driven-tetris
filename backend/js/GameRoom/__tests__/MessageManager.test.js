@@ -114,7 +114,7 @@ describe('message manager tests', () => {
 
     test('sendPlayerUpdate sends message for all to update player', () => {
       const sendAllSpy = jest.spyOn(messageManager, 'sendAll');
-      const data = { id: p1.id, board: p1.game.board };
+      const data = { id: p1.id, grid: p1.game.board };
       messageManager.sendPlayerUpdate(data);
 
       expect(sendAllSpy).toHaveBeenLastCalledWith({ type: UPDATE_PLAYER, data });
@@ -122,7 +122,7 @@ describe('message manager tests', () => {
 
     test('sendPlayerUpdateToOthers sends message for all others to update player', () => {
       const sendAllExceptSpy = jest.spyOn(messageManager, 'sendAllExcept');
-      const data = { id: p1.id, board: p1.game.board };
+      const data = { id: p1.id, grid: p1.game.board };
       messageManager.sendPlayerUpdateToOthers(data);
 
       expect(sendAllExceptSpy).toHaveBeenLastCalledWith(p1, { type: UPDATE_PLAYER, data });

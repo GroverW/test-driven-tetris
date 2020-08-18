@@ -50,7 +50,7 @@ describe('utils', () => {
     test('gets new player object', () => {
       const testPlayer = {
         ctx: 'test',
-        board: [],
+        grid: [],
         id: 1,
       };
 

@@ -34,10 +34,11 @@ class GameView extends SubscriberBase {
    * @param {number} [piece.y] - y-coordinate to start drawing piece
    * @param {object} [nextPiece] - nextPiece to draw
    * @param {number[][]} [nextPiece.grid] - nextPiece grid to draw
+   * @param {number} [brightness] - 0 - 4 levels of brightness
    */
-  [DRAW]({ board, piece, nextPiece }) {
-    if (board) this.player.drawGrid(board);
-    if (piece) this.player.drawGrid(piece.grid, piece.x, piece.y);
+  [DRAW]({ grid, piece, nextPiece, brightness }) {
+    if (grid) this.player.drawGrid({ grid, brightness });
+    if (piece) this.player.drawGrid({ grid: piece.grid, x: piece.x, y: piece.y, brightness });
     if (nextPiece) this.nextPiece.clearAndDrawCentered(nextPiece.grid);
   }
 
@@ -47,7 +48,7 @@ class GameView extends SubscriberBase {
    * @param {number[][]} board - board of player to add
    * @param {number} id - id of player to add
    */
-  addPlayer({ ctx, board, id }) {
+  addPlayer({ ctx, grid, id }) {
     let cellSize = CELL_SIZE;
 
     if (this.players.length >= 1) {
@@ -56,7 +57,7 @@ class GameView extends SubscriberBase {
       player2.scaleBoardSize(cellSize);
     }
 
-    const newPlayer = new GameCanvas(ctx, board, id, cellSize);
+    const newPlayer = new GameCanvas(ctx, grid, id, cellSize);
 
     this.players.push(newPlayer);
   }
@@ -79,12 +80,12 @@ class GameView extends SubscriberBase {
    * @param {number} id - id of player to update
    * @param {number[][]} board - board of player to update
    */
-  [UPDATE_PLAYER]({ id, board }) {
+  [UPDATE_PLAYER]({ id, grid }) {
     const player = this.players.find((p) => p.id === id);
 
     if (player) {
-      player.board = board;
-      player.drawGrid(board);
+      player.grid = grid;
+      player.drawGrid({ grid });
     }
   }
 

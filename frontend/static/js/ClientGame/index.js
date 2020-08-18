@@ -53,7 +53,7 @@ class ClientGame extends Game {
   [START_GAME]() {
     if (this.start()) {
       this.pubSub.publish(DRAW, {
-        board: this.board.grid,
+        grid: this.board.grid,
         piece: this.board.piece,
         nextPiece: this.board.nextPiece,
       });
@@ -93,8 +93,8 @@ class ClientGame extends Game {
    * @param {number} id - id of player
    * @param {number[][]} board - board to update
    */
-  [UPDATE_PLAYER]({ id, board }) {
-    if (id === this.playerId) this.board.replaceBoard(board);
+  [UPDATE_PLAYER]({ id, grid }) {
+    if (id === this.playerId) this.board.replaceBoard(grid);
   }
 
   /**

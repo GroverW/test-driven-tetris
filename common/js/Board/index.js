@@ -37,7 +37,7 @@ class Board {
     if (!this.validMove(0, 0)) {
       this.pubSub.publish(GAME_OVER, {
         id: this.playerId,
-        board: this.grid,
+        grid: this.grid,
       });
     }
 

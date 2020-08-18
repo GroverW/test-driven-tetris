@@ -324,7 +324,7 @@ describe('client game tests', () => {
 
         expect(game.board.grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: 1, board: newBoard });
+        publish(UPDATE_PLAYER, { id: 1, grid: newBoard });
 
         expect(game.board.grid).toEqual(newBoard);
       });
@@ -335,7 +335,7 @@ describe('client game tests', () => {
 
         expect(game.board.grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: p2, board: newBoard });
+        publish(UPDATE_PLAYER, { id: p2, grid: newBoard });
 
         expect(game.board.grid).toEqual(emptyBoard);
       });

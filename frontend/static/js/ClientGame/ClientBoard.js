@@ -59,8 +59,8 @@ class ClientBoard extends Board {
     this.publishDraw(this.grid, this.piece, this.nextPiece);
   }
 
-  publishDraw(board, piece, nextPiece) {
-    this.pubSub.publish(DRAW, { board, piece, nextPiece });
+  publishDraw(grid, piece, nextPiece) {
+    this.pubSub.publish(DRAW, { grid, piece, nextPiece });
   }
 }
 

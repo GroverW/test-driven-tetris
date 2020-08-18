@@ -22,13 +22,13 @@ class MessageManager {
     });
   }
 
-  sendGameOverMessage(id, board, ranking = false) {
+  sendGameOverMessage(id, grid, ranking = false) {
     const player = this.players.getById(id);
     const message = this.getGameOverMessage(player, ranking);
 
     this.sendAll({
       type: GAME_OVER,
-      data: { id, board, message },
+      data: { id, grid, message },
     });
   }
 
@@ -72,11 +72,11 @@ class MessageManager {
     });
   }
 
-  sendPlayerUpdateToOthers({ id, board }) {
+  sendPlayerUpdateToOthers({ id, grid }) {
     const player = this.players.getById(id);
     this.sendAllExcept(
       player,
-      { type: UPDATE_PLAYER, data: { id, board } },
+      { type: UPDATE_PLAYER, data: { id, grid } },
     );
   }
 

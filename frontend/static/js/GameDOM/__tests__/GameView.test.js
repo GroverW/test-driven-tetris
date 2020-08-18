@@ -113,7 +113,7 @@ describe('game view tests', () => {
 
       expect(gameView.players.length).toBe(1);
       expect(gameView.players[0].ctx).toBe(newPlayer1.ctx);
-      expect(gameView.players[0].board).toBe(newPlayer1.board);
+      expect(gameView.players[0].grid).toBe(newPlayer1.grid);
       expect(gameView.players[0].id).toBe(newPlayer1.id);
     });
 
@@ -198,7 +198,7 @@ describe('game view tests', () => {
       test('calls draw on publish', () => {
         const testBoard = getTestBoard('pattern1');
 
-        publish(DRAW, { board: testBoard });
+        publish(DRAW, { grid: testBoard });
 
         expect(drawGrid).toHaveBeenCalledTimes(1);
       });
@@ -209,10 +209,10 @@ describe('game view tests', () => {
 
         const testBoard = getTestBoard('pattern1');
 
-        publish(DRAW, { board: testBoard });
+        publish(DRAW, { grid: testBoard });
 
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
-        expect(drawGridSpy).toHaveBeenLastCalledWith(testBoard);
+        expect(drawGridSpy).toHaveBeenLastCalledWith({ grid: testBoard, brightness: undefined });
         expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
@@ -226,7 +226,7 @@ describe('game view tests', () => {
         publish(DRAW, { piece: testPiece });
 
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
-        expect(drawGridSpy).toHaveBeenLastCalledWith(grid, x, y);
+        expect(drawGridSpy).toHaveBeenLastCalledWith({ grid, x, y, brightness: undefined });
         expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
@@ -274,11 +274,11 @@ describe('game view tests', () => {
 
         expect(gameView.players.length).toBe(1);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
-        expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
+        expect(gameView.players[0].grid).toEqual(getTestBoard('empty'));
 
-        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        publish(UPDATE_PLAYER, { id: newId1, grid: testBoard });
 
-        expect(gameView.players[0].board).toEqual(testBoard);
+        expect(gameView.players[0].grid).toEqual(testBoard);
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
       });
 
@@ -289,11 +289,11 @@ describe('game view tests', () => {
 
         expect(gameView.players.length).toBe(1);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
-        expect(gameView.players[0].board).toEqual(emptyBoard);
+        expect(gameView.players[0].grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: 'fake', board: testBoard });
+        publish(UPDATE_PLAYER, { id: 'fake', grid: testBoard });
 
-        expect(gameView.players[0].board).toEqual(emptyBoard);
+        expect(gameView.players[0].grid).toEqual(emptyBoard);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
       });
     });
@@ -305,8 +305,8 @@ describe('game view tests', () => {
 
         publish(END_GAME);
 
-        publish(DRAW, { board: testBoard });
-        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        publish(DRAW, { grid: testBoard });
+        publish(UPDATE_PLAYER, { id: newId1, grid: testBoard });
         publish(REMOVE_PLAYER, newId1);
 
         expect(gameView.players.length).toBe(1);
