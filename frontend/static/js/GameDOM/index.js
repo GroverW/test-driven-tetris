@@ -229,7 +229,7 @@ class GameDOM extends SubscriberBase {
   /**
    * Adds game over message and updates board for player whose game is over
    * @param {number} id - player id whose game is over
-   * @param {number[][]} board - player's ending game board
+   * @param {number[][]} grid - player's ending game board
    * @param {object} message - game over message
    * @param {string} message.header - game over message header
    * @param {string[]} message.body - list of messages in body

@@ -13,13 +13,13 @@ class GameView extends SubscriberBase {
   /**
    * @constructor
    * @param {object} ctx - player canvas context
-   * @param {number[][]} board - player initial board
+   * @param {number[][]} grid - player initial board
    * @param {object} ctxNext - next piece canvas context
    * @param {number[][]} nextPieceBoard - initial next piece board
    */
-  constructor(ctx, board, ctxNext, nextPieceBoard) {
+  constructor(ctx, grid, ctxNext, nextPieceBoard) {
     super(pubSub, null);
-    this.player = new GameCanvas(ctx, board, null);
+    this.player = new GameCanvas(ctx, grid, null);
     this.nextPiece = new GameCanvas(ctxNext, nextPieceBoard, null);
     this.mapSubscriptions([DRAW, REMOVE_PLAYER, UPDATE_PLAYER]);
     this.players = [];
@@ -51,7 +51,7 @@ class GameView extends SubscriberBase {
   /**
    * Adds an additional player to the player list
    * @param {object} ctx - canvas context of player to add
-   * @param {number[][]} board - board of player to add
+   * @param {number[][]} grid - board of player to add
    * @param {number} id - id of player to add
    */
   addPlayer({ ctx, grid, id }) {
@@ -84,7 +84,7 @@ class GameView extends SubscriberBase {
   /**
    * Updates a player's board
    * @param {number} id - id of player to update
-   * @param {number[][]} board - board of player to update
+   * @param {number[][]} grid - board of player to update
    */
   [UPDATE_PLAYER]({ id, grid }) {
     const player = this.players.find((p) => p.id === id);
