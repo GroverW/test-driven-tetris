@@ -212,19 +212,19 @@ class Board {
    * @returns {number} - number of lines cleared
    */
   clearLines() {
-    let numCleared = 0;
+    const linesCleared = [];
 
-    this.grid.forEach((row, rowInd) => {
+    this.grid.forEach((row, rowIdx) => {
       if (row.every((cell) => cell > 0)) {
-        this.grid.splice(rowInd, 1);
+        this.grid.splice(rowIdx, 1);
         this.grid.unshift(Array(BOARD_WIDTH).fill(0));
-        numCleared += 1;
+        linesCleared.push(rowIdx);
       }
     });
 
-    if (numCleared > 0) this.pubSub.publish(CLEAR_LINES, numCleared);
+    if (linesCleared.length) this.pubSub.publish(CLEAR_LINES, linesCleared.length);
 
-    return numCleared;
+    return linesCleared;
   }
 
   /**
