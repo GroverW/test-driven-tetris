@@ -234,11 +234,11 @@ class GameDOM extends SubscriberBase {
    * @param {string} message.header - game over message header
    * @param {string[]} message.body - list of messages in body
    */
-  [GAME_OVER]({ id, board, message }) {
+  [GAME_OVER]({ id, grid, message }) {
     if (!message) return;
 
     if (id === this.playerId) {
-      this.gameView[UPDATE_PLAYER]({ id, board });
+      this.gameView[UPDATE_PLAYER]({ id, grid });
       addMessage(this.message, message);
       this.music.pause();
       return;
@@ -247,7 +247,7 @@ class GameDOM extends SubscriberBase {
     const player = this.players.find((p) => p.id === id);
 
     if (player) {
-      this.gameView.updatePlayer({ id, board });
+      this.gameView[UPDATE_PLAYER]({ id, grid });
       addMessage(player.message, message);
     }
   }

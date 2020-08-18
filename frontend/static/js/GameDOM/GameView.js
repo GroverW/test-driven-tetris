@@ -36,9 +36,15 @@ class GameView extends SubscriberBase {
    * @param {number[][]} [nextPiece.grid] - nextPiece grid to draw
    * @param {number} [brightness] - 0 - 4 levels of brightness
    */
-  [DRAW]({ grid, piece, nextPiece, brightness }) {
+  [DRAW]({
+    grid, piece, nextPiece, brightness,
+  }) {
     if (grid) this.player.drawGrid({ grid, brightness });
-    if (piece) this.player.drawGrid({ grid: piece.grid, x: piece.x, y: piece.y, brightness });
+    if (piece) {
+      this.player.drawGrid({
+        grid: piece.grid, x: piece.x, y: piece.y, brightness,
+      });
+    }
     if (nextPiece) this.nextPiece.clearAndDrawCentered(nextPiece.grid);
   }
 

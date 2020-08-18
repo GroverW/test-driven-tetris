@@ -104,7 +104,7 @@ describe('player tests', () => {
     p1.gameOver();
 
     expect(gameOverSpy).toHaveBeenLastCalledWith({
-      id: p1.id, board: expect.any(Array),
+      id: p1.id, grid: expect.any(Array),
     });
     expect(gameOverActionSpy).toHaveBeenCalledTimes(1);
     expect(p1.game.gameStatus).toBe(null);
