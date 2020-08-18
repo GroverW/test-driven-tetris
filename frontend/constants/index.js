@@ -1,4 +1,5 @@
 const COMMON_CONSTANTS = require('common/constants');
+const { mapColors } = require('frontend/constants/utils');
 
 const MESSAGE_TIMEOUT = 3000;
 
@@ -67,80 +68,61 @@ const ANIMATION_SPEED = {
 
 const COLOR_STEPS = 4;
 
-const adjustColors = (obj, adjAmt) => {
-  const adjustedColors = {};
-  Object.entries(obj).forEach(([type, rgb]) => {
-    let [r, g, b] = rgb;
-    r += Math.floor(255, Math.floor(((255 - r) / COLOR_STEPS) * adjAmt));
-    g += Math.floor(255, Math.floor(((255 - g) / COLOR_STEPS) * adjAmt));
-    b += Math.floor(255, Math.floor(((255 - b) / COLOR_STEPS) * adjAmt));
-    adjustedColors[type] = `rgb(${r}, ${g}, ${b})`;
-  });
-
-  return adjustedColors;
-};
-
-const mapColors = (colors) => (
-  new Array(COLOR_STEPS + 1)
-    .fill(null)
-    .map((_, i) => adjustColors(colors, i))
-);
-
 const CELL_COLORS = {
   0: mapColors({
     border: [0, 29, 62],
     highlight: [6, 6, 6],
     lowlight: [6, 6, 6],
     foreground: [6, 6, 6],
-  }),
+  }, COLOR_STEPS),
   1: mapColors({
     border: [17, 101, 140],
     highlight: [138, 216, 252],
     lowlight: [39, 148, 199],
     foreground: [99, 188, 230],
-  }),
-  2: {
+  }, COLOR_STEPS),
+  2: mapColors({
     border: [128, 105, 4],
     highlight: [242, 222, 131],
     lowlight: [196, 168, 41],
     foreground: [230, 206, 99],
-  },
-  3: {
+  }, COLOR_STEPS),
+  3: mapColors({
     border: [136, 6, 103],
     highlight: [246, 116, 213],
     lowlight: [207, 50, 168],
     foreground: [230, 78, 192],
-  },
-  4: {
+  }, COLOR_STEPS),
+  4: mapColors({
     border: [5, 128, 16],
     highlight: [106, 242, 118],
     lowlight: [48, 202, 61],
     foreground: [78, 230, 91],
-  },
-  5: {
+  }, COLOR_STEPS),
+  5: mapColors({
     border: [125, 8, 4],
     highlight: [243, 113, 109],
     lowlight: [203, 58, 53],
     foreground: [230, 83, 78],
-  },
-  6: {
+  }, COLOR_STEPS),
+  6: mapColors({
     border: [152, 91, 12],
     highlight: [245, 184, 105],
     lowlight: [222, 143, 41],
     foreground: [246, 168, 67],
-  },
-  7: {
+  }, COLOR_STEPS),
+  7: mapColors({
     border: [5, 29, 134],
     highlight: [110, 135, 246],
     lowlight: [47, 77, 208],
     foreground: [78, 106, 230],
-  },
-  8: {
+  }, COLOR_STEPS),
+  8: mapColors({
     border: [51, 51, 51],
     highlight: [187, 187, 187],
     lowlight: [153, 153, 153],
     foreground: [170, 170, 170],
-  },
+  }, COLOR_STEPS),
 };
 
 module.exports = {
