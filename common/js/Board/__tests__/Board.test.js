@@ -280,7 +280,6 @@ describe('game board tests', () => {
       expect(gameBoard.grid).toEqual(getTestBoard('clearLines3Cleared'));
       expect(clearLinesSpy.mock.results[0].value).toEqual([16, 18]);
     });
-
   });
 
   test('replace board - swaps board with new board', () => {
