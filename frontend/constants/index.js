@@ -136,5 +136,6 @@ module.exports = {
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
+  COLOR_STEPS,
   CELL_COLORS,
 };
