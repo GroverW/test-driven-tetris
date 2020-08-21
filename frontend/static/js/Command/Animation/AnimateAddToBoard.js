@@ -1,6 +1,6 @@
 const { publish } = require('frontend/helpers/pubSub');
 const { DRAW } = require('frontend/topics');
-const Command = require('.');
+const Command = require('..');
 
 class AnimateAddToBoard extends Command {
   constructor(piece) {
