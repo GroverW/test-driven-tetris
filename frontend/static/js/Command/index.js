@@ -48,9 +48,9 @@ class Command {
    * Iterates through delay list
    */
   updateDelay() {
-    if (this.type === 'toggleCommand') {
-      this.delayIdx = Math.min(this.delayList.length - 1, this.delayIdx + 1);
-    } else {
+    const currIdx = this.delayIdx;
+    this.delayIdx = Math.min(this.delayList.length - 1, currIdx + 1);
+    if (this.type !== 'toggleCommand' && currIdx === this.delayList.length - 1) {
       this.delayList[this.delayIdx] = Infinity;
     }
   }

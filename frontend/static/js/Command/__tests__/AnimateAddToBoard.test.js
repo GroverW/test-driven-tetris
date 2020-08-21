@@ -31,4 +31,12 @@ describe('Animate Add to Board tests', () => {
       piece: testPiece, brightness: expect.any(Number),
     });
   });
+
+  test('sets delay to infinite once end of animation reached', () => {
+    animate.delayList.forEach(() => {
+      expect(animate.delay).toBe(0);
+      animate.execute(0);
+    });
+    expect(animate.delay).toBe(Infinity);
+  });
 });
