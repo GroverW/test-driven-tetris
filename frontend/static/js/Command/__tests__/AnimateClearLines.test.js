@@ -1,4 +1,4 @@
-const AnimateClearLines = require('frontend/static/js/Command/AnimateClearLines');
+const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateClearLines');
 const { getTestBoard, pubSubMock } = require('frontend/mocks');
 const { COLOR_STEPS } = require('frontend/constants');
 const { DRAW } = require('frontend/topics');
@@ -21,7 +21,9 @@ describe('Animate Clear Lines tests', () => {
   });
 
   test('animation properties', () => {
-    const { grid, type, delayList, brightnessMap } = animate;
+    const {
+      grid, type, delayList, brightnessMap,
+    } = animate;
     expect([grid, type, delayList]).toEqual([expect.any(Array), 'animation', [0, 0, 0, 0]]);
     expect(brightnessMap.length).toBe(delayList.length);
   });

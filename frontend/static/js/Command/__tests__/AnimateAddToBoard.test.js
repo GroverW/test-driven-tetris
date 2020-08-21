@@ -1,4 +1,4 @@
-const AnimateAddToBoard = require('frontend/static/js/Command/AnimateAddToBoard');
+const AnimateAddToBoard = require('frontend/static/js/Command/Animation/AnimateAddToBoard');
 const { getTestPiece, pubSubMock } = require('frontend/mocks');
 const Piece = require('common/js/Piece');
 const { COLOR_STEPS } = require('frontend/constants');
@@ -22,7 +22,9 @@ describe('Animate Add to Board tests', () => {
   });
 
   test('animation properties', () => {
-    const { piece, type, delayList, brightnessMap } = animate;
+    const {
+      piece, type, delayList, brightnessMap,
+    } = animate;
     expect([piece, type, delayList]).toEqual([expect.any(Piece), 'animation', [0, 0, 0, 0, 0]]);
     expect(brightnessMap.length).toBe(delayList.length);
   });
