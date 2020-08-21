@@ -4,13 +4,19 @@ const Command = require('.');
 
 class AnimateAddToBoard extends Command {
   constructor(piece) {
-    super(null, null, [0, 0, 0, 0]);
+    super(null, null, [0, 0, 0, 0, 0]);
+    this.brightnessMap = [2, 4, 3, 2, 1];
     this.piece = piece;
     this.type = 'animation';
   }
 
+  get brightness() {
+    return this.brightnessMap[this.delayIdx];
+  }
+
   executeCallback() {
-    publish(DRAW, { piece: this.piece, brightness: 1 });
+    const { piece, brightness } = this;
+    publish(DRAW, { piece, brightness });
   }
 }
 
