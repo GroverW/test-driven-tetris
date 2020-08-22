@@ -20,8 +20,6 @@ const ADD_TO_QUEUE = 'addToQueue';
 const ADD_LOCK_DELAY = 'addLockDelay';
 const INTERRUPT_DELAY = 'interruptDelay';
 
-const CLEAR_ANIMATION = 'clearAnimation';
-
 module.exports = {
   ...COMMON_TOPICS,
   TOGGLE_MENU,
@@ -35,5 +33,4 @@ module.exports = {
   ADD_TO_QUEUE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
-  CLEAR_ANIMATION,
 };
