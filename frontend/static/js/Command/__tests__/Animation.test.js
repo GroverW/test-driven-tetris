@@ -5,7 +5,7 @@ const Command = require('frontend/static/js/Command');
 const NullCommand = require('frontend/static/js/Command/NullCommand');
 const Board = require('common/js/Board');
 const { pubSubMock } = require('frontend/mocks');
-const { CLEAR_ANIMATION } = require('frontend/topics');
+const { CLEAR_COMMAND } = require('frontend/topics');
 
 describe('Animation tests', () => {
   let animation;
@@ -26,6 +26,8 @@ describe('Animation tests', () => {
 
   test('animation properties', () => {
     expect(animation.steps.length).toBe(2);
+    expect(animation.type).toBe('animation');
+    expect(animation.key).toBe('animation');
     expect([...animation.steps]).toEqual([addToBoard, clearLines]);
   });
 
@@ -49,8 +51,8 @@ describe('Animation tests', () => {
     expect(clearLinesSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('stops executing and calls CLEAR_ANIMATION once all steps have been executed', () => {
-    const clearAnimationSpy = pubSubSpy.add(CLEAR_ANIMATION);
+  test('stops executing and calls CLEAR_COMMAND once all steps have been executed', () => {
+    const clearAnimationSpy = pubSubSpy.add(CLEAR_COMMAND);
     const addToBoardSpy = jest.spyOn(addToBoard, 'execute');
     const clearLinesSpy = jest.spyOn(clearLines, 'execute');
 

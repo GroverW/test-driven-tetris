@@ -1,9 +1,11 @@
 const NullCommand = require('frontend/static/js/Command/NullCommand');
 const { publish } = require('frontend/helpers/pubSub');
-const { CLEAR_ANIMATION } = require('frontend/topics');
+const { CLEAR_COMMAND } = require('frontend/topics');
 
 class Animation {
   constructor(...steps) {
+    this.type = 'animation';
+    this.key = 'animation';
     this.steps = steps;
     this.currStep = 0;
   }
@@ -29,7 +31,7 @@ class Animation {
 
   clearAnimation() {
     this.addStep(new NullCommand());
-    publish(CLEAR_ANIMATION);
+    publish(CLEAR_COMMAND, this.key);
   }
 }
 
