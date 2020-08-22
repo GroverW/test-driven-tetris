@@ -3,7 +3,7 @@ const {
   MAX_FLOOR_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
 } = require('common/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/topics');
-const { getEmptyBoard } = require('common/helpers/utils');
+const { getEmptyBoard, getEmptyRow } = require('common/helpers/utils');
 const Piece = require('common/js/Piece');
 const PieceList = require('common/js/PieceList');
 const { getMaxGridHeight } = require('./boardHelpers');
@@ -72,7 +72,8 @@ class Board {
    */
   drop() {
     this.addPieceToBoard();
-    this.clearLines();
+    const [newGrid, linesCleared] = this.clearLines();
+    if (linesCleared.length) this.grid = newGrid;
     this.getPieces();
   }
 
@@ -209,22 +210,22 @@ class Board {
 
   /**
    * Clears completed lines after piece added to board
-   * @returns {number} - number of lines cleared
+   * @returns {number[][], number[]} - new grid with lines removed, indices of lines removed
    */
   clearLines() {
     const linesCleared = [];
 
-    this.grid.forEach((row, rowIdx) => {
-      if (row.every((cell) => cell > 0)) {
-        this.grid.splice(rowIdx, 1);
-        this.grid.unshift(Array(BOARD_WIDTH).fill(0));
-        linesCleared.push(rowIdx);
-      }
+    const newGrid = this.grid.filter((row, rowIdx) => {
+      const keep = row.some((cell) => cell === 0);
+      if (!keep) linesCleared.push(rowIdx);
+      return keep;
     });
+
+    linesCleared.forEach(() => newGrid.unshift(getEmptyRow()));
 
     if (linesCleared.length) this.pubSub.publish(CLEAR_LINES, linesCleared.length);
 
-    return linesCleared;
+    return [newGrid, linesCleared];
   }
 
   /**
