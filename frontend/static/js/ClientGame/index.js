@@ -44,7 +44,7 @@ class ClientGame extends Game {
     this.mapSubscriptions([
       START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE,
     ]);
-    this.mapCommands();
+    this.commands = getCommandList(this);
   }
 
   /**
@@ -104,13 +104,6 @@ class ClientGame extends Game {
     this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => (this.players[i - 1] ? `PLAYER${this.players[i - 1]}` : false));
 
     this.playerTargets[PLAYER_KEYS[0]] = `PLAYER${this.playerId}`;
-  }
-
-  /**
-   * Maps keyboard commands to ClientGame commands
-   */
-  mapCommands() {
-    this.commands = getCommandList(this);
   }
 
   movement(boardKey, controlKey, ...args) {
