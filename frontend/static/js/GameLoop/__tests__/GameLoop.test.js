@@ -1,5 +1,8 @@
 const gameLoop = require('frontend/static/js/GameLoop');
 const Command = require('frontend/static/js/Command');
+const Animation = require('frontend/static/js/Command/Animation');
+const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateClearLines');
+const NullCommand = require('frontend/static/js/Command/NullCommand');
 const { publish } = require('frontend/helpers/pubSub');
 const { mockAnimation, mockCancelAnimation } = require('frontend/mocks');
 const {
@@ -111,6 +114,36 @@ describe('Game Loop tests', () => {
       jest.advanceTimersByTime(1000);
 
       expect(testCallback).toHaveBeenCalledTimes(1);
+    });
+
+    test('should only call animation command if present', () => {
+      const animation = new Animation(new NullCommand());
+      const animationSpy = jest.spyOn(animation, 'execute');
+
+      gameLoop[SET_COMMAND](animation);
+      gameLoop[SET_COMMAND](testCommand);
+      gameLoop[SET_COMMAND](testToggleCommand);
+      gameLoop[SET_AUTO_COMMAND](testAutoCommand);
+
+      gameLoop[START_GAME]();
+      jest.advanceTimersByTime(1000);
+
+      expect(animationSpy).toHaveBeenCalledTimes(11);
+      expect(testCallback).toHaveBeenCalledTimes(0);
+      expect(testToggleCallback).toHaveBeenCalledTimes(0);
+      expect(testAutoCallback).toHaveBeenCalledTimes(0);
+    });
+
+    test('should clear animation command when finished', () => {
+      const animation = new Animation(new AnimateClearLines());
+      const animationSpy = jest.spyOn(animation, 'execute');
+
+      gameLoop[SET_COMMAND](animation);
+      gameLoop[START_GAME]();
+      jest.advanceTimersByTime(400);
+
+      expect(animationSpy).toHaveBeenCalledTimes(4);
+      expect(gameLoop.animation).toBe(undefined);
     });
 
     test('cancel animation', () => {
