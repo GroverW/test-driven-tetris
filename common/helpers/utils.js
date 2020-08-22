@@ -38,10 +38,16 @@ const randomizedBuckets = (arr, numBuckets) => {
 };
 
 /**
+ * Returns a blank board row
+ * @returns {number[]}
+ */
+const getEmptyRow = () => new Array(BOARD_WIDTH).fill(0);
+
+/**
  * Returns a new, empty board
  */
 const getEmptyBoard = () => (
-  new Array(BOARD_HEIGHT).fill(null).map(() => new Array(BOARD_WIDTH).fill(0))
+  new Array(BOARD_HEIGHT).fill(null).map(() => getEmptyRow())
 );
 
 /**
@@ -73,6 +79,7 @@ module.exports = {
   randomize,
   randomizedBuckets,
   getEmptyBoard,
+  getEmptyRow,
   mapArrayToObj,
   formatMessage,
 };

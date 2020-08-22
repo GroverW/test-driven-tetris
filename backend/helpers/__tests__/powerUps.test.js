@@ -1,7 +1,7 @@
 const { getTestBoard } = require('common/mocks');
 const {
   getFilledRow,
-  getBlankRow,
+  getEmptyRow,
   swapLines,
   swapBoards,
   scrambleBoard,
@@ -24,7 +24,7 @@ describe('power ups', () => {
   });
 
   test('get blank row', () => {
-    const testRow = getBlankRow();
+    const testRow = getEmptyRow();
     const expectedRow = new Array(BOARD_WIDTH).fill(0);
 
     expect(testRow).toEqual(expectedRow);
