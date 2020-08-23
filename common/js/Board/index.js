@@ -29,9 +29,7 @@ class Board {
    * Sets the current and next pieces
    */
   getPieces() {
-    this.piece = this.nextPiece
-      ? this.nextPiece
-      : new Piece(this.pieceList.getNextPiece());
+    this.piece = this.nextPiece || new Piece(this.pieceList.getNextPiece());
 
     // Game Over condition. If a new piece cannot be set because it's blocked
     if (!this.validMove(0, 0)) {
@@ -73,7 +71,7 @@ class Board {
   drop() {
     this.addPieceToBoard();
     const [newGrid, linesCleared] = this.clearLines();
-    if (linesCleared.length) this.grid = newGrid;
+    if (linesCleared.length) this.setGrid(newGrid);
     this.getPieces();
   }
 
@@ -245,6 +243,10 @@ class Board {
       this.movePiece(0, yMove, 0);
     }
 
+    this.setGrid(newGrid);
+  }
+
+  setGrid(newGrid) {
     this.grid = newGrid;
   }
 
