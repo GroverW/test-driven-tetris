@@ -174,6 +174,7 @@ const PIECES = {
       [7, 7, 0],
     ],
   ],
+  E: new Array(4).fill(null).map(() => []),
 };
 const SEED_PIECES = [
   1, 2, 3, 4, 5, 6, 7,
