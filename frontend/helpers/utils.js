@@ -4,6 +4,8 @@ const { ADD_MESSAGE, MSG_TYPE } = require('frontend/topics');
 
 const getNextPieceBoard = () => new Array(4).fill(null).map(() => new Array(4).fill(0));
 
+const filterGrid = (grid, lines) => grid.map((row, idx) => (lines.includes(idx) ? row : []));
+
 /**
  * Creates an object containing new player information
  * @param {object} ctx - player canvas context
@@ -34,6 +36,7 @@ const publishError = (message) => (
 module.exports = {
   ...commonUtils,
   getNextPieceBoard,
+  filterGrid,
   getNewPlayer,
   getNewPlayerDOM,
   publishError,
