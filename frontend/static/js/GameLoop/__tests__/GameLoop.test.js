@@ -140,9 +140,9 @@ describe('Game Loop tests', () => {
 
       gameLoop[SET_COMMAND](animation);
       gameLoop[START_GAME]();
-      jest.advanceTimersByTime(400);
+      jest.advanceTimersByTime(300);
 
-      expect(animationSpy).toHaveBeenCalledTimes(4);
+      expect(animationSpy).toHaveBeenCalledTimes(3);
       expect(gameLoop.animation).toBe(undefined);
     });
 
