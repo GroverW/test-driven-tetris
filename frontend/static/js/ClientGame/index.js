@@ -20,11 +20,13 @@ const {
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
   ADD_TO_QUEUE,
+  CLEAR_QUEUE,
 } = require('frontend/topics');
 
 const { getCommandList } = require('frontend/static/js/Command/getCommandList');
 const ClientBoard = require('./ClientBoard');
 const Gravity = require('./Gravity');
+
 
 /**
  * Represents a client-side Tetris game
@@ -42,7 +44,7 @@ class ClientGame extends Game {
     this.playerTargets = {};
     this.commandQueue = [];
     this.mapSubscriptions([
-      START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE,
+      START_GAME, BOARD_CHANGE, UPDATE_PLAYER, ADD_PLAYER, REMOVE_PLAYER, ADD_TO_QUEUE, CLEAR_QUEUE,
     ]);
     this.commands = getCommandList(this);
   }
@@ -101,7 +103,7 @@ class ClientGame extends Game {
    * Maps keyboard controls to actual player ids
    */
   mapPlayerTargets() {
-    this.playerTargets = mapArrayToObj(PLAYER_KEYS, (p, i) => (this.players[i - 1] ? `PLAYER${this.players[i - 1]}` : false));
+    this.playerTargets = mapArrayToObj(PLAYER_KEYS, (_, i) => (this.players[i - 1] ? `PLAYER${this.players[i - 1]}` : false));
 
     this.playerTargets[PLAYER_KEYS[0]] = `PLAYER${this.playerId}`;
   }
@@ -149,6 +151,10 @@ class ClientGame extends Game {
     }
   }
 
+  [CLEAR_QUEUE]() {
+    this.commandQueue = [];
+  }
+
   /**
    * Sends current command queue to backend.
    */
@@ -158,7 +164,7 @@ class ClientGame extends Game {
       data: this.commandQueue,
     });
 
-    this.commandQueue = [];
+    this[CLEAR_QUEUE]();
   }
 
   /**

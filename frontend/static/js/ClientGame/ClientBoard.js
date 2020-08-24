@@ -5,7 +5,7 @@ const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateC
 const Command = require('frontend/static/js/Command');
 const { filterGrid } = require('frontend/helpers/utils');
 const { POINTS } = require('frontend/constants');
-const { DRAW, BOARD_CHANGE, SET_COMMAND } = require('frontend/topics');
+const { DRAW, BOARD_CHANGE, SET_COMMAND, CLEAR_QUEUE } = require('frontend/topics');
 
 /**
  * Represents a client-side game board
@@ -19,6 +19,11 @@ class ClientBoard extends Board {
    * @param {number} multiplier - Points multiplier based on type of movement
    * @returns {boolean} - Whether or not the move was valid.
    */
+  getPieces() {
+    super.getPieces();
+    this.pubSub.publish(CLEAR_QUEUE);
+  }
+
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if (super.movePiece(x, y, multiplier)) {
       if (multiplier < POINTS.HARD_DROP) {

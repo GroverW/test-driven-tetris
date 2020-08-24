@@ -14,6 +14,7 @@ const {
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
+  CLEAR_QUEUE,
 } = require('frontend/topics');
 const {
   pubSubMock,
@@ -201,6 +202,19 @@ describe('client game tests', () => {
 
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(2);
+    });
+
+    test('resets command queue', () => {
+      game[START_GAME]();
+      gameLoop[START_GAME]();
+
+      runCommands(game, CONTROLS.ROTATE_LEFT, CONTROLS.LEFT, CONTROLS.RIGHT);
+
+      expect(game.commandQueue.length).toBe(3);
+
+      game[CLEAR_QUEUE]();
+
+      expect(game.commandQueue.length).toBe(0);
     });
   });
 
