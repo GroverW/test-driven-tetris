@@ -43,7 +43,8 @@ describe('client game tests', () => {
   });
 
   afterEach(() => {
-    clearMocksAndUnsubscribe(pubSubSpy, game, gameLoop);
+    clearMocksAndUnsubscribe(pubSubSpy, game);
+    gameLoop.gameOverAction();
   });
 
   describe('basic tests', () => {
@@ -113,6 +114,8 @@ describe('client game tests', () => {
 
       test('does not run commands after game over', () => {
         game[START_GAME]();
+        gameLoop[START_GAME]();
+        gameLoop.autoCommand = undefined;
         game.board.piece = getTestPiece('O');
         const gameOverSpy = pubSubSpy.add(GAME_OVER);
         const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
@@ -178,6 +181,7 @@ describe('client game tests', () => {
       game.unsubscribe();
       game = getNewTestGame('I', p2, p4);
       game[START_GAME]();
+      gameLoop[START_GAME]();
       gameLoop.autoCommand = undefined;
 
       runCommands(game, CONTROLS.LEFT, CONTROLS.RIGHT, CONTROLS.DOWN, CONTROLS.ROTATE_LEFT);
@@ -187,6 +191,7 @@ describe('client game tests', () => {
 
     test('send commands', () => {
       game[START_GAME]();
+      gameLoop[START_GAME]();
       const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
 
       expect(game.commandQueue.length).toBe(0);
@@ -204,6 +209,7 @@ describe('client game tests', () => {
       game.addPlayer(p2);
       game.addPlayer(p4);
       game[START_GAME]();
+      gameLoop[START_GAME]();
     });
 
     test('adds to command queue', () => {
