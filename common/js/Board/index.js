@@ -70,9 +70,13 @@ class Board {
    */
   drop() {
     this.addPieceToBoard();
-    const [newGrid, linesCleared] = this.clearLines();
-    if (linesCleared.length) this.setGrid(newGrid);
+    this.clearLines();
+    this.updateBoardState();
     this.getPieces();
+  }
+
+  updateBoardState(newGrid) {
+    this.grid = newGrid || this.nextGrid;
   }
 
   /**
@@ -213,17 +217,17 @@ class Board {
   clearLines() {
     const linesCleared = [];
 
-    const newGrid = this.grid.filter((row, rowIdx) => {
+    this.nextGrid = this.grid.filter((row, rowIdx) => {
       const keep = row.some((cell) => cell === 0);
       if (!keep) linesCleared.push(rowIdx);
       return keep;
     });
 
-    linesCleared.forEach(() => newGrid.unshift(getEmptyRow()));
+    linesCleared.forEach(() => this.nextGrid.unshift(getEmptyRow()));
 
     if (linesCleared.length) this.pubSub.publish(CLEAR_LINES, linesCleared.length);
 
-    return [newGrid, linesCleared];
+    return linesCleared;
   }
 
   /**
@@ -243,11 +247,7 @@ class Board {
       this.movePiece(0, yMove, 0);
     }
 
-    this.setGrid(newGrid);
-  }
-
-  setGrid(newGrid) {
-    this.grid = newGrid;
+    this.updateBoardState(newGrid);
   }
 
   /**

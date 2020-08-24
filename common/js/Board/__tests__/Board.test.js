@@ -230,7 +230,7 @@ describe('game board tests', () => {
       expect([p2.x, p2.y]).toEqual([0, 0]);
     });
 
-    test('gets new piece on drop', () => {
+    test('gets new pieces', () => {
       gameBoard.getPieces();
 
       const currPiece = gameBoard.piece;
@@ -244,8 +244,8 @@ describe('game board tests', () => {
     });
   });
 
-  describe('clear lines', () => {
-    test('clears single line and returns new grid and lines cleared', () => {
+  describe('update board state', () => {
+    test('clears single line and returns lines cleared', () => {
       const clearLinesSpy = jest.spyOn(gameBoard, 'clearLines');
       gameBoard.grid = getTestBoard('clearLines1');
       gameBoard.piece = p1;
@@ -253,10 +253,10 @@ describe('game board tests', () => {
       gameBoard.hardDrop();
 
       expect(gameBoard.grid).toEqual(getTestBoard('clearLines1Cleared'));
-      expect(clearLinesSpy.mock.results[0].value).toEqual([gameBoard.grid, [19]]);
+      expect(clearLinesSpy.mock.results[0].value).toEqual([19]);
     });
 
-    test('clears multiple lines and returns new grid and lines cleared', () => {
+    test('clears multiple lines and returns lines cleared', () => {
       const clearLinesSpy = jest.spyOn(gameBoard, 'clearLines');
       gameBoard.grid = getTestBoard('clearLines2');
       gameBoard.piece = p1;
@@ -265,10 +265,10 @@ describe('game board tests', () => {
       gameBoard.hardDrop();
 
       expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
-      expect(clearLinesSpy.mock.results[0].value).toEqual([gameBoard.grid, [17, 18, 19]]);
+      expect(clearLinesSpy.mock.results[0].value).toEqual([17, 18, 19]);
     });
 
-    test('clears non-consecutive lines and returns new grid and lines cleared', () => {
+    test('clears non-consecutive lines and returns lines cleared', () => {
       const clearLinesSpy = jest.spyOn(gameBoard, 'clearLines');
       gameBoard.grid = getTestBoard('clearLines3');
       gameBoard.piece = p5;
@@ -278,7 +278,7 @@ describe('game board tests', () => {
       gameBoard.hardDrop();
 
       expect(gameBoard.grid).toEqual(getTestBoard('clearLines3Cleared'));
-      expect(clearLinesSpy.mock.results[0].value).toEqual([gameBoard.grid, [16, 18]]);
+      expect(clearLinesSpy.mock.results[0].value).toEqual([16, 18]);
     });
   });
 
