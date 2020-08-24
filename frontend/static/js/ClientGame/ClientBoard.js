@@ -30,8 +30,8 @@ class ClientBoard extends Board {
   drop() {
     this.addPieceToBoard();
     this.publishBoardUpdate();
+
     const animation = new Animation(new AnimateAddToBoard(this.piece));
-    this.removePiece();
     const linesCleared = this.clearLines();
 
     if (linesCleared.length) {
