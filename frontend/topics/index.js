@@ -16,6 +16,7 @@ const SET_AUTO_COMMAND = 'setAutoCommand';
 const CLEAR_COMMAND = 'clearCommand';
 
 const ADD_TO_QUEUE = 'addToQueue';
+const CLEAR_QUEUE = 'clearQueue';
 
 const ADD_LOCK_DELAY = 'addLockDelay';
 const INTERRUPT_DELAY = 'interruptDelay';
@@ -31,6 +32,7 @@ module.exports = {
   SET_AUTO_COMMAND,
   CLEAR_COMMAND,
   ADD_TO_QUEUE,
+  CLEAR_QUEUE,
   ADD_LOCK_DELAY,
   INTERRUPT_DELAY,
 };
