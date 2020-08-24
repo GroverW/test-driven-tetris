@@ -24,7 +24,7 @@ describe('Animate Clear Lines tests', () => {
     const {
       grid, type, delayList, brightnessMap,
     } = animate;
-    expect([grid, type, delayList]).toEqual([expect.any(Array), 'animation', [0, 0, 0, 0]]);
+    expect([grid, type, delayList]).toEqual([expect.any(Array), 'animation', [0, 0, 0]]);
     expect(brightnessMap.length).toBe(delayList.length);
   });
 

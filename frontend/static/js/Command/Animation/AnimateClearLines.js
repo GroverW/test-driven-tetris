@@ -4,8 +4,8 @@ const Command = require('..');
 
 class AnimateClearLines extends Command {
   constructor(grid) {
-    super(null, null, [0, 0, 0, 0]);
-    this.brightnessMap = [1, 2, 3, 4];
+    super(null, null, [0, 0, 0]);
+    this.brightnessMap = [1, 2, 4];
     this.grid = grid;
     this.type = 'animation';
   }
