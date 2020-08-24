@@ -1,9 +1,14 @@
 const ClientBoard = require('frontend/static/js/ClientGame/ClientBoard');
+const gameLoop = require('frontend/static/js/GameLoop');
+const Animation = require('frontend/static/js/Command/Animation');
+const AnimateAddToBoard = require('frontend/static/js/Command/Animation/AnimateAddToBoard');
+const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateClearLines');
+const Command = require('frontend/static/js/Command');
 const { ROTATE_LEFT } = require('frontend/constants');
-const { DRAW, CLEAR_LINES, BOARD_CHANGE } = require('frontend/topics');
+const { DRAW, CLEAR_LINES, BOARD_CHANGE, START_GAME, SET_COMMAND } = require('frontend/topics');
 const {
-  getTestBoard, getTestPiece, getTestPieces, pubSubMock,
-} = require('common/mocks');
+  getTestBoard, getTestPiece, getTestPieces, pubSubMock, mockAnimation, mockCancelAnimation,
+} = require('frontend/mocks');
 const pubSub = require('frontend/helpers/pubSub');
 
 describe('client - game board tests', () => {
@@ -35,22 +40,87 @@ describe('client - game board tests', () => {
     expect(drawSpy).toHaveBeenCalledTimes(2);
   });
 
-  test('publish board updates on line clear', () => {
-    const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
-    const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
+  describe('drop piece', () => {
+    let setCommandSpy;
 
-    gameBoard.grid = getTestBoard('clearLines2');
+    beforeEach(() => {
+      setCommandSpy = pubSubSpy.add(SET_COMMAND);
+      gameBoard.nextPiece = getTestPiece('O');
+      gameLoop.initialize(1);
+      jest.useFakeTimers();
+      requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
+      cancelAnimationFrame = jest.fn().mockImplementation(mockCancelAnimation);
+      gameLoop[START_GAME]();
+    });
 
-    gameBoard.rotatePiece(ROTATE_LEFT);
-    gameBoard.hardDrop();
+    afterEach(() => {
+      jest.clearAllMocks();
+      gameLoop.gameOverAction();
+    });
 
-    expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
+    test('adds piece to board, sends AnimateAddToBoard and getPieces to gameLoop', () => {
+      const addToBoardSpy = jest.spyOn(gameBoard, 'addPieceToBoard');
 
-    // 1 for adding piece to board
-    // 1 for clearing lines
-    expect(clearLinesSpy).toHaveBeenCalledTimes(1);
-    expect(boardChangeSpy).toHaveBeenCalledTimes(1);
+      gameBoard.hardDrop();
+
+      expect(addToBoardSpy).toHaveBeenCalledTimes(1);
+      expect(setCommandSpy).toHaveBeenLastCalledWith(expect.any(Animation));
+      expect(gameLoop.animation.steps).toEqual(
+        [expect.any(AnimateAddToBoard), expect.any(Command), expect.any(Command)],
+      );
+      expect(gameBoard.piece).toEqual(getTestPiece('E'));
+
+      jest.advanceTimersByTime(1000);
+
+      expect(gameBoard.piece).toEqual(getTestPiece('O'));
+      expect(gameLoop.animation).toBe(undefined);
+    });
+
+    test('also clears lines and replaces board when lines are cleaared', () => {
+      const addToBoardSpy = jest.spyOn(gameBoard, 'addPieceToBoard');
+      const updateBoardStateSpy = jest.spyOn(gameBoard, 'updateBoardState');
+
+      gameBoard.grid = getTestBoard('clearLines2');
+      gameBoard.rotatePiece(ROTATE_LEFT);
+      gameBoard.hardDrop();
+
+      expect(addToBoardSpy).toHaveBeenCalledTimes(1);
+      expect(updateBoardStateSpy).toHaveBeenCalledTimes(0);
+      expect(setCommandSpy).toHaveBeenLastCalledWith(expect.any(Animation));
+      expect(gameLoop.animation.steps).toEqual([
+        expect.any(AnimateAddToBoard),
+        expect.any(AnimateClearLines),
+        expect.any(Command),
+        expect.any(Command),
+        expect.any(Command),
+      ]);
+      expect(gameBoard.piece).toEqual(getTestPiece('E'));
+
+      jest.advanceTimersByTime(2000);
+
+      expect(updateBoardStateSpy).toHaveBeenCalledTimes(1);
+      expect(gameBoard.piece).toEqual(getTestPiece('O'));
+      expect(gameLoop.animation).toBe(undefined);
+      expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
+    });
   });
+
+  // test('publish board updates on line clear', () => {
+  //   const clearLinesSpy = pubSubSpy.add(CLEAR_LINES);
+  //   const boardChangeSpy = pubSubSpy.add(BOARD_CHANGE);
+
+  //   gameBoard.grid = getTestBoard('clearLines2');
+
+  //   gameBoard.rotatePiece(ROTATE_LEFT);
+  //   gameBoard.hardDrop();
+
+  //   expect(gameBoard.grid).toEqual(getTestBoard('clearLines2Cleared3'));
+
+  //   // 1 for adding piece to board
+  //   // 1 for clearing lines
+  //   expect(clearLinesSpy).toHaveBeenCalledTimes(1);
+  //   expect(boardChangeSpy).toHaveBeenCalledTimes(1);
+  // });
 
   test('publish boards updates when board gets replaced', () => {
     const newBoard = getTestBoard('pattern3');

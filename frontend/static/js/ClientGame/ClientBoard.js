@@ -1,6 +1,11 @@
 const Board = require('common/js/Board');
+const Animation = require('frontend/static/js/Command/Animation');
+const AnimateAddToBoard = require('frontend/static/js/Command/Animation/AnimateAddToBoard');
+const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateClearLines');
+const Command = require('frontend/static/js/Command');
+const { filterGrid } = require('frontend/helpers/utils');
 const { POINTS } = require('frontend/constants');
-const { DRAW, BOARD_CHANGE } = require('frontend/topics');
+const { DRAW, BOARD_CHANGE, SET_COMMAND } = require('frontend/topics');
 
 /**
  * Represents a client-side game board
@@ -17,14 +22,26 @@ class ClientBoard extends Board {
   movePiece(x, y, multiplier = POINTS.DOWN) {
     if (super.movePiece(x, y, multiplier)) {
       if (multiplier < POINTS.HARD_DROP) {
-        this.publishDraw(this.grid, this.piece);
+        this.publishDraw();
       }
     }
   }
 
   drop() {
-    super.drop();
+    this.addPieceToBoard();
     this.publishBoardUpdate();
+    const animation = new Animation(new AnimateAddToBoard(this.piece));
+    this.removePiece();
+    const linesCleared = this.clearLines();
+
+    if (linesCleared.length) {
+      animation.addStep(new AnimateClearLines(filterGrid(this.grid, linesCleared)));
+      animation.addStep(new Command(null, this.updateBoardState.bind(this)));
+    }
+    animation.addStep(new Command(null, this.getPieces.bind(this)));
+    animation.addStep(new Command(null, this.publishDraw.bind(this)));
+
+    this.pubSub.publish(SET_COMMAND, animation);
   }
 
   /**
@@ -59,7 +76,8 @@ class ClientBoard extends Board {
     this.publishDraw(this.grid, this.piece, this.nextPiece);
   }
 
-  publishDraw(grid, piece, nextPiece) {
+  publishDraw() {
+    const { grid, piece, nextPiece } = this
     this.pubSub.publish(DRAW, { grid, piece, nextPiece });
   }
 }
