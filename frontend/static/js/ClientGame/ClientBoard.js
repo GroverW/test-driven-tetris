@@ -5,7 +5,9 @@ const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateC
 const Command = require('frontend/static/js/Command');
 const { filterGrid } = require('frontend/helpers/utils');
 const { POINTS } = require('frontend/constants');
-const { DRAW, BOARD_CHANGE, SET_COMMAND, CLEAR_QUEUE } = require('frontend/topics');
+const {
+  DRAW, BOARD_CHANGE, SET_COMMAND, CLEAR_QUEUE,
+} = require('frontend/topics');
 
 /**
  * Represents a client-side game board
@@ -80,7 +82,7 @@ class ClientBoard extends Board {
   }
 
   publishDraw() {
-    const { grid, piece, nextPiece } = this
+    const { grid, piece, nextPiece } = this;
     this.pubSub.publish(DRAW, { grid, piece, nextPiece });
   }
 }

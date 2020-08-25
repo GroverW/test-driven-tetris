@@ -5,7 +5,9 @@ const AnimateAddToBoard = require('frontend/static/js/Command/Animation/AnimateA
 const AnimateClearLines = require('frontend/static/js/Command/Animation/AnimateClearLines');
 const Command = require('frontend/static/js/Command');
 const { ROTATE_LEFT } = require('frontend/constants');
-const { DRAW, START_GAME, SET_COMMAND, CLEAR_QUEUE } = require('frontend/topics');
+const {
+  DRAW, START_GAME, SET_COMMAND, CLEAR_QUEUE,
+} = require('frontend/topics');
 const {
   getTestBoard, getTestPiece, getTestPieces, pubSubMock, mockAnimation, mockCancelAnimation,
 } = require('frontend/mocks');

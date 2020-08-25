@@ -27,7 +27,6 @@ const { getCommandList } = require('frontend/static/js/Command/getCommandList');
 const ClientBoard = require('./ClientBoard');
 const Gravity = require('./Gravity');
 
-
 /**
  * Represents a client-side Tetris game
  * @extends Game
