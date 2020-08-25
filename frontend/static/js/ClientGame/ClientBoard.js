@@ -55,8 +55,7 @@ class ClientBoard extends Board {
    */
   rotatePiece(direction) {
     super.rotatePiece(direction);
-
-    this.publishDraw(this.grid, this.piece);
+    this.publishDraw();
   }
 
   /**
@@ -65,7 +64,7 @@ class ClientBoard extends Board {
    */
   replaceBoard(newGrid) {
     super.replaceBoard(newGrid);
-    this.publishDraw(this.grid, this.piece);
+    this.publishDraw();
   }
 
   isPieceAtLowestPoint() {
@@ -77,8 +76,7 @@ class ClientBoard extends Board {
    */
   publishBoardUpdate() {
     this.pubSub.publish(BOARD_CHANGE);
-
-    this.publishDraw(this.grid, this.piece, this.nextPiece);
+    this.publishDraw();
   }
 
   publishDraw() {
