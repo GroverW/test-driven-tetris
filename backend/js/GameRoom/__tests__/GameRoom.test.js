@@ -91,12 +91,14 @@ describe('game room tests', () => {
       test('syncs players', () => {
         const sendAllSpy = jest.spyOn(gameRoom.manager.msg, 'sendAll');
         const addOtherPlayersToSpy = jest.spyOn(gameRoom.manager.msg, 'addOtherPlayersTo');
+        const updatePlayersWaitingSpy = jest.spyOn(gameRoom.manager, 'updatePlayersWaiting');
 
         gameRoom.players.add(p2);
         gameRoom.syncPlayersWith(p2);
 
         expect(sendAllSpy).toHaveBeenLastCalledWith({ type: ADD_PLAYER, data: p2.id });
         expect(addOtherPlayersToSpy).toHaveBeenLastCalledWith(p2);
+        expect(updatePlayersWaitingSpy).toHaveBeenCalledTimes(1);
       });
 
       test('joining room sets attributes, adds subs, syncs players and returns true', () => {
