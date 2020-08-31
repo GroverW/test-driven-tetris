@@ -146,14 +146,34 @@ describe('game manager tests', () => {
         expect(animateStartSpy).toHaveBeenCalledTimes(1);
       });
 
-      test('sends waiting message if start conditions not met', () => {
-        const sendWaitingMessageSpy = jest.spyOn(gameManager.msg, 'sendWaitingMessage');
+      describe('waiting message', () => {
+        test('sends waiting message if start conditions not met', () => {
+          const sendWaitingMessageSpy = jest.spyOn(gameManager.msg, 'sendWaitingMessage');
 
-        p1.readyToPlay = true;
+          p1.readyToPlay = true;
 
-        gameManager.playerReady();
+          gameManager.playerReady();
 
-        expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(1, gameManager.id);
+          expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(1, gameManager.id);
+        });
+
+        test('sends correct number of players', () => {
+          const sendWaitingMessageSpy = jest.spyOn(gameManager.msg, 'sendWaitingMessage');
+          playerManager.add(new Player(mockSend(), pubSub()));
+
+          p1.readyToPlay = true;
+          p2.readyToPlay = true;
+
+          gameManager.playerReady();
+
+          expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(2, gameManager.id);
+
+          playerManager.remove(p2);
+
+          gameManager.playerReady();
+
+          expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(1, gameManager.id);
+        });
       });
     });
   });
