@@ -103,8 +103,8 @@ describe('websocket tests', () => {
 
       expect(syncPlayersSpy).toHaveBeenCalledTimes(1);
       // player joining should receive all other players in game
-      // 1 call for sendAll, 1 to send p1 info to p2
-      expect(sendSpy).toHaveBeenCalledTimes(2);
+      // 1 call for sendAll, 1 to send p1 info to p2, 1 to update players waiting message
+      expect(sendSpy).toHaveBeenCalledTimes(3);
     });
 
     test('second player is removed from room', () => {
