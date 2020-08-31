@@ -110,20 +110,20 @@ class GameManager {
     }
   }
 
-  updatePlayerBoard(player, board) {
+  updatePlayerBoard(player, grid) {
     const { id } = player;
-    player.game.board.replaceBoard(board);
-    this.msg.sendPlayerUpdate({ id, board });
+    player.game.board.replaceBoard(grid);
+    this.msg.sendPlayerUpdate({ id, grid });
   }
 
   getNextRanking(id = null) {
     return this.players.list.filter((p) => (p.game.gameStatus || p.id === id)).length;
   }
 
-  gameOver({ id, board }) {
+  gameOver({ id, grid }) {
     const ranking = this.getNextRanking(id);
 
-    this.msg.sendGameOverMessage(id, board, ranking);
+    this.msg.sendGameOverMessage(id, grid, ranking);
 
     this.checkIfWinnerAndEndGame();
   }

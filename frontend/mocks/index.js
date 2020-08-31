@@ -1,5 +1,6 @@
 const commonMocks = require('common/mocks');
 const ClientGame = require('frontend/static/js/ClientGame');
+const gameLoop = require('frontend/static/js/GameLoop');
 
 // time in ms for one requestAnimationFrame call
 const GAME_TIME_INTERVAL = 100;
@@ -130,6 +131,7 @@ const runCommands = (game, ...commands) => {
     game.command(command, 'down');
     jest.advanceTimersByTime(GAME_TIME_INTERVAL);
     game.command(command, 'up');
+    while (gameLoop.animation) jest.advanceTimersByTime(GAME_TIME_INTERVAL);
   });
 };
 

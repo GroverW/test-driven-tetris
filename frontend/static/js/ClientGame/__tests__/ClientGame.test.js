@@ -14,6 +14,7 @@ const {
   SEND_MESSAGE,
   SET_COMMAND,
   CLEAR_COMMAND,
+  CLEAR_QUEUE,
 } = require('frontend/topics');
 const {
   pubSubMock,
@@ -43,7 +44,8 @@ describe('client game tests', () => {
   });
 
   afterEach(() => {
-    clearMocksAndUnsubscribe(pubSubSpy, game, gameLoop);
+    clearMocksAndUnsubscribe(pubSubSpy, game);
+    gameLoop.gameOverAction();
   });
 
   describe('basic tests', () => {
@@ -113,6 +115,8 @@ describe('client game tests', () => {
 
       test('does not run commands after game over', () => {
         game[START_GAME]();
+        gameLoop[START_GAME]();
+        gameLoop.autoCommand = undefined;
         game.board.piece = getTestPiece('O');
         const gameOverSpy = pubSubSpy.add(GAME_OVER);
         const boardMoveSpy = jest.spyOn(game.board, 'movePiece');
@@ -178,6 +182,7 @@ describe('client game tests', () => {
       game.unsubscribe();
       game = getNewTestGame('I', p2, p4);
       game[START_GAME]();
+      gameLoop[START_GAME]();
       gameLoop.autoCommand = undefined;
 
       runCommands(game, CONTROLS.LEFT, CONTROLS.RIGHT, CONTROLS.DOWN, CONTROLS.ROTATE_LEFT);
@@ -187,6 +192,7 @@ describe('client game tests', () => {
 
     test('send commands', () => {
       game[START_GAME]();
+      gameLoop[START_GAME]();
       const sendMessageSpy = pubSubSpy.add(SEND_MESSAGE);
 
       expect(game.commandQueue.length).toBe(0);
@@ -197,6 +203,19 @@ describe('client game tests', () => {
       expect(game.commandQueue.length).toBe(0);
       expect(sendMessageSpy).toHaveBeenCalledTimes(2);
     });
+
+    test('resets command queue', () => {
+      game[START_GAME]();
+      gameLoop[START_GAME]();
+
+      runCommands(game, CONTROLS.ROTATE_LEFT, CONTROLS.LEFT, CONTROLS.RIGHT);
+
+      expect(game.commandQueue.length).toBe(3);
+
+      game[CLEAR_QUEUE]();
+
+      expect(game.commandQueue.length).toBe(0);
+    });
   });
 
   describe('power ups', () => {
@@ -204,6 +223,7 @@ describe('client game tests', () => {
       game.addPlayer(p2);
       game.addPlayer(p4);
       game[START_GAME]();
+      gameLoop[START_GAME]();
     });
 
     test('adds to command queue', () => {
@@ -324,7 +344,7 @@ describe('client game tests', () => {
 
         expect(game.board.grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: 1, board: newBoard });
+        publish(UPDATE_PLAYER, { id: 1, grid: newBoard });
 
         expect(game.board.grid).toEqual(newBoard);
       });
@@ -335,7 +355,7 @@ describe('client game tests', () => {
 
         expect(game.board.grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: p2, board: newBoard });
+        publish(UPDATE_PLAYER, { id: p2, grid: newBoard });
 
         expect(game.board.grid).toEqual(emptyBoard);
       });

@@ -3,7 +3,7 @@ const {
   MAX_FLOOR_KICKS, WALL_KICK_TESTS, WALL_KICK_TESTS_I,
 } = require('common/constants');
 const { GAME_OVER, LOWER_PIECE, CLEAR_LINES } = require('common/topics');
-const { getEmptyBoard } = require('common/helpers/utils');
+const { getEmptyBoard, getEmptyRow } = require('common/helpers/utils');
 const Piece = require('common/js/Piece');
 const PieceList = require('common/js/PieceList');
 const { getMaxGridHeight } = require('./boardHelpers');
@@ -29,15 +29,13 @@ class Board {
    * Sets the current and next pieces
    */
   getPieces() {
-    this.piece = this.nextPiece
-      ? this.nextPiece
-      : new Piece(this.pieceList.getNextPiece());
+    this.piece = this.nextPiece || new Piece(this.pieceList.getNextPiece());
 
     // Game Over condition. If a new piece cannot be set because it's blocked
     if (!this.validMove(0, 0)) {
       this.pubSub.publish(GAME_OVER, {
         id: this.playerId,
-        board: this.grid,
+        grid: this.grid,
       });
     }
 
@@ -73,7 +71,12 @@ class Board {
   drop() {
     this.addPieceToBoard();
     this.clearLines();
+    this.updateBoardState();
     this.getPieces();
+  }
+
+  updateBoardState(newGrid) {
+    this.grid = newGrid || this.nextGrid;
   }
 
   /**
@@ -209,22 +212,22 @@ class Board {
 
   /**
    * Clears completed lines after piece added to board
-   * @returns {number} - number of lines cleared
+   * @returns {number[][], number[]} - new grid with lines removed, indices of lines removed
    */
   clearLines() {
-    let numCleared = 0;
+    const linesCleared = [];
 
-    this.grid.forEach((row, rowInd) => {
-      if (row.every((cell) => cell > 0)) {
-        this.grid.splice(rowInd, 1);
-        this.grid.unshift(Array(BOARD_WIDTH).fill(0));
-        numCleared += 1;
-      }
+    this.nextGrid = this.grid.filter((row, rowIdx) => {
+      const keep = row.some((cell) => cell === 0);
+      if (!keep) linesCleared.push(rowIdx);
+      return keep;
     });
 
-    if (numCleared > 0) this.pubSub.publish(CLEAR_LINES, numCleared);
+    linesCleared.forEach(() => this.nextGrid.unshift(getEmptyRow()));
 
-    return numCleared;
+    if (linesCleared.length) this.pubSub.publish(CLEAR_LINES, linesCleared.length);
+
+    return linesCleared;
   }
 
   /**
@@ -244,7 +247,7 @@ class Board {
       this.movePiece(0, yMove, 0);
     }
 
-    this.grid = newGrid;
+    this.updateBoardState(newGrid);
   }
 
   /**

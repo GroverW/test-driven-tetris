@@ -1,4 +1,4 @@
-const { randomize, getEmptyBoard } = require('common/helpers/utils');
+const { randomize, getEmptyBoard, getEmptyRow } = require('common/helpers/utils');
 const {
   BOARD_WIDTH, PIECE_TYPES, POWER_UP_LIST, POWER_UP_TYPES,
 } = require('backend/constants');
@@ -18,12 +18,6 @@ const getFilledRow = () => {
 };
 
 /**
- * Returns a blank board row
- * @returns {number[]}
- */
-const getBlankRow = () => Array(BOARD_WIDTH).fill(0);
-
-/**
  * Moves the last (up to) 4 lines from one board to another
  * @param {number[][]} board1 - board to remove lines from
  * @param {number[][]} board2 - board to add lines to
@@ -37,7 +31,7 @@ const swapLines = (board1, board2) => {
     if (row.some((cell) => cell)) {
       newBoard2.shift();
       newBoard2.push(getFilledRow());
-      newBoard1.unshift(getBlankRow());
+      newBoard1.unshift(getEmptyRow());
       newBoard1.pop();
     }
   });
@@ -96,7 +90,7 @@ const handlePowerUp = (type, board1, board2) => {
 
 module.exports = {
   getFilledRow,
-  getBlankRow,
+  getEmptyRow,
   swapLines,
   swapBoards,
   scrambleBoard,

@@ -1,9 +1,7 @@
 const GameView = require('frontend/static/js/GameDOM/GameView');
 const gameLoop = require('frontend/static/js/GameLoop');
 
-const {
-  CONTROLS, BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE,
-} = require('frontend/constants');
+const { BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE } = require('frontend/constants');
 const {
   START_GAME, DRAW, REMOVE_PLAYER, UPDATE_PLAYER, END_GAME,
 } = require('frontend/topics');
@@ -12,7 +10,6 @@ const {
   getTestBoard,
   getTestPiece,
   getNewTestGame,
-  runCommands,
   mockAnimation,
   mockCancelAnimation,
   clearMocksAndUnsubscribe,
@@ -27,7 +24,7 @@ describe('game view tests', () => {
   let newCtx1; let newBoard1; let newId1;
   let newCtx2; let newBoard2; let newId2;
   let newPlayer1; let newPlayer2;
-  let drawGrid; let drawNext;
+  let drawGrid;
 
   beforeEach(() => {
     mockCtx = getMockCtx();
@@ -46,7 +43,6 @@ describe('game view tests', () => {
     gameLoop.initialize(2);
     gameView = new GameView(mockCtx, getTestBoard('empty'), mockCtxNext, getNextPieceBoard());
     drawGrid = jest.spyOn(gameView.player, 'drawGrid');
-    drawNext = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
     jest.useFakeTimers();
     requestAnimationFrame = jest.fn().mockImplementation(mockAnimation());
     cancelAnimationFrame = jest.fn().mockImplementation(mockCancelAnimation);
@@ -64,42 +60,33 @@ describe('game view tests', () => {
       expect(gameView.nextPiece.ctx.canvas.height).toBe(4 * CELL_SIZE);
 
       expect(drawGrid).toHaveBeenCalledTimes(0);
+      const drawNextSpy = jest.spyOn(gameView.nextPiece, 'clearAndDrawCentered');
 
       game[START_GAME]();
       gameLoop[START_GAME]();
 
       // 1 for board, 1 for piece
       expect(drawGrid).toHaveBeenCalledTimes(2);
-      expect(drawNext).toHaveBeenCalledTimes(1);
+      expect(drawNextSpy).toHaveBeenCalledTimes(1);
     });
 
-    test('draw elements on piece rotate', () => {
+    test('draws elements on board actions', () => {
       game[START_GAME]();
       gameLoop[START_GAME]();
 
-      expect(drawGrid).toHaveBeenCalledTimes(2);
-      expect(drawNext).toHaveBeenCalledTimes(1);
+      let numCalls = 0;
+      gameView.player.drawGrid = jest.fn().mockImplementation(() => { numCalls += 1; });
 
-      runCommands(game, CONTROLS.ROTATE_LEFT);
-
-      // board and piece updated on rotate
-      expect(drawGrid).toHaveBeenCalledTimes(4);
-      expect(drawNext).toHaveBeenCalledTimes(1);
-    });
-
-    test('only draw nextPiece when piece dropped', () => {
-      game[START_GAME]();
-      gameLoop[START_GAME]();
-
-      expect(drawGrid).toHaveBeenCalledTimes(2);
-      expect(drawNext).toHaveBeenCalledTimes(1);
-
-      runCommands(game, CONTROLS.HARD_DROP);
-
-      // when a new piece is grabbed, board, piece and nextPiece
-      // should be drawn
-      expect(drawGrid).toHaveBeenCalledTimes(4);
-      expect(drawNext).toHaveBeenCalledTimes(2);
+      [
+        ['rotatePiece', -1],
+        ['movePiece', 0, 1],
+        ['replaceBoard', game.board.grid],
+        ['drop'],
+      ].forEach(([cmd, ...args]) => {
+        const num = numCalls;
+        game.board[cmd](...args);
+        expect(num).toBeLessThan(numCalls);
+      });
     });
   });
 
@@ -113,7 +100,7 @@ describe('game view tests', () => {
 
       expect(gameView.players.length).toBe(1);
       expect(gameView.players[0].ctx).toBe(newPlayer1.ctx);
-      expect(gameView.players[0].board).toBe(newPlayer1.board);
+      expect(gameView.players[0].grid).toBe(newPlayer1.grid);
       expect(gameView.players[0].id).toBe(newPlayer1.id);
     });
 
@@ -198,7 +185,7 @@ describe('game view tests', () => {
       test('calls draw on publish', () => {
         const testBoard = getTestBoard('pattern1');
 
-        publish(DRAW, { board: testBoard });
+        publish(DRAW, { grid: testBoard });
 
         expect(drawGrid).toHaveBeenCalledTimes(1);
       });
@@ -209,10 +196,10 @@ describe('game view tests', () => {
 
         const testBoard = getTestBoard('pattern1');
 
-        publish(DRAW, { board: testBoard });
+        publish(DRAW, { grid: testBoard });
 
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
-        expect(drawGridSpy).toHaveBeenLastCalledWith(testBoard);
+        expect(drawGridSpy).toHaveBeenLastCalledWith({ grid: testBoard, brightness: undefined });
         expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
@@ -226,7 +213,9 @@ describe('game view tests', () => {
         publish(DRAW, { piece: testPiece });
 
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
-        expect(drawGridSpy).toHaveBeenLastCalledWith(grid, undefined, x, y);
+        expect(drawGridSpy).toHaveBeenLastCalledWith({
+          grid, x, y, brightness: undefined,
+        });
         expect(drawNextPieceSpy).toHaveBeenCalledTimes(0);
       });
 
@@ -274,11 +263,11 @@ describe('game view tests', () => {
 
         expect(gameView.players.length).toBe(1);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
-        expect(gameView.players[0].board).toEqual(getTestBoard('empty'));
+        expect(gameView.players[0].grid).toEqual(getTestBoard('empty'));
 
-        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        publish(UPDATE_PLAYER, { id: newId1, grid: testBoard });
 
-        expect(gameView.players[0].board).toEqual(testBoard);
+        expect(gameView.players[0].grid).toEqual(testBoard);
         expect(drawGridSpy).toHaveBeenCalledTimes(1);
       });
 
@@ -289,11 +278,11 @@ describe('game view tests', () => {
 
         expect(gameView.players.length).toBe(1);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
-        expect(gameView.players[0].board).toEqual(emptyBoard);
+        expect(gameView.players[0].grid).toEqual(emptyBoard);
 
-        publish(UPDATE_PLAYER, { id: 'fake', board: testBoard });
+        publish(UPDATE_PLAYER, { id: 'fake', grid: testBoard });
 
-        expect(gameView.players[0].board).toEqual(emptyBoard);
+        expect(gameView.players[0].grid).toEqual(emptyBoard);
         expect(drawGridSpy).toHaveBeenCalledTimes(0);
       });
     });
@@ -305,8 +294,8 @@ describe('game view tests', () => {
 
         publish(END_GAME);
 
-        publish(DRAW, { board: testBoard });
-        publish(UPDATE_PLAYER, { id: newId1, board: testBoard });
+        publish(DRAW, { grid: testBoard });
+        publish(UPDATE_PLAYER, { id: newId1, grid: testBoard });
         publish(REMOVE_PLAYER, newId1);
 
         expect(gameView.players.length).toBe(1);

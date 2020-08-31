@@ -1,4 +1,5 @@
 const COMMON_CONSTANTS = require('common/constants');
+const { mapColors } = require('frontend/constants/utils');
 
 const MESSAGE_TIMEOUT = 3000;
 
@@ -65,61 +66,63 @@ const ANIMATION_SPEED = {
   21: 20,
 };
 
+const COLOR_STEPS = 4;
+
 const CELL_COLORS = {
-  0: {
-    border: '#001d3e',
-    highlight: '#060606',
-    lowlight: '#060606',
-    foreground: '#060606',
-  },
-  1: {
-    border: '#11658C',
-    highlight: '#8AD8FC',
-    lowlight: '#2794C7',
-    foreground: '#63BCE6',
-  },
-  2: {
-    border: '#806904',
-    highlight: '#F2DE83',
-    lowlight: '#C4A829',
-    foreground: '#E6CE63',
-  },
-  3: {
-    border: '#880667',
-    highlight: '#F674D5',
-    lowlight: '#CF32A8',
-    foreground: '#E64EC0',
-  },
-  4: {
-    border: '#058010',
-    highlight: '#6AF276',
-    lowlight: '#30CA3D',
-    foreground: '#4EE65B',
-  },
-  5: {
-    border: '#7D0804',
-    highlight: '#F3716D',
-    lowlight: '#CB3A35',
-    foreground: '#E6534E',
-  },
-  6: {
-    border: '#985b0c',
-    highlight: '#f5b869',
-    lowlight: '#de8f29',
-    foreground: '#f6a843',
-  },
-  7: {
-    border: '#051D86',
-    highlight: '#6E87F6',
-    lowlight: '#2F4DD0',
-    foreground: '#4E6AE6',
-  },
-  8: {
-    border: '#333333',
-    highlight: '#bbbbbb',
-    lowlight: '#999999',
-    foreground: '#aaaaaa',
-  },
+  0: mapColors({
+    border: [0, 29, 62],
+    highlight: [6, 6, 6],
+    lowlight: [6, 6, 6],
+    foreground: [6, 6, 6],
+  }, COLOR_STEPS),
+  1: mapColors({
+    border: [17, 101, 140],
+    highlight: [138, 216, 252],
+    lowlight: [39, 148, 199],
+    foreground: [99, 188, 230],
+  }, COLOR_STEPS),
+  2: mapColors({
+    border: [128, 105, 4],
+    highlight: [242, 222, 131],
+    lowlight: [196, 168, 41],
+    foreground: [230, 206, 99],
+  }, COLOR_STEPS),
+  3: mapColors({
+    border: [136, 6, 103],
+    highlight: [246, 116, 213],
+    lowlight: [207, 50, 168],
+    foreground: [230, 78, 192],
+  }, COLOR_STEPS),
+  4: mapColors({
+    border: [5, 128, 16],
+    highlight: [106, 242, 118],
+    lowlight: [48, 202, 61],
+    foreground: [78, 230, 91],
+  }, COLOR_STEPS),
+  5: mapColors({
+    border: [125, 8, 4],
+    highlight: [243, 113, 109],
+    lowlight: [203, 58, 53],
+    foreground: [230, 83, 78],
+  }, COLOR_STEPS),
+  6: mapColors({
+    border: [152, 91, 12],
+    highlight: [245, 184, 105],
+    lowlight: [222, 143, 41],
+    foreground: [246, 168, 67],
+  }, COLOR_STEPS),
+  7: mapColors({
+    border: [5, 29, 134],
+    highlight: [110, 135, 246],
+    lowlight: [47, 77, 208],
+    foreground: [78, 106, 230],
+  }, COLOR_STEPS),
+  8: mapColors({
+    border: [51, 51, 51],
+    highlight: [187, 187, 187],
+    lowlight: [153, 153, 153],
+    foreground: [170, 170, 170],
+  }, COLOR_STEPS),
 };
 
 module.exports = {
@@ -133,5 +136,6 @@ module.exports = {
   MOVE_SPEED,
   ANIMATION_SPEED,
   MAX_SPEED,
+  COLOR_STEPS,
   CELL_COLORS,
 };

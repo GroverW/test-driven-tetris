@@ -170,7 +170,7 @@ describe('game manager tests', () => {
         const sendGameOverMessageSpy = jest.spyOn(gameManager.msg, 'sendGameOverMessage');
         const checkIfWinnerSpy = jest.spyOn(gameManager, 'checkIfWinner');
 
-        gameManager.gameOver({ id: p1.id, board: [] });
+        gameManager.gameOver({ id: p1.id, grid: [] });
 
         expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p1.id, [], 2);
         expect(checkIfWinnerSpy).toHaveBeenCalledTimes(1);
@@ -187,7 +187,7 @@ describe('game manager tests', () => {
 
         [p1, p2, p3, p4].forEach((p, rank, a) => {
           p.gameOver();
-          gameManager.gameOver({ id: p.id, board: [] });
+          gameManager.gameOver({ id: p.id, grid: [] });
           expect(sendGameOverMessageSpy).toHaveBeenLastCalledWith(p.id, [], a.length - rank);
         });
       });

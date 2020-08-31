@@ -54,7 +54,7 @@ class ServerGame extends Game {
 
     this.pubSub.publish(UPDATE_PLAYER, {
       id: this.playerId,
-      board: this.board.grid,
+      grid: this.board.grid,
     });
   }
 

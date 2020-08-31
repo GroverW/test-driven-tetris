@@ -2,6 +2,7 @@ const {
   randomize,
   randomizedBuckets,
   getNextPieceBoard,
+  filterGrid,
   getEmptyBoard,
   getNewPlayer,
   getNewPlayerDOM,
@@ -34,6 +35,23 @@ describe('utils', () => {
     });
   });
 
+  describe('filterGrid', () => {
+    test('filters grid based on selected indices', () => {
+      const testGrid = [
+        [1, 2, 3],
+        [2, 3, 4],
+        [3, 4, 5],
+      ];
+      const filteredGrid = [
+        [1, 2, 3],
+        [],
+        [3, 4, 5],
+      ];
+
+      expect(filterGrid(testGrid, [0, 2])).toEqual(filteredGrid);
+    });
+  });
+
   describe('randomize', () => {
     const expected = [1, 6, 2, 5, 3, 7, 4];
 
@@ -50,7 +68,7 @@ describe('utils', () => {
     test('gets new player object', () => {
       const testPlayer = {
         ctx: 'test',
-        board: [],
+        grid: [],
         id: 1,
       };
 

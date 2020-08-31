@@ -53,6 +53,8 @@ class GameLoop extends SubscriberBase {
       this.command = undefined;
     } else if (this.toggleCommand !== undefined && key === this.toggleCommand.key) {
       this.toggleCommand = undefined;
+    } else if (this.animation !== undefined && key === this.animation.key) {
+      this.animation = undefined;
     }
   }
 
@@ -61,9 +63,13 @@ class GameLoop extends SubscriberBase {
    * @param {number} currTime - current time in ms
    */
   [START_GAME](currTime = 0) {
-    if (this.command !== undefined) this.command.execute(currTime);
-    if (this.toggleCommand !== undefined) this.toggleCommand.execute(currTime);
-    if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
+    if (this.animation !== undefined) {
+      this.animation.execute(currTime);
+    } else {
+      if (this.command !== undefined) this.command.execute(currTime);
+      if (this.toggleCommand !== undefined) this.toggleCommand.execute(currTime);
+      if (this.autoCommand !== undefined) this.autoCommand.execute(currTime);
+    }
 
     this.animationId = requestAnimationFrame(this[START_GAME].bind(this));
   }
@@ -76,6 +82,7 @@ class GameLoop extends SubscriberBase {
     this.animationId = undefined;
     this.command = undefined;
     this.toggleCommand = undefined;
+    this.animation = undefined;
     this.autoCommand = undefined;
   }
 

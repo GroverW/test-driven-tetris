@@ -76,9 +76,9 @@ class Player {
       this.game.gameOverAction();
 
       const { id } = this;
-      const { grid: board } = this.game.board;
+      const { grid } = this.game.board;
 
-      this.pubSub.publish(GAME_OVER, { id, board });
+      this.pubSub.publish(GAME_OVER, { id, grid });
     }
   }
 

@@ -29,7 +29,7 @@ const getTestBoard = (board) => {
 
 /**
  * Creates new test piece grid
- * @param {string} type - I, O, T, S, Z, L, J, N
+ * @param {string} type - I, O, T, S, Z, L, J
  */
 const getTestPiece = (type) => new Piece(PIECE_TYPES[type]);
 
