@@ -91,6 +91,8 @@ class GameRoom {
   }
 
   syncPlayersWith(player) {
+    this.manager.updatePlayersWaiting();
+
     if (this.players.getById(player.id)) {
       this.manager.msg.sendAll({ type: ADD_PLAYER, data: player.id });
       this.manager.msg.addOtherPlayersTo(player);

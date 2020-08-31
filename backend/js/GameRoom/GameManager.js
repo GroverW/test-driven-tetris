@@ -16,8 +16,7 @@ class GameManager {
   }
 
   getTotalReady() {
-    this.totalReady = this.players.list.filter((p) => p.readyToPlay).length;
-    return this.totalReady;
+    return this.players.list.filter((p) => p.readyToPlay).length;
   }
 
   checkStartConditions() {
@@ -51,8 +50,12 @@ class GameManager {
     if (this.checkStartConditions()) {
       this.animateStart();
     } else {
-      this.msg.sendWaitingMessage(this.totalReady, this.id);
+      this.updatePlayersWaiting();
     }
+  }
+
+  updatePlayersWaiting() {
+    if (!this.gameStarted) this.msg.sendWaitingMessage(this.getTotalReady(), this.id);
   }
 
   animateStart() {
