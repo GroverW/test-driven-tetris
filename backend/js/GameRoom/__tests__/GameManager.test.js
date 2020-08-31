@@ -174,6 +174,16 @@ describe('game manager tests', () => {
 
           expect(sendWaitingMessageSpy).toHaveBeenLastCalledWith(1, gameManager.id);
         });
+
+        test('does not send message if game started', () => {
+          const sendWaitingMessageSpy = jest.spyOn(gameManager.msg, 'sendWaitingMessage');
+
+          gameManager.gameStarted = true;
+
+          gameManager.playerReady();
+
+          expect(sendWaitingMessageSpy).toHaveBeenCalledTimes(0);
+        });
       });
     });
   });
