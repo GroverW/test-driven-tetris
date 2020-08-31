@@ -37,18 +37,41 @@ class ClientBoard extends Board {
   drop() {
     this.addPieceToBoard();
     this.publishBoardUpdate();
+    this.animateDrop();
+  }
 
-    const animation = new Animation(new AnimateAddToBoard(this.piece));
-    const linesCleared = this.clearLines();
-
-    if (linesCleared.length) {
-      animation.addStep(new AnimateClearLines(filterGrid(this.grid, linesCleared)));
-      animation.addStep(new Command(null, this.updateBoardState.bind(this)));
-    }
-    animation.addStep(new Command(null, this.getPieces.bind(this)));
-    animation.addStep(new Command(null, this.publishDraw.bind(this)));
+  animateDrop() {
+    const animation = new Animation(
+      this.addPieceToBoardAnimationSteps(),
+      ...this.clearLinesAnimationSteps(this.clearLines()),
+      ...this.getPiecesAnimationSteps(),
+    );
 
     this.pubSub.publish(SET_COMMAND, animation);
+  }
+
+  addPieceToBoardAnimationSteps() {
+    return new AnimateAddToBoard(this.piece);
+  }
+
+  clearLinesAnimationSteps(linesCleared) {
+    const steps = [];
+
+    if (linesCleared.length) {
+      steps.push(
+        new AnimateClearLines(filterGrid(this.grid, linesCleared)),
+        new Command(null, this.updateBoardState.bind(this)),
+      );
+    }
+
+    return steps;
+  }
+
+  getPiecesAnimationSteps() {
+    return [
+      new Command(null, this.getPieces.bind(this)),
+      new Command(null, this.publishDraw.bind(this)),
+    ];
   }
 
   /**
