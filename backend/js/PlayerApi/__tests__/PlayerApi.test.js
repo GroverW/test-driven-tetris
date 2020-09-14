@@ -1,7 +1,7 @@
-const PlayerApi = require('..');
 const Player = require('backend/js/GameRoom/Player');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
+const PlayerApi = require('..');
 
 describe('player api tests', () => {
   let api;
