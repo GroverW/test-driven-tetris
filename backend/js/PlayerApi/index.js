@@ -4,7 +4,9 @@ const {
   createGame,
   getGameById,
 } = require('backend/helpers/routeHelpers');
-const { MSG_TYPE, PLAY, EXECUTE_COMMANDS } = require('backend/topics');
+const {
+  CREATE_GAME, JOIN_GAME, MSG_TYPE, PLAY, EXECUTE_COMMANDS,
+} = require('backend/topics');
 
 class PlayerApi {
   constructor(ws) {
@@ -44,7 +46,9 @@ class PlayerApi {
   handleMessage(message) {
     const { type, data } = JSON.parse(message);
     if (type === PLAY) this.player.startGame();
-    if (type === EXECUTE_COMMANDS) this.player.execute(data);
+    else if (type === EXECUTE_COMMANDS) this.player.execute(data);
+    else if (type === CREATE_GAME) this.createGame(data);
+    else if (type === JOIN_GAME) this.joinGame(data);
   }
 }
 

@@ -1,8 +1,9 @@
 const GameServer = require('backend/js/GameServer');
-const Player = require('backend/js/GameRoom/Player');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
-const { MSG_TYPE, PLAY, EXECUTE_COMMANDS } = require('backend/topics');
+const {
+  MSG_TYPE, PLAY, EXECUTE_COMMANDS, CREATE_GAME, JOIN_GAME,
+} = require('backend/topics');
 const PlayerApi = require('..');
 
 describe('player api tests', () => {
@@ -33,16 +34,13 @@ describe('player api tests', () => {
     });
 
     test('sends error if game not created', () => {
-      const addGameMock = jest.spyOn(GameServer, 'addGame');
-      addGameMock.mockReturnValue(false);
       api.createPlayer();
       api.createPlayer = jest.fn();
       const sendFlashSpy = jest.spyOn(api.player, 'sendFlash');
 
-      api.createGame(GAME_TYPES.MULTI);
+      api.createGame(null);
 
       expect(sendFlashSpy).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
-      addGameMock.mockRestore();
     });
 
     test('joins game with matching id', () => {
@@ -86,6 +84,25 @@ describe('player api tests', () => {
 
       beforeEach(() => {
         api.createGame(GAME_TYPES.SINGLE);
+      });
+
+      test('handles CREATE_GAME', () => {
+        const message = createMessage(CREATE_GAME, GAME_TYPES.SINGLE);
+        const createGameSpy = jest.spyOn(api, 'createGame');
+
+        api.handleMessage(message);
+
+        expect(createGameSpy).toHaveBeenLastCalledWith(GAME_TYPES.SINGLE);
+      });
+
+      test('handles JOIN_GAME', () => {
+        const gameId = GameServer.addGame(GAME_TYPES.MULTI);
+        const message = createMessage(JOIN_GAME, gameId);
+        const joinGameSpy = jest.spyOn(api, 'joinGame');
+
+        api.handleMessage(message);
+
+        expect(joinGameSpy).toHaveBeenLastCalledWith(gameId);
       });
 
       test('handles PLAY', () => {
