@@ -15,6 +15,7 @@ const PLAY = 'play';
 const START_GAME = 'startGame';
 const GAME_OVER = 'gameOver';
 const END_GAME = 'endGame';
+const LEAVE_GAME = 'leaveGame';
 
 const GAME_MESSAGE = 'gameMessage';
 
@@ -42,6 +43,7 @@ module.exports = {
   START_GAME,
   GAME_OVER,
   END_GAME,
+  LEAVE_GAME,
   ADD_PIECES,
   LOWER_PIECE,
   CLEAR_LINES,
