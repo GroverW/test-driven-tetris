@@ -2,7 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/GameRoom/Player');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
-const { MSG_TYPE } = require('backend/topics');
+const { MSG_TYPE, PLAY, EXECUTE_COMMANDS } = require('backend/topics');
 const PlayerApi = require('..');
 
 describe('player api tests', () => {
@@ -77,16 +77,37 @@ describe('player api tests', () => {
 
   describe('handle actions', () => {
     test('handles close', () => {
+      api.createGame(GAME_TYPES.SINGLE);
+      const leaveSpy = jest.spyOn(api.player, 'leave');
 
+      api.leaveCurrentGame();
+
+      expect(leaveSpy).toHaveBeenCalledTimes(1);
     });
 
     describe('handle message', () => {
-      test('handles PLAY', () => {
+      const createMessage = (type, data) => JSON.stringify({ type, data });
 
+      beforeEach(() => {
+        api.createGame(GAME_TYPES.SINGLE);
+      });
+
+      test('handles PLAY', () => {
+        const message = createMessage(PLAY);
+        const startGameSpy = jest.spyOn(api.player, 'startGame');
+
+        api.handleMessage(message);
+
+        expect(startGameSpy).toHaveBeenCalledTimes(1);
       });
 
       test('handles EXECUTE_COMMANDS', () => {
+        const message = createMessage(EXECUTE_COMMANDS, []);
+        const executeSpy = jest.spyOn(api.player, 'execute');
 
+        api.handleMessage(message);
+
+        expect(executeSpy).toHaveBeenCalledTimes(1);
       });
     });
   });
