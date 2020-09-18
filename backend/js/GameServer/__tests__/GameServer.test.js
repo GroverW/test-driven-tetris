@@ -29,14 +29,18 @@ describe('game server tests', () => {
       expect(GameServer.getGame(newId)).toEqual(expect.any(GameRoom));
     });
 
-    test('does not add a new GameRoom if id in use', () => {
-      uniqid.mockImplementation(() => testGameRoom.id);
-      const newId = GameServer.addGame(GAME_TYPES.MULTI);
-      expect(GameServer.getGame(newId)).not.toEqual(expect.any(GameRoom));
-      expect(GameServer.getGame(newId)).toBe(testGameRoom);
+    test('addGame returns false if game type invalid', () => {
+      expect(GameServer.addGame(null)).toBe(false);
+      expect(GAMES.size).toBe(1);
     });
 
-    test('removes game room if id mataches', () => {
+    test('does not add a new GameRoom if id in use', () => {
+      uniqid.mockImplementation(() => testGameRoom.id);
+      expect(GameServer.addGame(GAME_TYPES.MULTI)).toBe(false);
+      expect(GAMES.size).toBe(1);
+    });
+
+    test('removes game room if id matches', () => {
       expect(GameServer.removeGame(null)).toBe(false);
       expect(GameServer.removeGame(testGameRoom.id)).toBe(true);
       expect(GameServer.getGame(testGameRoom.id)).toBe(false);

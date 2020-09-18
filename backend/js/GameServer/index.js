@@ -1,6 +1,7 @@
 const { GAMES } = require('backend/constants');
 const GameRoom = require('backend/js/GameRoom');
 const uniqid = require('uniqid');
+const { isValidGameType } = require('./helpers');
 
 /**
  * Represents a game server
@@ -12,9 +13,7 @@ class GameServer {
    * @returns {object|boolean} - either a gameServer or false if not found
    */
   static getGame(id) {
-    if (GAMES.has(id)) return GAMES.get(id);
-
-    return false;
+    return GAMES.get(id) || false;
   }
 
   /**
@@ -25,7 +24,12 @@ class GameServer {
   static addGame(gameType) {
     const id = uniqid();
 
-    if (!GAMES.has(id)) GAMES.set(id, new GameRoom(id, gameType, this.removeGame.bind(this)));
+    if (
+      !isValidGameType(gameType)
+      || GAMES.has(id)
+    ) return false;
+
+    GAMES.set(id, new GameRoom(id, gameType, this.removeGame.bind(this)));
 
     return id;
   }
@@ -33,14 +37,10 @@ class GameServer {
   /**
    * Removes specified game
    * @param {string} id - id of game to remove
+   * @returns {boolean} - true / false if successfully deleted
    */
   static removeGame(id) {
-    if (GAMES.has(id)) {
-      GAMES.delete(id);
-      return true;
-    }
-
-    return false;
+    return GAMES.delete(id);
   }
 }
 
