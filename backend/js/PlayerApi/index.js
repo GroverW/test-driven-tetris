@@ -23,7 +23,15 @@ class PlayerApi {
     gameRoom.join(this.player);
   }
 
+  joinGame(gameId) {
+    this.createPlayer();
+
+    const gameRoom = getGameById(gameId);
+    gameRoom.join(this.player);
+  }
+
   createPlayer() {
+    if(this.player) this.player.leave();
     this.player = getNewPlayer(this.ws);
   }
 }
