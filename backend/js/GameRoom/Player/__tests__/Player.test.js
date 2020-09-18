@@ -95,6 +95,16 @@ describe('player tests', () => {
     expect(updateReadyStateSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('execute calls executeCommandQueue', () => {
+    const commands = [];
+    const executeSpy = jest.spyOn(p1.game, 'executeCommandQueue');
+
+    p1.game.gameStatus = true;
+    p1.execute(commands);
+
+    expect(executeSpy).toHaveBeenLastCalledWith(commands);
+  });
+
   test('endGame ends the current game if not already ended', () => {
     const gameOverSpy = pubSubSpy.add(GAME_OVER);
     const gameOverActionSpy = jest.spyOn(p1.game, 'gameOverAction');

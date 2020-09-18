@@ -71,6 +71,12 @@ class Player {
     }
   }
 
+  execute(commands) {
+    if (this.game.gameStatus) {
+      this.game.executeCommandQueue(commands);
+    }
+  }
+
   gameOver() {
     if (this.game.gameStatus) {
       this.game.gameOverAction();
