@@ -1,6 +1,9 @@
 /**
  * Common publish / subscribe topics
  */
+const CREATE_GAME = 'createGame';
+const JOIN_GAME = 'joinGame';
+
 const ADD_MESSAGE = 'addMessage';
 const CLEAR_MESSAGE = 'clearMessage';
 const MSG_TYPE = {
@@ -29,6 +32,8 @@ const ADD_POWER_UP = 'addPowerUp';
 const USE_POWER_UP = 'usePowerUp';
 
 module.exports = {
+  CREATE_GAME,
+  JOIN_GAME,
   ADD_MESSAGE,
   CLEAR_MESSAGE,
   MSG_TYPE,
