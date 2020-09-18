@@ -16,6 +16,14 @@ const createGame = (type) => GameServer.addGame(type);
 
 const getNewPlayer = (ws) => new Player(ws.send.bind(ws), pubSub());
 
+const nullSend = () => { };
+const nullPubSub = {
+  publish: () => { },
+  subscribe: () => { },
+};
+
+const getNullPlayer = () => new Player(nullSend, nullPubSub);
+
 const closeConnection = (ws, message) => ws.close(1008, message);
 
 const handleGameValidation = (gameId, ws) => {
@@ -51,6 +59,7 @@ module.exports = {
   multiGameExists,
   getGameById,
   getNewPlayer,
+  getNullPlayer,
   createGame,
   handleGameCreation,
   handleGameValidation,

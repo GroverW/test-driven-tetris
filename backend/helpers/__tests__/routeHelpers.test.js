@@ -7,6 +7,7 @@ const {
   getGameById,
   createGame,
   getNewPlayer,
+  getNullPlayer,
   closeConnection,
   handleMessage,
   handleClose,
@@ -69,6 +70,14 @@ describe('route helper tests', () => {
 
       const player = getNewPlayer(mockWs);
       expect(player).toEqual(expect.any(Player));
+    });
+
+    test('gets null player', () => {
+      const player = getNullPlayer();
+      expect(player).toEqual(expect.any(Player));
+      expect(player.send('')).toBe(undefined);
+      expect(player.pubSub.publish('')).toBe(undefined);
+      expect(player.pubSub.subscribe('')).toBe(undefined);
     });
   });
 
