@@ -31,6 +31,12 @@ class PlayerApi {
     this.createPlayer();
 
     const gameRoom = getGameById(gameId);
+
+    if (!gameRoom) {
+      this.player.sendFlash(MSG_TYPE.ERROR, 'Game not found.');
+      return;
+    }
+
     gameRoom.join(this.player);
   }
 

@@ -55,6 +55,16 @@ describe('player api tests', () => {
       expect(gameRoom.players.first).toBe(api.player);
     });
 
+    test('sends error if joining game that does not exist', () => {
+      api.createPlayer();
+      api.createPlayer = jest.fn();
+      const sendFlashSpy = jest.spyOn(api.player, 'sendFlash');
+
+      api.joinGame(null);
+
+      expect(sendFlashSpy).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
+    });
+
     test('joining / creating while in game leaves current game and creates new player', () => {
       const gameId = GameServer.addGame(GAME_TYPES.SINGLE);
       api.joinGame(gameId);
