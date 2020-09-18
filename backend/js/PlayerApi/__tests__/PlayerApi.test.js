@@ -24,12 +24,10 @@ describe('player api tests', () => {
 
   describe('join / create / leave game', () => {
     test('creates game of correct type', () => {
-      expect(api.player).toBe(undefined);
       expect(GAMES.size).toBe(0);
 
       api.createGame(GAME_TYPES.MULTI);
 
-      expect(api.player).toEqual(expect.any(Player));
       expect(GAMES.size).toBe(1);
       expect(api.player.game.gameType).toBe(GAME_TYPES.MULTI);
     });
@@ -51,12 +49,10 @@ describe('player api tests', () => {
       const gameId = GameServer.addGame(GAME_TYPES.SINGLE);
       const gameRoom = GameServer.getGame(gameId);
 
-      expect(api.player).toBe(undefined);
       expect(gameRoom.players.count).toBe(0);
 
       api.joinGame(gameId);
 
-      expect(api.player).toEqual(expect.any(Player));
       expect(gameRoom.players.count).toBe(1);
       expect(gameRoom.players.first).toBe(api.player);
     });

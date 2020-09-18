@@ -1,5 +1,6 @@
 const {
   getNewPlayer,
+  getNullPlayer,
   createGame,
   getGameById,
 } = require('backend/helpers/routeHelpers');
@@ -8,6 +9,7 @@ const { MSG_TYPE, PLAY, EXECUTE_COMMANDS } = require('backend/topics');
 class PlayerApi {
   constructor(ws) {
     this.ws = ws;
+    this.player = getNullPlayer();
   }
 
   createGame(type) {
@@ -36,7 +38,7 @@ class PlayerApi {
   }
 
   leaveCurrentGame() {
-    if (this.player) this.player.leave();
+    this.player.leave();
   }
 
   handleMessage(message) {
