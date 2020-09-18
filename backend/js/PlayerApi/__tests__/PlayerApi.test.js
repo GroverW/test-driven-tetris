@@ -2,6 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/GameRoom/Player');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
+const { MSG_TYPE } = require('backend/topics');
 const PlayerApi = require('..');
 
 describe('player api tests', () => {
@@ -9,6 +10,10 @@ describe('player api tests', () => {
 
   beforeEach(() => {
     api = new PlayerApi(webSocketMock);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('setup', () => {
@@ -27,6 +32,19 @@ describe('player api tests', () => {
       expect(api.player).toEqual(expect.any(Player));
       expect(GAMES.size).toBe(1);
       expect(api.player.game.gameType).toBe(GAME_TYPES.MULTI);
+    });
+
+    test('sends error if game not created', () => {
+      const addGameMock = jest.spyOn(GameServer, 'addGame');
+      addGameMock.mockReturnValue(false);
+      api.createPlayer();
+      api.createPlayer = jest.fn();
+      const sendFlashSpy = jest.spyOn(api.player, 'sendFlash');
+
+      api.createGame(GAME_TYPES.MULTI);
+
+      expect(sendFlashSpy).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
+      addGameMock.mockRestore();
     });
 
     test('joins game with matching id', () => {
