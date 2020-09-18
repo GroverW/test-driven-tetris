@@ -1,3 +1,4 @@
+const GameServer = require('backend/js/GameServer');
 const Player = require('backend/js/GameRoom/Player');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
@@ -29,11 +30,30 @@ describe('player api tests', () => {
     });
 
     test('joins game with matching id', () => {
+      const gameId = GameServer.addGame(GAME_TYPES.SINGLE);
+      const gameRoom = GameServer.getGame(gameId);
 
+      expect(api.player).toBe(undefined);
+      expect(gameRoom.players.count).toBe(0);
+
+      api.joinGame(gameId);
+
+      expect(api.player).toEqual(expect.any(Player));
+      expect(gameRoom.players.count).toBe(1);
+      expect(gameRoom.players.first).toBe(api.player);
     });
 
     test('joining / creating while in game leaves current game and creates new player', () => {
+      const gameId = GameServer.addGame(GAME_TYPES.SINGLE);
+      api.joinGame(gameId);
 
+      const firstPlayer = api.player;
+      const leaveSpy = jest.spyOn(firstPlayer, 'leave');
+
+      api.createGame(GAME_TYPES.SINGLE);
+
+      expect(leaveSpy).toHaveBeenCalledTimes(1);
+      expect(api.player).not.toBe(firstPlayer);
     });
   });
 
