@@ -1,7 +1,10 @@
 const ClientApi = require('frontend/static/js/ClientApi');
 const { formatMessage } = require('frontend/helpers/utils');
 const { pubSubMock } = require('frontend/mocks');
-const { ADD_MESSAGE, CREATE_GAME, JOIN_GAME } = require('frontend/topics');
+const { publish } = require('frontend/helpers/pubSub');
+const {
+  ADD_MESSAGE, SEND_MESSAGE, CREATE_GAME, JOIN_GAME, LEAVE_GAME,
+} = require('frontend/topics');
 const { GAME_TYPES } = require('frontend/constants');
 
 describe('client api tests', () => {
@@ -27,10 +30,10 @@ describe('client api tests', () => {
   });
 
   describe('send message', () => {
-    test('sends correctly formatted message', () => {
-      const message = { type: 'test', data: 'test' };
-      const formatted = formatMessage(message);
+    const message = { type: 'test', data: 'test' };
+    const formatted = formatMessage(message);
 
+    test('sends correctly formatted message', () => {
       api.sendMessage(message);
 
       expect(api.ws.send).toHaveBeenLastCalledWith(formatted);
@@ -43,6 +46,20 @@ describe('client api tests', () => {
       api.sendMessage('test');
 
       expect(publishErrorSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('SEND_MESSAGE sends message', () => {
+      publish(SEND_MESSAGE, message);
+
+      expect(api.ws.send).toHaveBeenLastCalledWith(formatted);
+    });
+
+    test('unsubscribe removes SEND_MESSAGE subscription', () => {
+      api.unsubscribe();
+
+      publish(SEND_MESSAGE, message);
+
+      expect(api.ws.send).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -65,4 +82,7 @@ describe('client api tests', () => {
     });
   });
 
+  describe('handle message', () => {
+
+  });
 });
