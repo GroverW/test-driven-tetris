@@ -74,6 +74,9 @@ const getMockDOMSelector = () => ({
   appendChild(selector) { this.children.push(selector); },
   play: jest.fn(),
   pause: jest.fn(),
+  addEventListener: jest.fn(),
+  querySelector: () => getMockDOMSelector(),
+  getElementById: () => getMockDOMSelector(),
 });
 
 /**
