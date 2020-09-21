@@ -1,9 +1,14 @@
+const { getMockDOMSelector } = require('frontend/mocks');
+
+document.querySelector = jest.fn().mockImplementation(getMockDOMSelector);
+document.getElementById = jest.fn().mockImplementation(getMockDOMSelector);
+
 const ClientApi = require('frontend/static/js/ClientApi');
 const { formatMessage } = require('frontend/helpers/utils');
 const { pubSubMock } = require('frontend/mocks');
 const { publish } = require('frontend/helpers/pubSub');
 const {
-  ADD_MESSAGE, SEND_MESSAGE, CREATE_GAME, JOIN_GAME, LEAVE_GAME,
+  ADD_MESSAGE, SEND_MESSAGE, CREATE_GAME, JOIN_GAME, LEAVE_GAME, ADD_PLAYER,
 } = require('frontend/topics');
 const { GAME_TYPES } = require('frontend/constants');
 
@@ -12,8 +17,12 @@ describe('client api tests', () => {
   let ws;
   let api;
   let pubSubSpy;
+  let message;
+  let formatted;
 
   beforeEach(() => {
+    message = { type: 'test', data: 'test' };
+    formatted = formatMessage(message);
     ws = mockWs();
     api = new ClientApi(ws);
     pubSubSpy = pubSubMock();
@@ -30,9 +39,6 @@ describe('client api tests', () => {
   });
 
   describe('send message', () => {
-    const message = { type: 'test', data: 'test' };
-    const formatted = formatMessage(message);
-
     test('sends correctly formatted message', () => {
       api.sendMessage(message);
 
@@ -65,24 +71,43 @@ describe('client api tests', () => {
 
   describe('join / create game', () => {
     test('sends correct create message', () => {
-      const message = formatMessage({ type: CREATE_GAME, data: GAME_TYPES.MULTI });
+      const createMessage = formatMessage({ type: CREATE_GAME, data: GAME_TYPES.MULTI });
 
       api.createGame(GAME_TYPES.MULTI);
 
-      expect(api.ws.send).toHaveBeenLastCalledWith(message);
+      expect(api.ws.send).toHaveBeenLastCalledWith(createMessage);
     });
 
     test('sends correct join message', () => {
       const gameId = 'test';
-      const message = formatMessage({ type: JOIN_GAME, data: gameId });
+      const joinMessage = formatMessage({ type: JOIN_GAME, data: gameId });
 
       api.joinGame(gameId);
 
-      expect(api.ws.send).toHaveBeenLastCalledWith(message);
+      expect(api.ws.send).toHaveBeenLastCalledWith(joinMessage);
     });
   });
 
   describe('handle message', () => {
+    test('ADD_PLAYER initializes game if no game currently', () => {
+      const initializeMessage = { type: ADD_PLAYER, data: 1 };
+      const formattedInitialize = formatMessage(initializeMessage);
 
+      api.handleMessage(formatted);
+
+      expect(api.gameInitializer.isGameInitialized()).toBe(false);
+
+      api.handleMessage(formattedInitialize);
+
+      expect(api.gameInitializer.isGameInitialized()).toBe(true);
+    });
+
+    test('publishes message with respective data', () => {
+      const sendSpy = pubSubSpy.add(message.type);
+
+      api.handleMessage(formatted);
+
+      expect(sendSpy).toHaveBeenLastCalledWith(message.data);
+    });
   });
 });
