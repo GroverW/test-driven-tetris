@@ -75,6 +75,16 @@ const mapArrayToObj = (keysArr, callback, resObj = {}) => {
  */
 const formatMessage = ({ type, data }) => JSON.stringify({ type, data });
 
+const createNullObject = (ObjectClass) => {
+  const nullInstance = {};
+  const nullFunction = () => { };
+  Object.getOwnPropertyNames(ObjectClass.prototype)
+    .forEach((propertyName) => {
+      nullInstance[propertyName] = nullFunction;
+    });
+  return nullInstance;
+};
+
 module.exports = {
   randomize,
   randomizedBuckets,
@@ -82,4 +92,5 @@ module.exports = {
   getEmptyRow,
   mapArrayToObj,
   formatMessage,
+  createNullObject,
 };

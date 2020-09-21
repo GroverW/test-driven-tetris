@@ -4,12 +4,14 @@ const {
   getNextPieceBoard,
   filterGrid,
   getEmptyBoard,
+  createNullObject,
   getNewPlayer,
   getNewPlayerDOM,
   publishError,
 } = require('frontend/helpers/utils');
 const { getTestBoard, pubSubMock } = require('frontend/mocks');
 const { ADD_MESSAGE } = require('frontend/topics');
+const ClientGame = require('frontend/static/js/ClientGame');
 
 describe('utils', () => {
   const pieces = [1, 2, 3, 4, 5, 6, 7];
@@ -94,6 +96,17 @@ describe('utils', () => {
       const testBoard = getTestBoard('empty');
 
       expect(getEmptyBoard()).toEqual(testBoard);
+    });
+  });
+
+  describe('createNullObject', () => {
+    test('creates null object of class with same methods', () => {
+      const nullObject = createNullObject(ClientGame);
+
+      Object.getOwnPropertyNames(ClientGame.prototype)
+        .forEach((propertyName) => {
+          expect(nullObject[propertyName]).not.toBe(undefined);
+        });
     });
   });
 
