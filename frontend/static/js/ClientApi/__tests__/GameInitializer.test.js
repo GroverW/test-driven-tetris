@@ -35,6 +35,15 @@ describe('game initializer tests', () => {
     });
   });
 
+  describe('set current game', () => {
+    test('only sets game if player id passed in', () => {
+      gameInitializer.setCurrentGame();
+      expect(gameInitializer.isGameInitialized()).toBe(false);
+      gameInitializer.setCurrentGame(playerId);
+      expect(gameInitializer.isGameInitialized()).toBe(true);
+    });
+  });
+
   describe('keyboard commands', () => {
     test('keyboard events should trigger commands for the current game', () => {
       const game1 = gameInitializer.currentGame;
@@ -71,6 +80,15 @@ describe('game initializer tests', () => {
       expect(gameLoopSpy).toHaveBeenLastCalledWith(playerId);
       expect(toggleMenuSpy).toHaveBeenCalledTimes(1);
       expect(gameInitializer.isGameInitialized()).toBe(true);
+    });
+  });
+
+  describe('remove game', () => {
+    test('unsets the current game', () => {
+      gameInitializer.newGame(playerId);
+
+      gameInitializer.removeGame();
+      expect(gameInitializer.isGameInitialized()).toBe(false);
     });
   });
 });

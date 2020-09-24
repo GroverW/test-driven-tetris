@@ -9,8 +9,12 @@ const { createGameEventListeners } = require('./helpers');
 
 class GameInitializer {
   constructor() {
-    this.currentGame = createNullObject(ClientGame);
+    this.setCurrentGame();
     createGameEventListeners(this);
+  }
+
+  setCurrentGame(playerId) {
+    this.currentGame = playerId ? new ClientGame(playerId) : createNullObject(ClientGame);
   }
 
   isGameInitialized() {
@@ -24,8 +28,12 @@ class GameInitializer {
   newGame(playerId) {
     gameDOM.initialize(gameSelectors, playerId);
     gameLoop.initialize(playerId);
-    this.currentGame = new ClientGame(playerId);
+    this.setCurrentGame(playerId);
     publish(TOGGLE_MENU);
+  }
+
+  removeGame() {
+    this.setCurrentGame();
   }
 }
 
