@@ -1,4 +1,4 @@
-const { GAME_OVER, END_GAME } = require('common/topics');
+const { GAME_OVER, END_GAME, LEAVE_GAME } = require('common/topics');
 
 /**
  * Represents a subscriber to publish / subscribe messages
@@ -18,7 +18,7 @@ class SubscriberBase {
 
   initialize(playerId) {
     this.playerId = playerId;
-    this.mapSubscriptions([GAME_OVER, END_GAME]);
+    this.mapSubscriptions([GAME_OVER, END_GAME, LEAVE_GAME]);
   }
 
   /**
@@ -54,17 +54,30 @@ class SubscriberBase {
     this.endGameAction();
   }
 
+  [LEAVE_GAME]() {
+    this.gameOverAction();
+    this.endGameAction();
+    this.leaveGameAction();
+  }
+
   /**
    * Action to take on game over. Implemented by sub-classes
    */
-  gameOverAction() {
+  gameOverAction() { // eslint-disable-line class-methods-use-this
 
   }
 
   /**
    * Action to take on end game. Implemented by sub-classes
    */
-  endGameAction() {
+  endGameAction() { // eslint-disable-line class-methods-use-this
+
+  }
+
+  /**
+   * Action to take on leaving game. Implemented by sub-classes
+   */
+  leaveGameAction() { // eslint-disable-line class-methods-use-this
 
   }
 

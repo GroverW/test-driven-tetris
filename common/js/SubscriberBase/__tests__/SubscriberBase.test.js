@@ -1,7 +1,7 @@
 const SubscriberBase = require('common/js/SubscriberBase');
 const pubSub = require('frontend/helpers/pubSub');
 
-const { GAME_OVER, END_GAME } = require('common/topics');
+const { GAME_OVER, END_GAME, LEAVE_GAME } = require('common/topics');
 
 describe('SubscriberBase tests', () => {
   let subscriberBase;
@@ -67,6 +67,18 @@ describe('SubscriberBase tests', () => {
       pubSub.publish(END_GAME);
 
       expect(endGameActionSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('LEAVE_GAME should call gameOver, endGame and leaveGame actions', () => {
+      const gameOverActionSpy = jest.spyOn(subscriberBase, 'gameOverAction');
+      const endGameActionSpy = jest.spyOn(subscriberBase, 'endGameAction');
+      const leaveGameActionSpy = jest.spyOn(subscriberBase, 'leaveGameAction');
+
+      pubSub.publish(LEAVE_GAME);
+
+      expect(gameOverActionSpy).toHaveBeenCalledTimes(1);
+      expect(endGameActionSpy).toHaveBeenCalledTimes(1);
+      expect(leaveGameActionSpy).toHaveBeenCalledTimes(1);
     });
 
     test('unsubscribes from topics', () => {
