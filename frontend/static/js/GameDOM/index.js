@@ -60,6 +60,7 @@ class GameDOM extends SubscriberBase {
     this.lines = lines;
     this.player = player;
     this.message = message;
+    this.message.classList.remove('hide');
     this.powerUps = mapPowerUps(powerUps);
     this.players = [];
     this.music = music;
