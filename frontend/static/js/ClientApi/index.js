@@ -1,6 +1,8 @@
 const { publishError, formatMessage } = require('frontend/helpers/utils');
 const { publish, subscribe } = require('frontend/helpers/pubSub');
-const { CREATE_GAME, JOIN_GAME, SEND_MESSAGE, ADD_PLAYER } = require('frontend/topics');
+const {
+  CREATE_GAME, JOIN_GAME, LEAVE_GAME, SEND_MESSAGE, ADD_PLAYER,
+} = require('frontend/topics');
 const GameInitializer = require('./GameInitializer');
 
 class ClientApi {
@@ -24,6 +26,12 @@ class ClientApi {
 
   joinGame(gameId) {
     this.sendMessage({ type: JOIN_GAME, data: gameId });
+  }
+
+  leaveGame() {
+    this.sendMessage({ type: LEAVE_GAME, data: '' });
+    publish(LEAVE_GAME);
+    this.gameInitializer.removeGame();
   }
 
   handleMessage(message) {

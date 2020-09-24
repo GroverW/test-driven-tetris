@@ -69,7 +69,7 @@ describe('client api tests', () => {
     });
   });
 
-  describe('join / create game', () => {
+  describe('join / create / leave game', () => {
     test('sends correct create message', () => {
       const createMessage = formatMessage({ type: CREATE_GAME, data: GAME_TYPES.MULTI });
 
@@ -85,6 +85,18 @@ describe('client api tests', () => {
       api.joinGame(gameId);
 
       expect(api.ws.send).toHaveBeenLastCalledWith(joinMessage);
+    });
+
+    test('sends correct leave message and publishes LEAVE_GAME', () => {
+      const leaveSpy = pubSubSpy.add(LEAVE_GAME);
+      const leaveMessage = formatMessage({ type: LEAVE_GAME, data: '' });
+      const removeGameSpy = jest.spyOn(api.gameInitializer, 'removeGame');
+
+      api.leaveGame();
+
+      expect(api.ws.send).toHaveBeenLastCalledWith(leaveMessage);
+      expect(leaveSpy).toHaveBeenCalledTimes(1);
+      expect(removeGameSpy).toHaveBeenCalledTimes(1);
     });
   });
 
