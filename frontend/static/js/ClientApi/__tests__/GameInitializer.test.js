@@ -52,7 +52,7 @@ describe('game initializer tests', () => {
 
       gameInitializer.currentGame = game2;
 
-      document.dispatchEvent(new KeyboardEvent('keydown'));
+      document.dispatchEvent(new KeyboardEvent('keyup'));
 
       expect(command1Spy).toHaveBeenCalledTimes(1);
       expect(command2Spy).toHaveBeenCalledTimes(1);
