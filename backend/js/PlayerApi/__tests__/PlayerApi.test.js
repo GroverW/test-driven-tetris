@@ -2,7 +2,7 @@ const GameServer = require('backend/js/GameServer');
 const { webSocketMock } = require('common/mocks');
 const { GAMES, GAME_TYPES } = require('backend/constants');
 const {
-  MSG_TYPE, PLAY, EXECUTE_COMMANDS, CREATE_GAME, JOIN_GAME,
+  MSG_TYPE, PLAY, EXECUTE_COMMANDS, CREATE_GAME, JOIN_GAME, LEAVE_GAME,
 } = require('backend/topics');
 const PlayerApi = require('..');
 
@@ -27,7 +27,7 @@ describe('player api tests', () => {
     test('creates game of correct type', () => {
       expect(GAMES.size).toBe(0);
 
-      api.createGame(GAME_TYPES.MULTI);
+      api[CREATE_GAME](GAME_TYPES.MULTI);
 
       expect(GAMES.size).toBe(1);
       expect(api.player.game.gameType).toBe(GAME_TYPES.MULTI);
@@ -38,7 +38,7 @@ describe('player api tests', () => {
       api.createPlayer = jest.fn();
       const sendFlashSpy = jest.spyOn(api.player, 'sendFlash');
 
-      api.createGame(null);
+      api[CREATE_GAME](null);
 
       expect(sendFlashSpy).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
     });
@@ -49,7 +49,7 @@ describe('player api tests', () => {
 
       expect(gameRoom.players.count).toBe(0);
 
-      api.joinGame(gameId);
+      api[JOIN_GAME](gameId);
 
       expect(gameRoom.players.count).toBe(1);
       expect(gameRoom.players.first).toBe(api.player);
@@ -60,19 +60,19 @@ describe('player api tests', () => {
       api.createPlayer = jest.fn();
       const sendFlashSpy = jest.spyOn(api.player, 'sendFlash');
 
-      api.joinGame(null);
+      api[JOIN_GAME](null);
 
       expect(sendFlashSpy).toHaveBeenLastCalledWith(MSG_TYPE.ERROR, expect.any(String));
     });
 
     test('joining / creating while in game leaves current game and creates new player', () => {
       const gameId = GameServer.addGame(GAME_TYPES.SINGLE);
-      api.joinGame(gameId);
+      api[JOIN_GAME](gameId);
 
       const firstPlayer = api.player;
       const leaveSpy = jest.spyOn(firstPlayer, 'leave');
 
-      api.createGame(GAME_TYPES.SINGLE);
+      api[CREATE_GAME](GAME_TYPES.SINGLE);
 
       expect(leaveSpy).toHaveBeenCalledTimes(1);
       expect(api.player).not.toBe(firstPlayer);
@@ -81,10 +81,10 @@ describe('player api tests', () => {
 
   describe('handle actions', () => {
     test('handles close', () => {
-      api.createGame(GAME_TYPES.SINGLE);
+      api[CREATE_GAME](GAME_TYPES.SINGLE);
       const leaveSpy = jest.spyOn(api.player, 'leave');
 
-      api.leaveCurrentGame();
+      api[LEAVE_GAME]();
 
       expect(leaveSpy).toHaveBeenCalledTimes(1);
     });
@@ -93,12 +93,12 @@ describe('player api tests', () => {
       const createMessage = (type, data) => JSON.stringify({ type, data });
 
       beforeEach(() => {
-        api.createGame(GAME_TYPES.SINGLE);
+        api[CREATE_GAME](GAME_TYPES.SINGLE);
       });
 
       test('handles CREATE_GAME', () => {
         const message = createMessage(CREATE_GAME, GAME_TYPES.SINGLE);
-        const createGameSpy = jest.spyOn(api, 'createGame');
+        const createGameSpy = jest.spyOn(api, CREATE_GAME);
 
         api.handleMessage(message);
 
@@ -108,11 +108,20 @@ describe('player api tests', () => {
       test('handles JOIN_GAME', () => {
         const gameId = GameServer.addGame(GAME_TYPES.MULTI);
         const message = createMessage(JOIN_GAME, gameId);
-        const joinGameSpy = jest.spyOn(api, 'joinGame');
+        const joinGameSpy = jest.spyOn(api, JOIN_GAME);
 
         api.handleMessage(message);
 
         expect(joinGameSpy).toHaveBeenLastCalledWith(gameId);
+      });
+
+      test('handles LEAVE_GAME', () => {
+        const message = createMessage(LEAVE_GAME);
+        const leaveGameSpy = jest.spyOn(api, LEAVE_GAME);
+
+        api.handleMessage(message);
+
+        expect(leaveGameSpy).toHaveBeenCalledTimes(1);
       });
 
       test('handles PLAY', () => {

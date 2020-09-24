@@ -5,7 +5,7 @@ const {
   getGameById,
 } = require('backend/helpers/routeHelpers');
 const {
-  CREATE_GAME, JOIN_GAME, MSG_TYPE, PLAY, EXECUTE_COMMANDS,
+  CREATE_GAME, JOIN_GAME, LEAVE_GAME, MSG_TYPE, PLAY, EXECUTE_COMMANDS,
 } = require('backend/topics');
 
 class PlayerApi {
@@ -14,7 +14,7 @@ class PlayerApi {
     this.player = getNullPlayer();
   }
 
-  createGame(type) {
+  [CREATE_GAME](type) {
     this.createPlayer();
     const gameId = createGame(type);
 
@@ -27,7 +27,7 @@ class PlayerApi {
     gameRoom.join(this.player);
   }
 
-  joinGame(gameId) {
+  [JOIN_GAME](gameId) {
     this.createPlayer();
 
     const gameRoom = getGameById(gameId);
@@ -41,20 +41,26 @@ class PlayerApi {
   }
 
   createPlayer() {
-    this.leaveCurrentGame();
+    this[LEAVE_GAME]();
     this.player = getNewPlayer(this.ws);
   }
 
-  leaveCurrentGame() {
+  [LEAVE_GAME]() {
     this.player.leave();
   }
 
+  [PLAY]() {
+    this.player.startGame();
+  }
+
+  [EXECUTE_COMMANDS](commands) {
+    this.player.execute(commands);
+  }
+
   handleMessage(message) {
-    const { type, data } = JSON.parse(message);
-    if (type === PLAY) this.player.startGame();
-    else if (type === EXECUTE_COMMANDS) this.player.execute(data);
-    else if (type === CREATE_GAME) this.createGame(data);
-    else if (type === JOIN_GAME) this.joinGame(data);
+    const { type: action, data } = JSON.parse(message);
+
+    if (this[action]) this[action](data);
   }
 }
 
