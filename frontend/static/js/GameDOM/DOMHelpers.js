@@ -78,7 +78,7 @@ const mapPowerUps = (selectors) => (
 
 const getPowerUpType = (powerUpId) => {
   const powerUpType = POWER_UPS.has(powerUpId) ? powerUpId : null;
-  const powerUpClass = `power-up${powerUpType || ''}`;
+  const powerUpClass = powerUpType ? `power-up${powerUpType}` : '';
   return [powerUpType, powerUpClass];
 };
 
@@ -89,6 +89,7 @@ const getNullPowerUp = () => ({
       add: () => {},
       replace: () => {},
       remove: () => {},
+      contains: () => {},
     },
   },
 });
