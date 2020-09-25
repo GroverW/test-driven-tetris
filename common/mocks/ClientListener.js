@@ -111,7 +111,7 @@ class MockClientListener {
       board: JSON.parse(JSON.stringify(this.game.board.grid)),
       score: this.game.score,
       gameStatus: this.game.gameStatus,
-      numPowerUps: this.gameDOM.powerUps.filter((p) => p.type).length,
+      numPowerUps: this.gameDOM.powerUpDisplay.powerUps.filter((p) => p.type).length,
       flashMessage: this.clientMessage.message.innerText,
     }[property];
   }

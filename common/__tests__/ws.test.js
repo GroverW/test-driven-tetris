@@ -278,9 +278,6 @@ describe('websocket tests', () => {
       server.gameRoom.gameType = GAME_TYPES.SINGLE;
       server.player.setGameType(GAME_TYPES.SINGLE);
 
-      client.gameDOM.usePowerUp();
-      client.gameDOM.usePowerUp();
-
       expect(server.getProp('numPowerUps')).toBe(0);
       expect(client.getProp('numPowerUps')).toBe(0);
 
