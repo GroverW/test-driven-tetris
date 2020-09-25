@@ -56,6 +56,17 @@ class PowerUpDisplay extends SubscriberBase {
     const decrement = currentPowerUpDisplay.type === null;
     this.nextIdx = Math.max(0, this.nextIdx - decrement);
   }
+
+  clearPowerUps() {
+    const nullPowerUp = getNullPowerUp();
+    this.powerUps.forEach((powerUp) => {
+      const currentPowerUp = powerUp;
+      const [, currentClass] = getPowerUpType(powerUp.type);
+      currentPowerUp.node.classList.remove(currentClass);
+      currentPowerUp.type = nullPowerUp.type;
+    });
+    this.nextIdx = 0;
+  }
 }
 
 module.exports = PowerUpDisplay;

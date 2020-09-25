@@ -21,8 +21,11 @@ describe('power up display tests', () => {
     });
   });
 
-  describe('add / use power up', () => {
+  describe('add / use / clear power ups', () => {
     const numPowerUps = (powerUps) => powerUps.filter((p) => p.type !== null).length;
+    const nodeClassListContains = (nodeId, powerUpId) => (
+      powerUpDisplay.powerUps[nodeId].node.classList.contains(`power-up${powerUpId}`)
+    );
 
     test('adds power up if valid type', () => {
       expect(powerUpDisplay.nextIdx).toBe(0);
@@ -52,9 +55,6 @@ describe('power up display tests', () => {
     });
 
     test('uses first power up and sets first to second', () => {
-      const nodeClassListContains = (nodeId, powerUpId) => (
-        powerUpDisplay.powerUps[nodeId].node.classList.contains(`power-up${powerUpId}`)
-      );
       const node1 = 0;
       const node2 = 1;
       const id1 = POWER_UP_TYPES.SWAP_LINES;
@@ -66,6 +66,7 @@ describe('power up display tests', () => {
       expect(nodeClassListContains(node1, id1)).toBe(true);
       expect(nodeClassListContains(node2, id2)).toBe(true);
       expect(powerUpDisplay.nextIdx).toBe(2);
+      expect(numPowerUps(powerUpDisplay.powerUps)).toBe(2);
 
       publish(USE_POWER_UP);
 
@@ -73,10 +74,29 @@ describe('power up display tests', () => {
       expect(nodeClassListContains(node1, id1)).toBe(false);
       expect(nodeClassListContains(node2, id2)).toBe(false);
       expect(powerUpDisplay.nextIdx).toBe(1);
+      expect(numPowerUps(powerUpDisplay.powerUps)).toBe(1);
 
       publish(USE_POWER_UP);
 
       expect(nodeClassListContains(node1, id2)).toBe(false);
+      expect(powerUpDisplay.nextIdx).toBe(0);
+      expect(numPowerUps(powerUpDisplay.powerUps)).toBe(0);
+    });
+
+    test('clears power ups', () => {
+      const id1 = POWER_UP_TYPES.SWAP_LINES;
+      const id2 = POWER_UP_TYPES.SCRAMBLE_BOARD;
+
+      publish(ADD_POWER_UP, id1);
+      publish(ADD_POWER_UP, id2);
+
+      powerUpDisplay.clearPowerUps();
+
+      powerUpDisplay.powerUps.forEach((_, nodeIdx) => {
+        expect(nodeClassListContains(nodeIdx, id1)).toBe(false);
+        expect(nodeClassListContains(nodeIdx, id2)).toBe(false);
+      });
+      expect(numPowerUps(powerUpDisplay.powerUps)).toBe(0);
       expect(powerUpDisplay.nextIdx).toBe(0);
     });
   });
