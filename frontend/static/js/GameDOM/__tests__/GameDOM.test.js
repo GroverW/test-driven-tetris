@@ -4,7 +4,7 @@ const gameLoop = require('frontend/static/js/GameLoop');
 const { publish } = require('frontend/helpers/pubSub');
 const { getNewPlayer } = require('frontend/helpers/utils');
 
-const { CONTROLS, POWER_UP_TYPES, LINES_PER_LEVEL } = require('frontend/constants');
+const { CONTROLS, LINES_PER_LEVEL } = require('frontend/constants');
 const {
   PLAY,
   START_GAME,
@@ -12,8 +12,6 @@ const {
   REMOVE_PLAYER,
   CLEAR_LINES,
   UPDATE_SCORE,
-  ADD_POWER_UP,
-  USE_POWER_UP,
   END_GAME,
   GAME_MESSAGE,
 } = require('frontend/topics');
