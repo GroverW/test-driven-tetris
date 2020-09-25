@@ -8,7 +8,6 @@ const {
   getNewPlayer,
   getNewPlayerDOM,
 } = require('frontend/helpers/utils');
-const { POWER_UPS } = require('frontend/constants');
 const {
   PLAY,
   START_GAME,
@@ -19,13 +18,12 @@ const {
   REMOVE_PLAYER,
   UPDATE_SCORE,
   UPDATE_PLAYER,
-  ADD_POWER_UP,
-  USE_POWER_UP,
 } = require('frontend/topics');
 const {
-  createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas, mapPowerUps,
+  createElement, addPowerUpTargetId, addMessage, hideElement, getNewPlayerCanvas,
 } = require('./DOMHelpers');
 const GameView = require('./GameView');
+const PowerUpDisplay = require('./PowerUpDisplay');
 
 /**
  * Represents a client-side DOM manager
@@ -54,6 +52,7 @@ class GameDOM extends SubscriberBase {
   }, playerId) {
     super.initialize(playerId);
     this.gameView = new GameView(playerCtx, getEmptyBoard(), nextCtx, getNextPieceBoard());
+    this.powerUpDisplay = new PowerUpDisplay(powerUps);
     this.opponents = opponents;
     this.score = score;
     this.level = level;
@@ -61,7 +60,6 @@ class GameDOM extends SubscriberBase {
     this.player = player;
     this.message = message;
     this.message.classList.remove('hide');
-    this.powerUps = mapPowerUps(powerUps);
     this.players = [];
     this.music = music;
     this.mapSubscriptions([
@@ -72,8 +70,6 @@ class GameDOM extends SubscriberBase {
       ADD_PLAYER,
       REMOVE_PLAYER,
       UPDATE_SCORE,
-      ADD_POWER_UP,
-      USE_POWER_UP,
     ]);
   }
 
@@ -192,39 +188,6 @@ class GameDOM extends SubscriberBase {
     if (score !== undefined) this.score.innerText = score;
     if (level !== undefined) this.level.innerText = level;
     if (lines !== undefined) this.lines.innerText = lines;
-  }
-
-  /**
-   * Adds a power up to the list, and sets the class on the DOM
-   * @param {number} powerUp - power up id
-   */
-  [ADD_POWER_UP](powerUp) {
-    if (POWER_UPS.has(powerUp)) {
-      const nextPowerUp = this.powerUps.find((p) => p.type === null);
-
-      if (nextPowerUp) {
-        nextPowerUp.type = powerUp;
-        nextPowerUp.node.classList.add(`power-up${powerUp}`);
-      }
-    }
-  }
-
-  /**
-   * Removes the first power up from the list. Updates all classes.
-   */
-  [USE_POWER_UP]() {
-    this.powerUps.forEach((p, i, a) => {
-      const updated = p;
-      const next = a[i + 1];
-
-      if (next !== undefined && next.type !== null) {
-        updated.node.classList.replace(`power-up${updated.type}`, `power-up${next.type}`);
-        updated.type = next.type;
-      } else {
-        updated.node.classList.remove(`power-up${updated.type}`);
-        updated.type = null;
-      }
-    });
   }
 
   /**
