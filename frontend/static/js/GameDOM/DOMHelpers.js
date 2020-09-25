@@ -1,4 +1,4 @@
-const { MAX_POWER_UPS } = require('frontend/constants');
+const { MAX_POWER_UPS, POWER_UPS } = require('frontend/constants');
 
 /**
  * Creates and returns a new HTML Element
@@ -76,6 +76,23 @@ const mapPowerUps = (selectors) => (
   selectors ? selectors.map((node) => ({ node, type: null })).slice(0, MAX_POWER_UPS) : false
 );
 
+const getPowerUpType = (powerUpId) => {
+  const powerUpType = POWER_UPS.has(powerUpId) ? powerUpId : null;
+  const powerUpClass = `power-up${powerUpType || ''}`;
+  return [powerUpType, powerUpClass];
+};
+
+const getNullPowerUp = () => ({
+  type: null,
+  node: {
+    classList: {
+      add: () => {},
+      replace: () => {},
+      remove: () => {},
+    },
+  },
+});
+
 module.exports = {
   createElement,
   addPowerUpTargetId,
@@ -83,4 +100,6 @@ module.exports = {
   hideElement,
   getNewPlayerCanvas,
   mapPowerUps,
+  getPowerUpType,
+  getNullPowerUp,
 };
